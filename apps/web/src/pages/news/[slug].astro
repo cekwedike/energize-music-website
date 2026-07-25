@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PagePlaceholder from '../../components/ui/PagePlaceholder.astro';
+
+export async function getStaticPaths() {
+  // Wired to Sanity in Phase 2 (newsBySlugQuery per post).
+  return [];
+}
+---
+
+<BaseLayout title="News" description="Energize Music news article.">
+  <PagePlaceholder heading="Article" />
+</BaseLayout>

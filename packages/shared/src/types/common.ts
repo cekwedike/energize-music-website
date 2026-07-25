@@ -1,0 +1,25 @@
+export interface SanityImage {
+  asset: {
+    _id: string;
+    url: string;
+  };
+  alt?: string;
+}
+
+export interface SanityFile {
+  asset: {
+    _id: string;
+    url: string;
+    originalFilename?: string;
+  };
+}
+
+export interface SlugField {
+  current: string;
+}
+
+export interface SeoFields {
+  title?: string;
+  description?: string;
+  ogImage?: SanityImage;
+}

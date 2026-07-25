@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Audit dependencies
+        # apps/studio's Sanity CLI deploy toolchain carries advisories with no upstream fix
+        # yet (dev-only, not shipped in dist/) — waived and tracked in docs/SECURITY.md.
+        run: pnpm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Build
+        run: pnpm build
+        env:
+          PUBLIC_SANITY_PROJECT_ID: ${{ secrets.PUBLIC_SANITY_PROJECT_ID }}
+          PUBLIC_SANITY_DATASET: production
+          PUBLIC_SANITY_API_VERSION: '2024-01-01'
+          PUBLIC_SITE_URL: https://energize-music.com
+          PUBLIC_FORM_ENDPOINT: ${{ secrets.FORM_ENDPOINT }}
+          SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}

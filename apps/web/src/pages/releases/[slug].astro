@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PagePlaceholder from '../../components/ui/PagePlaceholder.astro';
+
+export async function getStaticPaths() {
+  // Wired to Sanity in Phase 2 (releaseBySlugQuery per release).
+  return [];
+}
+---
+
+<BaseLayout title="Release" description="Release cover, credits, streaming links, and embed.">
+  <PagePlaceholder heading="Release" />
+</BaseLayout>

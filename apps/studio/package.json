@@ -1,0 +1,21 @@
+{
+  "name": "@energize/studio",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "lint": "eslint . --config ../../eslint.config.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "sanity": "^3.69.0",
+    "styled-components": "^6.1.13"
+  },
+  "devDependencies": {
+    "@sanity/vision": "^3.69.0",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

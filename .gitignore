@@ -1,0 +1,16 @@
+node_modules
+dist
+.astro
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+*.log
+.turbo
+coverage
+.sanity
+
+# Energize Label Website
+energize_label_website_a612350f.plan.md
+

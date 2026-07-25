@@ -1,0 +1,11 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "paths": {
+      "@energize/shared": ["../../packages/shared/src/index.ts"],
+      "@energize/shared/*": ["../../packages/shared/src/*"]
+    }
+  }
+}

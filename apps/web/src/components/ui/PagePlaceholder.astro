@@ -1,0 +1,13 @@
+---
+interface Props {
+  heading: string;
+  note?: string;
+}
+
+const { heading, note = 'CMS content wires up in Phase 2.' } = Astro.props;
+---
+
+<section class="mx-auto max-w-6xl px-6 py-24">
+  <h1 class="font-[family-name:var(--font-display)] text-3xl sm:text-5xl">{heading}</h1>
+  <p class="mt-4 max-w-xl text-paper/60">{note}</p>
+</section>

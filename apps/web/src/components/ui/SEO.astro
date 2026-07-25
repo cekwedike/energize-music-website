@@ -1,0 +1,28 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  path?: string;
+  ogImage?: string;
+}
+
+const { title, description, path = '/', ogImage } = Astro.props;
+const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
+const canonical = new URL(path, siteUrl).toString();
+const fullTitle = title.includes('Energize') ? title : `${title} · Energize Music`;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+{ogImage && <meta property="og:image" content={ogImage} />}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+{ogImage && <meta name="twitter:image" content={ogImage} />}
