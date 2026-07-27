@@ -1,12 +1,51 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PagePlaceholder from '../components/ui/PagePlaceholder.astro';
+import { sanityClient } from '../lib/sanity/client';
+import { allCareerOpeningsQuery, type CareerOpening } from '@energize/shared';
+
+const openings = await sanityClient.fetch<CareerOpening[]>(allCareerOpeningsQuery);
 ---
 
 <BaseLayout title="Careers" description="Open roles at Energize Music.">
-  <PagePlaceholder
-    heading="Careers"
-    image="https://picsum.photos/seed/energize-careers/800/600"
-    imageAlt="Stock placeholder — replace with team photography"
-  />
+  <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
+    <h1 class="text-h1">Careers</h1>
+    <p class="text-lead mt-4 max-w-xl text-paper/70">
+      Join the team building Energize Music’s global, family-friendly catalog.
+    </p>
+
+    {
+      openings.length === 0 ? (
+        <p class="mt-10 text-paper/60">
+          No open roles right now. Reach out via <a href="/contact" class="underline hover:text-[var(--color-gold)]">Contact</a> to introduce yourself.
+        </p>
+      ) : (
+        <ul class="mt-10 divide-y divide-white/10 border-t border-white/10">
+          {openings.map((role) => (
+            <li class="flex flex-col gap-2 py-6 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="font-medium text-paper">{role.title}</p>
+                <p class="mt-1 text-sm text-paper/60">
+                  {role.location} &middot; {role.type}
+                </p>
+              </div>
+              <a
+                href={role.applyUrl}
+                class="inline-block shrink-0 rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
+              >
+                Apply
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <p class="mt-10 text-sm text-paper/50">
+      General applications are also welcome via
+      {' '}
+      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--color-gold)]">
+        LinkedIn
+      </a>.
+    </p>
+  </section>
 </BaseLayout>
