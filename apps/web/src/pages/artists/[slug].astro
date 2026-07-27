@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ReleaseCard from '../../components/releases/ReleaseCard.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient, urlForImage } from '../../lib/sanity/client';
 import {
   allArtistsQuery,
@@ -34,9 +35,21 @@ const streamingLabels: Record<string, string> = {
   instagram: 'Instagram',
 };
 const streamingEntries = Object.entries(artist.streaming ?? {}).filter(([, url]) => Boolean(url));
+
+const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicGroup',
+  name: artist.name,
+  description: artist.bio,
+  image: photoUrl,
+  url: new URL(`/artists/${artist.slug}`, siteUrl).toString(),
+  sameAs: Object.values(artist.streaming ?? {}).filter(Boolean),
+};
 ---
 
 <BaseLayout title={artist.name} description={artist.bio}>
+  <JsonLd data={jsonLd} />
   <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
     <div class="grid gap-10 sm:grid-cols-[1fr_1.4fr] sm:items-start">
       <img

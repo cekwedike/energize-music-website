@@ -1,13 +1,119 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PagePlaceholder from '../components/ui/PagePlaceholder.astro';
+import { contactIntents } from '@energize/shared';
+
+const intentLabels: Record<(typeof contactIntents)[number], string> = {
+  'a&r': 'A&R',
+  press: 'Press',
+  partnership: 'Partnership',
+  booking: 'Booking',
+  general: 'General',
+};
+
+const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
 ---
 
 <BaseLayout title="Contact" description="Reach Energize Music by interest type and region.">
-  <PagePlaceholder
-    heading="Contact"
-    note="Form ships in Phase 4."
-    image="https://picsum.photos/seed/energize-contact/800/600"
-    imageAlt="Stock placeholder — replace with office/team photography"
-  />
+  <section class="mx-auto max-w-2xl px-6 py-16 sm:py-24">
+    <h1 class="text-h1">Contact</h1>
+    <p class="text-lead mt-4 text-paper/70">
+      Tell us what you're reaching out about and we'll route it to the right team.
+    </p>
+
+    <form
+      id="contact-form"
+      class="mt-10 space-y-5"
+      data-endpoint-configured={formEndpoint ? 'true' : 'false'}
+    >
+      <div>
+        <label for="name" class="block text-sm font-medium text-paper/80">Name</label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          required
+          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-2.5 text-paper focus-visible:border-[var(--color-gold)]"
+        />
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-paper/80">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-2.5 text-paper focus-visible:border-[var(--color-gold)]"
+        />
+      </div>
+
+      <div>
+        <label for="intent" class="block text-sm font-medium text-paper/80">I'm reaching out about</label>
+        <select
+          id="intent"
+          name="intent"
+          class="mt-1.5 w-full rounded-lg border border-white/20 bg-[var(--color-ink)] px-4 py-2.5 text-paper focus-visible:border-[var(--color-gold)]"
+        >
+          {contactIntents.map((intent) => (
+            <option value={intent}>{intentLabels[intent]}</option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label for="message" class="block text-sm font-medium text-paper/80">Message</label>
+        <textarea
+          id="message"
+          name="message"
+          rows={5}
+          required
+          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-2.5 text-paper focus-visible:border-[var(--color-gold)]"
+        />
+      </div>
+
+      <!-- Honeypot: hidden from real users, bots that fill it are rejected. -->
+      <div class="hidden" aria-hidden="true">
+        <label for="company">Company</label>
+        <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <button
+        type="submit"
+        class="rounded-full bg-[var(--color-gold)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
+      >
+        Send message
+      </button>
+
+      <p id="contact-form-status" class="text-sm text-paper/60" role="status"></p>
+    </form>
+  </section>
 </BaseLayout>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const status = document.getElementById('contact-form-status');
+  const intentSelect = document.getElementById('intent') as HTMLSelectElement | null;
+
+  const params = new URLSearchParams(window.location.search);
+  const requestedIntent = params.get('intent');
+  if (requestedIntent && intentSelect) {
+    const match = Array.from(intentSelect.options).find((opt) => opt.value === requestedIntent);
+    if (match) intentSelect.value = requestedIntent;
+  }
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const company = (form.elements.namedItem('company') as HTMLInputElement | null)?.value;
+    if (company) return; // honeypot triggered, silently drop
+
+    if (form.dataset.endpointConfigured !== 'true') {
+      if (status) {
+        status.textContent =
+          'Thanks — the contact form isn’t wired to a delivery provider yet. Please email us directly in the meantime.';
+      }
+      return;
+    }
+
+    // Real submission to PUBLIC_FORM_ENDPOINT lands in Phase 4.
+  });
+</script>

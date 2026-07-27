@@ -40,3 +40,7 @@ export const allCareerOpeningsQuery = /* groq */ `*[_type == "careerOpening"] | 
 export const allUniverseItemsQuery = /* groq */ `*[_type == "universeItem"] | order(title asc){
   _id, title, category, media${imageFragment}, link
 }`;
+
+export const pageBySlugQuery = /* groq */ `*[_type == "page" && slug.current == $slug][0]{
+  _id, title, "slug": slug.current, blocks
+}`;

@@ -1,52 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeHero from '../components/home/HomeHero.astro';
+import HomeArtists from '../components/home/HomeArtists.astro';
+import HomeNewMusic from '../components/home/HomeNewMusic.astro';
+import HomeCreators from '../components/home/HomeCreators.astro';
+import HomeUniverse from '../components/home/HomeUniverse.astro';
+import HomePartners from '../components/home/HomePartners.astro';
+import HomeAboutTeaser from '../components/home/HomeAboutTeaser.astro';
+import HomeNewsletter from '../components/home/HomeNewsletter.astro';
 ---
 
 <BaseLayout
   title="Energize Music"
   description="Energize Music is a global Afro-gospel and soul-fusion label — artists, releases, and services distributed via Orchard (Sony Music)."
 >
-  <section class="relative overflow-hidden border-b border-white/10">
-    <img
-      src="https://picsum.photos/seed/energize-hero/1920/1080"
-      alt="Stock placeholder — replace with hero performance photography or the Phase 3 WebGL hero"
-      class="absolute inset-0 h-full w-full object-cover opacity-40"
-      loading="eager"
-    />
-    <div
-      class="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)] via-[var(--color-ink)]/70 to-[var(--color-ink)]/20"
-    >
-    </div>
-    <div class="relative mx-auto max-w-6xl px-6 py-28 sm:py-40">
-      <p class="text-sm font-medium uppercase tracking-[0.2em] text-[var(--color-gold)]">
-        Afro-gospel &middot; Soul-fusion &middot; Global
-      </p>
-      <h1 class="text-display mt-4 max-w-3xl">Energize Music</h1>
-      <p class="text-lead mt-6 max-w-xl text-paper/80">
-        A Lagos-born, globally distributed label — family-friendly music, artists, and stories
-        that carry from Lagos to London to São Paulo.
-      </p>
-      <div class="mt-10 flex flex-wrap gap-4">
-        <a
-          href="/artists"
-          class="rounded-full bg-[var(--color-gold)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
-        >
-          Meet the roster
-        </a>
-        <a
-          href="/releases"
-          class="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-paper transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
-        >
-          Latest releases
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section class="mx-auto max-w-6xl px-6 py-20 sm:py-28">
-    <h2 class="text-h2 max-w-2xl">
-      Home modules — Hero, Artists, New music, Producers &amp; writers, Our universe, Partners,
-      About teaser, Newsletter — land in Phase 2 once wired to Sanity.
-    </h2>
-  </section>
+  <HomeHero />
+  <HomeArtists />
+  <HomeNewMusic />
+  <HomeCreators />
+  <HomeUniverse />
+  <HomePartners />
+  <HomeAboutTeaser />
+  <HomeNewsletter />
 </BaseLayout>

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient, urlForImage } from '../../lib/sanity/client';
 import { allReleasesQuery, releaseBySlugQuery, type Release } from '@energize/shared';
 
@@ -32,9 +33,25 @@ const releaseDate = new Date(release.releaseDate).toLocaleDateString('en-US', {
   month: 'long',
   day: 'numeric',
 });
+
+const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicAlbum',
+  name: release.title,
+  image: coverUrl,
+  datePublished: release.releaseDate,
+  url: new URL(`/releases/${release.slug}`, siteUrl).toString(),
+  byArtist: release.artists.map((artist) => ({
+    '@type': 'MusicGroup',
+    name: artist.name,
+    url: new URL(`/artists/${artist.slug}`, siteUrl).toString(),
+  })),
+};
 ---
 
 <BaseLayout title={release.title} description={`${release.title} — ${typeLabel[release.type]} on Energize Music.`}>
+  <JsonLd data={jsonLd} />
   <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
     <div class="grid gap-10 sm:grid-cols-[1fr_1.2fr] sm:items-start">
       <img

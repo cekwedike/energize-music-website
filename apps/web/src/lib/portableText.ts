@@ -51,7 +51,9 @@ export function renderBlockHtml(block: TextBlock): string {
   return (block.children ?? []).map((span) => renderSpan(span, block.markDefs ?? [])).join('');
 }
 
-export const blockTagByStyle: Record<string, string> = {
+export type BlockTagName = 'p' | 'h2' | 'h3' | 'h4' | 'blockquote';
+
+export const blockTagByStyle: Record<string, BlockTagName> = {
   normal: 'p',
   h2: 'h2',
   h3: 'h3',

@@ -1,0 +1,18 @@
+---
+import { sanityClient } from '../../lib/sanity/client';
+import { siteSettingsQuery, type SiteSettings } from '@energize/shared';
+
+const settings = await sanityClient.fetch<SiteSettings | null>(siteSettingsQuery);
+---
+
+<section class="mx-auto max-w-4xl px-6 py-16 text-center sm:py-24">
+  <p class="text-h2">
+    {settings?.description ?? 'A Lagos-born, globally distributed Afro-gospel and soul-fusion label.'}
+  </p>
+  <a
+    href="/about"
+    class="mt-6 inline-block text-sm font-semibold text-[var(--color-gold)] hover:underline"
+  >
+    More about us &rarr;
+  </a>
+</section>

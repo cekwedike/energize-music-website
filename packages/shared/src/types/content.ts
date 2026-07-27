@@ -69,3 +69,10 @@ export interface UniverseItem {
   media?: SanityImage;
   link?: string;
 }
+
+export interface Page {
+  _id: string;
+  title: string;
+  slug: string;
+  blocks: PortableTextBlock[];
+}

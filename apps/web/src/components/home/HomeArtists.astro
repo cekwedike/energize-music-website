@@ -1,0 +1,25 @@
+---
+import ArtistCard from '../artists/ArtistCard.astro';
+import { sanityClient } from '../../lib/sanity/client';
+import { featuredArtistsQuery, type Artist } from '@energize/shared';
+
+const artists = await sanityClient.fetch<Artist[]>(featuredArtistsQuery);
+---
+
+{
+  artists.length > 0 && (
+    <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
+      <div class="flex items-end justify-between gap-4">
+        <h2 class="text-h2">Artists</h2>
+        <a href="/artists" class="shrink-0 text-sm font-semibold text-[var(--color-gold)] hover:underline">
+          View all &rarr;
+        </a>
+      </div>
+      <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {artists.map((artist) => (
+          <ArtistCard artist={artist} />
+        ))}
+      </div>
+    </section>
+  )
+}

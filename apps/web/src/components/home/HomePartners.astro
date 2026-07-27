@@ -1,0 +1,25 @@
+---
+import { sanityClient, urlForImage } from '../../lib/sanity/client';
+import { allPartnersQuery, type Partner } from '@energize/shared';
+
+const partners = await sanityClient.fetch<Partner[]>(allPartnersQuery);
+---
+
+{
+  partners.length > 0 && (
+    <section class="mx-auto max-w-6xl px-6 py-16">
+      <p class="text-center text-sm uppercase tracking-wide text-paper/50">In partnership with</p>
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-10 opacity-80">
+        {partners.map((partner) => (
+          <a href={partner.url} target="_blank" rel="noopener noreferrer" aria-label={partner.name}>
+            <img
+              src={urlForImage(partner.logo).height(40).auto('format').url()}
+              alt={partner.name}
+              class="h-8 w-auto object-contain grayscale transition hover:grayscale-0"
+            />
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}

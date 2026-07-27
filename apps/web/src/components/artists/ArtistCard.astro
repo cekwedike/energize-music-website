@@ -19,14 +19,14 @@ const tierLabel: Record<Artist['tier'], string> = {
 <a
   href={`/artists/${artist.slug}`}
   data-tier={artist.tier}
-  class="group block overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] transition hover:border-[var(--color-gold)]/50"
+  class="artist-card group block overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] transition hover:border-[var(--color-gold)]/50"
 >
   <div class="aspect-square overflow-hidden">
     <img
       src={photoUrl}
       alt={artist.photo.alt ?? artist.name}
       loading="lazy"
-      class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+      class="artist-card-photo h-full w-full object-cover"
     />
   </div>
   <div class="p-4">
@@ -34,3 +34,25 @@ const tierLabel: Record<Artist['tier'], string> = {
     <p class="mt-1 text-xs uppercase tracking-wide text-paper/50">{tierLabel[artist.tier]}</p>
   </div>
 </a>
+
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReducedMotion) {
+    import('motion/mini').then(({ animate }) => {
+      const ease = [0.22, 1, 0.36, 1] as const;
+      document.querySelectorAll<HTMLAnchorElement>('.artist-card').forEach((card) => {
+        const photo = card.querySelector<HTMLImageElement>('.artist-card-photo');
+        if (!photo) return;
+        card.addEventListener('mouseenter', () => animate(photo, { scale: 1.08 }, { duration: 0.5, ease }));
+        card.addEventListener('mouseleave', () => animate(photo, { scale: 1 }, { duration: 0.5, ease }));
+      });
+    });
+  }
+</script>
+
+<style>
+  .artist-card-photo {
+    will-change: transform;
+  }
+</style>

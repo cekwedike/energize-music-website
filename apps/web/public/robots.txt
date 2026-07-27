@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://energize-music.com/sitemap-index.xml

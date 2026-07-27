@@ -1,0 +1,43 @@
+---
+import { sanityClient, urlForImage } from '../../lib/sanity/client';
+import { allUniverseItemsQuery, type UniverseItem } from '@energize/shared';
+
+const items = await sanityClient.fetch<UniverseItem[]>(allUniverseItemsQuery);
+
+const categoryLabel: Record<UniverseItem['category'], string> = {
+  studio: 'Studio',
+  video: 'Video',
+  podcast: 'Podcast',
+  event: 'Event',
+};
+---
+
+{
+  items.length > 0 && (
+    <section class="border-y border-white/10 bg-[var(--color-ink-raised)] py-16 sm:py-24">
+      <div class="mx-auto max-w-6xl px-6">
+        <h2 class="text-h2">Our universe</h2>
+        <div class="mt-8 grid gap-4 sm:grid-cols-3">
+          {items.map((item) => (
+            <div class="overflow-hidden rounded-lg border border-white/10">
+              {item.media?.asset && (
+                <img
+                  src={urlForImage(item.media).width(600).height(450).fit('crop').auto('format').url()}
+                  alt={item.media.alt ?? item.title}
+                  loading="lazy"
+                  class="aspect-[4/3] w-full object-cover"
+                />
+              )}
+              <div class="p-4">
+                <p class="text-xs uppercase tracking-wide text-[var(--color-gold)]">
+                  {categoryLabel[item.category]}
+                </p>
+                <p class="mt-1 font-medium text-paper">{item.title}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
