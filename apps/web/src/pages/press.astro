@@ -1,12 +1,59 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PagePlaceholder from '../components/ui/PagePlaceholder.astro';
+import { sanityClient } from '../lib/sanity/client';
+import { allPressAssetsQuery, type PressAsset, type PressAssetCategory } from '@energize/shared';
+
+const assets = await sanityClient.fetch<PressAsset[]>(allPressAssetsQuery);
+
+const categoryLabel: Record<PressAssetCategory, string> = {
+  logo: 'Logos',
+  photo: 'Photos',
+  pdf: 'Documents',
+};
+
+const grouped = assets.reduce<Record<string, PressAsset[]>>((acc, asset) => {
+  (acc[asset.category] ??= []).push(asset);
+  return acc;
+}, {});
 ---
 
 <BaseLayout title="Press" description="Energize Music EPK, logos, boilerplate, and press contacts.">
-  <PagePlaceholder
-    heading="Press"
-    image="https://picsum.photos/seed/energize-press/800/600"
-    imageAlt="Stock placeholder — replace with press kit imagery"
-  />
+  <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
+    <h1 class="text-h1">Press</h1>
+    <p class="text-lead mt-4 max-w-2xl text-paper/70">
+      Energize Music is a Lagos-born, globally distributed Afro-gospel and soul-fusion label,
+      distributed via The Orchard (Sony Music). For press inquiries, contact
+      {' '}
+      <a href="/contact?intent=press" class="underline hover:text-[var(--color-gold)]">
+        our press team
+      </a>.
+    </p>
+
+    {
+      Object.keys(grouped).length === 0 ? (
+        <p class="mt-10 text-paper/60">Press assets will appear here once added in Sanity Studio.</p>
+      ) : (
+        Object.entries(grouped).map(([category, items]) => (
+          <div class="mt-12">
+            <h2 class="text-h3">{categoryLabel[category as PressAssetCategory] ?? category}</h2>
+            <ul class="mt-4 divide-y divide-white/10 border-t border-white/10">
+              {items.map((asset) => (
+                <li class="flex items-center justify-between py-4">
+                  <span class="text-paper/85">{asset.title}</span>
+                  <a
+                    href={asset.file.asset.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-sm font-semibold text-[var(--color-gold)] hover:underline"
+                  >
+                    Download
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      )
+    }
+  </section>
 </BaseLayout>
