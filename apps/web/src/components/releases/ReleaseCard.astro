@@ -1,0 +1,41 @@
+---
+import type { Release } from '@energize/shared';
+import { urlForImage } from '../../lib/sanity/client';
+
+interface Props {
+  release: Release;
+}
+
+const { release } = Astro.props;
+const coverUrl = urlForImage(release.cover).width(600).height(600).fit('crop').auto('format').url();
+const year = new Date(release.releaseDate).getFullYear();
+
+const typeLabel: Record<Release['type'], string> = {
+  single: 'Single',
+  ep: 'EP',
+  album: 'Album',
+  compilation: 'Compilation',
+};
+---
+
+<a
+  href={`/releases/${release.slug}`}
+  data-type={release.type}
+  data-year={year}
+  class="group block overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] transition hover:border-[var(--color-gold)]/50"
+>
+  <div class="aspect-square overflow-hidden">
+    <img
+      src={coverUrl}
+      alt={release.cover.alt ?? release.title}
+      loading="lazy"
+      class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+    />
+  </div>
+  <div class="p-4">
+    <p class="font-medium text-paper">{release.title}</p>
+    <p class="mt-1 text-xs uppercase tracking-wide text-paper/50">
+      {typeLabel[release.type]} &middot; {year}
+    </p>
+  </div>
+</a>

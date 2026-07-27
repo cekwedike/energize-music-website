@@ -1,4 +1,4 @@
-import type { SanityImage, SlugField } from './common';
+import type { SanityImage } from './common';
 
 export type ArtistTier = 'official' | 'collaborator' | 'legacy';
 
@@ -12,7 +12,8 @@ export interface StreamingLinks {
 export interface Artist {
   _id: string;
   name: string;
-  slug: SlugField;
+  /** Flattened by GROQ as `"slug": slug.current` — a plain string, not `{ current }`. */
+  slug: string;
   tier: ArtistTier;
   featured?: boolean;
   photo: SanityImage;

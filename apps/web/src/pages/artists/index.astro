@@ -1,8 +1,70 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PagePlaceholder from '../../components/ui/PagePlaceholder.astro';
+import ArtistCard from '../../components/artists/ArtistCard.astro';
+import { sanityClient } from '../../lib/sanity/client';
+import { allArtistsQuery, type Artist } from '@energize/shared';
+
+const artists = await sanityClient.fetch<Artist[]>(allArtistsQuery);
+
+const tabs: { label: string; value: Artist['tier'] | 'all' }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Official', value: 'official' },
+  { label: 'Collaborators', value: 'collaborator' },
+  { label: 'Legacy', value: 'legacy' },
+];
 ---
 
 <BaseLayout title="Artists" description="Official, collaborator, and legacy artists on Energize Music.">
-  <PagePlaceholder heading="Artists" note="Grid + tier filters (Official / Collaborators / Legacy) land in Phase 2." />
+  <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
+    <h1 class="text-h1">Artists</h1>
+    <p class="text-lead mt-4 max-w-xl text-paper/70">
+      The Energize Music roster — Official artists, collaborators, and legacy catalog.
+    </p>
+
+    {
+      artists.length === 0 ? (
+        <p class="mt-10 text-paper/60">Artists will appear here once added in Sanity Studio.</p>
+      ) : (
+        <>
+          <div id="artist-tabs" class="mt-10 flex flex-wrap gap-2" role="tablist" aria-label="Filter artists by tier">
+            {tabs.map((tab, index) => (
+              <button
+                type="button"
+                data-tier={tab.value}
+                aria-pressed={index === 0 ? 'true' : 'false'}
+                class="rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-paper/75 transition hover:border-[var(--color-gold)] aria-[pressed=true]:border-[var(--color-gold)] aria-[pressed=true]:text-[var(--color-gold)]"
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div id="artist-grid" class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {artists.map((artist) => (
+              <ArtistCard artist={artist} />
+            ))}
+          </div>
+        </>
+      )
+    }
+  </section>
 </BaseLayout>
+
+<script>
+  const tabsEl = document.getElementById('artist-tabs');
+  const grid = document.getElementById('artist-grid');
+
+  tabsEl?.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-tier]');
+    if (!button || !grid) return;
+
+    tabsEl.querySelectorAll('button[data-tier]').forEach((btn) => btn.setAttribute('aria-pressed', 'false'));
+    button.setAttribute('aria-pressed', 'true');
+
+    const tier = button.dataset.tier;
+    grid.querySelectorAll<HTMLElement>('[data-tier]').forEach((card) => {
+      const show = tier === 'all' || card.dataset.tier === tier;
+      card.classList.toggle('hidden', !show);
+    });
+  });
+</script>

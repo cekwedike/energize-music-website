@@ -1,13 +1,86 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PagePlaceholder from '../../components/ui/PagePlaceholder.astro';
+import ReleaseCard from '../../components/releases/ReleaseCard.astro';
+import { sanityClient, urlForImage } from '../../lib/sanity/client';
+import {
+  allArtistsQuery,
+  artistBySlugQuery,
+  releasesByArtistSlugQuery,
+  type Artist,
+  type Release,
+} from '@energize/shared';
 
 export async function getStaticPaths() {
-  // Wired to Sanity in Phase 2 (artistBySlugQuery per artist).
-  return [];
+  const artists = await sanityClient.fetch<Pick<Artist, 'slug'>[]>(allArtistsQuery);
+  return artists.map((artist) => ({ params: { slug: artist.slug } }));
 }
+
+const { slug } = Astro.params;
+const artist = await sanityClient.fetch<Artist>(artistBySlugQuery, { slug });
+const discography = await sanityClient.fetch<Release[]>(releasesByArtistSlugQuery, { slug });
+
+const photoUrl = urlForImage(artist.photo).width(900).height(900).fit('crop').auto('format').url();
+
+const tierLabel: Record<Artist['tier'], string> = {
+  official: 'Official',
+  collaborator: 'Collaborator',
+  legacy: 'Legacy',
+};
+
+const streamingLabels: Record<string, string> = {
+  spotify: 'Spotify',
+  appleMusic: 'Apple Music',
+  youtube: 'YouTube',
+  instagram: 'Instagram',
+};
+const streamingEntries = Object.entries(artist.streaming ?? {}).filter(([, url]) => Boolean(url));
 ---
 
-<BaseLayout title="Artist" description="Artist bio, discography, and embeds.">
-  <PagePlaceholder heading="Artist" />
+<BaseLayout title={artist.name} description={artist.bio}>
+  <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
+    <div class="grid gap-10 sm:grid-cols-[1fr_1.4fr] sm:items-start">
+      <img
+        src={photoUrl}
+        alt={artist.photo.alt ?? artist.name}
+        class="aspect-square w-full rounded-lg object-cover"
+      />
+      <div>
+        <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-gold)]">
+          {tierLabel[artist.tier]}
+        </p>
+        <h1 class="text-h1 mt-2">{artist.name}</h1>
+        <p class="text-lead mt-6 max-w-xl text-paper/75">{artist.bio}</p>
+
+        {
+          streamingEntries.length > 0 && (
+            <div class="mt-8 flex flex-wrap gap-3">
+              {streamingEntries.map(([key, url]) => (
+                <a
+                  href={url as string}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
+                >
+                  {streamingLabels[key] ?? key}
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    {
+      discography.length > 0 && (
+        <div class="mt-20">
+          <h2 class="text-h3">Discography</h2>
+          <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {discography.map((release) => (
+              <ReleaseCard release={release} />
+            ))}
+          </div>
+        </div>
+      )
+    }
+  </section>
 </BaseLayout>

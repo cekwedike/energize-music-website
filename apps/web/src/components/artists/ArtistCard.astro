@@ -1,0 +1,36 @@
+---
+import type { Artist } from '@energize/shared';
+import { urlForImage } from '../../lib/sanity/client';
+
+interface Props {
+  artist: Artist;
+}
+
+const { artist } = Astro.props;
+const photoUrl = urlForImage(artist.photo).width(600).height(600).fit('crop').auto('format').url();
+
+const tierLabel: Record<Artist['tier'], string> = {
+  official: 'Official',
+  collaborator: 'Collaborator',
+  legacy: 'Legacy',
+};
+---
+
+<a
+  href={`/artists/${artist.slug}`}
+  data-tier={artist.tier}
+  class="group block overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] transition hover:border-[var(--color-gold)]/50"
+>
+  <div class="aspect-square overflow-hidden">
+    <img
+      src={photoUrl}
+      alt={artist.photo.alt ?? artist.name}
+      loading="lazy"
+      class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+    />
+  </div>
+  <div class="p-4">
+    <p class="font-medium text-paper">{artist.name}</p>
+    <p class="mt-1 text-xs uppercase tracking-wide text-paper/50">{tierLabel[artist.tier]}</p>
+  </div>
+</a>

@@ -23,3 +23,9 @@ export interface SeoFields {
   description?: string;
   ogImage?: SanityImage;
 }
+
+export interface PortableTextBlock {
+  _type: string;
+  _key: string;
+  [key: string]: unknown;
+}

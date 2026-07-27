@@ -1,13 +1,85 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PagePlaceholder from '../../components/ui/PagePlaceholder.astro';
+import { sanityClient, urlForImage } from '../../lib/sanity/client';
+import { allReleasesQuery, releaseBySlugQuery, type Release } from '@energize/shared';
 
 export async function getStaticPaths() {
-  // Wired to Sanity in Phase 2 (releaseBySlugQuery per release).
-  return [];
+  const releases = await sanityClient.fetch<Pick<Release, 'slug'>[]>(allReleasesQuery);
+  return releases.map((release) => ({ params: { slug: release.slug } }));
 }
+
+const { slug } = Astro.params;
+const release = await sanityClient.fetch<Release>(releaseBySlugQuery, { slug });
+
+const coverUrl = urlForImage(release.cover).width(1000).height(1000).fit('crop').auto('format').url();
+
+const typeLabel: Record<Release['type'], string> = {
+  single: 'Single',
+  ep: 'EP',
+  album: 'Album',
+  compilation: 'Compilation',
+};
+
+const linkLabels: Record<string, string> = {
+  spotify: 'Play on Spotify',
+  appleMusic: 'Play on Apple Music',
+  youtube: 'Watch on YouTube',
+};
+const linkEntries = Object.entries(release.links ?? {}).filter(([, url]) => Boolean(url));
+
+const releaseDate = new Date(release.releaseDate).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
 ---
 
-<BaseLayout title="Release" description="Release cover, credits, streaming links, and embed.">
-  <PagePlaceholder heading="Release" />
+<BaseLayout title={release.title} description={`${release.title} — ${typeLabel[release.type]} on Energize Music.`}>
+  <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
+    <div class="grid gap-10 sm:grid-cols-[1fr_1.2fr] sm:items-start">
+      <img
+        src={coverUrl}
+        alt={release.cover.alt ?? release.title}
+        class="aspect-square w-full rounded-lg object-cover"
+      />
+      <div>
+        <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-gold)]">
+          {typeLabel[release.type]} &middot; {releaseDate}
+        </p>
+        <h1 class="text-h1 mt-2">{release.title}</h1>
+
+        {
+          release.artists.length > 0 && (
+            <p class="text-lead mt-4 text-paper/75">
+              {release.artists.map((artist, index) => (
+                <>
+                  <a href={`/artists/${artist.slug}`} class="underline decoration-[var(--color-gold)] underline-offset-4 hover:text-[var(--color-gold)]">
+                    {artist.name}
+                  </a>
+                  {index < release.artists.length - 1 && ', '}
+                </>
+              ))}
+            </p>
+          )
+        }
+
+        {
+          linkEntries.length > 0 && (
+            <div class="mt-8 flex flex-wrap gap-3">
+              {linkEntries.map(([key, url]) => (
+                <a
+                  href={url as string}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="rounded-full bg-[var(--color-gold)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
+                >
+                  {linkLabels[key] ?? key}
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
 </BaseLayout>

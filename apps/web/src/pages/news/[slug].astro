@@ -1,13 +1,59 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PagePlaceholder from '../../components/ui/PagePlaceholder.astro';
+import PortableText from '../../components/portable/PortableText.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import { sanityClient, urlForImage } from '../../lib/sanity/client';
+import { allNewsQuery, newsBySlugQuery, type NewsPost } from '@energize/shared';
 
 export async function getStaticPaths() {
-  // Wired to Sanity in Phase 2 (newsBySlugQuery per post).
-  return [];
+  const posts = await sanityClient.fetch<Pick<NewsPost, 'slug'>[]>(allNewsQuery);
+  return posts.map((post) => ({ params: { slug: post.slug } }));
 }
+
+const { slug } = Astro.params;
+const post = await sanityClient.fetch<NewsPost>(newsBySlugQuery, { slug });
+
+const coverUrl = urlForImage(post.cover).width(1200).height(675).fit('crop').auto('format').url();
+const date = new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: post.title,
+  datePublished: post.date,
+  image: [coverUrl],
+  url: new URL(`/news/${post.slug}`, siteUrl).toString(),
+  publisher: {
+    '@type': 'Organization',
+    name: 'Energize Music',
+  },
+};
 ---
 
-<BaseLayout title="News" description="Energize Music news article.">
-  <PagePlaceholder heading="Article" />
+<BaseLayout title={post.title} description={post.title}>
+  <JsonLd data={jsonLd} />
+  <article class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+    <p class="text-sm uppercase tracking-wide text-paper/50">{date}</p>
+    <h1 class="text-h1 mt-3">{post.title}</h1>
+    <img
+      src={coverUrl}
+      alt={post.cover.alt ?? post.title}
+      class="mt-8 aspect-[16/9] w-full rounded-lg object-cover"
+    />
+    <div class="mt-8">
+      <PortableText value={post.body} />
+    </div>
+    {
+      post.tags && post.tags.length > 0 && (
+        <div class="mt-10 flex flex-wrap gap-2">
+          {post.tags.map((tag) => (
+            <span class="rounded-full border border-white/15 px-3 py-1 text-xs uppercase tracking-wide text-paper/60">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )
+    }
+  </article>
 </BaseLayout>

@@ -1,0 +1,17 @@
+---
+import { renderBlockHtml, blockTagByStyle } from '../../lib/portableText';
+
+interface Props {
+  value: {
+    style?: string;
+    children: { _type: 'span'; text: string; marks?: string[] }[];
+    markDefs?: { _key: string; _type: string; href?: string }[];
+  };
+}
+
+const { value } = Astro.props;
+const Tag = blockTagByStyle[value.style ?? 'normal'] ?? 'p';
+const html = renderBlockHtml(value as never);
+---
+
+<Tag class="mt-4 text-paper/80 [&_a]:text-paper first:mt-0" set:html={html} />

@@ -1,0 +1,24 @@
+---
+import TextBlock from './TextBlock.astro';
+import ImageBlock from './ImageBlock.astro';
+
+interface Props {
+  value?: Array<{ _type: string; _key: string } & Record<string, unknown>>;
+}
+
+const { value = [] } = Astro.props;
+---
+
+<div>
+  {
+    value.map((block) => {
+      if (block._type === 'image') {
+        return <ImageBlock value={block as never} />;
+      }
+      if (block._type === 'block') {
+        return <TextBlock value={block as never} />;
+      }
+      return null;
+    })
+  }
+</div>

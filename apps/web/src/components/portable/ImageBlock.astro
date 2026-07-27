@@ -1,0 +1,21 @@
+---
+import { urlForImage } from '../../lib/sanity/client';
+
+interface Props {
+  value: { asset?: { _ref?: string; _id?: string; url?: string }; alt?: string };
+}
+
+const { value } = Astro.props;
+const src = value?.asset ? urlForImage(value as never).width(1200).auto('format').url() : null;
+---
+
+{
+  src && (
+    <img
+      src={src}
+      alt={value.alt ?? ''}
+      loading="lazy"
+      class="my-8 w-full rounded-lg object-cover"
+    />
+  )
+}

@@ -1,4 +1,4 @@
-import type { SanityImage, SlugField } from './common';
+import type { SanityImage } from './common';
 import type { Artist } from './artist';
 
 export type ReleaseType = 'single' | 'ep' | 'album' | 'compilation';
@@ -12,7 +12,7 @@ export interface ReleaseLinks {
 export interface Release {
   _id: string;
   title: string;
-  slug: SlugField;
+  slug: string;
   type: ReleaseType;
   releaseDate: string;
   cover: SanityImage;

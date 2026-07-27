@@ -1,4 +1,4 @@
-import type { SanityImage, SanityFile, SlugField, SeoFields } from './common';
+import type { SanityImage, SanityFile, SeoFields, PortableTextBlock } from './common';
 
 export interface SiteSettings {
   title: string;
@@ -27,8 +27,8 @@ export interface Partner {
 export interface Service {
   _id: string;
   title: string;
-  slug: SlugField;
-  body: unknown;
+  slug: string;
+  body: PortableTextBlock[];
   icon?: string;
   contactIntent?: string;
 }
@@ -36,10 +36,10 @@ export interface Service {
 export interface NewsPost {
   _id: string;
   title: string;
-  slug: SlugField;
+  slug: string;
   date: string;
   cover: SanityImage;
-  body: unknown;
+  body: PortableTextBlock[];
   tags?: string[];
 }
 

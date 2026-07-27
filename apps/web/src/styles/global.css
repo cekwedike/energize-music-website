@@ -2,11 +2,20 @@
 
 @theme {
   --color-ink: #0b0b0d;
+  --color-ink-raised: #141417;
   --color-paper: #fafaf8;
   --color-gold: #c9a34a;
   --color-ember: #e0532c;
   --font-display: 'Fraunces', 'Georgia', serif;
   --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Fluid type scale — grows with viewport instead of capping on wide monitors. */
+  --text-display: clamp(2.75rem, 2rem + 3.5vw, 6rem);
+  --text-h1: clamp(2.25rem, 1.7rem + 2.5vw, 4rem);
+  --text-h2: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+  --text-h3: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  --text-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --text-body-lg: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
 }
 
 @layer base {
@@ -18,6 +27,15 @@
     background-color: var(--color-ink);
     color: var(--color-paper);
     font-family: var(--font-body);
+    font-size: var(--text-body-lg);
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    line-height: 1.1;
   }
 
   :focus-visible {
@@ -39,6 +57,26 @@
     left: 0.75rem;
     top: 0.75rem;
   }
+}
+
+@utility text-display {
+  font-size: var(--text-display);
+}
+
+@utility text-h1 {
+  font-size: var(--text-h1);
+}
+
+@utility text-h2 {
+  font-size: var(--text-h2);
+}
+
+@utility text-h3 {
+  font-size: var(--text-h3);
+}
+
+@utility text-lead {
+  font-size: var(--text-lead);
 }
 
 @media (prefers-reduced-motion: reduce) {

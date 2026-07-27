@@ -9,19 +9,24 @@ function isActive(href: string) {
 ---
 
 <header class="sticky top-0 z-40 border-b border-white/10 bg-[var(--color-ink)]/90 backdrop-blur">
-  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-    <a href="/" class="font-[family-name:var(--font-display)] text-xl tracking-tight">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4">
+    <a
+      href="/"
+      class="shrink-0 text-lg font-semibold tracking-tight text-paper sm:text-xl"
+      style="font-family: var(--font-display)"
+    >
       Energize Music
     </a>
-    <nav aria-label="Primary">
-      <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+
+    <nav aria-label="Primary" class="hidden sm:block">
+      <ul class="flex items-center gap-x-5 whitespace-nowrap text-sm font-medium lg:gap-x-7">
         {
           primaryNav.map((link) => (
             <li>
               <a
                 href={link.href}
                 aria-current={isActive(link.href) ? 'page' : undefined}
-                class="text-paper/80 hover:text-[var(--color-gold)] aria-[current=page]:text-[var(--color-gold)]"
+                class="text-paper/80 transition hover:text-[var(--color-gold)] aria-[current=page]:text-[var(--color-gold)]"
               >
                 {link.label}
               </a>
@@ -30,5 +35,53 @@ function isActive(href: string) {
         }
       </ul>
     </nav>
+
+    <button
+      type="button"
+      id="nav-toggle"
+      aria-expanded="false"
+      aria-controls="mobile-nav"
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 text-paper sm:hidden"
+    >
+      <span class="sr-only">Toggle menu</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" class="h-5 w-5">
+        <path id="nav-toggle-icon-open" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
   </div>
+
+  <nav id="mobile-nav" aria-label="Primary mobile" class="hidden border-t border-white/10 sm:hidden">
+    <ul class="mx-auto max-w-6xl px-6 py-4 text-base font-medium">
+      {
+        primaryNav.map((link) => (
+          <li class="border-b border-white/5 last:border-0">
+            <a
+              href={link.href}
+              aria-current={isActive(link.href) ? 'page' : undefined}
+              class="block py-3 text-paper/85 transition hover:text-[var(--color-gold)] aria-[current=page]:text-[var(--color-gold)]"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
 </header>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const panel = document.getElementById('mobile-nav');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = panel?.classList.toggle('hidden') === false;
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  panel?.addEventListener('click', (event) => {
+    if ((event.target as HTMLElement).tagName === 'A') {
+      panel.classList.add('hidden');
+      toggle?.setAttribute('aria-expanded', 'false');
+    }
+  });
+</script>
