@@ -1,12 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { sanityClient } from '../lib/sanity/client';
-import { allCareerOpeningsQuery, type CareerOpening } from '@energize/shared';
+import { allCareerOpeningsQuery, volunteerInfoQuery, type CareerOpening, type VolunteerInfo } from '@energize/shared';
 
 const openings = await sanityClient.fetch<CareerOpening[]>(allCareerOpeningsQuery);
+const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQuery);
 ---
 
-<BaseLayout title="Careers" description="Open roles at Energize Music.">
+<BaseLayout title="Careers" description="Open roles and volunteer opportunities at Energize Music.">
   <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
     <h1 class="text-h1">Careers</h1>
     <p class="text-lead mt-4 max-w-xl text-paper/70">
@@ -48,4 +49,58 @@ const openings = await sanityClient.fetch<CareerOpening[]>(allCareerOpeningsQuer
       </a>.
     </p>
   </section>
+
+  {
+    volunteer && (
+      <section class="border-t border-white/10 bg-[var(--color-ink-raised)]">
+        <div class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+          <h2 class="text-h2">{volunteer.heading}</h2>
+          <p class="text-lead mt-4 text-paper/70">{volunteer.intro}</p>
+
+          {
+            volunteer.roleOptions && volunteer.roleOptions.length > 0 && (
+              <div class="mt-8">
+                <p class="text-sm font-semibold uppercase tracking-wide text-paper/50">Ways to help</p>
+                <ul class="mt-3 flex flex-wrap gap-2">
+                  {volunteer.roleOptions.map((role) => (
+                    <li class="rounded-full border border-white/20 px-4 py-2 text-sm text-paper/80">{role}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+
+          {
+            volunteer.platforms && volunteer.platforms.length > 0 && (
+              <div class="mt-6">
+                <p class="text-sm font-semibold uppercase tracking-wide text-paper/50">Platforms</p>
+                <ul class="mt-3 flex flex-wrap gap-2">
+                  {volunteer.platforms.map((platform) => (
+                    <li class="rounded-full border border-white/20 px-4 py-2 text-sm text-paper/80">{platform}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+
+          {
+            volunteer.signupUrl ? (
+              <a
+                href={volunteer.signupUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-10 inline-block rounded-full bg-[var(--color-gold)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
+              >
+                {volunteer.ctaLabel ?? 'Join the volunteer list'}
+              </a>
+            ) : (
+              <p class="mt-10 text-sm text-paper/50">
+                Sign-up link isn’t configured yet — add one in Sanity Studio under Volunteer Info.
+              </p>
+            )
+          }
+        </div>
+      </section>
+    )
+  }
 </BaseLayout>

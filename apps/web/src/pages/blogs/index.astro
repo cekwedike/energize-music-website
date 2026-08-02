@@ -7,14 +7,14 @@ import { allNewsQuery, type NewsPost } from '@energize/shared';
 const posts = await sanityClient.fetch<NewsPost[]>(allNewsQuery);
 ---
 
-<BaseLayout title="News" description="Announcements and news from Energize Music.">
+<BaseLayout title="Blogs" description="Announcements and news from Energize Music.">
   <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
-    <h1 class="text-h1">News</h1>
+    <h1 class="text-h1">Blogs</h1>
     <p class="text-lead mt-4 max-w-xl text-paper/70">Announcements from Energize Music.</p>
 
     {
       posts.length === 0 ? (
-        <p class="mt-10 text-paper/60">News posts will appear here once added in Sanity Studio.</p>
+        <p class="mt-10 text-paper/60">Posts will appear here once added in Sanity Studio.</p>
       ) : (
         <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (

@@ -23,7 +23,7 @@ const jsonLd = {
   headline: post.title,
   datePublished: post.date,
   image: [coverUrl],
-  url: new URL(`/news/${post.slug}`, siteUrl).toString(),
+  url: new URL(`/blogs/${post.slug}`, siteUrl).toString(),
   publisher: {
     '@type': 'Organization',
     name: 'Energize Music',

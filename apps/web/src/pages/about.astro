@@ -1,13 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PortableText from '../components/portable/PortableText.astro';
-import { sanityClient } from '../lib/sanity/client';
-import { pageBySlugQuery, type Page } from '@energize/shared';
+import { sanityClient, urlForImage } from '../lib/sanity/client';
+import { pageBySlugQuery, allTeamMembersQuery, type Page, type TeamMember } from '@energize/shared';
 
 const page = await sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'about' });
+const team = await sanityClient.fetch<TeamMember[]>(allTeamMembersQuery);
 ---
 
-<BaseLayout title="About" description="Mission, vision, values, and partnership story.">
+<BaseLayout title="About Us" description="Energize Music's mission, vision, values, and the team behind it.">
   <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
     <h1 class="text-h1">About Energize Music</h1>
     {
@@ -19,10 +20,48 @@ const page = await sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'abo
           <PortableText value={page.blocks} />
         </div>
       ) : (
-        <p class="mt-10 text-paper/60">About content will appear here once added in Sanity Studio.</p>
+        <div class="mt-10 space-y-6 text-paper/80">
+          <p>
+            Energize Music is an Afro-gospel &amp; soul-fusion record label providing
+            high-quality, family-friendly, uplifting music — built on the belief that
+            music has the power to connect people and speak to audiences everywhere.
+          </p>
+          <p><strong class="text-paper">Mission:</strong> We are here to inspire positive emotions.</p>
+          <p><strong class="text-paper">Vision:</strong> To influence and inspire 1,000,000,000 minds with the good news.</p>
+          <p>
+            <strong class="text-paper">Values:</strong> Excellence in music and lyrics, positivity
+            and uplifting content, family-friendly material across cultures, and relevance to
+            global audiences.
+          </p>
+        </div>
       )
     }
   </section>
+
+  {
+    team.length > 0 && (
+      <section class="mx-auto max-w-6xl px-6 pb-16 sm:pb-24">
+        <h2 class="text-h2">Our Team</h2>
+        <div class="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {team.map((member) => (
+            <div>
+              {member.photo?.asset && (
+                <img
+                  src={urlForImage(member.photo).width(400).height(400).fit('crop').auto('format').url()}
+                  alt={member.photo.alt ?? member.name}
+                  loading="lazy"
+                  class="aspect-square w-full rounded-lg object-cover"
+                />
+              )}
+              <p class="mt-4 font-medium text-paper">{member.name}</p>
+              <p class="text-sm text-[var(--color-gold)]">{member.role}</p>
+              <p class="mt-2 text-sm text-paper/70">{member.bio}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
 </BaseLayout>
 
 <style>

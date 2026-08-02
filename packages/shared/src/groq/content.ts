@@ -24,3 +24,11 @@ export const allCareerOpeningsQuery = /* groq */ `*[_type == "careerOpening"] | 
 export const pageBySlugQuery = /* groq */ `*[_type == "page" && slug.current == $slug][0]{
   _id, title, "slug": slug.current, blocks
 }`;
+
+export const allTeamMembersQuery = /* groq */ `*[_type == "teamMember"] | order(order asc, name asc){
+  _id, name, role, bio, photo${imageFragment}
+}`;
+
+export const volunteerInfoQuery = /* groq */ `*[_type == "volunteerInfo"][0]{
+  heading, intro, roleOptions, platforms, signupUrl, ctaLabel
+}`;

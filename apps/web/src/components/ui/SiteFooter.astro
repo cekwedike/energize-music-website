@@ -1,5 +1,5 @@
 ---
-import { primaryNav, secondaryNav, initiativesNav, socialLinks } from '../../lib/nav';
+import { primaryNav, secondaryNav, socialLinks } from '../../lib/nav';
 import SocialIcon from './SocialIcon.astro';
 
 const year = new Date().getFullYear();
@@ -56,15 +56,6 @@ const exploreLinks = primaryNav.filter((link) => link.href !== '/');
         <ul class="mt-4 space-y-3 text-sm">
           {
             secondaryNav.map((link) => (
-              <li>
-                <a href={link.href} class="text-paper/75 transition hover:text-[var(--color-gold)]">
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
-          {
-            initiativesNav.map((link) => (
               <li>
                 <a href={link.href} class="text-paper/75 transition hover:text-[var(--color-gold)]">
                   {link.label}

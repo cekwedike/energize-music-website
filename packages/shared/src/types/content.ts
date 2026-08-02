@@ -33,3 +33,21 @@ export interface Page {
   slug: string;
   blocks: PortableTextBlock[];
 }
+
+export interface TeamMember {
+  _id: string;
+  name: string;
+  role: string;
+  bio: string;
+  photo?: SanityImage;
+  order?: number;
+}
+
+export interface VolunteerInfo {
+  heading: string;
+  intro: string;
+  roleOptions?: string[];
+  platforms?: string[];
+  signupUrl?: string;
+  ctaLabel?: string;
+}
