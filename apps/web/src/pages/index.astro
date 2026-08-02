@@ -1,17 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import HomeHero from '../components/home/HomeHero.astro';
-import HomeArtists from '../components/home/HomeArtists.astro';
-import HomeAboutTeaser from '../components/home/HomeAboutTeaser.astro';
-import HomeNewsletter from '../components/home/HomeNewsletter.astro';
+import Hero from '../components/home/Hero.astro';
+import QuoteSection from '../components/home/QuoteSection.astro';
 ---
 
 <BaseLayout
   title="Energize Music"
   description="Energize Music is a global Afro-gospel and soul-fusion label — artists and music distributed via The Orchard (Sony Music)."
+  hideFooter
 >
-  <HomeHero />
-  <HomeArtists />
-  <HomeAboutTeaser />
-  <HomeNewsletter />
+  <div class="bg-[#0a0608]">
+    <Hero />
+    <QuoteSection />
+  </div>
 </BaseLayout>

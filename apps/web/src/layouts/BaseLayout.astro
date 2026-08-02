@@ -8,9 +8,11 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  hideHeader?: boolean;
+  hideFooter?: boolean;
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, hideHeader = false, hideFooter = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -22,17 +24,17 @@ const { title, description, ogImage } = Astro.props;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
     <SEO title={title} description={description} path={Astro.url.pathname} ogImage={ogImage} />
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
-    <SiteHeader />
+    {!hideHeader && <SiteHeader />}
     <main id="main-content">
       <slot />
     </main>
-    <SiteFooter />
+    {!hideFooter && <SiteFooter />}
   </body>
 </html>
