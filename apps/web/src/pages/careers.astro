@@ -17,7 +17,7 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
     {
       openings.length === 0 ? (
         <p class="mt-10 text-paper/60">
-          No open roles right now. Reach out via <a href="/contact" class="underline hover:text-[var(--color-gold)]">Contact</a> to introduce yourself.
+          No open roles right now. Reach out via <a href="/contact" class="underline hover:text-[var(--color-accent)]">Contact</a> to introduce yourself.
         </p>
       ) : (
         <ul class="mt-10 divide-y divide-white/10 border-t border-white/10">
@@ -31,7 +31,7 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
               </div>
               <a
                 href={role.applyUrl}
-                class="inline-block shrink-0 rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
+                class="inline-block shrink-0 rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
               >
                 Apply
               </a>
@@ -44,7 +44,7 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
     <p class="mt-10 text-sm text-paper/50">
       General applications are also welcome via
       {' '}
-      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--color-gold)]">
+      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--color-accent)]">
         LinkedIn
       </a>.
     </p>
@@ -89,7 +89,7 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
                 href={volunteer.signupUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="mt-10 inline-block rounded-full bg-[var(--color-gold)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
+                class="mt-10 inline-block rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
               >
                 {volunteer.ctaLabel ?? 'Join the volunteer list'}
               </a>

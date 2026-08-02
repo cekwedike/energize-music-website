@@ -60,7 +60,7 @@ const jsonLd = {
         class="aspect-square w-full rounded-lg object-cover"
       />
       <div>
-        <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-gold)]">
+        <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
           {typeLabel[release.type]} &middot; {releaseDate}
         </p>
         <h1 class="text-h1 mt-2">{release.title}</h1>
@@ -70,7 +70,7 @@ const jsonLd = {
             <p class="text-lead mt-4 text-paper/75">
               {release.artists.map((artist, index) => (
                 <>
-                  <a href={`/artists/${artist.slug}`} class="underline decoration-[var(--color-gold)] underline-offset-4 hover:text-[var(--color-gold)]">
+                  <a href={`/artists/${artist.slug}`} class="underline decoration-[var(--color-accent)] underline-offset-4 hover:text-[var(--color-accent)]">
                     {artist.name}
                   </a>
                   {index < release.artists.length - 1 && ', '}
@@ -88,7 +88,7 @@ const jsonLd = {
                   href={url as string}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="rounded-full bg-[var(--color-gold)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
+                  class="rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
                 >
                   {linkLabels[key] ?? key}
                 </a>

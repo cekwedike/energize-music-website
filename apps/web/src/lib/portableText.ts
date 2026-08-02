@@ -38,7 +38,7 @@ function renderSpan(span: Span, markDefs: MarkDef[]): string {
       const def = markDefs.find((d) => d._key === mark);
       if (def?._type === 'link' && def.href && SAFE_HREF.test(def.href)) {
         const external = /^https?:/i.test(def.href);
-        html = `<a href="${escapeHtml(def.href)}" class="underline decoration-[var(--color-gold)] underline-offset-2 hover:text-[var(--color-gold)]"${
+        html = `<a href="${escapeHtml(def.href)}" class="underline decoration-[var(--color-accent)] underline-offset-2 hover:text-[var(--color-accent)]"${
           external ? ' target="_blank" rel="noopener noreferrer"' : ''
         }>${html}</a>`;
       }

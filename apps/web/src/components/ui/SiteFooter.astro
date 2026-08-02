@@ -22,11 +22,11 @@ const exploreLinks = primaryNav.filter((link) => link.href !== '/');
             type="email"
             required
             placeholder="you@example.com"
-            class="w-full rounded-full border border-white/20 bg-transparent px-4 py-2.5 text-sm text-paper placeholder:text-paper/40 focus-visible:border-[var(--color-gold)]"
+            class="w-full rounded-full border border-white/20 bg-transparent px-4 py-2.5 text-sm text-paper placeholder:text-paper/40 focus-visible:border-[var(--color-accent)]"
           />
           <button
             type="submit"
-            class="shrink-0 rounded-full bg-[var(--color-gold)] px-5 py-2.5 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
+            class="shrink-0 rounded-full bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
           >
             Join
           </button>
@@ -42,7 +42,7 @@ const exploreLinks = primaryNav.filter((link) => link.href !== '/');
           {
             exploreLinks.map((link) => (
               <li>
-                <a href={link.href} class="text-paper/75 transition hover:text-[var(--color-gold)]">
+                <a href={link.href} class="text-paper/75 transition hover:text-[var(--color-accent)]">
                   {link.label}
                 </a>
               </li>
@@ -57,7 +57,7 @@ const exploreLinks = primaryNav.filter((link) => link.href !== '/');
           {
             secondaryNav.map((link) => (
               <li>
-                <a href={link.href} class="text-paper/75 transition hover:text-[var(--color-gold)]">
+                <a href={link.href} class="text-paper/75 transition hover:text-[var(--color-accent)]">
                   {link.label}
                 </a>
               </li>
@@ -77,7 +77,7 @@ const exploreLinks = primaryNav.filter((link) => link.href !== '/');
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  class="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-paper/70 transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] [&_svg]:h-4 [&_svg]:w-4"
+                  class="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-paper/70 transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] [&_svg]:h-4 [&_svg]:w-4"
                 >
                   <SocialIcon label={social.label as 'Instagram' | 'YouTube' | 'Spotify' | 'TikTok'} />
                 </a>
