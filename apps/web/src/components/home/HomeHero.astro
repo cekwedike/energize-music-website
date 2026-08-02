@@ -1,57 +1,31 @@
 ---
+import { WebGLLiquid } from '../../islands/webgl-liquid';
 ---
 
-<section class="relative overflow-hidden border-b border-white/10">
-  <img
-    src="https://picsum.photos/seed/energize-hero/1920/1080"
-    alt="Stock placeholder — replace with hero performance photography"
-    class="absolute inset-0 h-full w-full object-cover opacity-40"
-    loading="eager"
-  />
-  <div id="hero-scene-root" class="absolute inset-0 opacity-0 transition-opacity duration-700"></div>
-  <div
-    class="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)] via-[var(--color-ink)]/70 to-[var(--color-ink)]/20"
-  >
+<WebGLLiquid
+  client:media="(min-width: 768px) and (prefers-reduced-motion: no-preference)"
+  title="Energize Music"
+  subtitle=""
+  description="A Lagos-born, globally distributed label — family-friendly music, artists, and stories that carry from Lagos to London to São Paulo."
+  colorDeep="#0b0b0d"
+  colorMid="#5a3a12"
+  colorHighlight="#c9a34a"
+  speed={1.8}
+  flowStrength={1.6}
+  className="border-b border-white/10"
+>
+  <div class="flex flex-wrap gap-4">
+    <a
+      href="/artists"
+      class="rounded-full bg-[var(--color-gold)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
+    >
+      Meet the roster
+    </a>
+    <a
+      href="/blogs"
+      class="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
+    >
+      Latest news
+    </a>
   </div>
-  <div class="relative mx-auto max-w-6xl px-6 py-28 sm:py-40">
-    <p class="text-sm font-medium uppercase tracking-[0.2em] text-[var(--color-gold)]">
-      Afro-gospel &middot; Soul-fusion &middot; Global
-    </p>
-    <h1 class="text-display mt-4 max-w-3xl">Energize Music</h1>
-    <p class="text-lead mt-6 max-w-xl text-paper/80">
-      A Lagos-born, globally distributed label — family-friendly music, artists, and stories that
-      carry from Lagos to London to São Paulo.
-    </p>
-    <div class="mt-10 flex flex-wrap gap-4">
-      <a
-        href="/artists"
-        class="rounded-full bg-[var(--color-gold)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
-      >
-        Meet the roster
-      </a>
-      <a
-        href="/releases"
-        class="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-paper transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
-      >
-        Latest releases
-      </a>
-    </div>
-  </div>
-</section>
-
-<script>
-  const root = document.getElementById('hero-scene-root');
-
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTabletUp = window.matchMedia('(min-width: 768px)').matches;
-  const nav = navigator as Navigator & { connection?: { saveData?: boolean } };
-  const saveData = Boolean(nav.connection?.saveData);
-
-  if (root && !prefersReducedMotion && isTabletUp && !saveData) {
-    import('../../lib/motion/mountHeroScene').then(({ mountHeroScene }) => {
-      mountHeroScene(root).then(() => {
-        root.classList.remove('opacity-0');
-      });
-    });
-  }
-</script>
+</WebGLLiquid>
