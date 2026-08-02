@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/home/Hero.astro';
+import HomeMission from '../components/home/HomeMission.astro';
 import HomeArtists from '../components/home/HomeArtists.astro';
 ---
 
@@ -9,7 +10,10 @@ import HomeArtists from '../components/home/HomeArtists.astro';
   description="Energize Music is a global Afro-gospel and soul-fusion label — artists and music distributed via The Orchard (Sony Music)."
 >
   <Hero />
-  <div style="background: linear-gradient(to bottom, transparent 0px, #0a0608 480px);">
+  <div style="background: linear-gradient(to bottom, transparent 0px, #0a0608 320px);">
+    <HomeMission />
+  </div>
+  <div class="bg-[#0a0608]">
     <HomeArtists />
   </div>
 </BaseLayout>

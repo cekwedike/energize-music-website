@@ -3,7 +3,19 @@
 
 <section class="relative h-screen w-full">
   <video
+    id="hero-video-a"
     class="fixed inset-0 -z-10 h-screen w-full object-cover"
+    style="transform-origin: 50% 100%; backface-visibility: hidden;"
+    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260613_180732_a54afbf6-b30d-470e-861f-669871f09f67.mp4"
+    autoplay
+    muted
+    loop
+    playsinline
+  />
+  <video
+    id="hero-video-b"
+    class="fixed inset-0 -z-10 h-screen w-full object-cover opacity-0"
+    style="transform-origin: 50% 100%; backface-visibility: hidden;"
     src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260613_180732_a54afbf6-b30d-470e-861f-669871f09f67.mp4"
     autoplay
     muted
@@ -11,13 +23,84 @@
     playsinline
   />
   <div class="absolute inset-0 bg-black/20"></div>
+  <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0a0608] to-transparent sm:h-48 md:h-64"></div>
 
   <div class="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-    <h1 class="font-instrument text-glow text-[36px] leading-[0.9] tracking-tight text-white md:text-7xl lg:text-[110px]">
+    <h1 class="font-instrument text-glow text-[32px] leading-[0.95] tracking-tight text-white sm:text-[44px] md:text-7xl lg:text-[110px]">
       Rooted in Lagos. Reaching the world.
     </h1>
-    <p class="font-inter mt-5 max-w-xl text-sm text-white/70 md:mt-7 md:text-base">
+    <p class="font-inter mt-4 max-w-xl text-sm text-white/70 sm:mt-5 md:mt-7 md:text-base">
       Afro-gospel and soul-fusion music, carried from Lagos to every corner of the earth.
     </p>
   </div>
 </section>
+
+<script>
+  const videoA = document.getElementById('hero-video-a') as HTMLVideoElement | null;
+  const videoB = document.getElementById('hero-video-b') as HTMLVideoElement | null;
+
+  if (videoA && videoB) {
+    const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+    const lerp = (current: number, target: number, factor: number) => current + (target - current) * factor;
+    const FADE_WINDOW = 0.8; // seconds of crossfade around each loop point
+
+    let offsetApplied = false;
+    videoB.addEventListener('loadedmetadata', () => {
+      if (!offsetApplied && videoB.duration) {
+        videoB.currentTime = videoB.duration / 2;
+        offsetApplied = true;
+      }
+    });
+
+    videoA.style.opacity = '1';
+    videoB.style.opacity = '0';
+
+    // translateZ(0) promotes each video to its own GPU layer for smoother scaling.
+    const startScale = 1.001;
+    const endScale = 1.12;
+    let scale = startScale;
+    let rafId = 0;
+
+    const applyTransform = (value: number) => {
+      const transform = `translateZ(0) scale(${value})`;
+      videoA.style.transform = transform;
+      videoB.style.transform = transform;
+    };
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const tick = () => {
+      if (!prefersReducedMotion) {
+        const scrollRange = window.innerHeight * 1.4;
+        const progress = clamp01(window.scrollY / scrollRange);
+        const targetScale = startScale + (endScale - startScale) * progress;
+        scale = lerp(scale, targetScale, 0.06);
+        applyTransform(scale);
+      }
+
+      if (videoA.duration && videoB.duration) {
+        const remainingA = videoA.duration - videoA.currentTime;
+        const remainingB = videoB.duration - videoB.currentTime;
+
+        if (remainingA >= 0 && remainingA < FADE_WINDOW) {
+          const t = clamp01(1 - remainingA / FADE_WINDOW);
+          videoA.style.opacity = String(1 - t);
+          videoB.style.opacity = String(t);
+        } else if (remainingB >= 0 && remainingB < FADE_WINDOW) {
+          const t = clamp01(1 - remainingB / FADE_WINDOW);
+          videoB.style.opacity = String(1 - t);
+          videoA.style.opacity = String(t);
+        }
+      }
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    if (prefersReducedMotion) {
+      applyTransform(startScale);
+    }
+
+    rafId = requestAnimationFrame(tick);
+    window.addEventListener('pagehide', () => cancelAnimationFrame(rafId));
+  }
+</script>
