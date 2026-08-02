@@ -6,14 +6,6 @@ export interface SanityImage {
   alt?: string;
 }
 
-export interface SanityFile {
-  asset: {
-    _id: string;
-    url: string;
-    originalFilename?: string;
-  };
-}
-
 export interface SlugField {
   current: string;
 }
