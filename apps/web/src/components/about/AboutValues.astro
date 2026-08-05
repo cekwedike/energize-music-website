@@ -2,14 +2,14 @@
 const values = [
   {
     label: 'Mission',
-    title: 'Inspire positive emotions',
+    title: 'Inspire Positive Emotions',
     body: 'We are here to inspire positive emotions through music that uplifts, connects, and speaks to audiences everywhere.',
     image: '/initiatives/next.jpg',
     imageAlt: 'Energize Music artists and the Next initiative',
   },
   {
     label: 'Vision',
-    title: 'One billion minds',
+    title: 'One Billion Minds',
     body: 'To influence and inspire 1,000,000,000 minds with the good news, carried from Lagos to every corner of the earth.',
     image: '/initiatives/energize-fest.webp',
     imageAlt: 'Energize Fest gathering with a global audience',
@@ -22,10 +22,16 @@ const values = [
     imageAlt: 'Energize Kids community and family-friendly events',
   },
 ];
+
+const slideCount = values.length;
 ---
 
-<section class="border-b border-white/10 bg-[var(--color-ink-raised)]" aria-labelledby="about-values-heading">
-  <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
+<section
+  class="about-values-section border-b border-white/10 bg-[var(--color-ink)]"
+  aria-labelledby="about-values-heading"
+  style={`--slide-count: ${slideCount}`}
+>
+  <div class="mx-auto max-w-6xl px-5 pt-20 pb-10 sm:px-6 sm:pt-28 sm:pb-12">
     <div class="about-scroll-reveal max-w-2xl">
       <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">What drives us</p>
       <h2 id="about-values-heading" class="text-h2 mt-4">Rooted in purpose</h2>
@@ -33,156 +39,572 @@ const values = [
         Energize Music is an Afro-gospel &amp; soul-fusion record label providing high-quality, family-friendly, uplifting music.
       </p>
     </div>
+  </div>
 
-    <div class="about-values-scroll about-scroll-reveal mt-12 sm:mt-14" style="--reveal-delay: 80ms">
-      <div class="about-values-scroll__edge about-values-scroll__edge--start" aria-hidden="true"></div>
-      <div class="about-values-scroll__edge about-values-scroll__edge--end" aria-hidden="true"></div>
-
-      <p class="about-values-scroll__hint" aria-hidden="true">
-        <span>Scroll</span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M3 8h8M8 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-        </svg>
+  <div class="about-values-pin about-scroll-reveal" style="--reveal-delay: 80ms">
+    <div class="about-values-sticky">
+      <p class="about-values-scroll-hint" aria-hidden="true">
+        <span>Scroll · Discover</span>
+        <span class="about-values-scroll-hint__chevron" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M8 3v8M5 8l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </span>
       </p>
 
-      <div class="about-values-track" role="list" aria-label="Mission, vision, and values">
+      <nav class="about-values-nav" aria-label="Mission, vision, and values">
         {
           values.map((item, i) => (
-            <article
-              role="listitem"
-              class="about-value-card group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-glow)]/30 bg-[var(--color-glow)]/[0.06] transition duration-300 hover:border-[var(--color-glow)]/45 hover:shadow-[0_8px_40px_rgba(77,168,255,0.1)]"
-              style={`--card-index: ${i}`}
+            <button
+              type="button"
+              class="about-values-nav__item"
+              data-nav-index={i}
+              aria-label={`Go to ${item.label}`}
             >
-              <div class="about-value-card__media relative aspect-[16/9] shrink-0 overflow-hidden bg-[var(--color-ink)]">
-                <img
-                  src={item.image}
-                  alt={item.imageAlt}
-                  loading="lazy"
-                  class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-                />
-                <div
-                  class="absolute inset-0 bg-gradient-to-t from-[var(--color-ink-raised)] via-[var(--color-ink-raised)]/15 to-transparent"
-                  aria-hidden="true"
-                />
-              </div>
-
-              <div class="flex flex-1 flex-col p-6 sm:p-8">
-                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-glow)]">{item.label}</p>
-                <h3 class="text-h3 mt-3 font-display">{item.title}</h3>
-                <p class="about-value-card__body mt-3 flex-1 text-sm leading-relaxed text-paper/70">{item.body}</p>
-                <div class="mt-6 h-px w-full bg-gradient-to-r from-[var(--color-glow)]/40 to-transparent" aria-hidden="true"></div>
-              </div>
-            </article>
+              <span class="about-values-nav__dot" aria-hidden="true"></span>
+              <span class="about-values-nav__label">{item.label}</span>
+            </button>
           ))
         }
+      </nav>
+
+      <div class="about-values-viewport">
+        <div class="about-values-track" role="list" aria-label="Mission, vision, and values">
+          {
+            values.map((item, i) => (
+              <article
+                role="listitem"
+                class="about-value-slide"
+                style={`--slide-index: ${i}`}
+                data-slide-index={i}
+                aria-label={`${item.label}: ${item.title}`}
+              >
+                <div class="about-value-slide__atmosphere" aria-hidden="true">
+                  <div class="about-value-slide__mesh"></div>
+                  <div class="about-value-slide__grain"></div>
+                </div>
+
+                <p class="about-value-slide__watermark font-display" aria-hidden="true">
+                  {item.label}
+                </p>
+
+                <div class="about-value-slide__layout">
+                  <div class="about-value-slide__frame">
+                    <div class="about-value-slide__frame-glow" aria-hidden="true"></div>
+                    <div class="about-value-slide__image-wrap">
+                      <img
+                        src={item.image}
+                        alt={item.imageAlt}
+                        loading={i === 0 ? 'eager' : 'lazy'}
+                        class="about-value-slide__image"
+                        data-parallax-image
+                      />
+                    </div>
+                    <div class="about-value-slide__frame-edge" aria-hidden="true"></div>
+                    <div class="about-value-slide__diagonal" aria-hidden="true"></div>
+                  </div>
+
+                  <div class="about-value-slide__content">
+                    <div class="about-value-slide__glass">
+                      <p class="about-value-slide__eyebrow">{item.label}</p>
+                      <h3 class="about-value-slide__title font-display">{item.title}</h3>
+                      <p class="about-value-slide__text">{item.body}</p>
+                      <div class="about-value-slide__accent" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))
+          }
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  .about-values-scroll {
+  .about-values-pin {
     position: relative;
-    margin-inline: -1.25rem;
   }
 
-  @media (min-width: 640px) {
-    .about-values-scroll {
-      margin-inline: -1.5rem;
-    }
+  .about-values-sticky {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .about-values-viewport {
+    position: relative;
+    width: 100dvw;
+    max-width: 100dvw;
+    height: 100dvh;
+    min-height: 100vh;
+    margin-inline: calc(50% - 50dvw);
+    overflow: hidden;
   }
 
   .about-values-track {
     display: flex;
-    align-items: stretch;
-    gap: 1rem;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 1.25rem;
-    padding-inline: 1.25rem;
-    padding-block: 0.25rem 0.5rem;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    height: 100%;
+    will-change: transform;
   }
 
-  .about-values-track::-webkit-scrollbar {
-    display: none;
+  .about-value-slide {
+    position: relative;
+    flex: 0 0 100dvw;
+    width: 100dvw;
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-ink);
   }
 
-  .about-value-card {
-    flex: 0 0 min(82vw, 320px);
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-    min-height: 100%;
+  .about-value-slide__atmosphere {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
   }
 
-  .about-value-card__body {
-    min-height: 5.5rem;
+  .about-value-slide__mesh {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 55% at 20% 15%, rgba(77, 168, 255, 0.12), transparent 55%),
+      radial-gradient(ellipse 50% 45% at 85% 80%, rgba(103, 232, 249, 0.06), transparent 50%),
+      linear-gradient(180deg, var(--color-ink) 0%, #0e0e11 50%, var(--color-ink-raised) 100%);
   }
 
-  @media (min-width: 768px) {
-    .about-value-card {
-      flex-basis: min(42vw, 340px);
+  .about-value-slide__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.3;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+  }
+
+  .about-value-slide__watermark {
+    position: absolute;
+    top: clamp(3rem, 8vh, 5.5rem);
+    left: clamp(1rem, 4vw, 3rem);
+    z-index: 0;
+    margin: 0;
+    font-size: clamp(4.5rem, 2rem + 14vw, 11rem);
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--color-glow) 18%, transparent);
+    opacity: 0.55;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .about-value-slide__layout {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: clamp(4.5rem, 10vh, 6.5rem) clamp(1.25rem, 4vw, 3rem) clamp(5.5rem, 12vh, 7rem);
+  }
+
+  .about-value-slide__frame {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    border-radius: clamp(1rem, 2vw, 1.5rem);
+    overflow: hidden;
+  }
+
+  .about-value-slide__frame-glow {
+    position: absolute;
+    inset: -1px;
+    z-index: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-glow) 55%, transparent),
+      color-mix(in srgb, var(--color-glow-cyan) 25%, transparent) 50%,
+      color-mix(in srgb, var(--color-glow) 35%, transparent)
+    );
+    opacity: 0.35;
+    transition: opacity 0.6s ease;
+  }
+
+  .about-value-slide.is-active .about-value-slide__frame-glow {
+    opacity: 0.85;
+    animation: values-glow-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes values-glow-pulse {
+    0%,
+    100% {
+      opacity: 0.65;
+    }
+    50% {
+      opacity: 1;
     }
   }
 
-  @media (min-width: 1024px) {
-    .about-values-track {
-      overflow-x: visible;
-      scroll-snap-type: none;
-      padding-inline: 0;
-      gap: 1.25rem;
-    }
-
-    .about-value-card {
-      flex: 1 1 0;
-      min-width: 0;
-    }
+  .about-value-slide__image-wrap {
+    position: absolute;
+    inset: 2px;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: calc(clamp(1rem, 2vw, 1.5rem) - 2px);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
 
-  .about-values-scroll__edge {
+  .about-value-slide__image {
+    width: 100%;
+    height: 115%;
+    object-fit: cover;
+    object-position: center;
+    will-change: transform;
+  }
+
+  .about-value-slide__frame-edge {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    border: 1px solid color-mix(in srgb, var(--color-glow) 30%, transparent);
+    pointer-events: none;
+    transition: border-color 0.6s ease;
+  }
+
+  .about-value-slide.is-active .about-value-slide__frame-edge {
+    border-color: color-mix(in srgb, var(--color-glow) 55%, transparent);
+  }
+
+  .about-value-slide__diagonal {
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    left: 0;
+    width: 140%;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-glow) 35%,
+      var(--color-glow-cyan) 65%,
+      transparent 100%
+    );
+    transform: rotate(-8deg);
+    transform-origin: left bottom;
+    opacity: 0.5;
+    box-shadow: 0 0 24px color-mix(in srgb, var(--color-glow) 60%, transparent);
+    pointer-events: none;
+  }
+
+  .about-value-slide__content {
+    position: relative;
+    z-index: 4;
+    flex-shrink: 0;
+    margin-top: -2.5rem;
+    padding-inline: 0.25rem;
+  }
+
+  .about-value-slide__glass {
+    position: relative;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border-radius: 1rem;
+    border: 1px solid color-mix(in srgb, var(--color-glow) 20%, transparent);
+    background: color-mix(in srgb, var(--color-ink-raised) 88%, transparent);
+    backdrop-filter: blur(16px);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    overflow: hidden;
+  }
+
+  .about-value-slide__accent {
     position: absolute;
     top: 0;
-    bottom: 0.5rem;
-    width: 2.5rem;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .about-values-scroll__edge--start {
     left: 0;
-    background: linear-gradient(to right, var(--color-ink-raised) 15%, transparent);
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--color-glow), var(--color-glow-cyan));
+    opacity: 0;
+    transition: opacity 0.5s ease;
   }
 
-  .about-values-scroll__edge--end {
-    right: 0;
-    background: linear-gradient(to left, var(--color-ink-raised) 15%, transparent);
+  .about-value-slide.is-active .about-value-slide__accent {
+    opacity: 1;
   }
 
-  @media (min-width: 1024px) {
-    .about-values-scroll__edge {
-      display: none;
+  .about-value-slide__eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .about-value-slide__title {
+    margin-top: 0.75rem;
+    font-size: clamp(1.625rem, 1.25rem + 1.2vw, 2.5rem);
+    line-height: 1.08;
+    color: var(--color-paper);
+  }
+
+  .about-value-slide__text {
+    margin-top: 0.875rem;
+    font-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1.0625rem);
+    line-height: 1.65;
+    color: color-mix(in srgb, var(--color-paper) 72%, transparent);
+  }
+
+  .about-values-scroll-hint {
+    position: absolute;
+    top: clamp(0.75rem, 2.5vh, 1.5rem);
+    left: 50%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-glow) 70%, transparent);
+    pointer-events: none;
+  }
+
+  .about-values-scroll-hint__chevron {
+    display: inline-flex;
+    animation: values-chevron-bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes values-chevron-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(4px);
     }
   }
 
-  .about-values-scroll__hint {
+  .about-values-nav {
+    position: absolute;
+    bottom: clamp(1rem, 3vh, 1.75rem);
+    left: 50%;
+    z-index: 5;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 0.35rem;
-    margin-inline: 1.25rem 1.25rem;
-    margin-bottom: 0.75rem;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-glow) 70%, transparent);
+    gap: clamp(0.5rem, 2vw, 1.25rem);
+    transform: translateX(-50%);
+    padding: 0.5rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-glow) 15%, transparent);
+    background: color-mix(in srgb, var(--color-ink) 75%, transparent);
+    backdrop-filter: blur(12px);
   }
 
-  @media (min-width: 1024px) {
-    .about-values-scroll__hint {
+  .about-values-nav__item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.625rem;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    cursor: default;
+    transition:
+      background 0.4s ease,
+      color 0.4s ease;
+  }
+
+  .about-values-nav__dot {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-glow) 30%, transparent);
+    transition:
+      transform 0.4s ease,
+      background 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+
+  .about-values-nav__label {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-paper) 45%, transparent);
+    transition: color 0.4s ease;
+  }
+
+  .about-values-nav__item.is-active {
+    background: color-mix(in srgb, var(--color-glow) 12%, transparent);
+  }
+
+  .about-values-nav__item.is-active .about-values-nav__dot {
+    background: var(--color-glow);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--color-glow) 70%, transparent);
+    transform: scale(1.15);
+  }
+
+  .about-values-nav__item.is-active .about-values-nav__label {
+    color: var(--color-paper);
+  }
+
+  /* Text reveal on active slide */
+  .about-value-slide__eyebrow,
+  .about-value-slide__title,
+  .about-value-slide__text {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Mobile & tablet: horizontal swipe snap */
+  @media (max-width: 1023px) {
+    .about-values-viewport {
+      height: 100svh;
+      min-height: 100svh;
+    }
+
+    .about-value-slide__watermark {
+      font-size: clamp(3.5rem, 1.5rem + 10vw, 6rem);
+      top: clamp(3.5rem, 8vh, 5rem);
+    }
+
+    .about-value-slide__layout {
+      padding-bottom: clamp(6rem, 14vh, 8rem);
+    }
+
+    .about-value-slide__content {
+      margin-top: -2rem;
+    }
+
+    .about-values-track {
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      transform: none !important;
+    }
+
+    .about-values-track::-webkit-scrollbar {
       display: none;
+    }
+
+    .about-value-slide {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+
+    .about-values-scroll-hint span:first-child {
+      display: none;
+    }
+
+    .about-values-scroll-hint__chevron svg {
+      transform: rotate(-90deg);
+    }
+
+    .about-values-nav__item {
+      cursor: pointer;
+    }
+  }
+
+  /* Desktop: sticky scroll-driven horizontal slides */
+  @media (min-width: 1024px) {
+    .about-values-pin {
+      height: calc(var(--slide-count) * 100vh);
+    }
+
+    .about-values-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      min-height: 100vh;
+    }
+
+    .about-value-slide__layout {
+      flex-direction: row;
+      align-items: stretch;
+      gap: clamp(1.5rem, 3vw, 2.5rem);
+      padding-top: clamp(5rem, 11vh, 7rem);
+      padding-bottom: clamp(4.5rem, 10vh, 6rem);
+    }
+
+    .about-value-slide__frame {
+      flex: 1 1 58%;
+      clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+    }
+
+    .about-value-slide__image-wrap {
+      clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+    }
+
+    .about-value-slide__diagonal {
+      bottom: 8%;
+      left: auto;
+      right: -2%;
+      width: 45%;
+      transform: rotate(-14deg);
+      transform-origin: right bottom;
+    }
+
+    .about-value-slide__content {
+      flex: 0 0 min(36%, 22rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      margin-top: 0;
+      padding-bottom: clamp(1rem, 3vh, 2rem);
+      padding-inline: 0;
+    }
+
+    .about-value-slide__glass {
+      margin-left: -3rem;
+    }
+
+    .about-value-slide__watermark {
+      top: 50%;
+      left: auto;
+      right: clamp(1rem, 3vw, 2rem);
+      font-size: clamp(5rem, 3rem + 8vw, 10rem);
+      transform: translateY(-50%);
+      text-align: right;
+      -webkit-text-stroke: 1px color-mix(in srgb, var(--color-glow) 14%, transparent);
+      opacity: 0.4;
+    }
+
+    .about-value-slide__eyebrow,
+    .about-value-slide__title,
+    .about-value-slide__text {
+      opacity: 0;
+      transform: translateY(1.25rem);
+      transition:
+        opacity 0.65s ease,
+        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .about-value-slide.is-active .about-value-slide__eyebrow {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0ms;
+    }
+
+    .about-value-slide.is-active .about-value-slide__title {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 90ms;
+    }
+
+    .about-value-slide.is-active .about-value-slide__text {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 180ms;
+    }
+
+    .about-values-nav__item {
+      cursor: pointer;
     }
   }
 
@@ -207,26 +629,248 @@ const values = [
       transition: none !important;
     }
 
-    .about-values-scroll {
+    .about-values-pin {
+      height: auto !important;
+    }
+
+    .about-values-sticky {
+      position: relative;
+      height: auto;
+      min-height: 0;
+    }
+
+    .about-values-viewport {
+      width: 100%;
+      max-width: none;
+      height: auto;
+      min-height: 0;
       margin-inline: 0;
+      overflow: visible;
     }
 
     .about-values-track {
-      flex-wrap: wrap;
-      overflow-x: visible;
-      scroll-snap-type: none;
-      padding-inline: 0;
-      gap: 1rem;
+      flex-direction: column;
+      transform: none !important;
+      overflow: visible;
     }
 
-    .about-value-card {
-      flex: 1 1 calc(50% - 0.5rem);
-      min-width: min(100%, 280px);
+    .about-value-slide {
+      flex: none;
+      width: 100%;
+      height: auto;
+      min-height: 28rem;
     }
 
-    .about-values-scroll__edge,
-    .about-values-scroll__hint {
+    .about-value-slide__layout {
+      flex-direction: column;
+      height: auto;
+      min-height: 24rem;
+    }
+
+    .about-value-slide__frame {
+      min-height: 16rem;
+      clip-path: none;
+    }
+
+    .about-value-slide__image-wrap {
+      clip-path: none;
+    }
+
+    .about-value-slide__content {
+      margin-top: -2rem;
+    }
+
+    .about-value-slide__glass {
+      margin-left: 0;
+    }
+
+    .about-value-slide__eyebrow,
+    .about-value-slide__title,
+    .about-value-slide__text {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+
+    .about-value-slide__frame-glow,
+    .about-values-scroll-hint__chevron {
+      animation: none !important;
+    }
+
+    .about-values-scroll-hint,
+    .about-values-nav {
       display: none;
     }
   }
 </style>
+
+<script>
+  (function initAboutValuesScroll() {
+    const pin = document.querySelector<HTMLElement>('.about-values-pin');
+    const viewport = pin?.querySelector<HTMLElement>('.about-values-viewport') ?? null;
+    const track = pin?.querySelector<HTMLElement>('.about-values-track') ?? null;
+    const slides = pin ? pin.querySelectorAll<HTMLElement>('.about-value-slide') : [];
+    const navItems = pin ? pin.querySelectorAll<HTMLElement>('.about-values-nav__item') : [];
+    if (!pin || !viewport || !track || slides.length === 0) return;
+
+    const pinSection = pin;
+    const slideTrack = track;
+    const slideViewport = viewport;
+
+    const reducedQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const desktopQuery = window.matchMedia('(min-width: 1024px)');
+
+    let ticking = false;
+    let maxTranslate = 0;
+
+    function measure() {
+      if (!desktopQuery.matches || reducedQuery.matches) {
+        maxTranslate = 0;
+        slideTrack.style.transform = '';
+        return;
+      }
+
+      maxTranslate = Math.max(0, slideTrack.scrollWidth - slideViewport.offsetWidth);
+    }
+
+    function setParallax(activeIndex: number, slideProgress: number) {
+      slides.forEach((slide, i) => {
+        const img = slide.querySelector<HTMLElement>('[data-parallax-image]');
+        if (!img) return;
+
+        if (reducedQuery.matches) {
+          img.style.transform = '';
+          return;
+        }
+
+        const isActive = i === activeIndex;
+        const neighborOffset = (i - activeIndex - slideProgress) * 8;
+        const yOffset = isActive ? slideProgress * -3 : neighborOffset;
+        const scale = isActive ? 1.04 + slideProgress * 0.02 : 1.04;
+
+        img.style.transform = `translate3d(0, ${yOffset}%, 0) scale(${scale})`;
+      });
+    }
+
+    function setActiveIndex(activeIndex: number, slideProgress = 0) {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('is-active', i === activeIndex);
+      });
+
+      navItems.forEach((item, i) => {
+        item.classList.toggle('is-active', i === activeIndex);
+      });
+
+      setParallax(activeIndex, slideProgress);
+    }
+
+    function scrollToSlide(index: number) {
+      const clamped = Math.max(0, Math.min(slides.length - 1, index));
+
+      if (desktopQuery.matches && !reducedQuery.matches) {
+        const scrollable = pinSection.offsetHeight - window.innerHeight;
+        const targetProgress = slides.length <= 1 ? 0 : clamped / (slides.length - 1);
+        const targetScroll = pinSection.offsetTop + scrollable * targetProgress;
+        window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+        return;
+      }
+
+      const slide = slides[clamped];
+      if (!slide) return;
+
+      slideTrack.scrollTo({
+        left: slide.offsetLeft,
+        behavior: reducedQuery.matches ? 'auto' : 'smooth',
+      });
+    }
+
+    function updateDesktop() {
+      const rect = pinSection.getBoundingClientRect();
+      const scrollable = pinSection.offsetHeight - window.innerHeight;
+      const scrolled = Math.max(0, -rect.top);
+      const rawProgress = scrollable > 0 ? Math.min(1, scrolled / scrollable) : 0;
+      const translateX = -rawProgress * maxTranslate;
+
+      slideTrack.style.transform = `translate3d(${translateX}px, 0, 0)`;
+
+      const segmentSize = slides.length <= 1 ? 1 : 1 / (slides.length - 1);
+      const floatIndex = rawProgress / segmentSize;
+      const activeIndex = slides.length <= 1 ? 0 : Math.min(slides.length - 1, Math.round(rawProgress * (slides.length - 1)));
+      const slideProgress = floatIndex - activeIndex;
+
+      setActiveIndex(activeIndex, Math.abs(slideProgress));
+    }
+
+    function updateMobileFromScroll() {
+      const viewportLeft = slideViewport.getBoundingClientRect().left;
+      const viewportCenter = viewportLeft + slideViewport.offsetWidth / 2;
+
+      let closestIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      slides.forEach((slide, i) => {
+        const slideRect = slide.getBoundingClientRect();
+        const slideCenter = slideRect.left + slideRect.width / 2;
+        const distance = Math.abs(slideCenter - viewportCenter);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
+        }
+      });
+
+      setActiveIndex(closestIndex, 0);
+    }
+
+    function update() {
+      ticking = false;
+
+      if (reducedQuery.matches) {
+        slides.forEach((slide) => slide.classList.add('is-active'));
+        return;
+      }
+
+      if (desktopQuery.matches) {
+        updateDesktop();
+        return;
+      }
+
+      updateMobileFromScroll();
+    }
+
+    function requestUpdate() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+
+    function onResize() {
+      measure();
+      requestUpdate();
+    }
+
+    navItems.forEach((item) => {
+      item.addEventListener('click', () => {
+        const index = Number(item.dataset.navIndex);
+        if (Number.isFinite(index)) scrollToSlide(index);
+      });
+    });
+
+    measure();
+    update();
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', onResize);
+    slideTrack.addEventListener('scroll', requestUpdate, { passive: true });
+
+    reducedQuery.addEventListener('change', () => {
+      measure();
+      requestUpdate();
+    });
+
+    desktopQuery.addEventListener('change', () => {
+      measure();
+      requestUpdate();
+    });
+  })();
+</script>
