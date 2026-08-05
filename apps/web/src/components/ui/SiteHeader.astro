@@ -1,5 +1,6 @@
 ---
 import { primaryNav } from '../../lib/nav';
+import Logo from './Logo.astro';
 
 const currentPath = Astro.url.pathname;
 
@@ -10,12 +11,8 @@ function isActive(href: string) {
 
 <header class="liquid-glass sticky top-0 z-40">
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-5">
-    <a
-      href="/"
-      class="shrink-0 text-lg font-semibold tracking-tight text-paper sm:text-xl"
-      style="font-family: var(--font-display)"
-    >
-      Energize Music
+    <a href="/" class="shrink-0" aria-label="Energize Music">
+      <Logo size="sm" animated={false} />
     </a>
 
     <nav aria-label="Primary" class="hidden sm:block">
