@@ -1,0 +1,19 @@
+---
+description: Never use em dashes in Energize Music project copy or comments
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# No em dashes
+
+Never use em dashes (`—`, `\u2014`, `&mdash;`, `&#8212;`) in user-facing copy, Sanity schema descriptions, or code comments for this project.
+
+Use one of these instead, depending on context:
+
+- Comma: "artists, releases, and initiatives, or discover..."
+- Colon: "Afro-gospel and soul-fusion: uplifting music..."
+- Period: split into two sentences
+- Hyphen `-`: only for compound words or numeric ranges (e.g. `energize-kids.com`, `404: Page not found`)
+
+Before finishing any edit, grep for em dash characters in changed files and replace any matches.

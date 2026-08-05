@@ -18,7 +18,7 @@ const tabs: { label: string; value: Artist['tier'] | 'all' }[] = [
   <PageHero
     eyebrow="Roster"
     title="Artists"
-    description="The Energize Music roster — official artists and legacy catalog shaping Afro-gospel and soul-fusion worldwide."
+    description="The Energize Music roster: official artists and legacy catalog shaping Afro-gospel and soul-fusion worldwide."
   />
 
   <section class="mx-auto max-w-6xl px-5 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16">
@@ -40,7 +40,7 @@ const tabs: { label: string; value: Artist['tier'] | 'all' }[] = [
             ))}
           </div>
 
-          <div id="artist-grid" class="scroll-reveal mt-8 grid grid-cols-2 gap-3 sm:mt-10 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4" style="--reveal-delay: 160ms">
+          <div id="artist-grid" class="scroll-reveal-stagger mt-8 grid grid-cols-2 gap-3 sm:mt-10 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {artists.map((artist) => (
               <ArtistCard artist={artist} />
             ))}

@@ -3,7 +3,7 @@ export interface NavLink {
   href: string;
 }
 
-// Used by the footer's "Explore" column — order doesn't need to match the header.
+// Used by the footer's "Explore" column. Order doesn't need to match the header.
 export const primaryNav: NavLink[] = [
   { label: 'About Us', href: '/about' },
   { label: 'Artists', href: '/artists' },
@@ -27,7 +27,7 @@ export const initiativesNav: InitiativeItem[] = [
     label: 'Energize Kids',
     href: '/energize-kids',
     blurb:
-      'Clean entertainment for kids — music, movement, learning, and joy. Explore activities and events at energize-kids.com.',
+      'Clean entertainment for kids: music, movement, learning, and joy. Explore activities and events at energize-kids.com.',
     image: '/initiatives/energize-kids.webp',
   },
   {
@@ -50,7 +50,7 @@ export type HeaderNavEntry =
   | ({ type: 'link' } & NavLink)
   | { type: 'dropdown'; label: string; items: InitiativeItem[] };
 
-// Drives SiteHeader specifically — order and Home visibility are handled there.
+// Drives SiteHeader specifically. Order and Home visibility are handled there.
 export const headerNav: HeaderNavEntry[] = [
   { type: 'link', label: 'Home', href: '/' },
   { type: 'link', label: 'About Us', href: '/about' },
@@ -66,7 +66,7 @@ export interface SocialLink {
   href: string;
 }
 
-// Placeholder handles — wire to siteSettings.socials once Sanity content is seeded.
+// Placeholder handles. Wire to siteSettings.socials once Sanity content is seeded.
 export const socialLinks: SocialLink[] = [
   { label: 'Instagram', href: 'https://instagram.com/energizemusic' },
   { label: 'YouTube', href: 'https://youtube.com/@energizemusic' },

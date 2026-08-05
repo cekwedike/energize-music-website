@@ -4,52 +4,74 @@ const values = [
     label: 'Mission',
     title: 'Inspire positive emotions',
     body: 'We are here to inspire positive emotions through music that uplifts, connects, and speaks to audiences everywhere.',
-    featured: true,
+    image: '/initiatives/next.jpg',
+    imageAlt: 'Energize Music artists and the Next initiative',
   },
   {
     label: 'Vision',
     title: 'One billion minds',
-    body: 'To influence and inspire 1,000,000,000 minds with the good news — carried from Lagos to every corner of the earth.',
-    featured: false,
+    body: 'To influence and inspire 1,000,000,000 minds with the good news, carried from Lagos to every corner of the earth.',
+    image: '/initiatives/energize-fest.webp',
+    imageAlt: 'Energize Fest gathering with a global audience',
   },
   {
     label: 'Values',
-    title: 'Excellence & relevance',
+    title: 'Excellence & Relevance',
     body: 'Excellence in music and lyrics, positivity and uplifting content, family-friendly material across cultures, and relevance to global audiences.',
-    featured: false,
+    image: '/initiatives/energize-kids.webp',
+    imageAlt: 'Energize Kids community and family-friendly events',
   },
 ];
 ---
 
 <section class="border-b border-white/10 bg-[var(--color-ink-raised)]" aria-labelledby="about-values-heading">
   <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
-    <div class="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:items-end lg:gap-20">
-      <div class="about-scroll-reveal">
-        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">What drives us</p>
-        <h2 id="about-values-heading" class="text-h2 mt-4">Rooted in purpose</h2>
-        <p class="mt-5 max-w-md text-paper/70">
-          Energize Music is an Afro-gospel &amp; soul-fusion record label providing high-quality, family-friendly, uplifting music.
-        </p>
-      </div>
+    <div class="about-scroll-reveal max-w-2xl">
+      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">What drives us</p>
+      <h2 id="about-values-heading" class="text-h2 mt-4">Rooted in purpose</h2>
+      <p class="mt-5 max-w-md text-paper/70">
+        Energize Music is an Afro-gospel &amp; soul-fusion record label providing high-quality, family-friendly, uplifting music.
+      </p>
+    </div>
 
-      <div class="grid gap-4 sm:grid-cols-2">
+    <div class="about-values-scroll about-scroll-reveal mt-12 sm:mt-14" style="--reveal-delay: 80ms">
+      <div class="about-values-scroll__edge about-values-scroll__edge--start" aria-hidden="true"></div>
+      <div class="about-values-scroll__edge about-values-scroll__edge--end" aria-hidden="true"></div>
+
+      <p class="about-values-scroll__hint" aria-hidden="true">
+        <span>Scroll</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3 8h8M8 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </p>
+
+      <div class="about-values-track" role="list" aria-label="Mission, vision, and values">
         {
           values.map((item, i) => (
             <article
-              class:list={[
-                'about-scroll-reveal about-value-card group rounded-2xl border p-6 transition duration-300',
-                item.featured
-                  ? 'sm:col-span-2 border-[var(--color-glow)]/30 bg-[var(--color-glow)]/[0.06] lg:p-8'
-                  : 'border-white/10 bg-white/[0.03] hover:border-[var(--color-glow)]/25 hover:bg-white/[0.05]',
-              ]}
-              style={`--reveal-delay: ${i * 100}ms`}
+              role="listitem"
+              class="about-value-card group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-glow)]/30 bg-[var(--color-glow)]/[0.06] transition duration-300 hover:border-[var(--color-glow)]/45 hover:shadow-[0_8px_40px_rgba(77,168,255,0.1)]"
+              style={`--card-index: ${i}`}
             >
-              <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-glow)]">{item.label}</p>
-              <h3 class="text-h3 mt-3 font-display">{item.title}</h3>
-              <p class="mt-3 text-sm leading-relaxed text-paper/70">{item.body}</p>
-              {item.featured && (
+              <div class="about-value-card__media relative aspect-[16/9] shrink-0 overflow-hidden bg-[var(--color-ink)]">
+                <img
+                  src={item.image}
+                  alt={item.imageAlt}
+                  loading="lazy"
+                  class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-[var(--color-ink-raised)] via-[var(--color-ink-raised)]/15 to-transparent"
+                  aria-hidden="true"
+                />
+              </div>
+
+              <div class="flex flex-1 flex-col p-6 sm:p-8">
+                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-glow)]">{item.label}</p>
+                <h3 class="text-h3 mt-3 font-display">{item.title}</h3>
+                <p class="about-value-card__body mt-3 flex-1 text-sm leading-relaxed text-paper/70">{item.body}</p>
                 <div class="mt-6 h-px w-full bg-gradient-to-r from-[var(--color-glow)]/40 to-transparent" aria-hidden="true"></div>
-              )}
+              </div>
             </article>
           ))
         }
@@ -59,6 +81,111 @@ const values = [
 </section>
 
 <style>
+  .about-values-scroll {
+    position: relative;
+    margin-inline: -1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .about-values-scroll {
+      margin-inline: -1.5rem;
+    }
+  }
+
+  .about-values-track {
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1.25rem;
+    padding-inline: 1.25rem;
+    padding-block: 0.25rem 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .about-values-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .about-value-card {
+    flex: 0 0 min(82vw, 320px);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 100%;
+  }
+
+  .about-value-card__body {
+    min-height: 5.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .about-value-card {
+      flex-basis: min(42vw, 340px);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .about-values-track {
+      overflow-x: visible;
+      scroll-snap-type: none;
+      padding-inline: 0;
+      gap: 1.25rem;
+    }
+
+    .about-value-card {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
+  .about-values-scroll__edge {
+    position: absolute;
+    top: 0;
+    bottom: 0.5rem;
+    width: 2.5rem;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .about-values-scroll__edge--start {
+    left: 0;
+    background: linear-gradient(to right, var(--color-ink-raised) 15%, transparent);
+  }
+
+  .about-values-scroll__edge--end {
+    right: 0;
+    background: linear-gradient(to left, var(--color-ink-raised) 15%, transparent);
+  }
+
+  @media (min-width: 1024px) {
+    .about-values-scroll__edge {
+      display: none;
+    }
+  }
+
+  .about-values-scroll__hint {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    margin-inline: 1.25rem 1.25rem;
+    margin-bottom: 0.75rem;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-glow) 70%, transparent);
+  }
+
+  @media (min-width: 1024px) {
+    .about-values-scroll__hint {
+      display: none;
+    }
+  }
+
   .about-scroll-reveal {
     opacity: 0;
     transform: translateY(24px);
@@ -78,6 +205,28 @@ const values = [
       opacity: 1 !important;
       transform: none !important;
       transition: none !important;
+    }
+
+    .about-values-scroll {
+      margin-inline: 0;
+    }
+
+    .about-values-track {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      scroll-snap-type: none;
+      padding-inline: 0;
+      gap: 1rem;
+    }
+
+    .about-value-card {
+      flex: 1 1 calc(50% - 0.5rem);
+      min-width: min(100%, 280px);
+    }
+
+    .about-values-scroll__edge,
+    .about-values-scroll__hint {
+      display: none;
     }
   }
 </style>

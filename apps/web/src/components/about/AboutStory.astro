@@ -20,8 +20,18 @@ const hasLegacy = legacyPage && legacyPage.blocks.length > 0;
         <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">Our story</p>
         <h2 class="text-h2 mt-4">Music with meaning</h2>
         <p class="mt-5 text-paper/60">
-          From Lagos to the world — we create and curate sounds that carry faith, culture, and excellence.
+          From Lagos to the world: we create and curate sounds that carry faith, culture, and excellence.
         </p>
+
+        <div class="about-story-visual mt-10 overflow-hidden rounded-2xl border border-white/10">
+          <img
+            src="/brand/logo.webp"
+            alt="Energize Music logo"
+            class="h-auto w-full bg-[var(--color-ink-raised)] p-8 object-contain"
+            loading="lazy"
+          />
+        </div>
+
         <div class="mt-8 hidden h-24 w-px bg-gradient-to-b from-[var(--color-glow)]/60 to-transparent lg:block" aria-hidden="true"></div>
       </div>
 
@@ -35,7 +45,7 @@ const hasLegacy = legacyPage && legacyPage.blocks.length > 0;
             <>
               <p class="text-lead text-paper/90">
                 Energize Music is an Afro-gospel &amp; soul-fusion record label providing high-quality,
-                family-friendly, uplifting music — built on the belief that music has the power to connect
+                family-friendly, uplifting music, built on the belief that music has the power to connect
                 people and speak to audiences everywhere.
               </p>
               <p>
@@ -55,6 +65,10 @@ const hasLegacy = legacyPage && legacyPage.blocks.length > 0;
 </section>
 
 <style>
+  .about-story-visual {
+    box-shadow: 0 16px 48px rgba(77, 168, 255, 0.06);
+  }
+
   .about-story-content :global(h2) {
     font-family: var(--font-display);
     font-size: var(--text-h3);

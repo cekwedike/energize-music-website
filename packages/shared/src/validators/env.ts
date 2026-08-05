@@ -23,7 +23,7 @@ export function parseSanityEnv(env: Record<string, string | undefined>): SanityE
   return sanityEnvSchema.parse(env);
 }
 
-// Full public env, including form/site URL — only needed once the contact form (Phase 4) lands.
+// Full public env, including form/site URL. Only needed once the contact form (Phase 4) lands.
 export function parsePublicEnv(env: Record<string, string | undefined>): PublicEnv {
   return publicEnvSchema.parse(env);
 }

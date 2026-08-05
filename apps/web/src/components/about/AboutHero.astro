@@ -1,4 +1,6 @@
 ---
+import Logo from '../ui/Logo.astro';
+
 interface Props {
   title: string;
   eyebrow?: string;
@@ -13,27 +15,52 @@ const { title, eyebrow = 'About Us' } = Astro.props;
   <div class="about-hero__glow about-hero__glow--left" aria-hidden="true"></div>
   <div class="about-hero__glow about-hero__glow--right" aria-hidden="true"></div>
 
-  <div class="relative mx-auto max-w-6xl px-5 pb-20 pt-24 sm:px-6 sm:pb-32 sm:pt-40">
-    <div class="max-w-4xl">
-      <p class="about-reveal about-reveal-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">
-        {eyebrow}
-      </p>
-      <div class="about-reveal about-reveal-2 mt-4 h-px w-12 bg-[var(--color-glow)]" aria-hidden="true"></div>
-      <h1 class="about-reveal about-reveal-3 text-display mt-8 max-w-3xl font-display leading-[0.95] tracking-tight">
-        {title}
-      </h1>
-      <p class="about-reveal about-reveal-4 text-lead mt-8 max-w-xl text-paper/70">
-        Afro-gospel &amp; soul-fusion — uplifting music built on the belief that sound can connect people and speak to audiences everywhere.
-      </p>
-    </div>
+  <div class="relative mx-auto max-w-6xl px-5 pb-20 pt-24 sm:px-6 sm:pb-32 sm:pt-36">
+    <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-16">
+      <div>
+        <div class="about-reveal about-reveal-1 mb-10 max-w-[280px] sm:max-w-[320px]">
+          <Logo size="sm" />
+        </div>
+        <p class="about-reveal about-reveal-2 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">
+          {eyebrow}
+        </p>
+        <div class="about-reveal about-reveal-3 mt-4 h-px w-12 bg-[var(--color-glow)]" aria-hidden="true"></div>
+        <h1 class="about-reveal about-reveal-4 text-display mt-8 max-w-3xl font-display leading-[0.95] tracking-tight">
+          {title}
+        </h1>
+        <p class="about-reveal about-reveal-5 text-lead mt-8 max-w-xl text-paper/70">
+          Afro-gospel and soul-fusion: uplifting music built on the belief that sound can connect people and speak to audiences everywhere.
+        </p>
 
-    <div class="about-reveal about-reveal-5 mt-16 hidden gap-4 sm:flex">
-      <a href="#story" class="rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90">
-        Our story
-      </a>
-      <a href="#team" class="rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-paper transition hover:border-white/45 hover:bg-white/5">
-        Meet the team
-      </a>
+        <div class="about-reveal about-reveal-6 mt-12 flex flex-wrap gap-3">
+          <a href="#story" class="rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90">
+            Our story
+          </a>
+          <a href="#team" class="rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-paper transition hover:border-white/45 hover:bg-white/5">
+            Meet the team
+          </a>
+        </div>
+      </div>
+
+      <div class="about-reveal about-reveal-7 relative hidden lg:block">
+        <div class="about-hero__visual relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10">
+          <img
+            src="/initiatives/next.jpg"
+            alt=""
+            class="h-full w-full object-cover object-center"
+            loading="eager"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)] via-[var(--color-ink)]/25 to-transparent"></div>
+          <div class="absolute inset-x-0 bottom-0 p-6">
+            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-glow)]">From Lagos to the world</p>
+            <p class="mt-2 max-w-xs text-sm text-paper/75">
+              Faith, culture, and excellence woven into every release, experience, and initiative.
+            </p>
+          </div>
+        </div>
+        <div class="about-hero__visual-accent absolute -bottom-6 -left-6 -z-10 h-32 w-32 rounded-full bg-[var(--color-glow)]/15 blur-3xl" aria-hidden="true"></div>
+        <div class="about-hero__visual-accent absolute -right-4 -top-4 -z-10 h-24 w-24 rounded-full bg-cyan-400/10 blur-2xl" aria-hidden="true"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -91,6 +118,10 @@ const { title, eyebrow = 'About Us' } = Astro.props;
     background: rgba(255, 255, 255, 0.04);
   }
 
+  .about-hero__visual {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  }
+
   .about-reveal {
     opacity: 0;
     transform: translateY(20px);
@@ -101,9 +132,11 @@ const { title, eyebrow = 'About Us' } = Astro.props;
 
   .about-hero.is-visible .about-reveal-1 { transition-delay: 0ms; }
   .about-hero.is-visible .about-reveal-2 { transition-delay: 80ms; }
-  .about-hero.is-visible .about-reveal-3 { transition-delay: 160ms; }
-  .about-hero.is-visible .about-reveal-4 { transition-delay: 280ms; }
-  .about-hero.is-visible .about-reveal-5 { transition-delay: 400ms; }
+  .about-hero.is-visible .about-reveal-3 { transition-delay: 140ms; }
+  .about-hero.is-visible .about-reveal-4 { transition-delay: 220ms; }
+  .about-hero.is-visible .about-reveal-5 { transition-delay: 320ms; }
+  .about-hero.is-visible .about-reveal-6 { transition-delay: 420ms; }
+  .about-hero.is-visible .about-reveal-7 { transition-delay: 500ms; }
 
   .about-hero.is-visible .about-reveal {
     opacity: 1;

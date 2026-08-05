@@ -18,17 +18,17 @@ const highlights = [
 ];
 ---
 
-<BaseLayout title="Energize Fest" description="Energize Fest — a live celebration of Afro-gospel culture. Details coming soon.">
+<BaseLayout title="Energize Fest" description="Energize Fest: a live celebration of Afro-gospel culture. Details coming soon.">
   <PageHero
     eyebrow="Initiative"
     title="Energize Fest"
-    description="A live celebration of Afro-gospel culture — worship, community, and the sound of a generation. Details are on the way."
+    description="A live celebration of Afro-gospel culture: worship, community, and the sound of a generation. Details are on the way."
     ctas={[{ label: 'Get notified', href: '/contact?intent=general', variant: 'primary' }]}
   />
 
   <section class="border-b border-white/10 bg-[var(--color-ink-raised)]">
     <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
-      <ul class="grid gap-6 sm:grid-cols-3">
+      <ul class="scroll-reveal-stagger grid gap-6 sm:grid-cols-3">
         {
           highlights.map((item) => (
             <li class="rounded-xl border border-white/10 bg-white/[0.03] p-6">
@@ -43,14 +43,15 @@ const highlights = [
 
   <section>
     <div class="mx-auto max-w-3xl px-5 py-16 text-center sm:px-6 sm:py-24">
-      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">Stay tuned</p>
-      <h2 class="text-h2 mt-4">The stage is being set.</h2>
-      <p class="mx-auto mt-4 max-w-xl text-paper/70">
+      <p class="scroll-reveal text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">Stay tuned</p>
+      <h2 class="scroll-reveal text-h2 mt-4" style="--reveal-delay: 80ms">The stage is being set.</h2>
+      <p class="scroll-reveal mx-auto mt-4 max-w-xl text-paper/70" style="--reveal-delay: 160ms">
         Energize Fest is in development. Reach out if you'd like to partner, perform, or volunteer when doors open.
       </p>
       <a
         href="/contact?intent=partnership"
-        class="button-glow mt-8 inline-flex min-h-11 items-center rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+        class="scroll-reveal button-glow mt-8 inline-flex min-h-11 items-center rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+        style="--reveal-delay: 240ms"
       >
         Partner with us
       </a>

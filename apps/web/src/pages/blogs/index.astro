@@ -12,15 +12,15 @@ const posts = await sanityClient.fetch<NewsPost[]>(allNewsQuery);
   <PageHero
     eyebrow="Editorial"
     title="Blogs"
-    description="Announcements, releases, and stories from Energize Music — straight from the label."
+    description="Announcements, releases, and stories from Energize Music, straight from the label."
   />
 
   <section class="mx-auto max-w-6xl px-5 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16">
     {
       posts.length === 0 ? (
-        <p class="text-paper/60">Posts will appear here once added in Sanity Studio.</p>
+        <p class="scroll-reveal text-paper/60">Posts will appear here once added in Sanity Studio.</p>
       ) : (
-        <div class="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        <div class="scroll-reveal-stagger grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {posts.map((post) => (
             <NewsCard post={post} />
           ))}

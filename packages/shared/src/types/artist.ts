@@ -12,7 +12,7 @@ export interface StreamingLinks {
 export interface Artist {
   _id: string;
   name: string;
-  /** Flattened by GROQ as `"slug": slug.current` — a plain string, not `{ current }`. */
+  /** Flattened by GROQ as `"slug": slug.current`: a plain string, not `{ current }`. */
   slug: string;
   tier: ArtistTier;
   featured?: boolean;

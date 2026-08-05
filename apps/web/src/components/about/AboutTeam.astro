@@ -12,7 +12,7 @@ const { team, aboutPage } = Astro.props;
 const teamHeading = aboutPage?.teamSectionTitle ?? 'Meet Our Team';
 const teamIntro =
   aboutPage?.teamSectionIntro ??
-  'The people behind Energize Music — strategists, creatives, and builders shaping Afro-gospel culture.';
+  'The people behind Energize Music: strategists, creatives, and builders shaping Afro-gospel culture.';
 ---
 
 <section id="team" class="scroll-mt-24 border-b border-white/10 bg-[var(--color-ink-raised)]" aria-labelledby="about-team-heading">
@@ -27,7 +27,7 @@ const teamIntro =
       team.length > 0 ? (
         <div class="about-team-grid mt-14">
           {team.map((member, i) => (
-            <div class="about-scroll-reveal about-team-item" style={`--reveal-delay: ${(i % 6) * 80}ms`}>
+            <div class="about-scroll-reveal about-team-item h-full" style={`--reveal-delay: ${(i % 6) * 80}ms`}>
               <TeamMemberCard member={member} />
             </div>
           ))}
@@ -47,45 +47,26 @@ const teamIntro =
 <style>
   .about-team-grid {
     display: grid;
-    gap: 1.25rem;
+    gap: 1.5rem;
+    grid-auto-rows: 1fr;
     grid-template-columns: 1fr;
   }
 
-  @media (min-width: 480px) {
+  @media (min-width: 640px) {
     .about-team-grid {
-      gap: 1.5rem;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-    }
-  }
-
-  @media (min-width: 768px) {
-    .about-team-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .about-team-item:nth-child(3n + 1) {
-      transform: translateY(0);
-    }
-
-    .about-team-item:nth-child(3n + 2) {
-      transform: translateY(1.5rem);
-    }
-
-    .about-team-item:nth-child(3n) {
-      transform: translateY(0.75rem);
-    }
-
-    .about-team-item.is-visible:nth-child(3n + 1),
-    .about-team-item.is-visible:nth-child(3n + 2),
-    .about-team-item.is-visible:nth-child(3n) {
-      transform: translateY(0);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 1024px) {
     .about-team-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+  }
+
+  .about-team-item {
+    display: flex;
+    min-height: 100%;
   }
 
   .about-scroll-reveal {

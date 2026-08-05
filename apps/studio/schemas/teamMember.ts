@@ -46,7 +46,7 @@ export default defineType({
       name: 'social',
       title: 'Social links',
       type: 'object',
-      description: 'Optional — only filled links appear on the site.',
+      description: 'Optional. Only filled links appear on the site.',
       fields: [
         defineField({ name: 'linkedin', title: 'LinkedIn', type: 'url' }),
         defineField({ name: 'instagram', title: 'Instagram', type: 'url' }),

@@ -23,7 +23,7 @@ export default defineType({
       name: 'signupUrl',
       title: 'Sign-up form URL',
       type: 'url',
-      description: 'Where the "Join the volunteer list" button sends people — e.g. a Google Form link.',
+      description: 'Where the "Join the volunteer list" button sends people, e.g. a Google Form link.',
     }),
     defineField({ name: 'ctaLabel', title: 'Button label', type: 'string', initialValue: 'Join the volunteer list' }),
   ],

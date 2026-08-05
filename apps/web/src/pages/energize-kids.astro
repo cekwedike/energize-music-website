@@ -29,37 +29,37 @@ const pillars = [
 
 <BaseLayout
   title="Energize Kids"
-  description="Fun, engaging experiences for amazing kids — clean music, movement, learning, and joy from Energize Music."
+  description="Fun, engaging experiences for amazing kids: clean music, movement, learning, and joy from Energize Music."
   ogImage="/initiatives/energize-kids.webp"
 >
   <!-- Hero -->
-  <section class="relative overflow-hidden border-b border-white/10">
-    <div class="absolute inset-0">
+  <section class="relative min-h-[32rem] overflow-hidden border-b border-white/10 sm:min-h-[38rem] lg:min-h-[42rem]">
+    <div class="absolute inset-0 bg-[#1a1218]">
       <img
         src="/initiatives/energize-kids.webp"
         alt=""
-        class="h-full w-full object-cover opacity-40"
+        class="h-full w-full object-contain object-center sm:object-cover sm:object-[center_38%] lg:object-[center_35%]"
         loading="eager"
       />
-      <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-ink)]/60 via-[var(--color-ink)]/80 to-[var(--color-ink)]"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-ink)]/30 via-[var(--color-ink)]/45 to-[var(--color-ink)]/88"></div>
     </div>
 
     <div class="relative mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-32">
-      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-paper/60">
+      <p class="scroll-reveal text-xs font-semibold uppercase tracking-[0.35em] text-paper/60">
         Music · Movement · Learning · Joy
       </p>
-      <h1 class="text-h1 mt-6 max-w-3xl">Fun, engaging experiences for amazing kids.</h1>
-      <p class="text-lead mt-6 max-w-2xl text-paper/75">
+      <h1 class="scroll-reveal text-h1 mt-6 max-w-3xl" style="--reveal-delay: 80ms">Fun, engaging experiences for amazing kids.</h1>
+      <p class="scroll-reveal text-lead mt-6 max-w-2xl text-paper/75" style="--reveal-delay: 160ms">
         Energize Kids is a colorful community for clean entertainment, bright creativity, and moments children can enjoy and share.
       </p>
-      <div class="mt-10 flex flex-wrap gap-3">
+      <div class="scroll-reveal mt-10 flex flex-wrap gap-3" style="--reveal-delay: 240ms">
         <a
           href={LIVE_SITE}
           target="_blank"
           rel="noopener noreferrer"
           class="button-glow rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
         >
-          Visit energize-kids.com
+          Visit Energize Kids
         </a>
         <a
           href="#pillars"
@@ -74,7 +74,7 @@ const pillars = [
   <!-- Highlights -->
   <section class="border-b border-white/10 bg-[var(--color-ink-raised)]">
     <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
-      <ul class="grid gap-6 sm:grid-cols-3">
+      <ul class="scroll-reveal-stagger grid gap-6 sm:grid-cols-3">
         <li class="text-sm text-paper/70">
           <strong class="block text-paper">Clean age-friendly entertainment</strong>
           Creative songs, movement, and learning
@@ -92,35 +92,52 @@ const pillars = [
   </section>
 
   <!-- Event -->
-  <section class="border-b border-white/10">
+  <section id="events" class="scroll-mt-24 border-b border-white/10">
     <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
-      <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div class="scroll-reveal mb-10 rounded-2xl border border-[var(--color-glow)]/30 bg-[var(--color-glow)]/[0.06] px-6 py-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
         <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-glow)]">Live events &amp; registration</p>
+          <p class="mt-2 text-sm text-paper/75">
+            Dates, Zoom links, and sign-up live on the Energize Kids site. Visit Energize Kids for the latest.
+          </p>
+        </div>
+        <a
+          href={LIVE_SITE}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="button-glow mt-4 inline-flex shrink-0 items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90 sm:mt-0"
+        >
+          Go to Energize Kids
+        </a>
+      </div>
+
+      <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+        <div class="scroll-reveal">
           <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-glow)]">Online event for parents and guardians</p>
           <h2 class="text-h2 mt-3">Crowned, Not Cloned.</h2>
           <p class="mt-4 text-paper/75">
             Join a thoughtful conversation about raising kings and queens with identity, conviction, purpose, and confidence in God.
           </p>
-          <dl class="mt-6 space-y-2 text-sm">
-            <div class="flex gap-3">
-              <dt class="text-paper/50">Date</dt>
-              <dd class="font-medium">July 25, 2026</dd>
-            </div>
-            <div class="flex gap-3">
-              <dt class="text-paper/50">Format</dt>
-              <dd class="font-medium">Live on Zoom</dd>
-            </div>
-          </dl>
-          <a
-            href={LIVE_SITE}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="mt-8 inline-block rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
-          >
-            Learn more and register
-          </a>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a
+              href={LIVE_SITE}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-block rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
+            >
+              Register at Energize Kids
+            </a>
+            <a
+              href={LIVE_SITE}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-block rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-paper transition hover:border-white/45 hover:bg-white/5"
+            >
+              View all events
+            </a>
+          </div>
         </div>
-        <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
+        <div class="scroll-reveal scroll-reveal-pixel rounded-2xl border border-white/10 bg-white/5 p-8" style="--reveal-delay: 120ms">
           <p class="text-xs font-semibold uppercase tracking-widest text-paper/50">Featured Artist</p>
           <h3 class="text-h3 mt-2">Xade</h3>
           <p class="mt-4 text-paper/75">
@@ -139,11 +156,11 @@ const pillars = [
   <!-- Pillars -->
   <section id="pillars" class="scroll-mt-24 border-b border-white/10 bg-[var(--color-ink-raised)]">
     <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
-      <div class="max-w-2xl">
+      <div class="scroll-reveal max-w-2xl">
         <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-glow)]">The Energize Kids World</p>
         <h2 class="text-h2 mt-3">More than music, built for joyful discovery.</h2>
       </div>
-      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="scroll-reveal-stagger mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal-variant="pixel">
         {pillars.map((pillar) => (
           <article class="rounded-xl border border-white/10 bg-white/5 p-6">
             <span class="text-2xl text-[var(--color-glow)]" aria-hidden="true">{pillar.icon}</span>
@@ -158,17 +175,18 @@ const pillars = [
   <!-- CTA -->
   <section>
     <div class="mx-auto max-w-6xl px-5 py-20 text-center sm:px-6 sm:py-28">
-      <h2 class="text-h2">Follow the movement.</h2>
-      <p class="mx-auto mt-4 max-w-xl text-paper/70">
+      <h2 class="scroll-reveal text-h2">Follow the movement.</h2>
+      <p class="scroll-reveal mx-auto mt-4 max-w-xl text-paper/70" style="--reveal-delay: 80ms">
         Powered by @energize_music and @energizecentral. Keep up with releases, activities, and community updates on the live Energize Kids site.
       </p>
       <a
         href={LIVE_SITE}
         target="_blank"
         rel="noopener noreferrer"
-        class="button-glow mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+        class="scroll-reveal button-glow mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+        style="--reveal-delay: 160ms"
       >
-        Go to energize-kids.com
+        Visit Energize Kids
       </a>
     </div>
   </section>

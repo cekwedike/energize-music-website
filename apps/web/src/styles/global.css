@@ -11,7 +11,7 @@
   --font-display: 'Fraunces', 'Georgia', serif;
   --font-body: 'Inter', system-ui, sans-serif;
 
-  /* Fluid type scale — grows with viewport instead of capping on wide monitors. */
+  /* Fluid type scale: grows with viewport instead of capping on wide monitors. */
   --text-display: clamp(2.75rem, 2rem + 3.5vw, 6rem);
   --text-h1: clamp(2.25rem, 1.7rem + 2.5vw, 4rem);
   --text-h2: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
@@ -94,7 +94,7 @@
   }
 }
 
-/* Homepage (Serene landing) — scoped utility classes */
+/* Homepage (Serene landing): scoped utility classes */
 
 .font-instrument {
   font-family: 'Instrument Serif', serif;
@@ -260,7 +260,7 @@
   background: radial-gradient(ellipse 120% 80% at 50% 50%, transparent 35%, rgba(11, 11, 13, 0.55) 100%);
 }
 
-/* Variant: home — video hero dominates; keep atmosphere minimal */
+/* Variant: home. Video hero dominates; keep atmosphere minimal */
 .ambient-bg--home .ambient-bg__mesh {
   opacity: 0.25;
 }
@@ -274,7 +274,7 @@
   opacity: 0.3;
 }
 
-/* Variant: editorial — calm, slow drift for about/story pages */
+/* Variant: editorial. Calm, slow drift for about/story pages */
 .ambient-bg--editorial .ambient-bg__mesh {
   animation-duration: 58s;
 }
@@ -288,7 +288,7 @@
   animation: ambient-pulse 22s ease-in-out infinite;
 }
 
-/* Variant: pulse — slightly more energy for campaign pages */
+/* Variant: pulse. Slightly more energy for campaign pages */
 .ambient-bg--pulse .ambient-bg__glow--primary {
   background: radial-gradient(circle, rgba(37, 99, 235, 0.14) 0%, rgba(77, 168, 255, 0.12) 45%, transparent 72%);
   animation-duration: 24s;
@@ -310,7 +310,7 @@
     radial-gradient(ellipse 60% 45% at 50% 90%, rgba(37, 99, 235, 0.08) 0%, transparent 45%);
 }
 
-/* Variant: warm — playful undertone for kids/initiatives */
+/* Variant: warm. Playful undertone for kids/initiatives */
 .ambient-bg--warm .ambient-bg__glow--primary {
   background: radial-gradient(circle, rgba(255, 180, 100, 0.1) 0%, rgba(77, 168, 255, 0.1) 50%, transparent 72%);
 }
@@ -414,10 +414,31 @@
   transform: translateY(0);
 }
 
+/* Pixelated dissolve: blur-to-sharp with stepped opacity */
+.scroll-reveal-pixel {
+  opacity: 0;
+  transform: translateY(14px) scale(0.985);
+  filter: blur(10px);
+  transition:
+    opacity 0.9s steps(8, end),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.85s ease;
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+
+.scroll-reveal-pixel.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .scroll-reveal {
+  .scroll-reveal,
+  .scroll-reveal-pixel {
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
     transition: none !important;
   }
 }
