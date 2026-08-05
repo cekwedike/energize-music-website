@@ -1,5 +1,5 @@
 ---
-import { primaryNav } from '../../lib/nav';
+import { primaryNav, initiativesNav } from '../../lib/nav';
 import Logo from './Logo.astro';
 
 const currentPath = Astro.url.pathname;
@@ -7,6 +7,8 @@ const currentPath = Astro.url.pathname;
 function isActive(href: string) {
   return currentPath.startsWith(href);
 }
+
+const isInitiativeActive = initiativesNav.some((link) => isActive(link.href));
 ---
 
 <header class="liquid-glass sticky top-0 z-40">
@@ -30,6 +32,55 @@ function isActive(href: string) {
             </li>
           ))
         }
+
+        <li class="relative">
+          <button
+            type="button"
+            id="initiatives-trigger"
+            aria-expanded="false"
+            aria-controls="initiatives-menu"
+            aria-current={isInitiativeActive ? 'page' : undefined}
+            class="flex items-center gap-1.5 rounded-full px-4 py-2 text-paper/60 transition hover:bg-white/5 hover:text-paper aria-[current=page]:bg-white/10 aria-[current=page]:text-paper aria-[expanded=true]:bg-white/10 aria-[expanded=true]:text-paper"
+          >
+            Initiatives
+            <svg
+              id="initiatives-chevron"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-3 w-3 shrink-0 transition-transform duration-200"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+
+          <div
+            id="initiatives-menu"
+            role="menu"
+            aria-label="Initiatives"
+            class="absolute right-0 top-full mt-2 hidden w-56 rounded-2xl border border-white/10 bg-[var(--color-ink-raised)] p-2 normal-case tracking-normal shadow-2xl shadow-black/50"
+          >
+            <ul>
+              {
+                initiativesNav.map((link) => (
+                  <li>
+                    <a
+                      href={link.href}
+                      role="menuitem"
+                      aria-current={isActive(link.href) ? 'page' : undefined}
+                      class="block rounded-xl px-4 py-2.5 text-sm text-paper/75 transition hover:bg-white/5 hover:text-paper aria-[current=page]:bg-white/10 aria-[current=page]:text-paper"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </li>
       </ul>
     </nav>
 
@@ -62,6 +113,24 @@ function isActive(href: string) {
           </li>
         ))
       }
+      <li class="border-b border-white/5 pt-4 pb-2 last:border-0">
+        <p class="text-xs font-semibold uppercase tracking-wide text-paper/40">Initiatives</p>
+        <ul class="mt-1">
+          {
+            initiativesNav.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  aria-current={isActive(link.href) ? 'page' : undefined}
+                  class="block py-2.5 text-paper/70 transition hover:text-paper aria-[current=page]:text-paper aria-[current=page]:font-semibold"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </li>
     </ul>
   </nav>
 </header>
@@ -80,5 +149,39 @@ function isActive(href: string) {
       panel.classList.add('hidden');
       toggle?.setAttribute('aria-expanded', 'false');
     }
+  });
+
+  const initiativesTrigger = document.getElementById('initiatives-trigger');
+  const initiativesMenu = document.getElementById('initiatives-menu');
+  const initiativesChevron = document.getElementById('initiatives-chevron');
+
+  function closeInitiatives() {
+    initiativesMenu?.classList.add('hidden');
+    initiativesTrigger?.setAttribute('aria-expanded', 'false');
+    initiativesChevron?.classList.remove('rotate-180');
+  }
+
+  initiativesTrigger?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = initiativesTrigger.getAttribute('aria-expanded') === 'true';
+    if (isOpen) {
+      closeInitiatives();
+    } else {
+      initiativesMenu?.classList.remove('hidden');
+      initiativesTrigger.setAttribute('aria-expanded', 'true');
+      initiativesChevron?.classList.add('rotate-180');
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!initiativesMenu || !initiativesTrigger) return;
+    const target = event.target as Node;
+    if (!initiativesMenu.contains(target) && !initiativesTrigger.contains(target)) {
+      closeInitiatives();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeInitiatives();
   });
 </script>

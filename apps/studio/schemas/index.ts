@@ -1,4 +1,3 @@
-import siteSettings from './siteSettings';
 import artist from './artist';
 import release from './release';
 import newsPost from './newsPost';
@@ -8,7 +7,6 @@ import volunteerInfo from './volunteerInfo';
 import page from './page';
 
 export const schemaTypes = [
-  siteSettings,
   artist,
   release,
   newsPost,

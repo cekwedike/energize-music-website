@@ -16,6 +16,12 @@ export const secondaryNav: NavLink[] = [
   { label: 'Terms', href: '/terms' },
 ];
 
+export const initiativesNav: NavLink[] = [
+  { label: 'Energize Kids', href: '/energize-kids' },
+  { label: 'NEXT', href: '/next' },
+  { label: 'Energize Fest', href: '/energize-fest' },
+];
+
 export interface SocialLink {
   label: string;
   href: string;

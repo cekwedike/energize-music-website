@@ -1,13 +1,4 @@
-import { imageFragment, seoFragment } from './fragments';
-
-export const siteSettingsQuery = /* groq */ `*[_type == "siteSettings"][0]{
-  title,
-  description,
-  seo${seoFragment},
-  socials,
-  announcementBar,
-  footerText
-}`;
+import { imageFragment } from './fragments';
 
 export const allNewsQuery = /* groq */ `*[_type == "newsPost"] | order(date desc){
   _id, title, "slug": slug.current, date, cover${imageFragment}, tags

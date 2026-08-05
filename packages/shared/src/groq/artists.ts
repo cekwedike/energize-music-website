@@ -21,6 +21,4 @@ export const artistDetailFragment = /* groq */ `{
 
 export const allArtistsQuery = /* groq */ `*[_type == "artist"] | order(tier asc, name asc) ${artistCardFragment}`;
 
-export const featuredArtistsQuery = /* groq */ `*[_type == "artist" && featured == true] | order(name asc) ${artistCardFragment}`;
-
 export const artistBySlugQuery = /* groq */ `*[_type == "artist" && slug.current == $slug][0] ${artistDetailFragment}`;

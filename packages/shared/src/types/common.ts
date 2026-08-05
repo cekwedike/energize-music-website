@@ -10,12 +10,6 @@ export interface SlugField {
   current: string;
 }
 
-export interface SeoFields {
-  title?: string;
-  description?: string;
-  ogImage?: SanityImage;
-}
-
 export interface PortableTextBlock {
   _type: string;
   _key: string;

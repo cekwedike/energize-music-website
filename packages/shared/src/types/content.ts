@@ -1,13 +1,4 @@
-import type { SanityImage, SeoFields, PortableTextBlock } from './common';
-
-export interface SiteSettings {
-  title: string;
-  description: string;
-  seo?: SeoFields;
-  socials?: Record<string, string>;
-  announcementBar?: string;
-  footerText?: string;
-}
+import type { SanityImage, PortableTextBlock } from './common';
 
 export interface NewsPost {
   _id: string;
