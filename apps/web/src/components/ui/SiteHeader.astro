@@ -1,14 +1,19 @@
 ---
-import { primaryNav, initiativesNav } from '../../lib/nav';
+import { headerNav } from '../../lib/nav';
 import Logo from './Logo.astro';
 
 const currentPath = Astro.url.pathname;
+const isHome = currentPath === '/';
 
 function isActive(href: string) {
-  return currentPath.startsWith(href);
+  return href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 }
 
-const isInitiativeActive = initiativesNav.some((link) => isActive(link.href));
+const navEntries = headerNav.filter((entry) => !(entry.type === 'link' && entry.href === '/' && isHome));
+
+const initiativesEntry = headerNav.find((entry) => entry.type === 'dropdown');
+const isInitiativeActive =
+  initiativesEntry?.type === 'dropdown' ? initiativesEntry.items.some((link) => isActive(link.href)) : false;
 ---
 
 <header class="liquid-glass sticky top-0 z-40">
@@ -18,69 +23,80 @@ const isInitiativeActive = initiativesNav.some((link) => isActive(link.href));
     </a>
 
     <nav aria-label="Primary" class="hidden sm:block">
-      <ul class="flex items-center gap-x-1 whitespace-nowrap text-xs font-medium uppercase tracking-[0.08em]">
+      <ul class="flex items-center gap-x-1 whitespace-nowrap text-xs font-medium">
         {
-          primaryNav.map((link) => (
-            <li>
-              <a
-                href={link.href}
-                aria-current={isActive(link.href) ? 'page' : undefined}
-                class="block rounded-full px-4 py-2 text-paper/60 transition hover:bg-white/5 hover:text-paper aria-[current=page]:bg-white/10 aria-[current=page]:text-paper"
-              >
-                {link.label}
-              </a>
-            </li>
-          ))
+          navEntries.map((entry) =>
+            entry.type === 'link' ? (
+              <li>
+                <a
+                  href={entry.href}
+                  aria-current={isActive(entry.href) ? 'page' : undefined}
+                  class="block rounded-full px-4 py-2 uppercase tracking-[0.08em] text-paper/60 transition hover:bg-white/5 hover:text-paper aria-[current=page]:bg-white/10 aria-[current=page]:text-paper"
+                >
+                  {entry.label}
+                </a>
+              </li>
+            ) : (
+              <li class="relative">
+                <button
+                  type="button"
+                  id="initiatives-trigger"
+                  aria-expanded="false"
+                  aria-controls="initiatives-menu"
+                  aria-current={isInitiativeActive ? 'page' : undefined}
+                  class="flex items-center gap-1.5 rounded-full px-4 py-2 uppercase tracking-[0.08em] text-paper/60 transition hover:bg-white/5 hover:text-paper aria-[current=page]:bg-white/10 aria-[current=page]:text-paper aria-[expanded=true]:bg-white/10 aria-[expanded=true]:text-paper"
+                >
+                  {entry.label}
+                  <svg
+                    id="initiatives-chevron"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-3 w-3 shrink-0 transition-transform duration-200"
+                  >
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+
+                <div
+                  id="initiatives-menu"
+                  role="menu"
+                  aria-label="Initiatives"
+                  class="absolute right-0 top-full mt-2 hidden w-[38rem] max-w-[calc(100vw-3rem)] rounded-2xl border border-white/10 bg-[var(--color-ink-raised)] p-3 whitespace-normal normal-case tracking-normal shadow-2xl shadow-black/50"
+                >
+                  <ul class="grid grid-cols-1 gap-1 sm:grid-cols-3">
+                    {
+                      entry.items.map((link) => (
+                        <li>
+                          <a
+                            href={link.href}
+                            role="menuitem"
+                            aria-current={isActive(link.href) ? 'page' : undefined}
+                            class="group block h-full rounded-xl p-2.5 transition hover:bg-white/5 aria-[current=page]:bg-white/10"
+                          >
+                            <div class="aspect-[4/3] w-full overflow-hidden rounded-lg bg-white/5">
+                              <img
+                                src={link.image}
+                                alt=""
+                                loading="lazy"
+                                class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                              />
+                            </div>
+                            <p class="mt-2.5 text-sm font-semibold text-paper">{link.label}</p>
+                            <p class="mt-1 text-xs leading-relaxed text-paper/60">{link.blurb}</p>
+                          </a>
+                        </li>
+                      ))
+                    }
+                  </ul>
+                </div>
+              </li>
+            ),
+          )
         }
-
-        <li class="relative">
-          <button
-            type="button"
-            id="initiatives-trigger"
-            aria-expanded="false"
-            aria-controls="initiatives-menu"
-            aria-current={isInitiativeActive ? 'page' : undefined}
-            class="flex items-center gap-1.5 rounded-full px-4 py-2 text-paper/60 transition hover:bg-white/5 hover:text-paper aria-[current=page]:bg-white/10 aria-[current=page]:text-paper aria-[expanded=true]:bg-white/10 aria-[expanded=true]:text-paper"
-          >
-            Initiatives
-            <svg
-              id="initiatives-chevron"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-3 w-3 shrink-0 transition-transform duration-200"
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
-
-          <div
-            id="initiatives-menu"
-            role="menu"
-            aria-label="Initiatives"
-            class="absolute right-0 top-full mt-2 hidden w-56 rounded-2xl border border-white/10 bg-[var(--color-ink-raised)] p-2 normal-case tracking-normal shadow-2xl shadow-black/50"
-          >
-            <ul>
-              {
-                initiativesNav.map((link) => (
-                  <li>
-                    <a
-                      href={link.href}
-                      role="menuitem"
-                      aria-current={isActive(link.href) ? 'page' : undefined}
-                      class="block rounded-xl px-4 py-2.5 text-sm text-paper/75 transition hover:bg-white/5 hover:text-paper aria-[current=page]:bg-white/10 aria-[current=page]:text-paper"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-        </li>
       </ul>
     </nav>
 
@@ -101,36 +117,45 @@ const isInitiativeActive = initiativesNav.some((link) => isActive(link.href));
   <nav id="mobile-nav" aria-label="Primary mobile" class="hidden border-t border-white/10 sm:hidden">
     <ul class="mx-auto max-w-6xl px-6 py-4 text-base font-medium">
       {
-        primaryNav.map((link) => (
-          <li class="border-b border-white/5 last:border-0">
-            <a
-              href={link.href}
-              aria-current={isActive(link.href) ? 'page' : undefined}
-              class="block py-3 text-paper/70 transition hover:text-paper aria-[current=page]:text-paper aria-[current=page]:font-semibold"
-            >
-              {link.label}
-            </a>
-          </li>
-        ))
+        navEntries.map((entry) =>
+          entry.type === 'link' ? (
+            <li class="border-b border-white/5 last:border-0">
+              <a
+                href={entry.href}
+                aria-current={isActive(entry.href) ? 'page' : undefined}
+                class="block py-3 text-paper/70 transition hover:text-paper aria-[current=page]:text-paper aria-[current=page]:font-semibold"
+              >
+                {entry.label}
+              </a>
+            </li>
+          ) : (
+            <li class="border-b border-white/5 pt-4 pb-2 last:border-0">
+              <p class="text-xs font-semibold uppercase tracking-wide text-paper/40">{entry.label}</p>
+              <ul class="mt-2 space-y-3">
+                {
+                  entry.items.map((link) => (
+                    <li>
+                      <a
+                        href={link.href}
+                        aria-current={isActive(link.href) ? 'page' : undefined}
+                        class="flex items-center gap-3 py-1.5 text-paper/70 transition hover:text-paper aria-[current=page]:text-paper aria-[current=page]:font-semibold"
+                      >
+                        <span class="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/5">
+                          <img src={link.image} alt="" loading="lazy" class="h-full w-full object-cover" />
+                        </span>
+                        <span class="flex flex-col">
+                          <span>{link.label}</span>
+                          <span class="text-xs font-normal text-paper/50">{link.blurb}</span>
+                        </span>
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </li>
+          ),
+        )
       }
-      <li class="border-b border-white/5 pt-4 pb-2 last:border-0">
-        <p class="text-xs font-semibold uppercase tracking-wide text-paper/40">Initiatives</p>
-        <ul class="mt-1">
-          {
-            initiativesNav.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  aria-current={isActive(link.href) ? 'page' : undefined}
-                  class="block py-2.5 text-paper/70 transition hover:text-paper aria-[current=page]:text-paper aria-[current=page]:font-semibold"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </li>
     </ul>
   </nav>
 </header>

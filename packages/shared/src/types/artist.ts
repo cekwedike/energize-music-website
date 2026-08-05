@@ -1,6 +1,6 @@
 import type { SanityImage } from './common';
 
-export type ArtistTier = 'official' | 'collaborator' | 'legacy';
+export type ArtistTier = 'official' | 'legacy';
 
 export interface StreamingLinks {
   spotify?: string;

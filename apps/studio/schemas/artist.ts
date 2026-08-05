@@ -15,9 +15,9 @@ export default defineType({
     }),
     defineField({
       name: 'tier',
-      title: 'Tier',
+      title: 'Status',
       type: 'string',
-      options: { list: ['official', 'collaborator', 'legacy'] },
+      options: { list: ['official', 'legacy'] },
       validation: (r) => r.required(),
     }),
     defineField({ name: 'featured', title: 'Featured on homepage', type: 'boolean', initialValue: false }),

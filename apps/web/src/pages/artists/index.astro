@@ -9,16 +9,15 @@ const artists = await sanityClient.fetch<Artist[]>(allArtistsQuery);
 const tabs: { label: string; value: Artist['tier'] | 'all' }[] = [
   { label: 'All', value: 'all' },
   { label: 'Official', value: 'official' },
-  { label: 'Collaborators', value: 'collaborator' },
   { label: 'Legacy', value: 'legacy' },
 ];
 ---
 
-<BaseLayout title="Artists" description="Official, collaborator, and legacy artists on Energize Music.">
+<BaseLayout title="Artists" description="Official and legacy artists on Energize Music.">
   <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
     <h1 class="text-h1">Artists</h1>
     <p class="text-lead mt-4 max-w-xl text-paper/70">
-      The Energize Music roster — Official artists, collaborators, and legacy catalog.
+      The Energize Music roster — official artists and legacy catalog.
     </p>
 
     {
