@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@sanity/client": "^6.28.4",
+    "@sanity/client": "^7.26.0",
     "@sanity/icons": "^3.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
