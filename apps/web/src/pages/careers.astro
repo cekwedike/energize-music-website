@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/ui/PageHero.astro';
 import { sanityClient } from '../lib/sanity/client';
 import { allCareerOpeningsQuery, volunteerInfoQuery, type CareerOpening, type VolunteerInfo } from '@energize/shared';
 
@@ -8,22 +9,24 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
 ---
 
 <BaseLayout title="Careers" description="Open roles and volunteer opportunities at Energize Music.">
-  <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
-    <h1 class="text-h1">Careers</h1>
-    <p class="text-lead mt-4 max-w-xl text-paper/70">
-      Join the team building Energize Music’s global, family-friendly catalog.
-    </p>
+  <PageHero
+    eyebrow="Join us"
+    title="Careers"
+    description="Join the team building Energize Music's global, family-friendly catalog — from Lagos to the world."
+    ctas={[{ label: 'Open roles', href: '#openings', variant: 'primary' }, { label: 'Contact us', href: '/contact', variant: 'secondary' }]}
+  />
 
+  <section id="openings" class="scroll-mt-24 mx-auto max-w-6xl px-5 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16">
     {
       openings.length === 0 ? (
-        <p class="mt-10 text-paper/60">
-          No open roles right now. Reach out via <a href="/contact" class="underline hover:text-[var(--color-accent)]">Contact</a> to introduce yourself.
+        <p class="text-paper/60">
+          No open roles right now. Reach out via <a href="/contact" class="underline hover:text-[var(--color-glow)]">Contact</a> to introduce yourself.
         </p>
       ) : (
-        <ul class="mt-10 divide-y divide-white/10 border-t border-white/10">
+        <ul class="divide-y divide-white/10 border-t border-white/10">
           {openings.map((role) => (
-            <li class="flex flex-col gap-2 py-6 sm:flex-row sm:items-center sm:justify-between">
-              <div>
+            <li class="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <div class="min-w-0">
                 <p class="font-medium text-paper">{role.title}</p>
                 <p class="mt-1 text-sm text-paper/60">
                   {role.location} &middot; {role.type}
@@ -31,7 +34,7 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
               </div>
               <a
                 href={role.applyUrl}
-                class="inline-block shrink-0 rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                class="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-[var(--color-glow)] hover:text-[var(--color-glow)] sm:w-auto"
               >
                 Apply
               </a>
@@ -44,7 +47,7 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
     <p class="mt-10 text-sm text-paper/50">
       General applications are also welcome via
       {' '}
-      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--color-accent)]">
+      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--color-glow)]">
         LinkedIn
       </a>.
     </p>
@@ -53,7 +56,7 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
   {
     volunteer && (
       <section class="border-t border-white/10 bg-[var(--color-ink-raised)]">
-        <div class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+        <div class="mx-auto max-w-3xl px-5 py-16 sm:px-6 sm:py-24">
           <h2 class="text-h2">{volunteer.heading}</h2>
           <p class="text-lead mt-4 text-paper/70">{volunteer.intro}</p>
 
@@ -89,13 +92,13 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
                 href={volunteer.signupUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="mt-10 inline-block rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
+                class="mt-10 inline-flex min-h-11 items-center rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
               >
                 {volunteer.ctaLabel ?? 'Join the volunteer list'}
               </a>
             ) : (
               <p class="mt-10 text-sm text-paper/50">
-                Sign-up link isn’t configured yet — add one in Sanity Studio under Volunteer Info.
+                Sign-up link isn't configured yet — add one in Sanity Studio under Volunteer Info.
               </p>
             )
           }

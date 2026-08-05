@@ -1,0 +1,19 @@
+---
+export type AmbientVariant = 'home' | 'cosmic' | 'editorial' | 'pulse' | 'warm';
+
+interface Props {
+  variant?: AmbientVariant;
+}
+
+const { variant = 'cosmic' } = Astro.props;
+---
+
+<div class={`ambient-bg ambient-bg--${variant}`} aria-hidden="true">
+  <div class="ambient-bg__base"></div>
+  <div class="ambient-bg__mesh"></div>
+  <div class="ambient-bg__glow ambient-bg__glow--primary"></div>
+  <div class="ambient-bg__glow ambient-bg__glow--secondary"></div>
+  <div class="ambient-bg__glow ambient-bg__glow--accent"></div>
+  <div class="ambient-bg__grain"></div>
+  <div class="ambient-bg__vignette"></div>
+</div>

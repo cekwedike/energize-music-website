@@ -18,33 +18,31 @@ export const secondaryNav: NavLink[] = [
 ];
 
 export interface InitiativeItem extends NavLink {
-  /** Draft copy — not sourced/researched, placeholder for editorial review. */
   blurb: string;
   image: string;
 }
 
-// Draft copy, pending editorial review — see initiativesNav below.
 export const initiativesNav: InitiativeItem[] = [
   {
     label: 'Energize Kids',
     href: '/energize-kids',
     blurb:
-      'A youth music program introducing the next generation to gospel and soul through mentorship, workshops, and performance opportunities. Built to spot and grow young talent early, close to home.',
-    image: 'https://picsum.photos/seed/energize-kids/640/480',
+      'Clean entertainment for kids — music, movement, learning, and joy. Explore activities and events at energize-kids.com.',
+    image: '/initiatives/energize-kids.webp',
   },
   {
     label: 'NEXT',
     href: '/next',
     blurb:
-      'Our development pipeline for emerging artists, pairing them with producers, writers, and industry mentors. NEXT is where raw talent gets the tools and time to become a signed act.',
-    image: 'https://picsum.photos/seed/energize-next/640/480',
+      'Pan-African Afrogospel talent competition. Submit, get voted in, and launch on the ENERGIZE Afrogospel Album.',
+    image: '/initiatives/next.jpg',
   },
   {
     label: 'Energize Fest',
     href: '/energize-fest',
     blurb:
-      'An annual live showcase bringing the full Energize Music roster together on one stage. A celebration of Afro-gospel and soul-fusion, built for the community that supports it.',
-    image: 'https://picsum.photos/seed/energize-fest/640/480',
+      'An annual live showcase bringing the full Energize Music roster together on one stage. Afro-gospel and soul-fusion, built for the community.',
+    image: '/initiatives/energize-fest.webp',
   },
 ];
 

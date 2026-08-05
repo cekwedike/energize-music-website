@@ -25,12 +25,27 @@ export interface Page {
   blocks: PortableTextBlock[];
 }
 
+export interface AboutPage {
+  _id: string;
+  title: string;
+  intro?: PortableTextBlock[];
+  teamSectionTitle: string;
+  teamSectionIntro?: string;
+}
+
+export interface TeamMemberSocial {
+  linkedin?: string;
+  instagram?: string;
+  twitter?: string;
+}
+
 export interface TeamMember {
   _id: string;
   name: string;
   role: string;
   bio: string;
   photo?: SanityImage;
+  social?: TeamMemberSocial;
   order?: number;
 }
 

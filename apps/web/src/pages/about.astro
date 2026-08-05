@@ -1,117 +1,55 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PortableText from '../components/portable/PortableText.astro';
-import { sanityClient, urlForImage } from '../lib/sanity/client';
-import { pageBySlugQuery, allTeamMembersQuery, type Page, type TeamMember } from '@energize/shared';
+import AboutHero from '../components/about/AboutHero.astro';
+import AboutValues from '../components/about/AboutValues.astro';
+import AboutStory from '../components/about/AboutStory.astro';
+import AboutTeam from '../components/about/AboutTeam.astro';
+import AboutCta from '../components/about/AboutCta.astro';
+import { sanityClient } from '../lib/sanity/client';
+import {
+  aboutPageQuery,
+  pageBySlugQuery,
+  allTeamMembersQuery,
+  type AboutPage,
+  type Page,
+  type TeamMember,
+} from '@energize/shared';
 
-const page = await sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'about' });
-const team = await sanityClient.fetch<TeamMember[]>(allTeamMembersQuery);
+const [aboutPage, legacyPage, team] = await Promise.all([
+  sanityClient.fetch<AboutPage | null>(aboutPageQuery),
+  sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'about' }),
+  sanityClient.fetch<TeamMember[]>(allTeamMembersQuery),
+]);
+
+const pageTitle = aboutPage?.title ?? legacyPage?.title ?? 'About Energize Music';
 ---
 
 <BaseLayout title="About Us" description="Energize Music's mission, vision, values, and the team behind it.">
-  <section class="mx-auto max-w-3xl px-6 py-16 sm:py-24">
-    <h1 class="text-h1">About Energize Music</h1>
-    {
-      page ? (
-        <div
-          id="about-reveal"
-          class="about-reveal mt-10 [&_h2]:text-h3 [&_h2]:mt-12 [&_h2]:first:mt-0"
-        >
-          <PortableText value={page.blocks} />
-        </div>
-      ) : (
-        <div class="mt-10 space-y-6 text-paper/80">
-          <p>
-            Energize Music is an Afro-gospel &amp; soul-fusion record label providing
-            high-quality, family-friendly, uplifting music — built on the belief that
-            music has the power to connect people and speak to audiences everywhere.
-          </p>
-          <p><strong class="text-paper">Mission:</strong> We are here to inspire positive emotions.</p>
-          <p><strong class="text-paper">Vision:</strong> To influence and inspire 1,000,000,000 minds with the good news.</p>
-          <p>
-            <strong class="text-paper">Values:</strong> Excellence in music and lyrics, positivity
-            and uplifting content, family-friendly material across cultures, and relevance to
-            global audiences.
-          </p>
-        </div>
-      )
-    }
-  </section>
-
-  {
-    team.length > 0 && (
-      <section class="mx-auto max-w-6xl px-6 pb-16 sm:pb-24">
-        <h2 class="text-h2">Our Team</h2>
-        <div class="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {team.map((member) => (
-            <div>
-              {member.photo?.asset && (
-                <img
-                  src={urlForImage(member.photo).width(400).height(400).fit('crop').auto('format').url()}
-                  alt={member.photo.alt ?? member.name}
-                  loading="lazy"
-                  class="aspect-square w-full rounded-lg object-cover"
-                />
-              )}
-              <p class="mt-4 font-medium text-paper">{member.name}</p>
-              <p class="text-sm text-[var(--color-accent)]">{member.role}</p>
-              <p class="mt-2 text-sm text-paper/70">{member.bio}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    )
-  }
+  <AboutHero title={pageTitle} />
+  <AboutValues />
+  <AboutStory aboutPage={aboutPage} legacyPage={legacyPage} />
+  <AboutTeam team={team} aboutPage={aboutPage} />
+  <AboutCta />
 </BaseLayout>
 
-<style>
-  .about-reveal.is-ready > :global(*) {
-    opacity: 0;
-    transform: translateY(16px);
-    transition:
-      opacity 0.7s ease,
-      transform 0.7s ease;
-  }
-
-  .about-reveal.is-ready.is-visible > :global(*) {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .about-reveal.is-ready.is-visible > :global(*:nth-child(1)) {
-    transition-delay: 0ms;
-  }
-  .about-reveal.is-ready.is-visible > :global(*:nth-child(2)) {
-    transition-delay: 60ms;
-  }
-  .about-reveal.is-ready.is-visible > :global(*:nth-child(3)) {
-    transition-delay: 120ms;
-  }
-  .about-reveal.is-ready.is-visible > :global(*:nth-child(4)) {
-    transition-delay: 180ms;
-  }
-  .about-reveal.is-ready.is-visible > :global(*:nth-child(n + 5)) {
-    transition-delay: 240ms;
-  }
-</style>
-
 <script>
-  const el = document.getElementById('about-reveal');
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (el && !prefersReducedMotion) {
-    el.classList.add('is-ready');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) {
+    document.querySelectorAll('.about-scroll-reveal').forEach((el) => el.classList.add('is-visible'));
+  } else if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            el.classList.add('is-visible');
-            observer.disconnect();
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
           }
         }
       },
-      { threshold: 0.15 },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
     );
-    observer.observe(el);
+    document.querySelectorAll('.about-scroll-reveal').forEach((el) => observer.observe(el));
+  } else {
+    document.querySelectorAll('.about-scroll-reveal').forEach((el) => el.classList.add('is-visible'));
   }
 </script>

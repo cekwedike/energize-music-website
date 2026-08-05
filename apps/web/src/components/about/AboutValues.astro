@@ -1,0 +1,83 @@
+---
+const values = [
+  {
+    label: 'Mission',
+    title: 'Inspire positive emotions',
+    body: 'We are here to inspire positive emotions through music that uplifts, connects, and speaks to audiences everywhere.',
+    featured: true,
+  },
+  {
+    label: 'Vision',
+    title: 'One billion minds',
+    body: 'To influence and inspire 1,000,000,000 minds with the good news — carried from Lagos to every corner of the earth.',
+    featured: false,
+  },
+  {
+    label: 'Values',
+    title: 'Excellence & relevance',
+    body: 'Excellence in music and lyrics, positivity and uplifting content, family-friendly material across cultures, and relevance to global audiences.',
+    featured: false,
+  },
+];
+---
+
+<section class="border-b border-white/10 bg-[var(--color-ink-raised)]" aria-labelledby="about-values-heading">
+  <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
+    <div class="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:items-end lg:gap-20">
+      <div class="about-scroll-reveal">
+        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">What drives us</p>
+        <h2 id="about-values-heading" class="text-h2 mt-4">Rooted in purpose</h2>
+        <p class="mt-5 max-w-md text-paper/70">
+          Energize Music is an Afro-gospel &amp; soul-fusion record label providing high-quality, family-friendly, uplifting music.
+        </p>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        {
+          values.map((item, i) => (
+            <article
+              class:list={[
+                'about-scroll-reveal about-value-card group rounded-2xl border p-6 transition duration-300',
+                item.featured
+                  ? 'sm:col-span-2 border-[var(--color-glow)]/30 bg-[var(--color-glow)]/[0.06] lg:p-8'
+                  : 'border-white/10 bg-white/[0.03] hover:border-[var(--color-glow)]/25 hover:bg-white/[0.05]',
+              ]}
+              style={`--reveal-delay: ${i * 100}ms`}
+            >
+              <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-glow)]">{item.label}</p>
+              <h3 class="text-h3 mt-3 font-display">{item.title}</h3>
+              <p class="mt-3 text-sm leading-relaxed text-paper/70">{item.body}</p>
+              {item.featured && (
+                <div class="mt-6 h-px w-full bg-gradient-to-r from-[var(--color-glow)]/40 to-transparent" aria-hidden="true"></div>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-scroll-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .about-scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-scroll-reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>

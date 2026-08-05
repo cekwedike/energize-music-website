@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/ui/PageHero.astro';
 import { contactIntents } from '@energize/shared';
 
 const intentLabels: Record<(typeof contactIntents)[number], string> = {
@@ -14,15 +15,17 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
 ---
 
 <BaseLayout title="Contact" description="Reach Energize Music by interest type and region.">
-  <section class="mx-auto max-w-2xl px-6 py-16 sm:py-24">
-    <h1 class="text-h1">Contact</h1>
-    <p class="text-lead mt-4 text-paper/70">
-      Tell us what you're reaching out about and we'll route it to the right team.
-    </p>
+  <PageHero
+    size="slim"
+    title="Contact"
+    description="Tell us what you're reaching out about and we'll route it to the right team."
+  />
 
+  <section class="mx-auto max-w-2xl px-5 pb-16 pt-10 sm:px-6 sm:pb-24 sm:pt-12">
     <form
       id="contact-form"
-      class="mt-10 space-y-5"
+      class="scroll-reveal space-y-5"
+      style="--reveal-delay: 80ms"
       data-endpoint-configured={formEndpoint ? 'true' : 'false'}
     >
       <div>
@@ -32,7 +35,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
           name="name"
           type="text"
           required
-          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-2.5 text-paper focus-visible:border-[var(--color-accent)]"
+          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-3 text-base text-paper focus-visible:border-[var(--color-glow)] sm:py-2.5 sm:text-sm"
         />
       </div>
 
@@ -43,7 +46,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
           name="email"
           type="email"
           required
-          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-2.5 text-paper focus-visible:border-[var(--color-accent)]"
+          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-3 text-base text-paper focus-visible:border-[var(--color-glow)] sm:py-2.5 sm:text-sm"
         />
       </div>
 
@@ -52,7 +55,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
         <select
           id="intent"
           name="intent"
-          class="mt-1.5 w-full rounded-lg border border-white/20 bg-[var(--color-ink)] px-4 py-2.5 text-paper focus-visible:border-[var(--color-accent)]"
+          class="mt-1.5 w-full rounded-lg border border-white/20 bg-[var(--color-ink)] px-4 py-3 text-base text-paper focus-visible:border-[var(--color-glow)] sm:py-2.5 sm:text-sm"
         >
           {contactIntents.map((intent) => (
             <option value={intent}>{intentLabels[intent]}</option>
@@ -67,7 +70,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
           name="message"
           rows={5}
           required
-          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-2.5 text-paper focus-visible:border-[var(--color-accent)]"
+          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-3 text-base text-paper focus-visible:border-[var(--color-glow)] sm:py-2.5 sm:text-sm"
         />
       </div>
 
@@ -79,7 +82,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
 
       <button
         type="submit"
-        class="rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
+        class="inline-flex min-h-11 items-center rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
       >
         Send message
       </button>
@@ -90,30 +93,30 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
 </BaseLayout>
 
 <script>
-  const form = document.getElementById('contact-form') as HTMLFormElement | null;
-  const status = document.getElementById('contact-form-status');
-  const intentSelect = document.getElementById('intent') as HTMLSelectElement | null;
+  (function () {
+    const form = document.getElementById('contact-form') as HTMLFormElement | null;
+    const status = document.getElementById('contact-form-status');
+    const intentSelect = document.getElementById('intent') as HTMLSelectElement | null;
 
-  const params = new URLSearchParams(window.location.search);
-  const requestedIntent = params.get('intent');
-  if (requestedIntent && intentSelect) {
-    const match = Array.from(intentSelect.options).find((opt) => opt.value === requestedIntent);
-    if (match) intentSelect.value = requestedIntent;
-  }
-
-  form?.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const company = (form.elements.namedItem('company') as HTMLInputElement | null)?.value;
-    if (company) return; // honeypot triggered, silently drop
-
-    if (form.dataset.endpointConfigured !== 'true') {
-      if (status) {
-        status.textContent =
-          'Thanks — the contact form isn’t wired to a delivery provider yet. Please email us directly in the meantime.';
-      }
-      return;
+    const params = new URLSearchParams(window.location.search);
+    const requestedIntent = params.get('intent');
+    if (requestedIntent && intentSelect) {
+      const match = Array.from(intentSelect.options).find((opt) => opt.value === requestedIntent);
+      if (match) intentSelect.value = requestedIntent;
     }
 
-    // Real submission to PUBLIC_FORM_ENDPOINT lands in Phase 4.
-  });
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const company = (form.elements.namedItem('company') as HTMLInputElement | null)?.value;
+      if (company) return;
+
+      if (form.dataset.endpointConfigured !== 'true') {
+        if (status) {
+          status.textContent =
+            'Thanks - the contact form is not wired to a delivery provider yet. Please email us directly in the meantime.';
+        }
+        return;
+      }
+    });
+  })();
 </script>

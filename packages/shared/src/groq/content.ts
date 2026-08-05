@@ -16,8 +16,12 @@ export const pageBySlugQuery = /* groq */ `*[_type == "page" && slug.current == 
   _id, title, "slug": slug.current, blocks
 }`;
 
+export const aboutPageQuery = /* groq */ `*[_id == "aboutPage"][0]{
+  _id, title, intro, teamSectionTitle, teamSectionIntro
+}`;
+
 export const allTeamMembersQuery = /* groq */ `*[_type == "teamMember"] | order(order asc, name asc){
-  _id, name, role, bio, photo${imageFragment}
+  _id, name, role, bio, order, photo${imageFragment}, social
 }`;
 
 export const volunteerInfoQuery = /* groq */ `*[_type == "volunteerInfo"][0]{

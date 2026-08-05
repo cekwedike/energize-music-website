@@ -5,7 +5,9 @@
   --color-ink-raised: #141417;
   --color-paper: #fafaf8;
   --color-accent: #fafaf8;
-  --color-ember: #e0532c;
+  --color-glow: #4da8ff;
+  --color-glow-deep: #2563eb;
+  --color-glow-cyan: #67e8f9;
   --font-display: 'Fraunces', 'Georgia', serif;
   --font-body: 'Inter', system-ui, sans-serif;
 
@@ -21,6 +23,7 @@
 @layer base {
   html {
     color-scheme: dark;
+    overflow-x: clip;
   }
 
   body {
@@ -29,6 +32,7 @@
     font-family: var(--font-body);
     font-size: var(--text-body-lg);
     line-height: 1.6;
+    overflow-x: clip;
   }
 
   h1,
@@ -177,4 +181,243 @@
   box-shadow:
     0 0 20px rgba(255, 255, 255, 0.3),
     0 0 40px rgba(255, 255, 255, 0.1);
+}
+
+/* ── Ambient page background ─────────────────────────────────────────────── */
+
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -20;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.ambient-bg__base {
+  position: absolute;
+  inset: 0;
+  background: var(--color-ink);
+}
+
+.ambient-bg__mesh {
+  position: absolute;
+  inset: -20%;
+  opacity: 0.55;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(77, 168, 255, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 25%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 45% at 50% 90%, rgba(103, 232, 249, 0.07) 0%, transparent 45%);
+  animation: ambient-mesh-shift 42s ease-in-out infinite alternate;
+}
+
+.ambient-bg__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  mix-blend-mode: screen;
+}
+
+.ambient-bg__glow--primary {
+  top: -12%;
+  left: -8%;
+  width: min(72vmax, 900px);
+  height: min(72vmax, 900px);
+  background: radial-gradient(circle, rgba(77, 168, 255, 0.22) 0%, transparent 68%);
+  animation: ambient-drift-a 36s ease-in-out infinite;
+}
+
+.ambient-bg__glow--secondary {
+  bottom: -18%;
+  right: -10%;
+  width: min(64vmax, 780px);
+  height: min(64vmax, 780px);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.16) 0%, transparent 70%);
+  animation: ambient-drift-b 48s ease-in-out infinite;
+}
+
+.ambient-bg__glow--accent {
+  top: 38%;
+  left: 42%;
+  width: min(42vmax, 520px);
+  height: min(42vmax, 520px);
+  background: radial-gradient(circle, rgba(103, 232, 249, 0.1) 0%, transparent 72%);
+  animation: ambient-pulse 14s ease-in-out infinite;
+}
+
+.ambient-bg__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+
+.ambient-bg__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 80% at 50% 50%, transparent 35%, rgba(11, 11, 13, 0.55) 100%);
+}
+
+/* Variant: home — video hero dominates; keep atmosphere minimal */
+.ambient-bg--home .ambient-bg__mesh {
+  opacity: 0.25;
+}
+
+.ambient-bg--home .ambient-bg__glow--primary,
+.ambient-bg--home .ambient-bg__glow--secondary {
+  opacity: 0.45;
+}
+
+.ambient-bg--home .ambient-bg__glow--accent {
+  opacity: 0.3;
+}
+
+/* Variant: editorial — calm, slow drift for about/story pages */
+.ambient-bg--editorial .ambient-bg__mesh {
+  animation-duration: 58s;
+}
+
+.ambient-bg--editorial .ambient-bg__glow--primary {
+  animation-duration: 52s;
+  background: radial-gradient(circle, rgba(77, 168, 255, 0.18) 0%, transparent 68%);
+}
+
+.ambient-bg--editorial .ambient-bg__glow--accent {
+  animation: ambient-pulse 22s ease-in-out infinite;
+}
+
+/* Variant: pulse — slightly more energy for campaign pages */
+.ambient-bg--pulse .ambient-bg__glow--primary {
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.14) 0%, rgba(77, 168, 255, 0.12) 45%, transparent 72%);
+  animation-duration: 24s;
+}
+
+.ambient-bg--pulse .ambient-bg__glow--secondary {
+  background: radial-gradient(circle, rgba(77, 168, 255, 0.18) 0%, transparent 70%);
+  animation-duration: 30s;
+}
+
+.ambient-bg--pulse .ambient-bg__glow--accent {
+  animation: ambient-pulse 9s ease-in-out infinite;
+}
+
+.ambient-bg--pulse .ambient-bg__mesh {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 25%, rgba(77, 168, 255, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 45% at 50% 90%, rgba(37, 99, 235, 0.08) 0%, transparent 45%);
+}
+
+/* Variant: warm — playful undertone for kids/initiatives */
+.ambient-bg--warm .ambient-bg__glow--primary {
+  background: radial-gradient(circle, rgba(255, 180, 100, 0.1) 0%, rgba(77, 168, 255, 0.1) 50%, transparent 72%);
+}
+
+.ambient-bg--warm .ambient-bg__glow--secondary {
+  background: radial-gradient(circle, rgba(103, 232, 249, 0.12) 0%, transparent 70%);
+}
+
+@keyframes ambient-mesh-shift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(3%, -2%, 0) scale(1.04);
+  }
+}
+
+@keyframes ambient-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  33% {
+    transform: translate3d(6vw, 4vh, 0);
+  }
+  66% {
+    transform: translate3d(2vw, 8vh, 0);
+  }
+}
+
+@keyframes ambient-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40% {
+    transform: translate3d(-5vw, -3vh, 0);
+  }
+  70% {
+    transform: translate3d(-2vw, -7vh, 0);
+  }
+}
+
+@keyframes ambient-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate3d(-2vw, 1vh, 0) scale(1.06);
+  }
+}
+
+@media (max-width: 768px) {
+  .ambient-bg__glow {
+    filter: blur(64px);
+  }
+
+  .ambient-bg__glow--primary,
+  .ambient-bg__glow--secondary {
+    width: min(90vmax, 640px);
+    height: min(90vmax, 640px);
+  }
+
+  .ambient-bg__glow--accent {
+    width: min(55vmax, 400px);
+    height: min(55vmax, 400px);
+  }
+
+  .ambient-bg__grain {
+    opacity: 0.03;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-bg__mesh,
+  .ambient-bg__glow {
+    animation: none !important;
+  }
+
+  .ambient-bg__glow--accent {
+    opacity: 0.65;
+  }
+}
+
+/* ── Shared scroll reveal ────────────────────────────────────────────────── */
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.75s ease,
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }

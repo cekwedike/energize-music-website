@@ -1,8 +1,59 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PagePlaceholder from '../components/ui/PagePlaceholder.astro';
+import PageHero from '../components/ui/PageHero.astro';
+
+const highlights = [
+  {
+    title: 'Live worship',
+    body: 'Pan-African gospel and soul-fusion performances under one roof.',
+  },
+  {
+    title: 'Community',
+    body: 'A gathering space for fans, artists, and families who share the Energize vision.',
+  },
+  {
+    title: 'Coming soon',
+    body: 'Dates, lineup, and tickets will be announced here first.',
+  },
+];
 ---
 
-<BaseLayout title="Energize Fest" description="Energize Fest — details coming soon.">
-  <PagePlaceholder heading="Energize Fest" note="Details on this initiative are coming soon." />
+<BaseLayout title="Energize Fest" description="Energize Fest — a live celebration of Afro-gospel culture. Details coming soon.">
+  <PageHero
+    eyebrow="Initiative"
+    title="Energize Fest"
+    description="A live celebration of Afro-gospel culture — worship, community, and the sound of a generation. Details are on the way."
+    ctas={[{ label: 'Get notified', href: '/contact?intent=general', variant: 'primary' }]}
+  />
+
+  <section class="border-b border-white/10 bg-[var(--color-ink-raised)]">
+    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
+      <ul class="grid gap-6 sm:grid-cols-3">
+        {
+          highlights.map((item) => (
+            <li class="rounded-xl border border-white/10 bg-white/[0.03] p-6">
+              <strong class="block font-display text-lg text-paper">{item.title}</strong>
+              <p class="mt-2 text-sm leading-relaxed text-paper/70">{item.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="mx-auto max-w-3xl px-5 py-16 text-center sm:px-6 sm:py-24">
+      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">Stay tuned</p>
+      <h2 class="text-h2 mt-4">The stage is being set.</h2>
+      <p class="mx-auto mt-4 max-w-xl text-paper/70">
+        Energize Fest is in development. Reach out if you'd like to partner, perform, or volunteer when doors open.
+      </p>
+      <a
+        href="/contact?intent=partnership"
+        class="button-glow mt-8 inline-flex min-h-11 items-center rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+      >
+        Partner with us
+      </a>
+    </div>
+  </section>
 </BaseLayout>

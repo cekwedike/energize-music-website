@@ -1,11 +1,175 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PagePlaceholder from '../components/ui/PagePlaceholder.astro';
+
+const LIVE_SITE = 'https://energize-kids.com/';
+
+const pillars = [
+  {
+    icon: '♪',
+    title: 'Music',
+    body: 'Clean sounds kids can sing, dance, and grow with.',
+  },
+  {
+    icon: '↗',
+    title: 'Movement',
+    body: 'Simple activities that get energy moving in a positive way.',
+  },
+  {
+    icon: '?',
+    title: 'Learning',
+    body: 'Fun prompts and challenges that spark curiosity.',
+  },
+  {
+    icon: '★',
+    title: 'Joy',
+    body: 'Bright experiences that feel safe, expressive, and shareable.',
+  },
+];
 ---
 
 <BaseLayout
   title="Energize Kids"
-  description="Energize Kids — a family-friendly initiative from Energize Music. Coming soon."
+  description="Fun, engaging experiences for amazing kids — clean music, movement, learning, and joy from Energize Music."
+  ogImage="/initiatives/energize-kids.webp"
 >
-  <PagePlaceholder heading="Energize Kids" note="A new Energize Music initiative for family-friendly, kid-focused content. Coming soon." />
+  <!-- Hero -->
+  <section class="relative overflow-hidden border-b border-white/10">
+    <div class="absolute inset-0">
+      <img
+        src="/initiatives/energize-kids.webp"
+        alt=""
+        class="h-full w-full object-cover opacity-40"
+        loading="eager"
+      />
+      <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-ink)]/60 via-[var(--color-ink)]/80 to-[var(--color-ink)]"></div>
+    </div>
+
+    <div class="relative mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-32">
+      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-paper/60">
+        Music · Movement · Learning · Joy
+      </p>
+      <h1 class="text-h1 mt-6 max-w-3xl">Fun, engaging experiences for amazing kids.</h1>
+      <p class="text-lead mt-6 max-w-2xl text-paper/75">
+        Energize Kids is a colorful community for clean entertainment, bright creativity, and moments children can enjoy and share.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a
+          href={LIVE_SITE}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="button-glow rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+        >
+          Visit energize-kids.com
+        </a>
+        <a
+          href="#pillars"
+          class="rounded-full border border-white/30 px-7 py-3.5 text-sm font-semibold text-paper transition hover:border-white/50 hover:bg-white/5"
+        >
+          Explore the pillars
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Highlights -->
+  <section class="border-b border-white/10 bg-[var(--color-ink-raised)]">
+    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
+      <ul class="grid gap-6 sm:grid-cols-3">
+        <li class="text-sm text-paper/70">
+          <strong class="block text-paper">Clean age-friendly entertainment</strong>
+          Creative songs, movement, and learning
+        </li>
+        <li class="text-sm text-paper/70">
+          <strong class="block text-paper">Community powered</strong>
+          By Energize Music and Energize Central
+        </li>
+        <li class="text-sm text-paper/70">
+          <strong class="block text-paper">Built for families</strong>
+          Safe, expressive, shareable experiences
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Event -->
+  <section class="border-b border-white/10">
+    <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
+      <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-glow)]">Online event for parents and guardians</p>
+          <h2 class="text-h2 mt-3">Crowned, Not Cloned.</h2>
+          <p class="mt-4 text-paper/75">
+            Join a thoughtful conversation about raising kings and queens with identity, conviction, purpose, and confidence in God.
+          </p>
+          <dl class="mt-6 space-y-2 text-sm">
+            <div class="flex gap-3">
+              <dt class="text-paper/50">Date</dt>
+              <dd class="font-medium">July 25, 2026</dd>
+            </div>
+            <div class="flex gap-3">
+              <dt class="text-paper/50">Format</dt>
+              <dd class="font-medium">Live on Zoom</dd>
+            </div>
+          </dl>
+          <a
+            href={LIVE_SITE}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-8 inline-block rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
+          >
+            Learn more and register
+          </a>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-8">
+          <p class="text-xs font-semibold uppercase tracking-widest text-paper/50">Featured Artist</p>
+          <h3 class="text-h3 mt-2">Xade</h3>
+          <p class="mt-4 text-paper/75">
+            Xade brings a soulful blend of Afro-Gospel, Afrobeats, and Hip-Hop. His single <em>Prayer</em> is available across all platforms.
+          </p>
+          <ul class="mt-4 flex flex-wrap gap-2">
+            {['Afro-Gospel', 'Afrobeats', 'Hip-Hop', 'Clean Energy'].map((tag) => (
+              <li class="rounded-full border border-white/15 px-3 py-1 text-xs text-paper/70">{tag}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pillars -->
+  <section id="pillars" class="scroll-mt-24 border-b border-white/10 bg-[var(--color-ink-raised)]">
+    <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
+      <div class="max-w-2xl">
+        <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-glow)]">The Energize Kids World</p>
+        <h2 class="text-h2 mt-3">More than music, built for joyful discovery.</h2>
+      </div>
+      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {pillars.map((pillar) => (
+          <article class="rounded-xl border border-white/10 bg-white/5 p-6">
+            <span class="text-2xl text-[var(--color-glow)]" aria-hidden="true">{pillar.icon}</span>
+            <h3 class="mt-4 font-display text-lg font-medium">{pillar.title}</h3>
+            <p class="mt-2 text-sm text-paper/70">{pillar.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section>
+    <div class="mx-auto max-w-6xl px-5 py-20 text-center sm:px-6 sm:py-28">
+      <h2 class="text-h2">Follow the movement.</h2>
+      <p class="mx-auto mt-4 max-w-xl text-paper/70">
+        Powered by @energize_music and @energizecentral. Keep up with releases, activities, and community updates on the live Energize Kids site.
+      </p>
+      <a
+        href={LIVE_SITE}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="button-glow mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+      >
+        Go to energize-kids.com
+      </a>
+    </div>
+  </section>
 </BaseLayout>

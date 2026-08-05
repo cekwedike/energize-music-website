@@ -49,29 +49,29 @@ const jsonLd = {
 
 <BaseLayout title={artist.name} description={artist.bio}>
   <JsonLd data={jsonLd} />
-  <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
-    <div class="grid gap-10 sm:grid-cols-[1fr_1.4fr] sm:items-start">
+  <section class="mx-auto max-w-6xl px-5 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16">
+    <div class="grid gap-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] sm:items-start sm:gap-10">
       <img
         src={photoUrl}
         alt={artist.photo.alt ?? artist.name}
-        class="aspect-square w-full rounded-lg object-cover"
+        class="aspect-square w-full max-w-md rounded-lg object-cover sm:max-w-none"
       />
-      <div>
-        <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
+      <div class="min-w-0">
+        <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-glow)]">
           {tierLabel[artist.tier]}
         </p>
-        <h1 class="text-h1 mt-2">{artist.name}</h1>
-        <p class="text-lead mt-6 max-w-xl text-paper/75">{artist.bio}</p>
+        <h1 class="text-h1 mt-2 break-words">{artist.name}</h1>
+        <p class="text-lead mt-4 max-w-xl text-paper/75 sm:mt-6">{artist.bio}</p>
 
         {
           streamingEntries.length > 0 && (
-            <div class="mt-8 flex flex-wrap gap-3">
+            <div class="mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
               {streamingEntries.map(([key, url]) => (
                 <a
                   href={url as string}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                  class="inline-flex min-h-10 items-center rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-paper transition hover:border-[var(--color-glow)] hover:text-[var(--color-glow)] sm:px-5 sm:py-2.5"
                 >
                   {streamingLabels[key] ?? key}
                 </a>
@@ -84,9 +84,9 @@ const jsonLd = {
 
     {
       discography.length > 0 && (
-        <div class="mt-20">
+        <div class="mt-14 sm:mt-20">
           <h2 class="text-h3">Discography</h2>
-          <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {discography.map((release) => (
               <ReleaseCard release={release} />
             ))}

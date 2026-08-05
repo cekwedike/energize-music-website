@@ -14,138 +14,158 @@ const navEntries = headerNav.filter((entry) => !(entry.type === 'link' && entry.
 const initiativesEntry = headerNav.find((entry) => entry.type === 'dropdown');
 const isInitiativeActive =
   initiativesEntry?.type === 'dropdown' ? initiativesEntry.items.some((link) => isActive(link.href)) : false;
+
+const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.href === '/contact');
 ---
 
-<header class="liquid-glass sticky top-0 z-40">
-  <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-5">
-    <a href="/" class="shrink-0" aria-label="Energize Music">
+<header id="site-header" class="site-header sticky top-0 z-40">
+  <div class="site-header__bar mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3.5 sm:gap-6 sm:px-6 sm:py-4 lg:py-[1.125rem]">
+    <a href="/" class="site-header__logo shrink-0 transition-opacity duration-300 hover:opacity-90" aria-label="Energize Music">
       <Logo size="sm" animated={false} />
     </a>
 
-    <nav aria-label="Primary" class="hidden sm:block">
-      <ul class="flex items-center gap-x-1 whitespace-nowrap text-xs font-medium">
-        {
-          navEntries.map((entry) =>
-            entry.type === 'link' ? (
-              <li>
-                <a
-                  href={entry.href}
-                  aria-current={isActive(entry.href) ? 'page' : undefined}
-                  class="block rounded-full px-4 py-2 uppercase tracking-[0.08em] text-paper/60 transition hover:bg-white/5 hover:text-paper aria-[current=page]:bg-white/10 aria-[current=page]:text-paper"
-                >
-                  {entry.label}
-                </a>
-              </li>
-            ) : (
-              <li class="relative">
-                <button
-                  type="button"
-                  id="initiatives-trigger"
-                  aria-expanded="false"
-                  aria-controls="initiatives-menu"
-                  aria-current={isInitiativeActive ? 'page' : undefined}
-                  class="flex items-center gap-1.5 rounded-full px-4 py-2 uppercase tracking-[0.08em] text-paper/60 transition hover:bg-white/5 hover:text-paper aria-[current=page]:bg-white/10 aria-[current=page]:text-paper aria-[expanded=true]:bg-white/10 aria-[expanded=true]:text-paper"
-                >
-                  {entry.label}
-                  <svg
-                    id="initiatives-chevron"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="h-3 w-3 shrink-0 transition-transform duration-200"
+    <div class="hidden items-center gap-2 sm:flex lg:gap-3">
+      <nav aria-label="Primary">
+        <ul class="flex items-center gap-0.5 lg:gap-1">
+          {
+            navEntries.map((entry) =>
+              entry.type === 'link' && entry.href !== '/contact' ? (
+                <li>
+                  <a
+                    href={entry.href}
+                    aria-current={isActive(entry.href) ? 'page' : undefined}
+                    class="nav-link"
                   >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </button>
+                    {entry.label}
+                  </a>
+                </li>
+              ) : entry.type === 'dropdown' ? (
+                <li class="relative">
+                  <button
+                    type="button"
+                    id="initiatives-trigger"
+                    aria-expanded="false"
+                    aria-controls="initiatives-menu"
+                    aria-current={isInitiativeActive ? 'page' : undefined}
+                    class="nav-link flex items-center gap-1.5"
+                  >
+                    {entry.label}
+                    <svg
+                      id="initiatives-chevron"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="h-3 w-3 shrink-0 transition-transform duration-200"
+                    >
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </button>
 
-                <div
-                  id="initiatives-menu"
-                  role="menu"
-                  aria-label="Initiatives"
-                  class="absolute right-0 top-full mt-2 hidden w-[38rem] max-w-[calc(100vw-3rem)] rounded-2xl border border-white/10 bg-[var(--color-ink-raised)] p-3 whitespace-normal normal-case tracking-normal shadow-2xl shadow-black/50"
-                >
-                  <ul class="grid grid-cols-1 gap-1 sm:grid-cols-3">
-                    {
-                      entry.items.map((link) => (
-                        <li>
-                          <a
-                            href={link.href}
-                            role="menuitem"
-                            aria-current={isActive(link.href) ? 'page' : undefined}
-                            class="group block h-full rounded-xl p-2.5 transition hover:bg-white/5 aria-[current=page]:bg-white/10"
-                          >
-                            <div class="aspect-[4/3] w-full overflow-hidden rounded-lg bg-white/5">
-                              <img
-                                src={link.image}
-                                alt=""
-                                loading="lazy"
-                                class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                              />
-                            </div>
-                            <p class="mt-2.5 text-sm font-semibold text-paper">{link.label}</p>
-                            <p class="mt-1 text-xs leading-relaxed text-paper/60">{link.blurb}</p>
-                          </a>
-                        </li>
-                      ))
-                    }
-                  </ul>
-                </div>
-              </li>
-            ),
-          )
-        }
-      </ul>
-    </nav>
+                  <div
+                    id="initiatives-menu"
+                    role="menu"
+                    aria-label="Initiatives"
+                    class="absolute right-0 top-full mt-2 hidden w-[38rem] max-w-[calc(100vw-2.5rem)] rounded-2xl border border-white/10 bg-[var(--color-ink-raised)] p-3 whitespace-normal normal-case tracking-normal shadow-2xl shadow-black/50 lg:left-auto lg:right-0"
+                  >
+                    <ul class="grid grid-cols-1 gap-1 sm:grid-cols-3">
+                      {
+                        entry.items.map((link) => (
+                          <li>
+                            <a
+                              href={link.href}
+                              role="menuitem"
+                              aria-current={isActive(link.href) ? 'page' : undefined}
+                              class="group block h-full rounded-xl p-2.5 transition hover:bg-white/5 aria-[current=page]:bg-white/10"
+                            >
+                              <div class="aspect-[4/3] w-full overflow-hidden rounded-lg bg-white/5">
+                                <img
+                                  src={link.image}
+                                  alt=""
+                                  loading="lazy"
+                                  class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                />
+                              </div>
+                              <p class="mt-2.5 text-sm font-semibold text-paper">{link.label}</p>
+                              <p class="mt-1 text-xs leading-relaxed text-paper/60">{link.blurb}</p>
+                            </a>
+                          </li>
+                        ))
+                      }
+                    </ul>
+                  </div>
+                </li>
+              ) : null,
+            )
+          }
+        </ul>
+      </nav>
+
+      {
+        contactEntry?.type === 'link' ? (
+          <a
+            href={contactEntry.href}
+            aria-current={isActive(contactEntry.href) ? 'page' : undefined}
+            class="nav-cta"
+          >
+            {contactEntry.label}
+          </a>
+        ) : null
+      }
+    </div>
 
     <button
       type="button"
       id="nav-toggle"
       aria-expanded="false"
       aria-controls="mobile-nav"
-      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 text-paper sm:hidden"
+      class="nav-toggle flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-paper transition hover:border-white/30 hover:bg-white/5 sm:hidden"
     >
       <span class="sr-only">Toggle menu</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" class="h-5 w-5">
-        <path id="nav-toggle-icon-open" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
+      <span class="nav-toggle__icon" aria-hidden="true">
+        <span class="nav-toggle__line"></span>
+        <span class="nav-toggle__line"></span>
+        <span class="nav-toggle__line"></span>
+      </span>
     </button>
   </div>
 
-  <nav id="mobile-nav" aria-label="Primary mobile" class="hidden border-t border-white/10 sm:hidden">
-    <ul class="mx-auto max-w-6xl px-6 py-4 text-base font-medium">
+  <div id="mobile-nav-backdrop" class="mobile-nav-backdrop sm:hidden" aria-hidden="true"></div>
+
+  <nav id="mobile-nav" aria-label="Primary mobile" class="mobile-nav sm:hidden">
+    <ul class="mobile-nav__list">
       {
         navEntries.map((entry) =>
           entry.type === 'link' ? (
-            <li class="border-b border-white/5 last:border-0">
+            <li>
               <a
                 href={entry.href}
                 aria-current={isActive(entry.href) ? 'page' : undefined}
-                class="block py-3 text-paper/70 transition hover:text-paper aria-[current=page]:text-paper aria-[current=page]:font-semibold"
+                class="mobile-nav__link"
               >
                 {entry.label}
               </a>
             </li>
           ) : (
-            <li class="border-b border-white/5 pt-4 pb-2 last:border-0">
-              <p class="text-xs font-semibold uppercase tracking-wide text-paper/40">{entry.label}</p>
-              <ul class="mt-2 space-y-3">
+            <li class="mobile-nav__section">
+              <p class="mobile-nav__section-label">{entry.label}</p>
+              <ul class="mobile-nav__subsection">
                 {
                   entry.items.map((link) => (
                     <li>
                       <a
                         href={link.href}
                         aria-current={isActive(link.href) ? 'page' : undefined}
-                        class="flex items-center gap-3 py-1.5 text-paper/70 transition hover:text-paper aria-[current=page]:text-paper aria-[current=page]:font-semibold"
+                        class="mobile-nav__initiative"
                       >
-                        <span class="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/5">
+                        <span class="mobile-nav__initiative-thumb">
                           <img src={link.image} alt="" loading="lazy" class="h-full w-full object-cover" />
                         </span>
-                        <span class="flex flex-col">
-                          <span>{link.label}</span>
-                          <span class="text-xs font-normal text-paper/50">{link.blurb}</span>
+                        <span class="mobile-nav__initiative-copy">
+                          <span class="mobile-nav__initiative-title">{link.label}</span>
+                          <span class="mobile-nav__initiative-blurb">{link.blurb}</span>
                         </span>
                       </a>
                     </li>
@@ -160,21 +180,370 @@ const isInitiativeActive =
   </nav>
 </header>
 
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(11, 11, 13, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition:
+      background 0.35s ease,
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+
+  .site-header.is-scrolled {
+    background: rgba(11, 11, 13, 0.88);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  .site-header.is-menu-open {
+    background: rgba(11, 11, 13, 0.96);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .nav-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.875rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.62);
+    border-radius: 9999px;
+    transition:
+      color 0.25s ease,
+      background 0.25s ease;
+  }
+
+  @media (min-width: 1024px) {
+    .nav-link {
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  .nav-link:hover {
+    color: var(--color-paper);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .nav-link[aria-current='page'] {
+    color: var(--color-paper);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-link[aria-current='page']::after,
+  .nav-link[aria-expanded='true']::after {
+    content: '';
+    position: absolute;
+    bottom: 0.3rem;
+    left: 50%;
+    width: 0.875rem;
+    height: 2px;
+    border-radius: 9999px;
+    background: var(--color-glow);
+    transform: translateX(-50%);
+    opacity: 0.85;
+  }
+
+  .nav-link[aria-expanded='true'] {
+    color: var(--color-paper);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  button.nav-link {
+    border: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  #initiatives-trigger {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.375rem;
+    white-space: nowrap;
+  }
+
+  .nav-cta {
+    margin-left: 0.25rem;
+    padding: 0.5625rem 1.25rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    background: var(--color-paper);
+    border-radius: 9999px;
+    box-shadow:
+      0 0 20px rgba(255, 255, 255, 0.22),
+      0 0 40px rgba(255, 255, 255, 0.08);
+    transition:
+      background 0.25s ease,
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  @media (min-width: 1024px) {
+    .nav-cta {
+      padding: 0.625rem 1.375rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  .nav-cta:hover {
+    background: rgba(250, 250, 248, 0.92);
+    transform: translateY(-1px);
+  }
+
+  .nav-cta[aria-current='page'] {
+    box-shadow:
+      0 0 24px rgba(77, 168, 255, 0.35),
+      0 0 40px rgba(255, 255, 255, 0.12);
+  }
+
+  .nav-toggle__icon {
+    position: relative;
+    display: block;
+    width: 1.125rem;
+    height: 0.875rem;
+  }
+
+  .nav-toggle__line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    border-radius: 9999px;
+    background: currentColor;
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.2s ease,
+      top 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .nav-toggle__line:nth-child(1) {
+    top: 0;
+  }
+
+  .nav-toggle__line:nth-child(2) {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .nav-toggle__line:nth-child(3) {
+    top: 100%;
+    transform: translateY(-100%);
+  }
+
+  .nav-toggle[aria-expanded='true'] .nav-toggle__line:nth-child(1) {
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .nav-toggle[aria-expanded='true'] .nav-toggle__line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .nav-toggle[aria-expanded='true'] .nav-toggle__line:nth-child(3) {
+    top: 50%;
+    transform: translateY(-50%) rotate(-45deg);
+  }
+
+  .mobile-nav-backdrop {
+    position: fixed;
+    inset: 0;
+    top: var(--header-height, 4rem);
+    z-index: 35;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.35s ease,
+      visibility 0.35s ease;
+    pointer-events: none;
+  }
+
+  .mobile-nav-backdrop.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .mobile-nav {
+    position: relative;
+    z-index: 36;
+    overflow: hidden;
+    max-height: 0;
+    border-top: 1px solid transparent;
+    transition:
+      max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.35s ease;
+  }
+
+  .mobile-nav.is-open {
+    max-height: min(85vh, 720px);
+    overflow-y: auto;
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .mobile-nav__list {
+    margin: 0 auto;
+    max-width: 80rem;
+    padding: 0.75rem 1.25rem 1.5rem;
+  }
+
+  .mobile-nav__link {
+    display: block;
+    padding: 0.875rem 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: rgba(250, 250, 248, 0.72);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    transition: color 0.2s ease;
+  }
+
+  .mobile-nav__link:hover,
+  .mobile-nav__link[aria-current='page'] {
+    color: var(--color-paper);
+  }
+
+  .mobile-nav__link[aria-current='page'] {
+    font-weight: 600;
+  }
+
+  .mobile-nav__section {
+    padding-top: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .mobile-nav__section-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.38);
+  }
+
+  .mobile-nav__subsection {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+  }
+
+  .mobile-nav__initiative {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    color: rgba(250, 250, 248, 0.72);
+    transition: color 0.2s ease;
+  }
+
+  .mobile-nav__initiative:hover,
+  .mobile-nav__initiative[aria-current='page'] {
+    color: var(--color-paper);
+  }
+
+  .mobile-nav__initiative-thumb {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    overflow: hidden;
+    border-radius: 0.625rem;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .mobile-nav__initiative-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .mobile-nav__initiative-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .mobile-nav__initiative-blurb {
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: rgba(250, 250, 248, 0.48);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-header,
+    .nav-link,
+    .nav-cta,
+    .nav-toggle__line,
+    .mobile-nav,
+    .mobile-nav-backdrop {
+      transition: none !important;
+    }
+  }
+</style>
+
 <script>
+  const header = document.getElementById('site-header');
   const toggle = document.getElementById('nav-toggle');
   const panel = document.getElementById('mobile-nav');
+  const backdrop = document.getElementById('mobile-nav-backdrop');
+
+  function syncHeaderHeight() {
+    if (!header) return;
+    document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
+  }
+
+  function setMobileMenuOpen(isOpen: boolean) {
+    panel?.classList.toggle('is-open', isOpen);
+    backdrop?.classList.toggle('is-visible', isOpen);
+    header?.classList.toggle('is-menu-open', isOpen);
+    toggle?.setAttribute('aria-expanded', String(isOpen));
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    syncHeaderHeight();
+  }
 
   toggle?.addEventListener('click', () => {
-    const isOpen = panel?.classList.toggle('hidden') === false;
-    toggle.setAttribute('aria-expanded', String(isOpen));
+    const isOpen = toggle.getAttribute('aria-expanded') !== 'true';
+    setMobileMenuOpen(isOpen);
   });
+
+  backdrop?.addEventListener('click', () => setMobileMenuOpen(false));
 
   panel?.addEventListener('click', (event) => {
     if ((event.target as HTMLElement).tagName === 'A') {
-      panel.classList.add('hidden');
-      toggle?.setAttribute('aria-expanded', 'false');
+      setMobileMenuOpen(false);
     }
   });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') {
+      setMobileMenuOpen(false);
+    }
+  });
+
+  function updateScrollState() {
+    header?.classList.toggle('is-scrolled', window.scrollY > 12);
+  }
+
+  updateScrollState();
+  window.addEventListener('scroll', updateScrollState, { passive: true });
+  window.addEventListener('resize', syncHeaderHeight);
+  syncHeaderHeight();
 
   const initiativesTrigger = document.getElementById('initiatives-trigger');
   const initiativesMenu = document.getElementById('initiatives-menu');

@@ -1,0 +1,214 @@
+---
+export interface PageHeroCta {
+  label: string;
+  href: string;
+  variant?: 'primary' | 'secondary';
+  external?: boolean;
+}
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  size?: 'slim' | 'standard';
+  align?: 'left' | 'center';
+  ctas?: PageHeroCta[];
+}
+
+const { eyebrow, title, description, size = 'standard', align = 'left', ctas = [] } = Astro.props;
+
+const isSlim = size === 'slim';
+const isCenter = align === 'center';
+---
+
+<section
+  class:list={['page-hero relative overflow-hidden', isSlim && 'page-hero--slim', isCenter && 'page-hero--center']}
+  data-page-hero
+>
+  <div class="page-hero__mesh" aria-hidden="true"></div>
+  <div class="page-hero__grain" aria-hidden="true"></div>
+  <div class="page-hero__glow page-hero__glow--left" aria-hidden="true"></div>
+  <div class="page-hero__glow page-hero__glow--right" aria-hidden="true"></div>
+
+  <div
+    class:list={[
+      'relative mx-auto max-w-6xl px-5 sm:px-6',
+      isSlim ? 'pb-12 pt-24 sm:pb-16 sm:pt-28' : 'pb-16 pt-24 sm:pb-20 sm:pt-32 lg:pb-24 lg:pt-36',
+    ]}
+  >
+    <div class:list={['max-w-4xl', isCenter && 'mx-auto text-center']}>
+      {
+        eyebrow && (
+          <p class="page-hero-reveal page-hero-reveal-1 text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--color-glow)] sm:text-xs sm:tracking-[0.35em]">
+            {eyebrow}
+          </p>
+        )
+      }
+      {
+        eyebrow && (
+          <div
+            class:list={['page-hero-reveal page-hero-reveal-2 mt-3 h-px w-10 bg-[var(--color-glow)] sm:mt-4', isCenter && 'mx-auto']}
+            aria-hidden="true"
+          />
+        )
+      }
+      <h1
+        class:list={[
+          'page-hero-reveal font-display leading-[0.95] tracking-tight text-paper',
+          eyebrow ? 'page-hero-reveal-3 mt-5 sm:mt-6' : 'page-hero-reveal-1',
+          isSlim ? 'text-h2 sm:text-h1' : 'text-h1 max-w-3xl',
+          isCenter && 'mx-auto',
+        ]}
+      >
+        {title}
+      </h1>
+      {
+        description && (
+          <p
+            class:list={[
+              'page-hero-reveal text-lead mt-4 text-paper/70 sm:mt-5',
+              eyebrow ? 'page-hero-reveal-4' : 'page-hero-reveal-2',
+              isSlim ? 'max-w-2xl' : 'max-w-xl',
+              isCenter && 'mx-auto',
+            ]}
+          >
+            {description}
+          </p>
+        )
+      }
+
+      {
+        ctas.length > 0 && (
+          <div
+            class:list={[
+              'page-hero-reveal mt-8 flex flex-wrap gap-3 sm:mt-10',
+              eyebrow ? 'page-hero-reveal-5' : 'page-hero-reveal-3',
+              isCenter && 'justify-center',
+            ]}
+          >
+            {
+              ctas.map((cta) => (
+                <a
+                  href={cta.href}
+                  target={cta.external ? '_blank' : undefined}
+                  rel={cta.external ? 'noopener noreferrer' : undefined}
+                  class:list={[
+                    'inline-flex min-h-11 items-center rounded-full px-5 py-2.5 text-sm font-semibold transition sm:px-6 sm:py-3',
+                    cta.variant === 'secondary'
+                      ? 'border border-white/25 text-paper hover:border-white/45 hover:bg-white/5'
+                      : 'bg-[var(--color-glow)] text-white hover:bg-[var(--color-glow)]/90',
+                  ]}
+                >
+                  {cta.label}
+                </a>
+              ))
+            }
+          </div>
+        )
+      }
+
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .page-hero--slim {
+    min-height: 0;
+  }
+
+  .page-hero:not(.page-hero--slim) {
+    min-height: min(52vh, 560px);
+  }
+
+  @media (min-width: 640px) {
+    .page-hero:not(.page-hero--slim) {
+      min-height: min(58vh, 640px);
+    }
+  }
+
+  .page-hero__mesh {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(77, 168, 255, 0.12), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(103, 232, 249, 0.06), transparent 50%),
+      linear-gradient(165deg, var(--color-ink) 0%, #0f0f12 45%, var(--color-ink-raised) 100%);
+  }
+
+  .page-hero__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.3;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  .page-hero__glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(72px);
+    pointer-events: none;
+  }
+
+  .page-hero__glow--left {
+    top: 5%;
+    left: -12%;
+    width: min(280px, 70vw);
+    height: min(280px, 70vw);
+    background: rgba(77, 168, 255, 0.1);
+  }
+
+  .page-hero__glow--right {
+    bottom: 0;
+    right: -8%;
+    width: min(220px, 55vw);
+    height: min(220px, 55vw);
+    background: rgba(255, 255, 255, 0.035);
+  }
+
+  .page-hero-reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .page-hero.is-visible .page-hero-reveal-1 { transition-delay: 0ms; }
+  .page-hero.is-visible .page-hero-reveal-2 { transition-delay: 70ms; }
+  .page-hero.is-visible .page-hero-reveal-3 { transition-delay: 140ms; }
+  .page-hero.is-visible .page-hero-reveal-4 { transition-delay: 220ms; }
+  .page-hero.is-visible .page-hero-reveal-5 { transition-delay: 300ms; }
+
+  .page-hero.is-visible .page-hero-reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-hero-reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  const heroes = document.querySelectorAll('[data-page-hero]');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  heroes.forEach((hero) => {
+    if (reduced) {
+      hero.classList.add('is-visible');
+    } else {
+      requestAnimationFrame(() => hero.classList.add('is-visible'));
+    }
+  });
+</script>

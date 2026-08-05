@@ -32,6 +32,12 @@ importers:
 
   apps/studio:
     dependencies:
+      '@sanity/client':
+        specifier: ^6.28.4
+        version: 6.29.1
+      '@sanity/icons':
+        specifier: ^3.7.0
+        version: 3.8.0(react@19.2.8)
       react:
         specifier: ^19.0.0
         version: 19.2.8

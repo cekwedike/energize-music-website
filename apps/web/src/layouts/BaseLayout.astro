@@ -2,6 +2,7 @@
 import SEO from '../components/ui/SEO.astro';
 import SiteHeader from '../components/ui/SiteHeader.astro';
 import SiteFooter from '../components/ui/SiteFooter.astro';
+import AmbientBackground, { type AmbientVariant } from '../components/ui/AmbientBackground.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -10,9 +11,21 @@ interface Props {
   ogImage?: string;
   hideHeader?: boolean;
   hideFooter?: boolean;
+  ambientVariant?: AmbientVariant;
 }
 
-const { title, description, ogImage, hideHeader = false, hideFooter = false } = Astro.props;
+const { title, description, ogImage, hideHeader = false, hideFooter = false, ambientVariant } = Astro.props;
+
+const pathname = Astro.url.pathname;
+
+function resolveAmbientVariant(): AmbientVariant {
+  if (ambientVariant) return ambientVariant;
+  if (pathname === '/') return 'home';
+  if (pathname.startsWith('/about')) return 'editorial';
+  if (pathname.startsWith('/next')) return 'pulse';
+  if (pathname.startsWith('/energize-kids') || pathname.startsWith('/energize-fest')) return 'warm';
+  return 'cosmic';
+}
 ---
 
 <!doctype html>
@@ -30,11 +43,39 @@ const { title, description, ogImage, hideHeader = false, hideFooter = false } = 
     <SEO title={title} description={description} path={Astro.url.pathname} ogImage={ogImage} />
   </head>
   <body>
+    <AmbientBackground variant={resolveAmbientVariant()} />
     <a href="#main-content" class="skip-link">Skip to content</a>
     {!hideHeader && <SiteHeader />}
-    <main id="main-content">
+    <main id="main-content" class="relative">
       <slot />
     </main>
     {!hideFooter && <SiteFooter />}
   </body>
 </html>
+
+<script>
+  (function () {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reveals = document.querySelectorAll('.scroll-reveal');
+
+    if (reveals.length > 0) {
+      if (reduced) {
+        reveals.forEach((el) => el.classList.add('is-visible'));
+      } else {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
+        );
+
+        reveals.forEach((el) => observer.observe(el));
+      }
+    }
+  })();
+</script>

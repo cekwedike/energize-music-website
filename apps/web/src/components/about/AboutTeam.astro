@@ -1,0 +1,113 @@
+---
+import TeamMemberCard from '../team/TeamMemberCard.astro';
+import type { AboutPage, TeamMember } from '@energize/shared';
+
+interface Props {
+  team: TeamMember[];
+  aboutPage: AboutPage | null;
+}
+
+const { team, aboutPage } = Astro.props;
+
+const teamHeading = aboutPage?.teamSectionTitle ?? 'Meet Our Team';
+const teamIntro =
+  aboutPage?.teamSectionIntro ??
+  'The people behind Energize Music — strategists, creatives, and builders shaping Afro-gospel culture.';
+---
+
+<section id="team" class="scroll-mt-24 border-b border-white/10 bg-[var(--color-ink-raised)]" aria-labelledby="about-team-heading">
+  <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
+    <div class="about-scroll-reveal max-w-2xl">
+      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">Energized Team</p>
+      <h2 id="about-team-heading" class="text-h2 mt-4">{teamHeading}</h2>
+      <p class="mt-4 text-paper/70">{teamIntro}</p>
+    </div>
+
+    {
+      team.length > 0 ? (
+        <div class="about-team-grid mt-14">
+          {team.map((member, i) => (
+            <div class="about-scroll-reveal about-team-item" style={`--reveal-delay: ${(i % 6) * 80}ms`}>
+              <TeamMemberCard member={member} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div class="about-scroll-reveal about-team-empty mt-14 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-8 py-16 text-center" style="--reveal-delay: 100ms">
+          <p class="text-h3 font-display text-paper/40">Team profiles coming soon</p>
+          <p class="mx-auto mt-3 max-w-md text-sm text-paper/50">
+            We're assembling the full Energize team roster. Check back as we add profiles from Sanity CMS.
+          </p>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .about-team-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 480px) {
+    .about-team-grid {
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    }
+  }
+
+  @media (min-width: 768px) {
+    .about-team-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .about-team-item:nth-child(3n + 1) {
+      transform: translateY(0);
+    }
+
+    .about-team-item:nth-child(3n + 2) {
+      transform: translateY(1.5rem);
+    }
+
+    .about-team-item:nth-child(3n) {
+      transform: translateY(0.75rem);
+    }
+
+    .about-team-item.is-visible:nth-child(3n + 1),
+    .about-team-item.is-visible:nth-child(3n + 2),
+    .about-team-item.is-visible:nth-child(3n) {
+      transform: translateY(0);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .about-team-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .about-scroll-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .about-scroll-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-scroll-reveal,
+    .about-team-item {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>

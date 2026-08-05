@@ -2,7 +2,7 @@
 import Logo from '../ui/Logo.astro';
 ---
 
-<section class="relative h-screen w-full">
+<section class="relative h-screen w-full overflow-hidden">
   <video
     id="hero-video-a"
     class="fixed inset-0 -z-10 h-screen w-full object-cover"
@@ -25,12 +25,12 @@ import Logo from '../ui/Logo.astro';
   />
   <div class="absolute inset-0 bg-black/20"></div>
 
-  <div id="hero-content" class="absolute inset-0 flex flex-col items-center px-6 pt-28 text-center sm:pt-32 md:pt-36">
+  <div id="hero-content" class="absolute inset-0 flex flex-col items-center px-5 pt-24 text-center sm:px-6 sm:pt-32 md:pt-36">
     <Logo />
     <p class="hero-text-el font-inter mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/60 sm:mt-6 sm:text-xs">
       The Energy Different
     </p>
-    <h1 class="hero-text-el hero-text-el-heading font-instrument text-glow-pulse mt-6 text-[32px] leading-[0.95] tracking-tight text-white sm:mt-8 sm:text-[44px] md:mt-9 md:text-7xl lg:text-[100px]">
+    <h1 class="hero-text-el hero-text-el-heading font-instrument text-glow-pulse mt-5 max-w-xs text-[28px] leading-[0.95] tracking-tight text-white sm:mt-8 sm:max-w-2xl sm:text-[44px] md:mt-9 md:max-w-4xl md:text-7xl lg:text-[100px]">
       Rooted in Lagos. Reaching the world.
     </h1>
     <p class="hero-text-el hero-text-el-sub font-inter mt-4 max-w-xl text-sm text-white/70 sm:mt-5 md:mt-7 md:text-base">

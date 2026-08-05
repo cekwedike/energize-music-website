@@ -1,0 +1,133 @@
+---
+interface Props {
+  title: string;
+  eyebrow?: string;
+}
+
+const { title, eyebrow = 'About Us' } = Astro.props;
+---
+
+<section class="about-hero relative overflow-hidden">
+  <div class="about-hero__mesh" aria-hidden="true"></div>
+  <div class="about-hero__grain" aria-hidden="true"></div>
+  <div class="about-hero__glow about-hero__glow--left" aria-hidden="true"></div>
+  <div class="about-hero__glow about-hero__glow--right" aria-hidden="true"></div>
+
+  <div class="relative mx-auto max-w-6xl px-5 pb-20 pt-24 sm:px-6 sm:pb-32 sm:pt-40">
+    <div class="max-w-4xl">
+      <p class="about-reveal about-reveal-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">
+        {eyebrow}
+      </p>
+      <div class="about-reveal about-reveal-2 mt-4 h-px w-12 bg-[var(--color-glow)]" aria-hidden="true"></div>
+      <h1 class="about-reveal about-reveal-3 text-display mt-8 max-w-3xl font-display leading-[0.95] tracking-tight">
+        {title}
+      </h1>
+      <p class="about-reveal about-reveal-4 text-lead mt-8 max-w-xl text-paper/70">
+        Afro-gospel &amp; soul-fusion — uplifting music built on the belief that sound can connect people and speak to audiences everywhere.
+      </p>
+    </div>
+
+    <div class="about-reveal about-reveal-5 mt-16 hidden gap-4 sm:flex">
+      <a href="#story" class="rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90">
+        Our story
+      </a>
+      <a href="#team" class="rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-paper transition hover:border-white/45 hover:bg-white/5">
+        Meet the team
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-hero {
+    min-height: min(72vh, 900px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  @media (min-width: 640px) {
+    .about-hero {
+      min-height: min(88vh, 900px);
+    }
+  }
+
+  .about-hero__mesh {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(77, 168, 255, 0.14), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(103, 232, 249, 0.08), transparent 50%),
+      linear-gradient(165deg, var(--color-ink) 0%, #0f0f12 45%, var(--color-ink-raised) 100%);
+  }
+
+  .about-hero__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.35;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  .about-hero__glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .about-hero__glow--left {
+    top: 10%;
+    left: -8%;
+    width: 320px;
+    height: 320px;
+    background: rgba(77, 168, 255, 0.12);
+  }
+
+  .about-hero__glow--right {
+    bottom: 5%;
+    right: -5%;
+    width: 280px;
+    height: 280px;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .about-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .about-hero.is-visible .about-reveal-1 { transition-delay: 0ms; }
+  .about-hero.is-visible .about-reveal-2 { transition-delay: 80ms; }
+  .about-hero.is-visible .about-reveal-3 { transition-delay: 160ms; }
+  .about-hero.is-visible .about-reveal-4 { transition-delay: 280ms; }
+  .about-hero.is-visible .about-reveal-5 { transition-delay: 400ms; }
+
+  .about-hero.is-visible .about-reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  const hero = document.querySelector('.about-hero');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (hero) {
+    if (reduced) {
+      hero.classList.add('is-visible');
+    } else {
+      requestAnimationFrame(() => hero.classList.add('is-visible'));
+    }
+  }
+</script>
