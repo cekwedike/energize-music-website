@@ -2,6 +2,7 @@
 import type { Artist } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
 import ArtistStreamingLinks from './ArtistStreamingLinks.astro';
+import EditorialSectionLink from '../ui/EditorialSectionLink.astro';
 
 interface Props {
   artist: Artist;
@@ -23,15 +24,12 @@ const portraitUrl = urlForImage(artist.photo).width(800).height(800).fit('crop')
 
   <div class="artist-profile-hero__content relative flex min-h-[92vh] flex-col">
     <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col px-5 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-12">
-      <a
+      <EditorialSectionLink
         href="/artists"
-        class="artist-profile-hero__back inline-flex min-h-10 w-fit items-center gap-2 rounded-full border border-white/15 bg-black/20 px-4 py-2 text-sm font-medium text-paper/70 backdrop-blur-sm transition hover:border-[var(--color-glow)]/40 hover:text-[var(--color-glow)]"
-      >
-        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M19 12H5M12 19l-7-7 7-7" />
-        </svg>
-        All artists
-      </a>
+        label="All Artists"
+        variant="back"
+        class="artist-profile-hero__back"
+      />
 
       <div class="mt-auto grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:items-end lg:gap-16">
         <div class="min-w-0">

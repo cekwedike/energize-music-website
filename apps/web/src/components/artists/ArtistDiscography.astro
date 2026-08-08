@@ -1,5 +1,6 @@
 ---
 import type { EnrichedRelease } from '@energize/shared';
+import EditorialSectionLink from '../ui/EditorialSectionLink.astro';
 
 interface Props {
   releases: EnrichedRelease[];
@@ -30,9 +31,7 @@ const sorted = [...releases].sort(
           </h2>
           <p class="mt-2 text-sm text-paper/50">Releases by {artistName}</p>
         </div>
-        <a href="/releases" class="text-sm font-semibold text-paper/45 transition hover:text-[var(--color-glow)]">
-          View all releases
-        </a>
+        <EditorialSectionLink href="/releases" label="View All Releases" />
       </div>
 
       <ul class="discography__grid mt-8">

@@ -20,7 +20,7 @@ export const aboutPageQuery = /* groq */ `*[_id == "aboutPage"][0]{
   _id, title, intro, teamSectionTitle, teamSectionIntro
 }`;
 
-export const allTeamMembersQuery = /* groq */ `*[_type == "teamMember"] | order(order asc, name asc){
+export const allTeamMembersQuery = /* groq */ `*[_type == "teamMember" && defined(name) && defined(role)] | order(coalesce(order, 999) asc, name asc){
   _id, name, role, bio, order, photo${imageFragment}, social
 }`;
 

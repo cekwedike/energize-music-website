@@ -2,6 +2,7 @@
 import type { Artist } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
 import ArtistStreamingLinks from './ArtistStreamingLinks.astro';
+import EditorialSectionLink from '../ui/EditorialSectionLink.astro';
 
 interface Props {
   artist: Artist;
@@ -34,12 +35,7 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
   </div>
 
   <div class="profile-hero__body mx-auto max-w-7xl px-5 sm:px-6">
-    <a
-      href="/artists"
-      class="profile-hero__back inline-flex min-h-10 items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-paper/50 transition hover:text-paper"
-    >
-      ← All artists
-    </a>
+    <EditorialSectionLink href="/artists" label="All Artists" variant="back" class="profile-hero__back" />
 
     <div class="profile-hero__main">
       <img

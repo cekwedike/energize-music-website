@@ -58,8 +58,14 @@ export default defineType({
       name: 'genres',
       title: 'Genres',
       type: 'array',
-      of: [{ type: 'string' }],
-      options: { layout: 'tags' },
+      of: [
+        {
+          type: 'string',
+          validation: (rule) => rule.required().min(1).max(40),
+        },
+      ],
+      options: { layout: 'list' },
+      description: 'Add one genre per row (e.g. Afro-Gospel, Afrobeats).',
     }),
     defineField({ name: 'bio', title: 'Bio', type: 'text', validation: (r) => r.required() }),
     defineField({

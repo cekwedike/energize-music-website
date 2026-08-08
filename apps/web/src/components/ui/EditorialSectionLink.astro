@@ -1,0 +1,99 @@
+---
+interface Props {
+  href: string;
+  label: string;
+  class?: string;
+  variant?: 'default' | 'back';
+}
+
+const { href, label, class: className, variant = 'default' } = Astro.props;
+const isBack = variant === 'back';
+---
+
+<a
+  href={href}
+  class:list={['editorial-link', isBack && 'editorial-link--back', className]}
+>
+  {
+    isBack ? (
+      <>
+        <span class="editorial-link__arrow editorial-link__arrow--back" aria-hidden="true">←</span>
+        <span class="editorial-link__label">{label}</span>
+      </>
+    ) : (
+      <>
+        <span class="editorial-link__label">{label}</span>
+        <span class="editorial-link__arrow" aria-hidden="true">→</span>
+      </>
+    )
+  }
+</a>
+
+<style>
+  .editorial-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.5rem;
+    padding: 0.45rem 1rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%),
+      rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: rgba(250, 250, 248, 0.58);
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease,
+      background 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .editorial-link:hover,
+  .editorial-link:focus-visible {
+    border-color: rgba(77, 168, 255, 0.45);
+    color: var(--color-glow);
+    background:
+      linear-gradient(135deg, rgba(77, 168, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%),
+      rgba(77, 168, 255, 0.04);
+    box-shadow: 0 0 28px rgba(77, 168, 255, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .editorial-link__arrow {
+    font-size: 0.875rem;
+    line-height: 1;
+    opacity: 0.7;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .editorial-link:hover .editorial-link__arrow,
+  .editorial-link:focus-visible .editorial-link__arrow {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+
+  .editorial-link--back:hover .editorial-link__arrow--back,
+  .editorial-link--back:focus-visible .editorial-link__arrow--back {
+    transform: translateX(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .editorial-link:hover,
+    .editorial-link:focus-visible {
+      transform: none;
+    }
+
+    .editorial-link:hover .editorial-link__arrow,
+    .editorial-link:focus-visible .editorial-link__arrow {
+      transform: none;
+    }
+  }
+</style>

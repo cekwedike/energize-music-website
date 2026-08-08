@@ -8,7 +8,9 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "lint": "eslint . --config ../../eslint.config.mjs",
-    "typecheck": "astro check"
+    "typecheck": "astro check",
+    "test:mobile": "playwright test tests/mobile-responsiveness.spec.ts",
+    "test:mobile:ui": "playwright test tests/mobile-responsiveness.spec.ts --ui"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.2",

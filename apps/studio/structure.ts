@@ -1,7 +1,8 @@
 import type { StructureResolver } from 'sanity/structure';
 import { DocumentTextIcon, UsersIcon } from '@sanity/icons';
 
-const SINGLETONS = ['aboutPage', 'volunteerInfo'];
+/** Document types with custom sidebar entries (hide auto-generated duplicates). */
+const HIDDEN_FROM_NAV = ['aboutPage', 'volunteerInfo', 'teamMember', 'page'];
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -26,6 +27,6 @@ export const structure: StructureResolver = (S) =>
       S.divider(),
       ...S.documentTypeListItems().filter((item) => {
         const id = item.getId();
-        return id ? !SINGLETONS.includes(id) : true;
+        return id ? !HIDDEN_FROM_NAV.includes(id) : true;
       }),
     ]);

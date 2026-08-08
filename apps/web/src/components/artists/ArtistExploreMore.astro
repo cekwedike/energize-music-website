@@ -1,6 +1,7 @@
 ---
 import type { ArtistCard as ArtistCardType } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
+import EditorialSectionLink from '../ui/EditorialSectionLink.astro';
 
 interface Props {
   artists: ArtistCardType[];
@@ -16,11 +17,9 @@ if (others.length === 0) return null;
 <section class="explore-more mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20" aria-labelledby="explore-more-heading">
   <div class="flex items-end justify-between gap-4">
     <h2 id="explore-more-heading" class="font-display text-2xl text-paper sm:text-3xl">
-      More artists
+      More Artists
     </h2>
-    <a href="/artists" class="text-sm font-semibold text-paper/45 transition hover:text-[var(--color-glow)]">
-      View all
-    </a>
+    <EditorialSectionLink href="/artists" label="View All" />
   </div>
 
   <div class="explore-more__scroll mt-6 -mx-5 px-5 sm:-mx-6 sm:px-6">
