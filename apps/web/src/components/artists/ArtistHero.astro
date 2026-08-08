@@ -12,10 +12,6 @@ const { artist } = Astro.props;
 const heroUrl = urlForImage(artist.photo).width(1920).height(1080).fit('crop').auto('format').url();
 const portraitUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').auto('format').url();
 
-const tierLabel: Record<Artist['tier'], string> = {
-  official: 'Official artist',
-  legacy: 'Legacy catalog',
-};
 ---
 
 <section class="artist-profile-hero relative min-h-[92vh] overflow-hidden">
@@ -39,10 +35,7 @@ const tierLabel: Record<Artist['tier'], string> = {
 
       <div class="mt-auto grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:items-end lg:gap-16">
         <div class="min-w-0">
-          <p class="artist-hero-reveal artist-hero-reveal-1 text-xs font-bold uppercase tracking-[0.3em] text-[var(--color-glow)]">
-            {tierLabel[artist.tier]}
-          </p>
-          <h1 class="artist-profile-hero__headline mt-4 font-display leading-[0.88] tracking-tight">
+          <h1 class="artist-profile-hero__headline artist-hero-reveal artist-hero-reveal-1 font-display leading-[0.88] tracking-tight">
             <span class="block text-[clamp(2.75rem,2rem+5vw,6.5rem)] text-paper" data-split-line>{artist.name}</span>
           </h1>
           {

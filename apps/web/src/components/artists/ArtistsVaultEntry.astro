@@ -1,11 +1,9 @@
 ---
 interface Props {
   total: number;
-  officialCount: number;
-  legacyCount: number;
 }
 
-const { total, officialCount, legacyCount } = Astro.props;
+const { total } = Astro.props;
 const paddedTotal = String(total).padStart(2, '0');
 ---
 
@@ -40,18 +38,10 @@ const paddedTotal = String(total).padStart(2, '0');
         ready to pull from the rack.
       </p>
 
-      <dl class="vault-entry__stats mt-12 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10">
-        <div class="vault-entry__stat bg-[var(--color-ink)] px-4 py-5 sm:px-6">
-          <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-paper/40">Total</dt>
-          <dd class="mt-2 font-display text-3xl tabular-nums text-paper sm:text-4xl">{total}</dd>
-        </div>
+      <dl class="vault-entry__stats mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:max-w-xs">
         <div class="vault-entry__stat vault-entry__stat--glow bg-[var(--color-ink)] px-4 py-5 sm:px-6">
-          <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-[var(--color-glow)]/70">Official</dt>
-          <dd class="mt-2 font-display text-3xl tabular-nums text-[var(--color-glow)] sm:text-4xl">{officialCount}</dd>
-        </div>
-        <div class="vault-entry__stat bg-[var(--color-ink)] px-4 py-5 sm:px-6">
-          <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-paper/40">Legacy</dt>
-          <dd class="mt-2 font-display text-3xl tabular-nums text-paper/80 sm:text-4xl">{legacyCount}</dd>
+          <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-[var(--color-glow)]/70">Artists</dt>
+          <dd class="mt-2 font-display text-3xl tabular-nums text-[var(--color-glow)] sm:text-4xl">{total}</dd>
         </div>
       </dl>
 

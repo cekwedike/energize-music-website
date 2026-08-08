@@ -43,24 +43,22 @@ export default function ArtistsRosterMotion() {
             animate(bgName, { x: ['-2%', '0%'] }, { duration: 0.9, ease: [0.22, 1, 0.36, 1] });
           }
 
-          const portrait = section.querySelector<HTMLElement>('[data-motion="portrait"]');
-          if (portrait) {
+          section.querySelectorAll<HTMLElement>('[data-motion="portrait"]').forEach((portrait) => {
             animate(portrait, { scale: [1.02, 1] }, { duration: 0.8, ease: [0.22, 1, 0.36, 1] });
-          }
+          });
         },
         { amount: 0.22 },
       );
 
       cleanups.push(() => stopInView());
 
-      const portrait = section.querySelector<HTMLElement>('[data-motion="portrait"]');
-      if (portrait) {
+      section.querySelectorAll<HTMLElement>('[data-motion="portrait"]').forEach((portrait) => {
         const stopScroll = scroll(animate(portrait, { y: ['0%', '6%'] }), {
           target: section,
           offset: ['start end', 'end start'],
         });
         cleanups.push(() => stopScroll());
-      }
+      });
     });
 
     return () => cleanups.forEach((fn) => fn());

@@ -2,6 +2,14 @@
 import { headerNav } from '../../lib/nav';
 import Logo from './Logo.astro';
 
+export type HeaderVariant = 'default' | 'ambient' | 'overlay';
+
+interface Props {
+  variant?: HeaderVariant;
+}
+
+const { variant = 'default' } = Astro.props;
+
 const currentPath = Astro.url.pathname;
 const isHome = currentPath === '/';
 
@@ -16,38 +24,16 @@ const isInitiativeActive =
   initiativesEntry?.type === 'dropdown' ? initiativesEntry.items.some((link) => isActive(link.href)) : false;
 
 const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.href === '/contact');
-
-const outlineItems = navEntries.filter(
-  (entry) => !(entry.type === 'link' && entry.href === '/contact'),
-);
-const outlineCount = outlineItems.length;
-const OUTLINE_PERIMETER = 1000;
-const OUTLINE_CORNER_PAD = 40;
-const outlineSegment = OUTLINE_PERIMETER / outlineCount;
-const initiativesOutlineIndex =
-  outlineItems.findIndex((entry) => entry.type === 'dropdown') + 1;
-
-const outlineHoverRules = outlineItems
-  .map((entry, index) => {
-    const child = index + 1;
-    const offset = -(index * outlineSegment + OUTLINE_CORNER_PAD);
-    const expandedRule =
-      entry.type === 'dropdown' && initiativesOutlineIndex === child
-        ? `.nav-outline-group:has(li:nth-child(${child}) button[aria-expanded='true']) svg .nav-outline-rect,`
-        : '';
-    return `
-    ${expandedRule}
-    .nav-outline-group:has(li:nth-child(${child}) :is(a, button):hover) svg .nav-outline-rect,
-    .nav-outline-group:has(li:nth-child(${child}) :is(a, button):focus-visible) svg .nav-outline-rect {
-      stroke-dasharray: ${outlineSegment} ${OUTLINE_PERIMETER};
-      stroke-dashoffset: ${offset};
-      transition: stroke-dasharray 0.45s ease, stroke-dashoffset 0.45s ease;
-    }`;
-  })
-  .join('\n');
 ---
 
-<header id="site-header" class="site-header sticky top-0 z-40">
+<header
+  id="site-header"
+  class:list={[
+    'site-header sticky top-0 z-40',
+    variant === 'ambient' && 'site-header--ambient',
+    variant === 'overlay' && 'site-header--overlay',
+  ]}
+>
   <div class="site-header__bar mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3.5 sm:gap-6 sm:px-6 sm:py-4 lg:py-[1.125rem]">
     <a href="/" class="site-header__logo shrink-0 transition-opacity duration-300 hover:opacity-90" aria-label="Energize Music">
       <Logo size="sm" animated={false} />
@@ -70,12 +56,13 @@ const outlineHoverRules = outlineItems
                     </a>
                   </li>
                 ) : entry.type === 'dropdown' ? (
-                  <li class="relative">
+                  <li class="initiatives-dropdown relative">
                     <button
                       type="button"
                       id="initiatives-trigger"
                       aria-expanded="false"
                       aria-controls="initiatives-menu"
+                      aria-haspopup="true"
                       aria-current={isInitiativeActive ? 'page' : undefined}
                       class="nav-link flex items-center gap-1.5"
                     >
@@ -89,6 +76,7 @@ const outlineHoverRules = outlineItems
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         class="h-3 w-3 shrink-0 transition-transform duration-200"
+                        aria-hidden="true"
                       >
                         <path d="M6 9l6 6 6-6" />
                       </svg>
@@ -98,9 +86,14 @@ const outlineHoverRules = outlineItems
                       id="initiatives-menu"
                       role="menu"
                       aria-label="Initiatives"
-                      class="absolute right-0 top-full mt-2 hidden w-[38rem] max-w-[calc(100vw-2.5rem)] rounded-2xl border border-white/10 bg-[var(--color-ink-raised)] p-3 whitespace-normal normal-case tracking-normal shadow-2xl shadow-black/50 lg:left-auto lg:right-0"
+                      class="initiatives-panel hidden"
                     >
-                      <ul class="grid grid-cols-1 gap-1 sm:grid-cols-3">
+                      <div class="initiatives-panel__mesh" aria-hidden="true"></div>
+                      <div class="initiatives-panel__header">
+                        <p class="initiatives-panel__eyebrow">Our initiatives</p>
+                        <p class="initiatives-panel__lede">Programs Shaping The Energize Ecosystem</p>
+                      </div>
+                      <ul class="initiatives-panel__grid">
                         {
                           entry.items.map((link) => (
                             <li>
@@ -108,18 +101,17 @@ const outlineHoverRules = outlineItems
                                 href={link.href}
                                 role="menuitem"
                                 aria-current={isActive(link.href) ? 'page' : undefined}
-                                class="group block h-full rounded-xl p-2.5 transition hover:bg-white/5 aria-[current=page]:bg-white/10"
+                                class="initiatives-card group"
                               >
-                                <div class="aspect-[4/3] w-full overflow-hidden rounded-lg bg-white/5">
-                                  <img
-                                    src={link.image}
-                                    alt=""
-                                    loading="lazy"
-                                    class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                                  />
-                                </div>
-                                <p class="mt-2.5 text-sm font-semibold text-paper">{link.label}</p>
-                                <p class="mt-1 text-xs leading-relaxed text-paper/60">{link.blurb}</p>
+                                <span class="initiatives-card__media">
+                                  <img src={link.image} alt="" loading="lazy" class="initiatives-card__image" />
+                                  <span class="initiatives-card__overlay" aria-hidden="true"></span>
+                                </span>
+                                <span class="initiatives-card__copy">
+                                  <span class="initiatives-card__title">{link.label}</span>
+                                  <span class="initiatives-card__blurb">{link.blurb}</span>
+                                  <span class="initiatives-card__cta">Explore</span>
+                                </span>
                               </a>
                             </li>
                           ))
@@ -132,25 +124,6 @@ const outlineHoverRules = outlineItems
             }
           </ul>
         </nav>
-
-        <svg
-          class="nav-outline-svg"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <rect
-            class="nav-outline-rect"
-            x="1"
-            y="1"
-            width="98"
-            height="98"
-            rx="8"
-            ry="8"
-            pathLength={OUTLINE_PERIMETER}
-          />
-        </svg>
       </div>
 
       {
@@ -171,20 +144,23 @@ const outlineHoverRules = outlineItems
       id="nav-toggle"
       aria-expanded="false"
       aria-controls="mobile-nav"
-      class="nav-toggle flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-paper transition hover:border-white/30 hover:bg-white/5 sm:hidden"
+      class="nav-toggle sm:hidden"
     >
-      <span class="sr-only">Toggle menu</span>
-      <span class="nav-toggle__icon" aria-hidden="true">
-        <span class="nav-toggle__line"></span>
-        <span class="nav-toggle__line"></span>
-        <span class="nav-toggle__line"></span>
+      <span class="nav-toggle__shell">
+        <span class="nav-toggle__label" data-label-closed="Menu" data-label-open="Close">Menu</span>
+        <span class="nav-toggle__icon" aria-hidden="true">
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+        </span>
       </span>
+      <span class="sr-only">Toggle menu</span>
     </button>
   </div>
 
   <div id="mobile-nav-backdrop" class="mobile-nav-backdrop sm:hidden" aria-hidden="true"></div>
 
-  <nav id="mobile-nav" aria-label="Primary mobile" class="mobile-nav sm:hidden">
+  <nav id="mobile-nav" aria-label="Primary mobile" class="mobile-nav sm:hidden" inert>
     <ul class="mobile-nav__list">
       {
         navEntries.map((entry) =>
@@ -199,29 +175,50 @@ const outlineHoverRules = outlineItems
               </a>
             </li>
           ) : (
-            <li class="mobile-nav__section">
-              <p class="mobile-nav__section-label">{entry.label}</p>
-              <ul class="mobile-nav__subsection">
-                {
-                  entry.items.map((link) => (
-                    <li>
-                      <a
-                        href={link.href}
-                        aria-current={isActive(link.href) ? 'page' : undefined}
-                        class="mobile-nav__initiative"
-                      >
-                        <span class="mobile-nav__initiative-thumb">
-                          <img src={link.image} alt="" loading="lazy" class="h-full w-full object-cover" />
-                        </span>
-                        <span class="mobile-nav__initiative-copy">
-                          <span class="mobile-nav__initiative-title">{link.label}</span>
-                          <span class="mobile-nav__initiative-blurb">{link.blurb}</span>
-                        </span>
-                      </a>
-                    </li>
-                  ))
-                }
-              </ul>
+            <li class="mobile-nav__accordion">
+              <button
+                type="button"
+                id="mobile-initiatives-trigger"
+                class="mobile-nav__accordion-trigger"
+                aria-expanded="false"
+                aria-controls="mobile-initiatives-panel"
+              >
+                <span>{entry.label}</span>
+                <svg
+                  class="mobile-nav__accordion-chevron"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              <div id="mobile-initiatives-panel" class="mobile-initiatives-panel" hidden>
+                <p class="mobile-initiatives-panel__lede">Programs shaping the Energize ecosystem</p>
+                <ul class="mobile-initiatives-panel__grid">
+                  {
+                    entry.items.map((link) => (
+                      <li>
+                        <a
+                          href={link.href}
+                          aria-current={isActive(link.href) ? 'page' : undefined}
+                          class="mobile-initiative-card"
+                        >
+                          <span class="mobile-initiative-card__media">
+                            <img src={link.image} alt="" loading="lazy" class="h-full w-full object-cover" />
+                          </span>
+                          <span class="mobile-initiative-card__copy">
+                            <span class="mobile-initiative-card__title">{link.label}</span>
+                            <span class="mobile-initiative-card__blurb">{link.blurb}</span>
+                          </span>
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
             </li>
           ),
         )
@@ -256,65 +253,133 @@ const outlineHoverRules = outlineItems
     border-bottom-color: rgba(255, 255, 255, 0.08);
   }
 
+  .site-header--ambient {
+    background: linear-gradient(180deg, rgba(11, 11, 13, 0.42) 0%, rgba(11, 11, 13, 0.08) 100%);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .site-header--ambient.is-scrolled {
+    background: rgba(11, 11, 13, 0.72);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  .site-header--ambient.is-menu-open {
+    background: rgba(11, 11, 13, 0.96);
+  }
+
+  .site-header--ambient .nav-link,
+  .site-header--ambient .site-header__logo {
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
+  }
+
+  .site-header--ambient .nav-outline-group {
+    background: rgba(11, 11, 13, 0.35);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .site-header--ambient.is-scrolled .nav-outline-group,
+  .site-header--ambient.is-menu-open .nav-outline-group {
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .site-header--overlay {
+    background: linear-gradient(180deg, rgba(11, 11, 13, 0.24) 0%, rgba(11, 11, 13, 0.04) 100%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .site-header--overlay.is-scrolled {
+    background: rgba(11, 11, 13, 0.82);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  .site-header--overlay.is-menu-open {
+    background: rgba(11, 11, 13, 0.96);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .site-header--overlay .nav-link,
+  .site-header--overlay .site-header__logo {
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
+  }
+
+  .site-header--overlay .nav-outline-group {
+    background: rgba(11, 11, 13, 0.28);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.22);
+  }
+
+  .site-header--overlay.is-scrolled .nav-outline-group,
+  .site-header--overlay.is-menu-open .nav-outline-group {
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
   .nav-outline-group {
     position: relative;
     display: inline-flex;
     border-radius: 0.5rem;
-    background: rgba(255, 255, 255, 0.025);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-  }
-
-  .nav-outline-svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: visible;
-  }
-
-  .nav-outline-rect {
-    fill: rgba(77, 168, 255, 0.03);
-    stroke: var(--color-glow);
-    stroke-width: 1.25;
-    vector-effect: non-scaling-stroke;
-    stroke-dasharray: 8 1000;
-    stroke-dashoffset: 0;
-    transition: stroke-dasharray 0.45s ease, stroke-dashoffset 0.45s ease;
-    filter: drop-shadow(0 0 6px rgba(77, 168, 255, 0.35));
-  }
-
-  .nav-outline-group:not(:hover):not(:has(button[aria-expanded='true'])) svg .nav-outline-rect {
-    stroke-dasharray: 8 1000;
-    stroke-dashoffset: 0;
-    transition:
-      stroke-dasharray 0.45s ease 999s,
-      stroke-dashoffset 0.45s ease 999s;
-  }
-
-  .nav-outline-group:hover svg .nav-outline-rect,
-  .nav-outline-group:has(button[aria-expanded='true']) svg .nav-outline-rect {
-    transition: stroke-dasharray 0.45s ease, stroke-dashoffset 0.45s ease;
-  }
-
-  .nav-outline-group .nav-link {
-    border-radius: 0.375rem;
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 8px 24px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .nav-link {
     position: relative;
     display: block;
     padding: 0.5rem 0.875rem;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.6875rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgba(250, 250, 248, 0.62);
-    border-radius: 9999px;
+    border-radius: 0.375rem;
+    transition: color 0.25s ease;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 0.375rem;
+    border: 1.25px solid transparent;
+    background: transparent;
+    pointer-events: none;
     transition:
-      color 0.25s ease,
-      background 0.25s ease;
+      border-color 0.3s ease,
+      background 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after,
+  .nav-link[aria-current='page']::after,
+  button.nav-link[aria-expanded='true']::after {
+    border-color: var(--color-glow);
+    background: rgba(77, 168, 255, 0.04);
+    box-shadow: 0 0 8px rgba(77, 168, 255, 0.28);
+  }
+
+  .nav-outline-group:has(.nav-link:hover) .nav-link[aria-current='page']:not(:hover):not(:focus-visible)::after,
+  .nav-outline-group:has(.nav-link:focus-visible) .nav-link[aria-current='page']:not(:hover):not(:focus-visible)::after {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
   }
 
   @media (min-width: 1024px) {
@@ -324,46 +389,13 @@ const outlineHoverRules = outlineItems
     }
   }
 
-  .nav-link:hover {
+  .nav-link:hover,
+  .nav-link:focus-visible {
     color: var(--color-paper);
-    background: rgba(255, 255, 255, 0.06);
   }
 
   .nav-link[aria-current='page'] {
     color: var(--color-paper);
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .nav-link[aria-current='page']::after,
-  .nav-link[aria-expanded='true']::after {
-    content: '';
-    position: absolute;
-    bottom: 0.3rem;
-    left: 50%;
-    width: 0.875rem;
-    height: 2px;
-    border-radius: 9999px;
-    background: var(--color-glow);
-    transform: translateX(-50%);
-    opacity: 0.85;
-    transition: opacity 0.2s ease;
-  }
-
-  .nav-outline-group:hover .nav-link::after,
-  .nav-outline-group:has(button[aria-expanded='true']) .nav-link::after {
-    opacity: 0;
-  }
-
-  .nav-outline-group:hover .nav-link[aria-current='page'],
-  .nav-outline-group:hover .nav-link[aria-expanded='true'],
-  .nav-outline-group:has(button[aria-expanded='true']) .nav-link[aria-current='page'],
-  .nav-outline-group:has(button[aria-expanded='true']) .nav-link[aria-expanded='true'] {
-    background: transparent;
-  }
-
-  .nav-link[aria-expanded='true'] {
-    color: var(--color-paper);
-    background: rgba(255, 255, 255, 0.1);
   }
 
   button.nav-link {
@@ -371,6 +403,7 @@ const outlineHoverRules = outlineItems
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
+    background: transparent;
   }
 
   #initiatives-trigger {
@@ -381,17 +414,193 @@ const outlineHoverRules = outlineItems
     white-space: nowrap;
   }
 
+  #initiatives-trigger[aria-expanded='true'] #initiatives-chevron {
+    transform: rotate(180deg);
+  }
+
+  @media (hover: hover) and (min-width: 640px) {
+    .initiatives-dropdown::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      height: 0.625rem;
+    }
+  }
+
+  .initiatives-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.625rem);
+    z-index: 50;
+    width: min(40rem, calc(100vw - 2.5rem));
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(20, 20, 23, 0.92);
+    padding: 1rem;
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(77, 168, 255, 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .initiatives-panel__mesh {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 55% 45% at 12% 0%, rgba(77, 168, 255, 0.16), transparent 55%),
+      radial-gradient(ellipse 40% 35% at 88% 100%, rgba(103, 232, 249, 0.1), transparent 50%);
+  }
+
+  .initiatives-panel__header {
+    position: relative;
+    margin-bottom: 0.875rem;
+    padding: 0.25rem 0.25rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .initiatives-panel__eyebrow {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .initiatives-panel__lede {
+    margin-top: 0.35rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: rgba(250, 250, 248, 0.55);
+  }
+
+  .initiatives-panel__grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+  }
+
+  @media (min-width: 640px) {
+    .initiatives-panel__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .initiatives-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    text-decoration: none;
+    transition:
+      border-color 0.25s ease,
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .initiatives-card:hover,
+  .initiatives-card:focus-visible {
+    border-color: rgba(77, 168, 255, 0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(77, 168, 255, 0.12);
+  }
+
+  .initiatives-card[aria-current='page'] {
+    border-color: rgba(77, 168, 255, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(77, 168, 255, 0.15);
+  }
+
+  .initiatives-card__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .initiatives-card__image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .initiatives-card:hover .initiatives-card__image,
+  .initiatives-card:focus-visible .initiatives-card__image {
+    transform: scale(1.05);
+  }
+
+  .initiatives-card__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 35%, rgba(11, 11, 13, 0.75) 100%);
+  }
+
+  .initiatives-card__copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.75rem 0.875rem 0.875rem;
+  }
+
+  .initiatives-card__title {
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-paper);
+  }
+
+  .initiatives-card__blurb {
+    font-size: 0.6875rem;
+    line-height: 1.45;
+    color: rgba(250, 250, 248, 0.55);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .initiatives-card__cta {
+    margin-top: auto;
+    padding-top: 0.35rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .initiatives-card:hover .initiatives-card__cta,
+  .initiatives-card:focus-visible .initiatives-card__cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   .nav-cta {
     margin-left: 0.25rem;
     padding: 0.5625rem 1.25rem;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-ink);
     background: var(--color-paper);
-    border-radius: 9999px;
+    border-radius: 0.5rem;
     box-shadow:
       0 0 20px rgba(255, 255, 255, 0.22),
       0 0 40px rgba(255, 255, 255, 0.08);
@@ -419,14 +628,77 @@ const outlineHoverRules = outlineItems
       0 0 40px rgba(255, 255, 255, 0.12);
   }
 
+  .nav-toggle {
+    position: relative;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.5rem;
+    background: #040f16;
+    color: var(--color-paper);
+    cursor: pointer;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      background 0.25s ease;
+  }
+
+  .nav-toggle:hover,
+  .nav-toggle:focus-visible {
+    border-color: rgba(77, 168, 255, 0.45);
+    box-shadow: 0 0 20px rgba(77, 168, 255, 0.18);
+  }
+
+  .nav-toggle__shell {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.5rem;
+    padding: 0.375rem 0.75rem;
+  }
+
+  .nav-toggle__label {
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease,
+      max-width 0.25s ease;
+    max-width: 4rem;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
   .nav-toggle__icon {
     position: relative;
     display: block;
     width: 1.125rem;
     height: 0.875rem;
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .nav-toggle__line {
+  .nav-toggle:hover .nav-toggle__icon,
+  .nav-toggle:focus-visible .nav-toggle__icon {
+    transform: scale(1.15);
+  }
+
+  .nav-toggle:hover .nav-toggle__label,
+  .nav-toggle:focus-visible .nav-toggle__label {
+    opacity: 0;
+    max-width: 0;
+    transform: translateX(-4px);
+  }
+
+  .nav-toggle[aria-expanded='true'] .nav-toggle__label {
+    opacity: 1;
+    max-width: 4rem;
+    transform: none;
+  }
+
+  .nav-toggle__bar {
     position: absolute;
     left: 0;
     width: 100%;
@@ -439,30 +711,30 @@ const outlineHoverRules = outlineItems
       top 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .nav-toggle__line:nth-child(1) {
+  .nav-toggle__bar:nth-child(1) {
     top: 0;
   }
 
-  .nav-toggle__line:nth-child(2) {
+  .nav-toggle__bar:nth-child(2) {
     top: 50%;
     transform: translateY(-50%);
   }
 
-  .nav-toggle__line:nth-child(3) {
+  .nav-toggle__bar:nth-child(3) {
     top: 100%;
     transform: translateY(-100%);
   }
 
-  .nav-toggle[aria-expanded='true'] .nav-toggle__line:nth-child(1) {
+  .nav-toggle[aria-expanded='true'] .nav-toggle__bar:nth-child(1) {
     top: 50%;
     transform: translateY(-50%) rotate(45deg);
   }
 
-  .nav-toggle[aria-expanded='true'] .nav-toggle__line:nth-child(2) {
+  .nav-toggle[aria-expanded='true'] .nav-toggle__bar:nth-child(2) {
     opacity: 0;
   }
 
-  .nav-toggle[aria-expanded='true'] .nav-toggle__line:nth-child(3) {
+  .nav-toggle[aria-expanded='true'] .nav-toggle__bar:nth-child(3) {
     top: 50%;
     transform: translateY(-50%) rotate(-45deg);
   }
@@ -513,7 +785,7 @@ const outlineHoverRules = outlineItems
   .mobile-nav__link {
     display: block;
     padding: 0.875rem 0;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
     font-size: 1rem;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -531,105 +803,187 @@ const outlineHoverRules = outlineItems
     font-weight: 600;
   }
 
-  .mobile-nav__section {
-    padding-top: 1.25rem;
+  .mobile-nav__accordion {
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  .mobile-nav__section-label {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: rgba(250, 250, 248, 0.38);
-  }
-
-  .mobile-nav__subsection {
-    margin-top: 0.75rem;
+  .mobile-nav__accordion-trigger {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding-bottom: 1rem;
-  }
-
-  .mobile-nav__initiative {
-    display: flex;
+    width: 100%;
     align-items: center;
-    gap: 0.875rem;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.875rem 0;
+    border: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     color: rgba(250, 250, 248, 0.72);
+    cursor: pointer;
     transition: color 0.2s ease;
   }
 
-  .mobile-nav__initiative:hover,
-  .mobile-nav__initiative[aria-current='page'] {
+  .mobile-nav__accordion-trigger:hover,
+  .mobile-nav__accordion-trigger[aria-expanded='true'] {
     color: var(--color-paper);
   }
 
-  .mobile-nav__initiative-thumb {
+  .mobile-nav__accordion-chevron {
+    width: 1rem;
+    height: 1rem;
     flex-shrink: 0;
-    width: 3rem;
-    height: 3rem;
+    transition: transform 0.25s ease;
+  }
+
+  .mobile-nav__accordion-trigger[aria-expanded='true'] .mobile-nav__accordion-chevron {
+    transform: rotate(180deg);
+  }
+
+  .mobile-initiatives-panel {
+    padding-bottom: 1rem;
+  }
+
+  .mobile-initiatives-panel__lede {
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: rgba(250, 250, 248, 0.45);
+  }
+
+  .mobile-initiatives-panel__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .mobile-initiative-card {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 0.875rem;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(135deg, rgba(77, 168, 255, 0.06), rgba(255, 255, 255, 0.02));
+    padding: 0.625rem;
+    color: rgba(250, 250, 248, 0.78);
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .mobile-initiative-card:hover,
+  .mobile-initiative-card:focus-visible,
+  .mobile-initiative-card[aria-current='page'] {
+    border-color: rgba(77, 168, 255, 0.35);
+    color: var(--color-paper);
+  }
+
+  .mobile-initiative-card__media {
+    aspect-ratio: 1;
     overflow: hidden;
     border-radius: 0.625rem;
     background: rgba(255, 255, 255, 0.05);
   }
 
-  .mobile-nav__initiative-copy {
+  .mobile-initiative-card__copy {
     display: flex;
     flex-direction: column;
-    gap: 0.125rem;
+    gap: 0.2rem;
+    min-width: 0;
   }
 
-  .mobile-nav__initiative-title {
+  .mobile-initiative-card__title {
+    font-family: var(--font-display);
     font-size: 0.9375rem;
-    font-weight: 600;
+    font-weight: 500;
   }
 
-  .mobile-nav__initiative-blurb {
-    font-size: 0.75rem;
-    font-weight: 400;
+  .mobile-initiative-card__blurb {
+    font-size: 0.6875rem;
     line-height: 1.4;
     color: rgba(250, 250, 248, 0.48);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .site-header,
     .nav-link,
     .nav-cta,
-    .nav-toggle__line,
+    .nav-toggle,
+    .nav-toggle__bar,
+    .nav-toggle__label,
+    .nav-toggle__icon,
     .mobile-nav,
-    .mobile-nav-backdrop {
+    .mobile-nav-backdrop,
+    .initiatives-card,
+    .initiatives-card__image {
       transition: none !important;
     }
 
-    .nav-outline-rect {
-      transition: none !important;
-      stroke-dasharray: none !important;
-      stroke-dashoffset: 0 !important;
-      filter: none;
-    }
-
-    .nav-outline-group:hover svg .nav-outline-rect,
-    .nav-outline-group:has(:is(a, button):hover) svg .nav-outline-rect,
-    .nav-outline-group:has(:is(a, button):focus-visible) svg .nav-outline-rect {
-      stroke-dasharray: none !important;
-      stroke-dashoffset: 0 !important;
+    .initiatives-card__cta {
+      opacity: 1;
+      transform: none;
     }
   }
 </style>
-
-<style is:global set:html={outlineHoverRules} />
 
 <script>
   const header = document.getElementById('site-header');
   const toggle = document.getElementById('nav-toggle');
   const panel = document.getElementById('mobile-nav');
   const backdrop = document.getElementById('mobile-nav-backdrop');
+  const toggleLabel = toggle?.querySelector<HTMLElement>('.nav-toggle__label');
+  const mobileInitiativesTrigger = document.getElementById('mobile-initiatives-trigger');
+  const mobileInitiativesPanel = document.getElementById('mobile-initiatives-panel');
+
+  let releaseFocusTrap: (() => void) | null = null;
 
   function syncHeaderHeight() {
     if (!header) return;
     document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
+  }
+
+  function syncToggleLabel(isOpen: boolean) {
+    if (!toggleLabel) return;
+    const closed = toggleLabel.dataset.labelClosed ?? 'Menu';
+    const open = toggleLabel.dataset.labelOpen ?? 'Close';
+    toggleLabel.textContent = isOpen ? open : closed;
+  }
+
+  function trapFocus(container: HTMLElement) {
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+    );
+    const items = [...focusable].filter((el) => el.offsetParent !== null || container.contains(el));
+    if (items.length === 0) return () => {};
+
+    const first = items[0];
+    const last = items[items.length - 1];
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== 'Tab') return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    }
+
+    container.addEventListener('keydown', onKeyDown);
+    first?.focus();
+
+    return () => container.removeEventListener('keydown', onKeyDown);
   }
 
   function setMobileMenuOpen(isOpen: boolean) {
@@ -637,8 +991,19 @@ const outlineHoverRules = outlineItems
     backdrop?.classList.toggle('is-visible', isOpen);
     header?.classList.toggle('is-menu-open', isOpen);
     toggle?.setAttribute('aria-expanded', String(isOpen));
+    panel?.toggleAttribute('inert', !isOpen);
+    syncToggleLabel(isOpen);
     document.body.style.overflow = isOpen ? 'hidden' : '';
     syncHeaderHeight();
+
+    if (isOpen) {
+      releaseFocusTrap?.();
+      releaseFocusTrap = panel ? trapFocus(panel) : null;
+    } else {
+      releaseFocusTrap?.();
+      releaseFocusTrap = null;
+      toggle?.focus();
+    }
   }
 
   toggle?.addEventListener('click', () => {
@@ -652,6 +1017,12 @@ const outlineHoverRules = outlineItems
     if ((event.target as HTMLElement).tagName === 'A') {
       setMobileMenuOpen(false);
     }
+  });
+
+  mobileInitiativesTrigger?.addEventListener('click', () => {
+    const isOpen = mobileInitiativesTrigger.getAttribute('aria-expanded') === 'true';
+    mobileInitiativesTrigger.setAttribute('aria-expanded', String(!isOpen));
+    mobileInitiativesPanel?.toggleAttribute('hidden', isOpen);
   });
 
   document.addEventListener('keydown', (event) => {
@@ -668,38 +1039,112 @@ const outlineHoverRules = outlineItems
   window.addEventListener('scroll', updateScrollState, { passive: true });
   window.addEventListener('resize', syncHeaderHeight);
   syncHeaderHeight();
+  syncToggleLabel(false);
 
   const initiativesTrigger = document.getElementById('initiatives-trigger');
   const initiativesMenu = document.getElementById('initiatives-menu');
-  const initiativesChevron = document.getElementById('initiatives-chevron');
+  const initiativesDropdown = initiativesTrigger?.closest('.initiatives-dropdown');
+  const desktopInitiativesHover = window.matchMedia('(hover: hover) and (min-width: 640px)');
+  let initiativesCloseTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function isInitiativesOpen() {
+    return initiativesTrigger?.getAttribute('aria-expanded') === 'true';
+  }
+
+  function openInitiatives() {
+    initiativesMenu?.classList.remove('hidden');
+    initiativesTrigger?.setAttribute('aria-expanded', 'true');
+  }
 
   function closeInitiatives() {
     initiativesMenu?.classList.add('hidden');
     initiativesTrigger?.setAttribute('aria-expanded', 'false');
-    initiativesChevron?.classList.remove('rotate-180');
   }
 
-  initiativesTrigger?.addEventListener('click', (event) => {
-    event.stopPropagation();
-    const isOpen = initiativesTrigger.getAttribute('aria-expanded') === 'true';
-    if (isOpen) {
+  function cancelInitiativesClose() {
+    if (initiativesCloseTimer !== null) {
+      clearTimeout(initiativesCloseTimer);
+      initiativesCloseTimer = null;
+    }
+  }
+
+  function scheduleInitiativesClose() {
+    cancelInitiativesClose();
+    initiativesCloseTimer = setTimeout(() => {
+      closeInitiatives();
+      initiativesCloseTimer = null;
+    }, 150);
+  }
+
+  function toggleInitiatives() {
+    if (isInitiativesOpen()) {
       closeInitiatives();
     } else {
-      initiativesMenu?.classList.remove('hidden');
-      initiativesTrigger.setAttribute('aria-expanded', 'true');
-      initiativesChevron?.classList.add('rotate-180');
+      openInitiatives();
     }
+  }
+
+  function bindDesktopInitiativesHover() {
+    if (!desktopInitiativesHover.matches || !initiativesDropdown) return;
+
+    const onEnter = () => {
+      cancelInitiativesClose();
+      openInitiatives();
+    };
+
+    const onLeave = () => {
+      scheduleInitiativesClose();
+    };
+
+    initiativesDropdown.addEventListener('mouseenter', onEnter);
+    initiativesDropdown.addEventListener('mouseleave', onLeave);
+
+    return () => {
+      initiativesDropdown.removeEventListener('mouseenter', onEnter);
+      initiativesDropdown.removeEventListener('mouseleave', onLeave);
+    };
+  }
+
+  let releaseInitiativesHover: (() => void) | null = bindDesktopInitiativesHover() ?? null;
+  desktopInitiativesHover.addEventListener('change', () => {
+    cancelInitiativesClose();
+    closeInitiatives();
+    releaseInitiativesHover?.();
+    releaseInitiativesHover = bindDesktopInitiativesHover() ?? null;
+  });
+
+  initiativesTrigger?.addEventListener('click', (event) => {
+    if (desktopInitiativesHover.matches) {
+      event.preventDefault();
+      return;
+    }
+
+    event.stopPropagation();
+    toggleInitiatives();
+  });
+
+  initiativesTrigger?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    toggleInitiatives();
+  });
+
+  initiativesMenu?.querySelectorAll('a[role="menuitem"]').forEach((link) => {
+    link.addEventListener('click', () => closeInitiatives());
   });
 
   document.addEventListener('click', (event) => {
-    if (!initiativesMenu || !initiativesTrigger) return;
+    if (!initiativesDropdown || !isInitiativesOpen()) return;
     const target = event.target as Node;
-    if (!initiativesMenu.contains(target) && !initiativesTrigger.contains(target)) {
+    if (!initiativesDropdown.contains(target)) {
       closeInitiatives();
     }
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeInitiatives();
+    if (event.key === 'Escape' && isInitiativesOpen()) {
+      closeInitiatives();
+      initiativesTrigger?.focus();
+    }
   });
 </script>

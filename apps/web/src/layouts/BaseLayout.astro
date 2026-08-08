@@ -1,6 +1,6 @@
 ---
 import SEO from '../components/ui/SEO.astro';
-import SiteHeader from '../components/ui/SiteHeader.astro';
+import SiteHeader, { type HeaderVariant } from '../components/ui/SiteHeader.astro';
 import SiteFooter from '../components/ui/SiteFooter.astro';
 import FooterMarquee from '../components/ui/FooterMarquee.astro';
 import AmbientBackground, { type AmbientVariant } from '../components/ui/AmbientBackground.astro';
@@ -14,6 +14,7 @@ interface Props {
   hideFooter?: boolean;
   showTopMarquee?: boolean;
   ambientVariant?: AmbientVariant;
+  headerVariant?: HeaderVariant;
 }
 
 const {
@@ -24,6 +25,7 @@ const {
   hideFooter = false,
   showTopMarquee = false,
   ambientVariant,
+  headerVariant = 'default',
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
@@ -55,7 +57,7 @@ function resolveAmbientVariant(): AmbientVariant {
   <body>
     <AmbientBackground variant={resolveAmbientVariant()} />
     <a href="#main-content" class="skip-link">Skip to content</a>
-    {!hideHeader && <SiteHeader />}
+    {!hideHeader && <SiteHeader variant={headerVariant} />}
     {showTopMarquee && <FooterMarquee placement="top" />}
     <main id="main-content" class="relative">
       <slot />

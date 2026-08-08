@@ -12,11 +12,6 @@ const { artist } = Astro.props;
 const heroUrl = urlForImage(artist.photo).width(1920).height(1280).fit('crop').auto('format').url();
 const portraitUrl = urlForImage(artist.photo).width(900).height(1200).fit('crop').auto('format').url();
 
-const tierLabel: Record<Artist['tier'], string> = {
-  official: 'Official',
-  legacy: 'Legacy catalog',
-};
-
 const nameParts = artist.name.split(' ');
 ---
 
@@ -32,11 +27,7 @@ const nameParts = artist.name.split(' ');
         </a>
 
         <div class="chroma-hero__intro">
-          <p class="chroma-hero__tier text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--color-glow)]">
-            {tierLabel[artist.tier]}
-          </p>
-
-          <h1 class="chroma-hero__name mt-6 font-display leading-[0.82] tracking-tight">
+          <h1 class="chroma-hero__name font-display leading-[0.82] tracking-tight">
             {
               nameParts.map((part, index) => (
                 <span

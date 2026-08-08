@@ -1,0 +1,52 @@
+---
+interface Props {
+  bio: string;
+  name: string;
+}
+
+const { bio, name } = Astro.props;
+
+const paragraphs = bio
+  .split(/\n\s*\n/)
+  .map((block) => block.trim())
+  .filter(Boolean);
+---
+
+<section class="artist-bio" aria-labelledby="artist-bio-heading">
+  <div class="artist-bio__inner mx-auto max-w-7xl px-5 py-12 sm:px-6 sm:py-16">
+    <h2 id="artist-bio-heading" class="font-display text-xl text-paper sm:text-2xl">About {name}</h2>
+    <div class="artist-bio__content mt-5 max-w-3xl">
+      {
+        paragraphs.map((paragraph) => (
+          <p class="artist-bio__paragraph">{paragraph}</p>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .artist-bio {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .artist-bio__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+  }
+
+  .artist-bio__paragraph {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: rgba(250, 250, 248, 0.68);
+    white-space: pre-line;
+  }
+
+  @media (min-width: 640px) {
+    .artist-bio__paragraph {
+      font-size: 1.0625rem;
+    }
+  }
+</style>

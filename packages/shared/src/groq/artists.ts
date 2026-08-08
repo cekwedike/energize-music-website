@@ -29,6 +29,7 @@ export const artistDetailFragment = /* groq */ `{
 }`;
 
 export const allArtistsQuery = /* groq */ `*[_type == "artist"] | order(featured desc, tier asc, name asc) ${artistCardFragment}`;
+// tier in order() is internal CMS sorting only; the website does not display artist tiers.
 
 export const featuredArtistsQuery = /* groq */ `*[_type == "artist" && featured == true] | order(name asc) ${artistCardFragment}`;
 

@@ -4,12 +4,10 @@ import { urlForImage } from '../../lib/sanity/client';
 
 interface Props {
   total: number;
-  officialCount: number;
-  legacyCount: number;
   featured: ArtistCardType[];
 }
 
-const { total, officialCount, legacyCount, featured } = Astro.props;
+const { total, featured } = Astro.props;
 const collage = featured.slice(0, 4);
 const paddedTotal = String(total).padStart(2, '0');
 ---
@@ -47,21 +45,13 @@ const paddedTotal = String(total).padStart(2, '0');
         </h1>
 
         <p class="prism-reveal prism-reveal-3 mt-8 max-w-lg text-[clamp(1rem,0.95rem+0.4vw,1.15rem)] leading-relaxed text-paper/60">
-          Afro-gospel and soul-fusion artists, official roster and legacy catalog, each with a profile worth opening.
+          Afro-gospel and soul-fusion artists on the Energize roster, each with a profile worth opening.
         </p>
 
         <dl class="prism-reveal prism-reveal-4 mt-10 flex flex-wrap gap-3">
-          <div class="prism-hero__stat">
-            <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-paper/40">Total</dt>
-            <dd class="mt-1 font-display text-2xl tabular-nums text-paper sm:text-3xl">{total}</dd>
-          </div>
           <div class="prism-hero__stat prism-hero__stat--glow">
-            <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-[var(--color-glow)]/70">Official</dt>
-            <dd class="mt-1 font-display text-2xl tabular-nums text-[var(--color-glow)] sm:text-3xl">{officialCount}</dd>
-          </div>
-          <div class="prism-hero__stat">
-            <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-paper/40">Legacy</dt>
-            <dd class="mt-1 font-display text-2xl tabular-nums text-paper/85 sm:text-3xl">{legacyCount}</dd>
+            <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-[var(--color-glow)]/70">Artists</dt>
+            <dd class="mt-1 font-display text-2xl tabular-nums text-[var(--color-glow)] sm:text-3xl">{total}</dd>
           </div>
         </dl>
 

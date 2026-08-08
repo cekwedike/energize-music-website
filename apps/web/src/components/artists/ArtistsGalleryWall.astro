@@ -7,11 +7,6 @@ interface Props {
 }
 
 const { artists } = Astro.props;
-
-const tierLabel: Record<ArtistCardType['tier'], string> = {
-  official: 'Official',
-  legacy: 'Legacy',
-};
 ---
 
 <section
@@ -55,7 +50,6 @@ const tierLabel: Record<ArtistCardType['tier'], string> = {
               <a
                 href={`/artists/${artist.slug}`}
                 class:list={['gallery-wall__print group shrink-0', isEven ? 'gallery-wall__print--high' : 'gallery-wall__print--low']}
-                data-tier={artist.tier}
                 data-gallery-print
               >
                 <div class="gallery-wall__frame">
@@ -72,7 +66,6 @@ const tierLabel: Record<ArtistCardType['tier'], string> = {
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <div class="gallery-wall__meta">
-                    <span class="gallery-wall__tier">{tierLabel[artist.tier]}</span>
                     <p class="gallery-wall__name">{artist.name}</p>
                     {artist.tagline && <p class="gallery-wall__tagline">{artist.tagline}</p>}
                   </div>
@@ -230,16 +223,7 @@ const tierLabel: Record<ArtistCardType['tier'], string> = {
     background: linear-gradient(180deg, transparent, rgba(11, 11, 13, 0.95));
   }
 
-  .gallery-wall__tier {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--color-glow);
-  }
-
   .gallery-wall__name {
-    margin-top: 0.35rem;
     font-family: var(--font-display);
     font-size: 1.25rem;
     color: var(--color-paper);

@@ -11,11 +11,6 @@ interface Props {
 const { artist, index, variant = 'default' } = Astro.props;
 const photoUrl = urlForImage(artist.photo).width(900).height(900).fit('crop').auto('format').url();
 
-const tierLabel: Record<ArtistCardType['tier'], string> = {
-  official: 'Official',
-  legacy: 'Legacy',
-};
-
 const isBentoLead = variant === 'bento-lead';
 const isBentoSide = variant === 'bento-side';
 const isRunway = variant === 'runway';
@@ -24,7 +19,6 @@ const isFeatured = variant === 'featured' || isBentoLead;
 
 <a
   href={`/artists/${artist.slug}`}
-  data-tier={artist.tier}
   data-tilt
   data-clip-reveal
   class:list={[
@@ -69,11 +63,7 @@ const isFeatured = variant === 'featured' || isBentoLead;
       )
     }
     <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5 lg:p-6">
-      <div class="flex items-center gap-2">
-        <span class="artist-card__tier-dot" aria-hidden="true"></span>
-        <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--color-glow)]">{tierLabel[artist.tier]}</p>
-      </div>
-      <p class:list={['mt-2 font-display text-paper', isBentoLead ? 'text-2xl sm:text-4xl' : 'text-xl sm:text-2xl']}>
+      <p class:list={['font-display text-paper', isBentoLead ? 'text-2xl sm:text-4xl' : 'text-xl sm:text-2xl']}>
         {artist.name}
       </p>
       {
@@ -133,14 +123,6 @@ const isFeatured = variant === 'featured' || isBentoLead;
 
   .artist-card__index {
     font-size: clamp(2.5rem, 2rem + 2vw, 4.5rem);
-  }
-
-  .artist-card__tier-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 9999px;
-    background: var(--color-glow);
-    box-shadow: 0 0 12px rgba(77, 168, 255, 0.6);
   }
 
   .artist-card__cta {

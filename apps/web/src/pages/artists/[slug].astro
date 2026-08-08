@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArtistProfileHero from '../../components/artists/ArtistProfileHero.astro';
+import ArtistBio from '../../components/artists/ArtistBio.astro';
 import ArtistQuote from '../../components/artists/ArtistQuote.astro';
 import ArtistDiscography from '../../components/artists/ArtistDiscography.astro';
 import ArtistExploreMore from '../../components/artists/ArtistExploreMore.astro';
@@ -39,6 +40,7 @@ if (!artist) {
 const enrichedDiscography = await enrichReleases(discography);
 
 const photoUrl = urlForImage(artist.photo).width(1200).height(630).fit('crop').auto('format').url();
+const profileBgUrl = urlForImage(artist.photo).width(2400).height(1350).fit('crop').auto('format').url();
 const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
 const pageUrl = new URL(`/artists/${artist.slug}`, siteUrl).toString();
 
@@ -59,13 +61,116 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout title={artist.name} description={description} ogImage={photoUrl} ambientVariant="pulse">
+<BaseLayout
+  title={artist.name}
+  description={description}
+  ogImage={photoUrl}
+  ambientVariant="pulse"
+  headerVariant="overlay"
+>
   <JsonLd data={jsonLd} />
-  <ArtistProfileHero artist={artist} />
-  {artist.quote && <ArtistQuote quote={artist.quote} name={artist.name} />}
-  <ArtistDiscography releases={enrichedDiscography} artistName={artist.name} />
-  <ArtistExploreMore artists={allArtists} currentSlug={artist.slug} />
+  <div class="artist-profile-page">
+    <ArtistProfileHero artist={artist} />
+    <div class="artist-profile-body__backdrop" aria-hidden="true">
+      <img
+        src={profileBgUrl}
+        alt=""
+        class="artist-profile-body__backdrop-image"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+    <div class="artist-profile-body">
+      <div class="artist-profile-body__scrim" aria-hidden="true"></div>
+      <ArtistBio bio={artist.bio} name={artist.name} />
+      {artist.quote && <ArtistQuote quote={artist.quote} name={artist.name} />}
+      <ArtistDiscography releases={enrichedDiscography} artistName={artist.name} />
+      <ArtistExploreMore artists={allArtists} currentSlug={artist.slug} />
+    </div>
+  </div>
 </BaseLayout>
+
+<style>
+  .artist-profile-page {
+    position: relative;
+  }
+
+  .artist-profile-page :global(.profile-hero) {
+    position: relative;
+    z-index: 2;
+    background: var(--color-ink);
+  }
+
+  .artist-profile-body__backdrop {
+    position: fixed;
+    z-index: 0;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .artist-profile-body__backdrop-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 22%;
+    opacity: 0.22;
+  }
+
+  .artist-profile-body {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+  }
+
+  .artist-profile-body__scrim {
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 100vw;
+    max-width: none;
+    margin-left: -50vw;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(11, 11, 13, 0.52) 0%,
+        rgba(11, 11, 13, 0.68) 18%,
+        rgba(11, 11, 13, 0.84) 52%,
+        var(--color-ink) 100%
+      ),
+      radial-gradient(ellipse 130% 90% at 50% 0%, rgba(11, 11, 13, 0.55), transparent 62%);
+  }
+
+  .artist-profile-body > :global(*:not(.artist-profile-body__scrim)) {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (min-width: 1280px) {
+    .artist-profile-body__backdrop-image {
+      object-position: center 20%;
+    }
+  }
+
+  @media (min-width: 1920px) {
+    .artist-profile-body__backdrop-image {
+      object-position: center 18%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .artist-profile-body__backdrop {
+      position: absolute;
+      inset: 0;
+      width: auto;
+      height: auto;
+    }
+  }
+</style>
 
 <script>
   import { initArtistProfile } from '../../lib/motion/artists/initProfile';

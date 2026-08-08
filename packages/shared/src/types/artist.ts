@@ -14,6 +14,7 @@ export interface ArtistCard {
   _id: string;
   name: string;
   slug: string;
+/** Internal CMS roster status. Not displayed on the public website. */
   tier: ArtistTier;
   featured?: boolean;
   photo: SanityImage;

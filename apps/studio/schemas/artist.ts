@@ -15,9 +15,18 @@ export default defineType({
     }),
     defineField({
       name: 'tier',
-      title: 'Status',
+      title: 'Internal roster status',
       type: 'string',
-      options: { list: ['official', 'legacy'] },
+      options: {
+        list: [
+          { title: 'Official roster', value: 'official' },
+          { title: 'Legacy catalog', value: 'legacy' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'official',
+      description:
+        'Internal CMS label only. The public website does not display artist tiers or categorization.',
       validation: (r) => r.required(),
     }),
     defineField({ name: 'featured', title: 'Featured on homepage', type: 'boolean', initialValue: false }),
@@ -27,6 +36,7 @@ export default defineType({
       type: 'image',
       options: { hotspot: true },
       fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
+      description: 'Portrait for roster cards and profile pages. Use at least 1200px width for best quality.',
       validation: (r) => r.required(),
     }),
     defineField({

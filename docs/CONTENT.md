@@ -18,5 +18,12 @@
 
 ## Artists
 
-Set **Tier**: official | collaborator | legacy.
-Mark **Featured** for home grid.
+1. **Artist** → fill in name, slug, photo, bio (required), optional tagline, genres, streaming links
+2. **Publish** (not just Save). Draft changes do not appear on the site.
+3. Local dev: refresh the page. If content still looks old, restart `pnpm dev` (dev now bypasses the Sanity CDN).
+4. Production: run `pnpm build` and deploy, or push to `main` so CI rebuilds. Each published artist gets `/artists/their-slug` automatically.
+
+**Photo tips:** Use a portrait at least 1200px wide. TY Bello's first upload was 640×640, which can look soft when cropped large.
+
+Set **Internal roster status** for CMS sorting only (not shown on the public site).
+Mark **Featured on homepage** for the home grid.

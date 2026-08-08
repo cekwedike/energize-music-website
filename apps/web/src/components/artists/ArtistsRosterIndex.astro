@@ -2,23 +2,11 @@
 import type { ArtistCard as ArtistCardType } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
 
-interface Tab {
-  label: string;
-  value: ArtistCardType['tier'] | 'all';
-  count: number;
-}
-
 interface Props {
   artists: ArtistCardType[];
-  tabs: Tab[];
 }
 
-const { artists, tabs } = Astro.props;
-
-const tierLabel: Record<ArtistCardType['tier'], string> = {
-  official: 'Official',
-  legacy: 'Legacy',
-};
+const { artists } = Astro.props;
 
 function previewText(artist: ArtistCardType): string | undefined {
   if (artist.tagline?.trim()) return artist.tagline.trim();
@@ -37,39 +25,13 @@ function previewText(artist: ArtistCardType): string | undefined {
     <p class="mt-2 max-w-lg text-sm text-paper/50">Browse every artist on Energize Music.</p>
   </div>
 
-  <div
-    class="roster-index__filters mt-8 inline-flex flex-wrap gap-2 rounded-full border border-white/10 bg-white/[0.03] p-1"
-    id="artist-tabs"
-    role="tablist"
-    aria-label="Filter artists by tier"
-  >
-    {
-      tabs.map((tab, index) => (
-        <button
-          type="button"
-          data-tier={tab.value}
-          role="tab"
-          aria-selected={index === 0 ? 'true' : 'false'}
-          class="roster-filter"
-        >
-          {tab.label}
-          <span class="roster-filter__count">{tab.count}</span>
-        </button>
-      ))
-    }
-  </div>
-
-  <p id="artist-empty-filter" class="mt-12 hidden text-center text-paper/55" role="status">
-    No artists in this tier yet.
-  </p>
-
   <div id="artist-grid" class="roster-index__grid mt-8">
     {
       artists.map((artist) => {
         const photoUrl = urlForImage(artist.photo).width(600).height(600).fit('crop').auto('format').url();
         const preview = previewText(artist);
         return (
-          <a href={`/artists/${artist.slug}`} data-tier={artist.tier} class="roster-card group">
+          <a href={`/artists/${artist.slug}`} class="roster-card group">
             <div class="roster-card__art">
               <img
                 src={photoUrl}
@@ -80,7 +42,6 @@ function previewText(artist: ArtistCardType): string | undefined {
               />
             </div>
             <div class="roster-card__body">
-              <span class="roster-card__tier">{tierLabel[artist.tier]}</span>
               <p class="roster-card__name">{artist.name}</p>
               {preview && <p class="roster-card__preview">{preview}</p>}
             </div>
@@ -92,38 +53,6 @@ function previewText(artist: ArtistCardType): string | undefined {
 </section>
 
 <style>
-  .roster-filter {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-height: 2.25rem;
-    padding: 0.35rem 0.9rem;
-    border-radius: 9999px;
-    border: 1px solid transparent;
-    background: transparent;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: rgba(250, 250, 248, 0.65);
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  }
-
-  .roster-filter:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--color-paper);
-  }
-
-  .roster-filter[aria-selected='true'] {
-    border-color: rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--color-paper);
-  }
-
-  .roster-filter__count {
-    font-size: 0.6875rem;
-    font-variant-numeric: tabular-nums;
-    color: rgba(250, 250, 248, 0.35);
-  }
-
   .roster-index__grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -168,10 +97,6 @@ function previewText(artist: ArtistCardType): string | undefined {
     transform: translateY(-2px);
   }
 
-  .roster-card.is-hidden {
-    display: none;
-  }
-
   .roster-card__art {
     aspect-ratio: 1;
     overflow: hidden;
@@ -196,14 +121,6 @@ function previewText(artist: ArtistCardType): string | undefined {
     gap: 0.25rem;
     padding: 0.75rem;
     min-height: 5.5rem;
-  }
-
-  .roster-card__tier {
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(250, 250, 248, 0.4);
   }
 
   .roster-card__name {

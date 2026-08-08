@@ -8,7 +8,8 @@ export const sanityClient = createClient({
   projectId: env.PUBLIC_SANITY_PROJECT_ID,
   dataset: env.PUBLIC_SANITY_DATASET,
   apiVersion: env.PUBLIC_SANITY_API_VERSION,
-  useCdn: true,
+  // Skip Sanity CDN in dev so Studio publishes show up immediately after a refresh.
+  useCdn: import.meta.env.PROD,
   perspective: 'published',
 });
 

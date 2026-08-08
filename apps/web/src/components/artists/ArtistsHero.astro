@@ -4,12 +4,10 @@ import { urlForImage } from '../../lib/sanity/client';
 
 interface Props {
   total: number;
-  officialCount: number;
-  legacyCount: number;
   artists: ArtistCardType[];
 }
 
-const { total, officialCount, legacyCount, artists } = Astro.props;
+const { total, artists } = Astro.props;
 const stripArtists = artists.slice(0, 8);
 const marqueeNames = artists.map((artist) => artist.name);
 ---
@@ -49,21 +47,13 @@ const marqueeNames = artists.map((artist) => artist.name);
         </h1>
 
         <p class="artists-reveal artists-reveal-4 text-lead mt-8 max-w-xl text-paper/68">
-          Afro-gospel and soul-fusion voices, official roster and legacy catalog, each with a story worth hearing.
+          Afro-gospel and soul-fusion voices on the Energize roster, each with a story worth hearing.
         </p>
 
         <dl class="artists-reveal artists-reveal-5 mt-10 flex flex-wrap gap-3">
-          <div class="artists-hero__stat">
-            <dt class="text-[10px] font-bold uppercase tracking-[0.22em] text-paper/45">Total</dt>
-            <dd class="mt-1 font-display text-2xl text-paper sm:text-3xl">{total}</dd>
-          </div>
           <div class="artists-hero__stat artists-hero__stat--glow">
-            <dt class="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--color-glow)]/70">Official</dt>
-            <dd class="mt-1 font-display text-2xl text-[var(--color-glow)] sm:text-3xl">{officialCount}</dd>
-          </div>
-          <div class="artists-hero__stat">
-            <dt class="text-[10px] font-bold uppercase tracking-[0.22em] text-paper/45">Legacy</dt>
-            <dd class="mt-1 font-display text-2xl text-paper/85 sm:text-3xl">{legacyCount}</dd>
+            <dt class="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--color-glow)]/70">Artists</dt>
+            <dd class="mt-1 font-display text-2xl text-[var(--color-glow)] sm:text-3xl">{total}</dd>
           </div>
         </dl>
 
