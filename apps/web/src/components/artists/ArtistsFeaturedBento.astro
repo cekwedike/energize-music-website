@@ -1,0 +1,39 @@
+---
+import type { ArtistCard as ArtistCardType } from '@energize/shared';
+import ArtistCard from './ArtistCard.astro';
+
+interface Props {
+  featured: ArtistCardType[];
+}
+
+const { featured } = Astro.props;
+const lead = featured[0];
+const side = featured.slice(1, 3);
+---
+
+<section class="relative mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20" aria-labelledby="featured-artists-heading">
+  <div class="scroll-reveal flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs font-bold uppercase tracking-[0.28em] text-[var(--color-glow)]">Spotlight</p>
+      <h2 id="featured-artists-heading" class="text-h2 mt-3 font-display">
+        Featured artists
+      </h2>
+    </div>
+    <p class="max-w-sm text-sm text-paper/55">
+      Hand-picked voices from the roster, curated in Sanity for the homepage and this spotlight.
+    </p>
+  </div>
+
+  {
+    lead && (
+      <div class="scroll-reveal-stagger mt-10 grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12 lg:grid-rows-2">
+        <ArtistCard artist={lead} index={0} variant="bento-lead" />
+        {
+          side.map((artist, index) => (
+            <ArtistCard artist={artist} index={index + 1} variant="bento-side" />
+          ))
+        }
+      </div>
+    )
+  }
+</section>

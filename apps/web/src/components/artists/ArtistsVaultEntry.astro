@@ -1,0 +1,157 @@
+---
+interface Props {
+  total: number;
+  officialCount: number;
+  legacyCount: number;
+}
+
+const { total, officialCount, legacyCount } = Astro.props;
+const paddedTotal = String(total).padStart(2, '0');
+---
+
+<section class="vault-entry relative overflow-hidden border-b border-white/8" data-vault-entry aria-label="Artist roster introduction">
+  <div class="vault-entry__scanline" aria-hidden="true"></div>
+  <div class="vault-entry__grid mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-24 lg:py-28">
+    <div class="vault-entry__vertical hidden lg:block" aria-hidden="true">
+      <span>ROSTER</span>
+      <span>SIGNAL</span>
+      <span>VAULT</span>
+    </div>
+
+    <div class="vault-entry__main">
+      <p class="vault-entry__pulse text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--color-glow)]">
+        Energize Music
+      </p>
+
+      <h1 class="vault-entry__headline mt-6 font-display leading-[0.82] tracking-tight">
+        <span class="vault-entry__line block text-[clamp(3.5rem,2rem+9vw,10rem)] text-paper" data-split-line>
+          {paddedTotal}
+        </span>
+        <span
+          class="vault-entry__line vault-entry__line--ghost mt-1 block text-[clamp(2rem,1.2rem+4vw,5rem)] italic text-[var(--color-glow)]/75"
+          data-split-line
+        >
+          voices indexed
+        </span>
+      </h1>
+
+      <p class="vault-entry__copy mt-8 max-w-lg text-paper/55 leading-relaxed">
+        Not a gallery wall of headshots. A living archive of Afro-gospel and soul-fusion artists, filed, numbered, and
+        ready to pull from the rack.
+      </p>
+
+      <dl class="vault-entry__stats mt-12 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10">
+        <div class="vault-entry__stat bg-[var(--color-ink)] px-4 py-5 sm:px-6">
+          <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-paper/40">Total</dt>
+          <dd class="mt-2 font-display text-3xl tabular-nums text-paper sm:text-4xl">{total}</dd>
+        </div>
+        <div class="vault-entry__stat vault-entry__stat--glow bg-[var(--color-ink)] px-4 py-5 sm:px-6">
+          <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-[var(--color-glow)]/70">Official</dt>
+          <dd class="mt-2 font-display text-3xl tabular-nums text-[var(--color-glow)] sm:text-4xl">{officialCount}</dd>
+        </div>
+        <div class="vault-entry__stat bg-[var(--color-ink)] px-4 py-5 sm:px-6">
+          <dt class="text-[9px] font-bold uppercase tracking-[0.25em] text-paper/40">Legacy</dt>
+          <dd class="mt-2 font-display text-3xl tabular-nums text-paper/80 sm:text-4xl">{legacyCount}</dd>
+        </div>
+      </dl>
+
+      <a
+        href="#gallery-wall"
+        class="vault-entry__cta mt-10 inline-flex min-h-11 items-center gap-3 border border-white/15 bg-white/[0.02] px-5 py-3 text-xs font-bold uppercase tracking-[0.22em] text-paper/70 transition hover:border-[var(--color-glow)]/50 hover:text-[var(--color-glow)]"
+      >
+        Pull from the wall
+        <span class="vault-entry__cta-arrow" aria-hidden="true">↓</span>
+      </a>
+    </div>
+
+    <div class="vault-entry__meta hidden xl:flex xl:flex-col xl:justify-end" aria-hidden="true">
+      <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-paper/25">Scroll to scrub</p>
+      <p class="mt-2 max-w-[8rem] text-xs leading-relaxed text-paper/30">
+        Horizontal pass through every artist on the roster.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .vault-entry {
+    background:
+      radial-gradient(ellipse 60% 50% at 100% 0%, rgba(77, 168, 255, 0.08), transparent 55%),
+      var(--color-ink);
+  }
+
+  .vault-entry__scanline {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.012) 2px,
+      rgba(255, 255, 255, 0.012) 4px
+    );
+    pointer-events: none;
+  }
+
+  .vault-entry__grid {
+    display: grid;
+    gap: 2rem;
+    align-items: end;
+  }
+
+  @media (min-width: 1024px) {
+    .vault-entry__grid {
+      grid-template-columns: auto 1fr auto;
+      gap: 3rem;
+    }
+  }
+
+  .vault-entry__vertical {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    display: flex;
+    gap: 2rem;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 2rem + 3vw, 5rem);
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: rgba(250, 250, 248, 0.06);
+    user-select: none;
+  }
+
+  .vault-entry__headline :global(.motion-char) {
+    display: inline-block;
+    transform-origin: 50% 100%;
+    will-change: transform, opacity;
+  }
+
+  .vault-entry__line--ghost {
+    text-shadow: 0 0 60px rgba(77, 168, 255, 0.2);
+  }
+
+  .vault-entry__stat--glow {
+    box-shadow: inset 0 0 40px rgba(77, 168, 255, 0.06);
+  }
+
+  .vault-entry__cta-arrow {
+    display: inline-block;
+    animation: vault-bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes vault-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(4px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vault-entry__cta-arrow {
+      animation: none;
+    }
+  }
+</style>

@@ -29,7 +29,35 @@ export default defineType({
       fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
       validation: (r) => r.required(),
     }),
+    defineField({
+      name: 'coverImage',
+      title: 'Cover image',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
+      description:
+        'Optional wide banner for the artist profile hero. If empty, the Energize logo is used as the cover.',
+    }),
+    defineField({
+      name: 'tagline',
+      title: 'Tagline',
+      type: 'string',
+      description: 'Short line under the name on the artist page (e.g. "Afro-gospel visionary").',
+    }),
+    defineField({
+      name: 'genres',
+      title: 'Genres',
+      type: 'array',
+      of: [{ type: 'string' }],
+      options: { layout: 'tags' },
+    }),
     defineField({ name: 'bio', title: 'Bio', type: 'text', validation: (r) => r.required() }),
+    defineField({
+      name: 'quote',
+      title: 'Pull quote',
+      type: 'text',
+      description: 'Optional quote shown on the artist profile page.',
+    }),
     defineField({
       name: 'streaming',
       title: 'Streaming links',

@@ -1,57 +1,175 @@
 ---
-import type { Artist } from '@energize/shared';
+import type { ArtistCard as ArtistCardType } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
 
 interface Props {
-  artist: Artist;
+  artist: ArtistCardType;
+  index?: number;
+  variant?: 'default' | 'featured' | 'bento-lead' | 'bento-side' | 'runway';
 }
 
-const { artist } = Astro.props;
-const photoUrl = urlForImage(artist.photo).width(600).height(600).fit('crop').auto('format').url();
+const { artist, index, variant = 'default' } = Astro.props;
+const photoUrl = urlForImage(artist.photo).width(900).height(900).fit('crop').auto('format').url();
 
-const tierLabel: Record<Artist['tier'], string> = {
+const tierLabel: Record<ArtistCardType['tier'], string> = {
   official: 'Official',
   legacy: 'Legacy',
 };
+
+const isBentoLead = variant === 'bento-lead';
+const isBentoSide = variant === 'bento-side';
+const isRunway = variant === 'runway';
+const isFeatured = variant === 'featured' || isBentoLead;
 ---
 
 <a
   href={`/artists/${artist.slug}`}
   data-tier={artist.tier}
-  class="artist-card group block overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] transition hover:border-[var(--color-accent)]/50"
+  data-tilt
+  data-clip-reveal
+  class:list={[
+    'artist-card group relative block overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]',
+    'transition duration-500 hover:border-[var(--color-glow)]/45 hover:shadow-[0_24px_70px_rgba(77,168,255,0.14)]',
+    isBentoLead && 'artist-card--bento-lead lg:col-span-7 lg:row-span-2',
+    isBentoSide && 'artist-card--bento-side lg:col-span-5',
+    isRunway && 'artist-card--runway h-full min-h-[420px]',
+    isFeatured && !isBentoLead && !isBentoSide && 'artist-card--featured sm:col-span-2 sm:row-span-2',
+  ]}
 >
-  <div class="aspect-square overflow-hidden">
+  <div
+    class:list={[
+      'relative overflow-hidden',
+      isBentoLead ? 'aspect-[4/5] lg:aspect-auto lg:min-h-[520px]' : '',
+      isBentoSide ? 'aspect-[4/5] lg:aspect-[3/4]' : '',
+      isRunway ? 'h-full min-h-[420px]' : '',
+      !isBentoLead && !isBentoSide && !isRunway && isFeatured ? 'aspect-[4/5] sm:aspect-auto sm:min-h-[420px]' : '',
+      !isBentoLead && !isBentoSide && !isRunway && !isFeatured ? 'aspect-[4/5]' : '',
+    ]}
+  >
     <img
       src={photoUrl}
       alt={artist.photo.alt ?? artist.name}
       loading="lazy"
-      class="artist-card-photo h-full w-full object-cover"
+      decoding="async"
+      class="artist-card__photo h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.05]"
     />
-  </div>
-  <div class="p-3 sm:p-4">
-    <p class="font-medium text-paper">{artist.name}</p>
-    <p class="mt-1 text-xs uppercase tracking-wide text-paper/50">{tierLabel[artist.tier]}</p>
+    <div class="artist-card__shine" aria-hidden="true"></div>
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)] via-[var(--color-ink)]/40 to-transparent opacity-90 transition group-hover:opacity-95"
+      aria-hidden="true"
+    ></div>
+    {
+      typeof index === 'number' && (
+        <span
+          class="artist-card__index absolute left-4 top-4 font-display leading-none text-white/18 transition group-hover:text-[var(--color-glow)]/40"
+          aria-hidden="true"
+        >
+          {String(index + 1).padStart(2, '0')}
+        </span>
+      )
+    }
+    <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5 lg:p-6">
+      <div class="flex items-center gap-2">
+        <span class="artist-card__tier-dot" aria-hidden="true"></span>
+        <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--color-glow)]">{tierLabel[artist.tier]}</p>
+      </div>
+      <p class:list={['mt-2 font-display text-paper', isBentoLead ? 'text-2xl sm:text-4xl' : 'text-xl sm:text-2xl']}>
+        {artist.name}
+      </p>
+      {
+        artist.tagline && (
+          <p class:list={['mt-2 text-paper/65', isBentoLead ? 'line-clamp-3 text-sm sm:text-base' : 'line-clamp-2 text-sm']}>
+            {artist.tagline}
+          </p>
+        )
+      }
+      {
+        artist.genres && artist.genres.length > 0 && (
+          <ul class="mt-3 flex flex-wrap gap-1.5" aria-label="Genres">
+            {artist.genres.slice(0, isBentoLead ? 4 : 3).map((genre) => (
+              <li class="rounded-full border border-white/12 bg-white/[0.04] px-2.5 py-0.5 text-[10px] uppercase tracking-wide text-paper/70 backdrop-blur-sm">
+                {genre}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      <span class="artist-card__cta mt-4 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-paper/50 transition group-hover:text-[var(--color-glow)]">
+        View profile
+        <svg class="h-3.5 w-3.5 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </span>
+    </div>
   </div>
 </a>
 
-<script>
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (!prefersReducedMotion) {
-    import('motion/mini').then(({ animate }) => {
-      const ease = [0.22, 1, 0.36, 1] as const;
-      document.querySelectorAll<HTMLAnchorElement>('.artist-card').forEach((card) => {
-        const photo = card.querySelector<HTMLImageElement>('.artist-card-photo');
-        if (!photo) return;
-        card.addEventListener('mouseenter', () => animate(photo, { scale: 1.08 }, { duration: 0.5, ease }));
-        card.addEventListener('mouseleave', () => animate(photo, { scale: 1 }, { duration: 0.5, ease }));
-      });
-    });
-  }
-</script>
-
 <style>
-  .artist-card-photo {
+  .artist-card {
+    transform-style: preserve-3d;
+  }
+
+  .artist-card__photo {
     will-change: transform;
+  }
+
+  .artist-card__shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      125deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.06) 50%,
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .artist-card:hover .artist-card__shine,
+  .artist-card:focus-visible .artist-card__shine {
+    opacity: 1;
+  }
+
+  .artist-card__index {
+    font-size: clamp(2.5rem, 2rem + 2vw, 4.5rem);
+  }
+
+  .artist-card__tier-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: var(--color-glow);
+    box-shadow: 0 0 12px rgba(77, 168, 255, 0.6);
+  }
+
+  .artist-card__cta {
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.35s ease,
+      transform 0.35s ease,
+      color 0.35s ease;
+  }
+
+  .artist-card:hover .artist-card__cta,
+  .artist-card:focus-visible .artist-card__cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .artist-card__photo {
+      transition: none !important;
+    }
+
+    .artist-card:hover .artist-card__photo {
+      transform: none !important;
+    }
+
+    .artist-card__cta {
+      opacity: 1;
+      transform: none;
+    }
   }
 </style>

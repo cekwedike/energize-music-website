@@ -9,14 +9,23 @@ export interface StreamingLinks {
   instagram?: string;
 }
 
-export interface Artist {
+/** Card/list shape from GROQ (bio optional on cards). */
+export interface ArtistCard {
   _id: string;
   name: string;
-  /** Flattened by GROQ as `"slug": slug.current`: a plain string, not `{ current }`. */
   slug: string;
   tier: ArtistTier;
   featured?: boolean;
   photo: SanityImage;
+  tagline?: string;
+  bio?: string;
+  quote?: string;
+  genres?: string[];
+}
+
+export interface Artist extends ArtistCard {
   bio: string;
+  coverImage?: SanityImage;
+  quote?: string;
   streaming?: StreamingLinks;
 }

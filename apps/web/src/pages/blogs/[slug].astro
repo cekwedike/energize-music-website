@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PortableText from '../../components/portable/PortableText.astro';
+import BlogPostReader from '../../components/blogs/BlogPostReader.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient, urlForImage } from '../../lib/sanity/client';
 import { allNewsQuery, newsBySlugQuery, type NewsPost } from '@energize/shared';
@@ -31,29 +31,13 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout title={post.title} description={post.title}>
+<BaseLayout title={post.title} description={post.title} ogImage={coverUrl} ambientVariant="editorial">
   <JsonLd data={jsonLd} />
-  <article class="mx-auto max-w-3xl px-5 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16">
-    <p class="text-sm uppercase tracking-wide text-paper/50">{date}</p>
-    <h1 class="text-h1 mt-3 break-words">{post.title}</h1>
-    <img
-      src={coverUrl}
-      alt={post.cover.alt ?? post.title}
-      class="mt-8 aspect-[16/9] w-full rounded-lg object-cover"
-    />
-    <div class="mt-8">
-      <PortableText value={post.body} />
-    </div>
-    {
-      post.tags && post.tags.length > 0 && (
-        <div class="mt-10 flex flex-wrap gap-2">
-          {post.tags.map((tag) => (
-            <span class="rounded-full border border-white/15 px-3 py-1 text-xs uppercase tracking-wide text-paper/60">
-              {tag}
-            </span>
-          ))}
-        </div>
-      )
-    }
-  </article>
+  <BlogPostReader post={post} coverUrl={coverUrl} date={date} />
 </BaseLayout>
+
+<script>
+  import { initBlogPost } from '../../lib/motion/blogs/initBlogPost';
+
+  initBlogPost();
+</script>

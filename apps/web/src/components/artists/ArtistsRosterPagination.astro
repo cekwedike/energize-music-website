@@ -1,0 +1,149 @@
+---
+import type { RosterNavItem } from '../../lib/artists/rosterUtils';
+import { pagerDotPosition } from '../../lib/artists/rosterUtils';
+
+interface Props {
+  items: RosterNavItem[];
+  activeIndex: number;
+}
+
+const { items, activeIndex } = Astro.props;
+const dotLeft = pagerDotPosition(activeIndex, items.length);
+---
+
+<footer class="roster-pager" aria-label={`Roster navigation, viewing ${items[activeIndex]?.name ?? 'artist'}`}>
+  <div class="roster-pager__track-wrap">
+    <div class="roster-pager__track" aria-hidden="true">
+      <span class="roster-pager__dot" style={`left: ${dotLeft}%`}></span>
+    </div>
+  </div>
+
+  <div class="roster-pager__pills">
+    {
+      items.map((item) => {
+        const isActive = item.index === activeIndex;
+        const padded = String(item.index + 1).padStart(2, '0');
+        return (
+          <a
+            href={`#artist-${item.slug}`}
+            class="roster-pager__pill"
+            data-roster-pill
+            data-index={item.index}
+            data-active={isActive ? 'true' : 'false'}
+            aria-current={isActive ? 'true' : undefined}
+          >
+            <span class="roster-pager__pill-index">{padded}</span>
+            <span class="roster-pager__pill-label">{item.shortLabel}</span>
+          </a>
+        );
+      })
+    }
+  </div>
+</footer>
+
+<style>
+  .roster-pager {
+    position: relative;
+    z-index: 3;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(11, 11, 13, 0.94);
+    padding: clamp(0.85rem, 2vh, 1.1rem) clamp(1.25rem, 4vw, 2.5rem) clamp(1rem, 2.5vh, 1.25rem);
+  }
+
+  .roster-pager__track-wrap {
+    margin-bottom: clamp(0.75rem, 1.8vh, 1rem);
+  }
+
+  .roster-pager__track {
+    position: relative;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .roster-pager__dot {
+    position: absolute;
+    top: 50%;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 9999px;
+    background: var(--color-paper);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 3px rgba(250, 250, 248, 0.08);
+  }
+
+  .roster-pager__pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .roster-pager__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 2.15rem;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 9999px;
+    background: transparent;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: rgba(250, 250, 248, 0.52);
+    transition:
+      border-color 0.25s ease,
+      background 0.25s ease,
+      color 0.25s ease;
+  }
+
+  .roster-pager__pill:hover,
+  .roster-pager__pill:focus-visible {
+    border-color: rgba(255, 255, 255, 0.42);
+    color: var(--color-paper);
+  }
+
+  .roster-pager__pill[data-active='true'] {
+    border-color: var(--color-paper);
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  .roster-pager__pill-index {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.72;
+  }
+
+  .roster-pager__pill[data-active='true'] .roster-pager__pill-index {
+    opacity: 1;
+  }
+
+  .roster-pager__pill-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 9rem;
+  }
+
+  @media (max-width: 640px) {
+    .roster-pager__pills {
+      justify-content: flex-start;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: none;
+    }
+
+    .roster-pager__pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .roster-pager__pill {
+      flex: 0 0 auto;
+    }
+  }
+</style>

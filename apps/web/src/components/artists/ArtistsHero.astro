@@ -1,0 +1,397 @@
+---
+import type { ArtistCard as ArtistCardType } from '@energize/shared';
+import { urlForImage } from '../../lib/sanity/client';
+
+interface Props {
+  total: number;
+  officialCount: number;
+  legacyCount: number;
+  artists: ArtistCardType[];
+}
+
+const { total, officialCount, legacyCount, artists } = Astro.props;
+const stripArtists = artists.slice(0, 8);
+const marqueeNames = artists.map((artist) => artist.name);
+---
+
+<section class="artists-hero relative overflow-hidden border-b border-white/8">
+  <canvas class="artists-hero__noise" data-noise-canvas aria-hidden="true"></canvas>
+  <div class="artists-hero__mesh" aria-hidden="true"></div>
+  <div class="artists-hero__grain" aria-hidden="true"></div>
+  <div class="artists-hero__glow artists-hero__glow--a" aria-hidden="true"></div>
+  <div class="artists-hero__glow artists-hero__glow--b" aria-hidden="true"></div>
+  <div class="artists-hero__line" aria-hidden="true"></div>
+
+  <div class="relative mx-auto max-w-7xl px-5 pb-10 pt-24 sm:px-6 sm:pb-14 sm:pt-32">
+    <div class="grid items-end gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16">
+      <div class="min-w-0">
+        <p class="artists-reveal artists-reveal-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">
+          Energize roster
+        </p>
+        <div class="artists-reveal artists-reveal-2 mt-4 flex items-center gap-4" aria-hidden="true">
+          <span class="h-px w-14 bg-[var(--color-glow)]"></span>
+          <span class="font-display text-sm tabular-nums text-paper/40">{String(total).padStart(2, '0')} voices</span>
+        </div>
+
+        <h1 class="artists-hero__headline mt-8 font-display leading-[0.88] tracking-tight">
+          <span
+            class="artists-reveal artists-reveal-3 block text-[clamp(3rem,2rem+6vw,7.5rem)] text-paper"
+            data-split-line
+          >
+            Meet the
+          </span>
+          <span
+            class="artists-reveal artists-reveal-3 artists-hero__title-accent mt-1 block text-[clamp(3.25rem,2.2rem+7vw,8.5rem)] italic text-[var(--color-glow)]"
+            data-split-line
+          >
+            artists
+          </span>
+        </h1>
+
+        <p class="artists-reveal artists-reveal-4 text-lead mt-8 max-w-xl text-paper/68">
+          Afro-gospel and soul-fusion voices, official roster and legacy catalog, each with a story worth hearing.
+        </p>
+
+        <dl class="artists-reveal artists-reveal-5 mt-10 flex flex-wrap gap-3">
+          <div class="artists-hero__stat">
+            <dt class="text-[10px] font-bold uppercase tracking-[0.22em] text-paper/45">Total</dt>
+            <dd class="mt-1 font-display text-2xl text-paper sm:text-3xl">{total}</dd>
+          </div>
+          <div class="artists-hero__stat artists-hero__stat--glow">
+            <dt class="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--color-glow)]/70">Official</dt>
+            <dd class="mt-1 font-display text-2xl text-[var(--color-glow)] sm:text-3xl">{officialCount}</dd>
+          </div>
+          <div class="artists-hero__stat">
+            <dt class="text-[10px] font-bold uppercase tracking-[0.22em] text-paper/45">Legacy</dt>
+            <dd class="mt-1 font-display text-2xl text-paper/85 sm:text-3xl">{legacyCount}</dd>
+          </div>
+        </dl>
+
+        {
+          stripArtists.length > 0 && (
+            <a
+              href="#full-roster"
+              class="artists-reveal artists-reveal-6 mt-10 inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 bg-white/[0.03] px-5 py-2.5 text-sm font-semibold text-paper transition hover:border-[var(--color-glow)]/50 hover:text-[var(--color-glow)]"
+            >
+              Browse full roster
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+              </svg>
+            </a>
+          )
+        }
+      </div>
+
+      {
+        stripArtists.length > 0 && (
+          <div class="artists-reveal artists-reveal-7 min-w-0">
+            <p class="mb-4 text-[10px] font-bold uppercase tracking-[0.28em] text-paper/40">On rotation</p>
+            <div class="artists-hero__strip scrollbar-hide" tabindex="0" aria-label="Featured artist previews">
+              {
+                stripArtists.map((artist, index) => {
+                  const photoUrl = urlForImage(artist.photo).width(480).height(640).fit('crop').auto('format').url();
+                  return (
+                    <a
+                      href={`/artists/${artist.slug}`}
+                      class="artists-hero__strip-card group shrink-0"
+                      style={`--strip-index: ${index}`}
+                    >
+                      <div class="artists-hero__strip-frame">
+                        <img
+                          src={photoUrl}
+                          alt={artist.photo.alt ?? artist.name}
+                          loading="eager"
+                          decoding="async"
+                          class="artists-hero__strip-photo"
+                        />
+                        <div class="artists-hero__strip-overlay" aria-hidden="true"></div>
+                        <span class="artists-hero__strip-num" aria-hidden="true">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <div class="artists-hero__strip-meta">
+                          <p class="font-display text-lg leading-tight text-paper">{artist.name}</p>
+                          {artist.tagline && <p class="mt-1 line-clamp-2 text-xs text-paper/60">{artist.tagline}</p>}
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })
+              }
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    marqueeNames.length > 0 && (
+      <div class="artists-hero__marquee-wrap border-t border-white/6" data-marquee-wrap aria-hidden="true">
+        <div class="artists-hero__marquee">
+          <div class="artists-hero__marquee-track" data-marquee-track data-marquee-duration="38">
+            {[...marqueeNames, ...marqueeNames].map((name) => (
+              <span class="artists-hero__marquee-item">{name}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .artists-hero {
+    min-height: min(88vh, 920px);
+  }
+
+  .artists-hero__noise {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.45;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .artists-hero__headline {
+    perspective: 900px;
+  }
+
+  .artists-hero__headline :global(.motion-char) {
+    display: inline-block;
+    transform-origin: 50% 100%;
+    will-change: transform, opacity;
+  }
+
+  .artists-hero__mesh {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 75% 60% at 8% 12%, rgba(77, 168, 255, 0.18), transparent 55%),
+      radial-gradient(ellipse 55% 45% at 95% 65%, rgba(103, 232, 249, 0.1), transparent 50%),
+      linear-gradient(165deg, var(--color-ink) 0%, #0e0e11 50%, var(--color-ink-raised) 100%);
+  }
+
+  .artists-hero__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.32;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  .artists-hero__glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .artists-hero__glow--a {
+    top: 5%;
+    right: -4%;
+    width: 340px;
+    height: 340px;
+    background: rgba(77, 168, 255, 0.16);
+  }
+
+  .artists-hero__glow--b {
+    bottom: 15%;
+    left: -6%;
+    width: 260px;
+    height: 260px;
+    background: rgba(37, 99, 235, 0.12);
+  }
+
+  .artists-hero__line {
+    position: absolute;
+    top: 28%;
+    left: 0;
+    width: 38%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(77, 168, 255, 0.35), transparent);
+    opacity: 0.6;
+  }
+
+  .artists-hero__title-accent {
+    text-shadow: 0 0 80px rgba(77, 168, 255, 0.25);
+  }
+
+  .artists-hero__stat {
+    min-width: 5.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    padding: 0.85rem 1.1rem;
+    border-radius: 1rem;
+  }
+
+  .artists-hero__stat--glow {
+    border-color: rgba(77, 168, 255, 0.25);
+    background: rgba(77, 168, 255, 0.06);
+    box-shadow: 0 0 40px rgba(77, 168, 255, 0.08);
+  }
+
+  .artists-hero__strip {
+    display: flex;
+    gap: 0.85rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .artists-hero__strip-card {
+    scroll-snap-align: start;
+    width: min(42vw, 200px);
+  }
+
+  @media (min-width: 1024px) {
+    .artists-hero__strip-card {
+      width: 200px;
+    }
+  }
+
+  .artists-hero__strip-frame {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition:
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+
+  .artists-hero__strip-card:hover .artists-hero__strip-frame,
+  .artists-hero__strip-card:focus-visible .artists-hero__strip-frame {
+    transform: translateY(-6px) scale(1.02);
+    border-color: rgba(77, 168, 255, 0.45);
+    box-shadow: 0 24px 60px rgba(77, 168, 255, 0.15);
+  }
+
+  .artists-hero__strip-photo {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+  }
+
+  .artists-hero__strip-card:hover .artists-hero__strip-photo {
+    transform: scale(1.06);
+  }
+
+  .artists-hero__strip-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 35%, rgba(11, 11, 13, 0.92) 100%);
+  }
+
+  .artists-hero__strip-num {
+    position: absolute;
+    left: 0.85rem;
+    top: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.18);
+    transition: color 0.4s ease;
+  }
+
+  .artists-hero__strip-card:hover .artists-hero__strip-num {
+    color: rgba(77, 168, 255, 0.45);
+  }
+
+  .artists-hero__strip-meta {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: 0.85rem;
+  }
+
+  .artists-hero__marquee-wrap {
+    overflow: hidden;
+    padding-block: 1.25rem;
+    background: rgba(255, 255, 255, 0.015);
+  }
+
+  .artists-hero__marquee {
+    mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  }
+
+  .artists-hero__marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 3rem;
+    animation: artists-marquee 38s linear infinite;
+  }
+
+  .artists-hero__marquee-item {
+    flex-shrink: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1rem + 1.2vw, 2rem);
+    font-style: italic;
+    color: rgba(250, 250, 248, 0.22);
+    white-space: nowrap;
+  }
+
+  .artists-hero__marquee-item::after {
+    content: '✦';
+    margin-left: 3rem;
+    font-style: normal;
+    font-size: 0.65em;
+    color: rgba(77, 168, 255, 0.35);
+  }
+
+  @keyframes artists-marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .artists-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .artists-hero.is-visible .artists-reveal-1 { transition-delay: 0ms; }
+  .artists-hero.is-visible .artists-reveal-2 { transition-delay: 70ms; }
+  .artists-hero.is-visible .artists-reveal-3 { transition-delay: 150ms; }
+  .artists-hero.is-visible .artists-reveal-4 { transition-delay: 240ms; }
+  .artists-hero.is-visible .artists-reveal-5 { transition-delay: 330ms; }
+  .artists-hero.is-visible .artists-reveal-6 { transition-delay: 420ms; }
+  .artists-hero.is-visible .artists-reveal-7 { transition-delay: 500ms; }
+
+  .artists-hero.is-visible .artists-reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .artists-reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+
+    .artists-hero__noise {
+      display: none;
+    }
+
+    .artists-hero__marquee-track {
+      animation: artists-marquee 38s linear infinite;
+    }
+
+    .artists-hero__strip-card:hover .artists-hero__strip-frame,
+    .artists-hero__strip-card:hover .artists-hero__strip-photo {
+      transform: none;
+    }
+  }
+</style>

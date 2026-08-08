@@ -15,8 +15,18 @@ export interface Release {
   slug: string;
   type: ReleaseType;
   releaseDate: string;
-  cover: SanityImage;
+  cover?: SanityImage;
   artists: Artist[];
   links?: ReleaseLinks;
+  sourceUrl?: string;
   featured?: boolean;
+}
+
+/** Release enriched with build-time link metadata for the frontend. */
+export interface EnrichedRelease extends Release {
+  displayTitle: string;
+  coverUrl?: string;
+  artistNames: string[];
+  externalUrl?: string;
+  metaProvider?: string;
 }

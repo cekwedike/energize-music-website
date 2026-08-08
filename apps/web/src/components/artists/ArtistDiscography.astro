@@ -1,0 +1,181 @@
+---
+import type { EnrichedRelease } from '@energize/shared';
+
+interface Props {
+  releases: EnrichedRelease[];
+  artistName: string;
+}
+
+const { releases, artistName } = Astro.props;
+
+const typeLabel: Record<EnrichedRelease['type'], string> = {
+  single: 'Single',
+  ep: 'EP',
+  album: 'Album',
+  compilation: 'Compilation',
+};
+
+const sorted = [...releases].sort(
+  (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
+);
+---
+
+{
+  sorted.length > 0 && (
+    <section class="discography mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20" aria-labelledby="discography-heading">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 id="discography-heading" class="font-display text-2xl text-paper sm:text-3xl">
+            Discography
+          </h2>
+          <p class="mt-2 text-sm text-paper/50">Releases by {artistName}</p>
+        </div>
+        <a href="/releases" class="text-sm font-semibold text-paper/45 transition hover:text-[var(--color-glow)]">
+          View all releases
+        </a>
+      </div>
+
+      <ul class="discography__grid mt-8">
+        {
+          sorted.map((release) => {
+            const year = new Date(release.releaseDate).getFullYear();
+            const href = release.externalUrl ?? `/releases/${release.slug}`;
+            const isExternal = Boolean(release.externalUrl);
+            const artistsLabel =
+              release.artistNames.length > 0 ? release.artistNames.join(', ') : artistName;
+
+            return (
+              <li>
+                <a
+                  href={href}
+                  class="discography__card group"
+                  {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
+                  <div class="discography__cover-wrap">
+                    {
+                      release.coverUrl ? (
+                        <img
+                          src={release.coverUrl}
+                          alt={release.cover?.alt ?? release.displayTitle}
+                          loading="lazy"
+                          decoding="async"
+                          class="discography__cover"
+                        />
+                      ) : (
+                        <div class="discography__cover discography__cover--placeholder" aria-hidden="true">
+                          <span>No cover</span>
+                        </div>
+                      )
+                    }
+                  </div>
+                  <div class="discography__meta">
+                    <p class="discography__title">{release.displayTitle}</p>
+                    <p class="discography__sub">
+                      {artistsLabel} · {typeLabel[release.type]} · {year}
+                    </p>
+                  </div>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .discography__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  @media (min-width: 640px) {
+    .discography__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .discography__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .discography__grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .discography__card {
+    display: block;
+    text-decoration: none;
+  }
+
+  .discography__cover-wrap {
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .discography__card:hover .discography__cover-wrap,
+  .discography__card:focus-visible .discography__cover-wrap {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  .discography__cover {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .discography__cover--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: rgba(250, 250, 248, 0.35);
+  }
+
+  .discography__meta {
+    margin-top: 0.65rem;
+  }
+
+  .discography__title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-paper);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .discography__sub {
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    color: rgba(250, 250, 248, 0.42);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .discography__card:hover .discography__cover-wrap {
+      transform: none;
+    }
+  }
+</style>

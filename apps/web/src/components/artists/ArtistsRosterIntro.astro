@@ -1,0 +1,73 @@
+---
+/** Subtle three-column intro row above the first roster card. */
+---
+
+<div class="roster-intro" aria-hidden="true">
+  <p class="roster-intro__cell">
+    <span>Afro-gospel &amp; soul-fusion</span>
+    <span>voices on the Energize roster</span>
+  </p>
+  <p class="roster-intro__cell">
+    <span>High-quality, uplifting music</span>
+  </p>
+  <p class="roster-intro__cell roster-intro__cell--right">
+    <span class="roster-intro__marker" aria-hidden="true">•</span>
+    Artist Section
+  </p>
+</div>
+
+<style>
+  .roster-intro {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 100%),
+      var(--color-ink);
+  }
+
+  .roster-intro__cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin: 0;
+    padding: clamp(1rem, 2.5vh, 1.35rem) clamp(1.25rem, 4vw, 2.5rem);
+    font-size: 0.625rem;
+    font-weight: 600;
+    line-height: 1.55;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.38);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .roster-intro__cell:last-child {
+    border-bottom: none;
+  }
+
+  .roster-intro__cell--right {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+  }
+
+  .roster-intro__marker {
+    color: rgba(250, 250, 248, 0.55);
+  }
+
+  @media (min-width: 768px) {
+    .roster-intro {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .roster-intro__cell {
+      border-bottom: none;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .roster-intro__cell:last-child {
+      border-right: none;
+    }
+  }
+</style>

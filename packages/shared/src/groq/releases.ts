@@ -9,6 +9,8 @@ export const releaseCardFragment = /* groq */ `{
   releaseDate,
   cover${imageFragment},
   artists[]->${artistCardFragment},
+  links,
+  sourceUrl,
   featured
 }`;
 
@@ -20,7 +22,8 @@ export const releaseDetailFragment = /* groq */ `{
   releaseDate,
   cover${imageFragment},
   artists[]->${artistCardFragment},
-  links
+  links,
+  sourceUrl
 }`;
 
 export const allReleasesQuery = /* groq */ `*[_type == "release"] | order(releaseDate desc) ${releaseCardFragment}`;
@@ -29,4 +32,5 @@ export const featuredReleasesQuery = /* groq */ `*[_type == "release" && feature
 
 export const releaseBySlugQuery = /* groq */ `*[_type == "release" && slug.current == $slug][0] ${releaseDetailFragment}`;
 
-export const releasesByArtistSlugQuery = /* groq */ `*[_type == "release" && $slug in artists[]->slug.current] | order(releaseDate desc) ${releaseCardFragment}`;
+/** Max 10 releases per artist profile (newest first). */
+export const releasesByArtistSlugQuery = /* groq */ `*[_type == "release" && $slug in artists[]->slug.current] | order(releaseDate desc) [0...10] ${releaseCardFragment}`;

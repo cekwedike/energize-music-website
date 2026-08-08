@@ -1,0 +1,222 @@
+---
+import type { NewsPost } from '@energize/shared';
+import PortableText from '../portable/PortableText.astro';
+
+interface Props {
+  post: NewsPost;
+  coverUrl: string;
+  date: string;
+}
+
+const { post, coverUrl, date } = Astro.props;
+---
+
+<article class="zine-reader" data-zine-reader>
+  <div class="zine-reader__progress" aria-hidden="true">
+    <div class="zine-reader__progress-fill" data-read-progress></div>
+  </div>
+
+  <header class="zine-reader__hero">
+    <div class="zine-reader__hero-bg" aria-hidden="true">
+      <img src={coverUrl} alt="" class="zine-reader__hero-img" />
+      <div class="zine-reader__hero-mask"></div>
+    </div>
+
+    <div class="zine-reader__hero-content mx-auto max-w-4xl px-5 pt-32 pb-16 sm:px-6 sm:pt-40 sm:pb-24">
+      <a href="/blogs" class="zine-reader__back text-xs font-bold uppercase tracking-[0.25em] text-paper/50 transition hover:text-[var(--color-glow)]">
+        ← All blogs
+      </a>
+      <time class="zine-reader__date mt-10 block text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-glow)]" datetime={post.date}>
+        {date}
+      </time>
+      <h1 class="zine-reader__title mt-6 font-display text-[clamp(2.25rem,1.5rem+3vw,4.5rem)] leading-[0.95] tracking-tight">
+        {post.title}
+      </h1>
+      {
+        post.tags && post.tags.length > 0 && (
+          <ul class="zine-reader__tags mt-8 flex flex-wrap gap-2">
+            {post.tags.map((tag) => (
+              <li class="zine-reader__tag">{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </header>
+
+  <div class="zine-reader__layout mx-auto max-w-6xl px-5 pb-24 sm:px-6 sm:pb-32">
+    <div class="zine-reader__columns">
+      <aside class="zine-reader__margin hidden lg:block" aria-hidden="true">
+        <p class="zine-reader__margin-text">Energize Music Dispatch</p>
+        <p class="zine-reader__margin-num">{date.split(' ').pop()}</p>
+      </aside>
+
+      <div class="zine-reader__body" data-zine-body>
+        <figure class="zine-reader__figure">
+          <img src={coverUrl} alt={post.cover.alt ?? post.title} class="zine-reader__figure-img" />
+        </figure>
+        <div class="zine-reader__prose">
+          <PortableText value={post.body} />
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .zine-reader {
+    position: relative;
+  }
+
+  .zine-reader__progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .zine-reader__progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--color-glow);
+    box-shadow: 0 0 12px rgba(77, 168, 255, 0.6);
+  }
+
+  .zine-reader__hero {
+    position: relative;
+    min-height: 70vh;
+    overflow: hidden;
+    border-bottom: 4px solid var(--color-glow);
+  }
+
+  .zine-reader__hero-bg {
+    position: absolute;
+    inset: 0;
+  }
+
+  .zine-reader__hero-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    opacity: 0.35;
+    filter: grayscale(0.3);
+    will-change: transform;
+  }
+
+  .zine-reader__hero-mask {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 11, 13, 0.4) 0%, rgba(11, 11, 13, 0.85) 70%, var(--color-ink) 100%);
+  }
+
+  .zine-reader__hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .zine-reader__tag {
+    border: 1px solid rgba(77, 168, 255, 0.4);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .zine-reader__columns {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .zine-reader__columns {
+      grid-template-columns: 80px 1fr;
+      gap: 4rem;
+    }
+  }
+
+  .zine-reader__margin-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.2);
+  }
+
+  .zine-reader__margin-num {
+    margin-top: 2rem;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: rgba(77, 168, 255, 0.2);
+  }
+
+  .zine-reader__figure {
+    margin: 0 0 2.5rem;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+
+  .zine-reader__figure-img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+  }
+
+  .zine-reader__prose {
+    max-width: 42rem;
+    font-size: clamp(1.05rem, 1rem + 0.15vw, 1.15rem);
+    line-height: 1.8;
+    color: rgba(250, 250, 248, 0.82);
+  }
+
+  .zine-reader__prose :global(p) {
+    margin-bottom: 1.5rem;
+  }
+
+  .zine-reader__prose :global(h2) {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--color-paper);
+  }
+
+  .zine-reader__prose :global(h3) {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    color: var(--color-paper);
+  }
+
+  .zine-reader__prose :global(a) {
+    color: var(--color-glow);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .zine-reader__prose :global(blockquote) {
+    margin: 2rem 0;
+    padding-left: 1.25rem;
+    border-left: 3px solid var(--color-glow);
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-style: italic;
+    color: rgba(250, 250, 248, 0.75);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zine-reader__hero-img {
+      will-change: auto;
+    }
+  }
+</style>

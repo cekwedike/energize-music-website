@@ -7,7 +7,9 @@ interface Props {
 }
 
 const { release } = Astro.props;
-const coverUrl = urlForImage(release.cover).width(600).height(600).fit('crop').auto('format').url();
+const coverUrl = release.cover
+  ? urlForImage(release.cover).width(600).height(600).fit('crop').auto('format').url()
+  : undefined;
 const year = new Date(release.releaseDate).getFullYear();
 
 const typeLabel: Record<Release['type'], string> = {
@@ -25,12 +27,18 @@ const typeLabel: Record<Release['type'], string> = {
   class="group block overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] transition hover:border-[var(--color-accent)]/50"
 >
   <div class="aspect-square overflow-hidden">
-    <img
-      src={coverUrl}
-      alt={release.cover.alt ?? release.title}
-      loading="lazy"
-      class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-    />
+    {
+      coverUrl ? (
+        <img
+          src={coverUrl}
+          alt={release.cover?.alt ?? release.title}
+          loading="lazy"
+          class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <div class="flex h-full w-full items-center justify-center bg-white/[0.04] text-xs text-paper/40">No cover</div>
+      )
+    }
   </div>
   <div class="p-4">
     <p class="font-medium text-paper">{release.title}</p>

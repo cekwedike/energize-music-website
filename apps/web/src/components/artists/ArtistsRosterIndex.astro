@@ -1,0 +1,233 @@
+---
+import type { ArtistCard as ArtistCardType } from '@energize/shared';
+import { urlForImage } from '../../lib/sanity/client';
+
+interface Tab {
+  label: string;
+  value: ArtistCardType['tier'] | 'all';
+  count: number;
+}
+
+interface Props {
+  artists: ArtistCardType[];
+  tabs: Tab[];
+}
+
+const { artists, tabs } = Astro.props;
+
+const tierLabel: Record<ArtistCardType['tier'], string> = {
+  official: 'Official',
+  legacy: 'Legacy',
+};
+
+function previewText(artist: ArtistCardType): string | undefined {
+  if (artist.tagline?.trim()) return artist.tagline.trim();
+  if (artist.bio?.trim()) return artist.bio.trim();
+  return undefined;
+}
+---
+
+<section
+  id="full-roster"
+  class="roster-index mx-auto max-w-7xl px-5 pb-20 sm:px-6 sm:pb-28"
+  aria-labelledby="roster-index-heading"
+>
+  <div class="roster-index__header border-t border-white/10 pt-14 sm:pt-16">
+    <h2 id="roster-index-heading" class="font-display text-2xl text-paper sm:text-3xl">Full roster</h2>
+    <p class="mt-2 max-w-lg text-sm text-paper/50">Browse every artist on Energize Music.</p>
+  </div>
+
+  <div
+    class="roster-index__filters mt-8 inline-flex flex-wrap gap-2 rounded-full border border-white/10 bg-white/[0.03] p-1"
+    id="artist-tabs"
+    role="tablist"
+    aria-label="Filter artists by tier"
+  >
+    {
+      tabs.map((tab, index) => (
+        <button
+          type="button"
+          data-tier={tab.value}
+          role="tab"
+          aria-selected={index === 0 ? 'true' : 'false'}
+          class="roster-filter"
+        >
+          {tab.label}
+          <span class="roster-filter__count">{tab.count}</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <p id="artist-empty-filter" class="mt-12 hidden text-center text-paper/55" role="status">
+    No artists in this tier yet.
+  </p>
+
+  <div id="artist-grid" class="roster-index__grid mt-8">
+    {
+      artists.map((artist) => {
+        const photoUrl = urlForImage(artist.photo).width(600).height(600).fit('crop').auto('format').url();
+        const preview = previewText(artist);
+        return (
+          <a href={`/artists/${artist.slug}`} data-tier={artist.tier} class="roster-card group">
+            <div class="roster-card__art">
+              <img
+                src={photoUrl}
+                alt={artist.photo.alt ?? artist.name}
+                loading="lazy"
+                decoding="async"
+                class="roster-card__photo"
+              />
+            </div>
+            <div class="roster-card__body">
+              <span class="roster-card__tier">{tierLabel[artist.tier]}</span>
+              <p class="roster-card__name">{artist.name}</p>
+              {preview && <p class="roster-card__preview">{preview}</p>}
+            </div>
+          </a>
+        );
+      })
+    }
+  </div>
+</section>
+
+<style>
+  .roster-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background: transparent;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: rgba(250, 250, 248, 0.65);
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .roster-filter:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-paper);
+  }
+
+  .roster-filter[aria-selected='true'] {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-paper);
+  }
+
+  .roster-filter__count {
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+    color: rgba(250, 250, 248, 0.35);
+  }
+
+  .roster-index__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.875rem;
+  }
+
+  @media (min-width: 640px) {
+    .roster-index__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .roster-index__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .roster-index__grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .roster-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+
+  .roster-card:hover,
+  .roster-card:focus-visible {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-2px);
+  }
+
+  .roster-card.is-hidden {
+    display: none;
+  }
+
+  .roster-card__art {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .roster-card__photo {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .roster-card:hover .roster-card__photo {
+    transform: scale(1.03);
+  }
+
+  .roster-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    min-height: 5.5rem;
+  }
+
+  .roster-card__tier {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.4);
+  }
+
+  .roster-card__name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--color-paper);
+  }
+
+  .roster-card__preview {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: rgba(250, 250, 248, 0.45);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .roster-card:hover .roster-card__photo,
+    .roster-card:hover,
+    .roster-card:focus-visible {
+      transform: none;
+    }
+  }
+</style>

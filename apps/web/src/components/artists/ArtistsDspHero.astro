@@ -1,0 +1,47 @@
+---
+interface Props {
+  artistCount: number;
+}
+
+const { artistCount } = Astro.props;
+---
+
+<section class="dsp-hero" aria-label="Artists">
+  <div class="dsp-hero__glow" aria-hidden="true"></div>
+
+  <div class="relative mx-auto max-w-7xl px-5 pb-10 pt-24 sm:px-6 sm:pb-14 sm:pt-32">
+    <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--color-glow)]">Energize Music</p>
+    <h1 class="mt-4 font-display text-[clamp(2.5rem,1.5rem+5vw,4.5rem)] leading-none tracking-tight text-paper">
+      Artists
+    </h1>
+    <p class="mt-5 max-w-2xl text-base leading-relaxed text-paper/60 sm:text-lg">
+      Official roster and legacy catalog in Afro-gospel and soul-fusion. Stream, explore, and follow every artist on the
+      label.
+    </p>
+    {
+      artistCount > 0 && (
+        <p class="mt-6 text-sm text-paper/40">
+          {artistCount} {artistCount === 1 ? 'artist' : 'artists'} on the roster
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .dsp-hero {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, #0c0c0f 0%, var(--color-ink) 100%);
+  }
+
+  .dsp-hero__glow {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 15% 0%, rgba(77, 168, 255, 0.12), transparent 55%),
+      radial-gradient(ellipse 40% 40% at 85% 20%, rgba(29, 185, 84, 0.06), transparent 50%);
+    pointer-events: none;
+  }
+</style>

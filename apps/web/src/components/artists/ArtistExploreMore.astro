@@ -1,0 +1,110 @@
+---
+import type { ArtistCard as ArtistCardType } from '@energize/shared';
+import { urlForImage } from '../../lib/sanity/client';
+
+interface Props {
+  artists: ArtistCardType[];
+  currentSlug: string;
+}
+
+const { artists, currentSlug } = Astro.props;
+const others = artists.filter((artist) => artist.slug !== currentSlug).slice(0, 8);
+
+if (others.length === 0) return null;
+---
+
+<section class="explore-more mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20" aria-labelledby="explore-more-heading">
+  <div class="flex items-end justify-between gap-4">
+    <h2 id="explore-more-heading" class="font-display text-2xl text-paper sm:text-3xl">
+      More artists
+    </h2>
+    <a href="/artists" class="text-sm font-semibold text-paper/45 transition hover:text-[var(--color-glow)]">
+      View all
+    </a>
+  </div>
+
+  <div class="explore-more__scroll mt-6 -mx-5 px-5 sm:-mx-6 sm:px-6">
+    <ul class="explore-more__track">
+      {
+        others.map((artist) => {
+          const photoUrl = urlForImage(artist.photo).width(300).height(300).fit('crop').auto('format').url();
+          return (
+            <li class="explore-more__item">
+              <a href={`/artists/${artist.slug}`} class="explore-more__card group">
+                <div class="explore-more__art">
+                  <img
+                    src={photoUrl}
+                    alt={artist.photo.alt ?? artist.name}
+                    loading="lazy"
+                    decoding="async"
+                    class="explore-more__photo"
+                  />
+                </div>
+                <p class="explore-more__name">{artist.name}</p>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .explore-more__scroll {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .explore-more__scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .explore-more__track {
+    display: flex;
+    gap: 1rem;
+    width: max-content;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .explore-more__item {
+    width: 9rem;
+    flex-shrink: 0;
+  }
+
+  .explore-more__card {
+    display: block;
+    text-decoration: none;
+  }
+
+  .explore-more__art {
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.04);
+    transition: transform 0.2s ease;
+  }
+
+  .explore-more__card:hover .explore-more__art {
+    transform: translateY(-2px);
+  }
+
+  .explore-more__photo {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .explore-more__name {
+    margin-top: 0.6rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-paper);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>

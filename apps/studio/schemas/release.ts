@@ -22,19 +22,32 @@ export default defineType({
     }),
     defineField({ name: 'releaseDate', title: 'Release date', type: 'date', validation: (r) => r.required() }),
     defineField({
+      name: 'sourceUrl',
+      title: 'Primary streaming URL',
+      type: 'url',
+      description:
+        'Spotify, Apple Music, or YouTube link. Cover art and title can be fetched from this URL at build time if cover is missing.',
+    }),
+    defineField({
       name: 'cover',
       title: 'Cover',
       type: 'image',
       options: { hotspot: true },
       fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
-      validation: (r) => r.required(),
+      validation: (rule) =>
+        rule.custom((cover, context) => {
+          const doc = context.document as { sourceUrl?: string } | undefined;
+          if (cover || doc?.sourceUrl) return true;
+          return 'Add a cover image or a primary streaming URL.';
+        }),
     }),
     defineField({
       name: 'artists',
       title: 'Artists',
       type: 'array',
       of: [{ type: 'reference', to: [{ type: 'artist' }] }],
-      validation: (r) => r.required().min(1),
+      validation: (r) => r.required().min(1).max(10),
+      description: 'Link up to 10 artists. Each artist profile shows their 10 most recent releases.',
     }),
     defineField({
       name: 'links',

@@ -1,0 +1,163 @@
+---
+import type { NewsPost } from '@energize/shared';
+
+interface Props {
+  posts: NewsPost[];
+}
+
+const { posts } = Astro.props;
+const issueNum = String(posts.length).padStart(2, '0');
+---
+
+<section class="zine-masthead relative overflow-hidden border-b border-white/10" data-zine-masthead>
+  <div class="zine-masthead__glow zine-masthead__glow--a" aria-hidden="true"></div>
+  <div class="zine-masthead__glow zine-masthead__glow--b" aria-hidden="true"></div>
+
+  <div class="zine-masthead__grid mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-24">
+    <div class="zine-masthead__stamp" aria-hidden="true">
+      <span>Issue</span>
+      <span class="zine-masthead__stamp-num">{issueNum}</span>
+    </div>
+
+    <div class="zine-masthead__main">
+      <p class="zine-masthead__label text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--color-glow-cyan)]">
+        Energize dispatch
+      </p>
+      <h1 class="zine-masthead__title mt-4 font-display leading-[0.85] tracking-tight">
+        <span class="zine-masthead__title-accent block text-[clamp(3.5rem,2rem+10vw,9rem)]" data-split-line>Blogs</span>
+        <span class="mt-2 block text-[clamp(1.25rem,1rem+1.5vw,2rem)] font-normal uppercase tracking-[0.15em] text-paper/50">
+          Stories from the label
+        </span>
+      </h1>
+      <p class="zine-masthead__deck mt-8 max-w-xl text-paper/65 leading-relaxed">
+        Announcements, releases, and stories from the label. Read like a folded broadsheet, not a corporate feed.
+      </p>
+    </div>
+
+    <div class="zine-masthead__meta hidden lg:block">
+      <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-paper/40">Published</p>
+      <p class="mt-2 font-display text-2xl text-paper/70">{new Date().getFullYear()}</p>
+      <p class="mt-6 text-xs text-paper/45">{posts.length} stories filed</p>
+    </div>
+  </div>
+
+  <div class="zine-masthead__bar" aria-hidden="true">
+    <span>Energize Music</span>
+    <span class="zine-masthead__dot"></span>
+    <span>Editorial</span>
+    <span class="zine-masthead__dot"></span>
+    <span>Label news</span>
+  </div>
+</section>
+
+<style>
+  .zine-masthead {
+    background:
+      radial-gradient(ellipse 70% 50% at 15% 0%, rgba(77, 168, 255, 0.1), transparent 55%),
+      radial-gradient(ellipse 50% 40% at 90% 80%, rgba(103, 232, 249, 0.06), transparent 50%),
+      linear-gradient(180deg, var(--color-ink-raised) 0%, var(--color-ink) 100%);
+  }
+
+  .zine-masthead__glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .zine-masthead__glow--a {
+    top: -20%;
+    right: 10%;
+    width: 320px;
+    height: 320px;
+    background: rgba(77, 168, 255, 0.12);
+  }
+
+  .zine-masthead__glow--b {
+    bottom: 10%;
+    left: -5%;
+    width: 240px;
+    height: 240px;
+    background: rgba(245, 235, 220, 0.04);
+  }
+
+  .zine-masthead__grid {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .zine-masthead__grid {
+      grid-template-columns: auto 1fr auto;
+      align-items: end;
+      gap: 3rem;
+    }
+  }
+
+  .zine-masthead__stamp {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    border: 1px solid rgba(250, 250, 248, 0.22);
+    background: rgba(250, 250, 248, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(77, 168, 255, 0.12);
+    transform: rotate(-6deg);
+    font-size: 0.5rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.75);
+  }
+
+  .zine-masthead__stamp-num {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-top: 0.15rem;
+    background: linear-gradient(135deg, var(--color-paper) 0%, var(--color-glow-cyan) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .zine-masthead__title-accent {
+    background: linear-gradient(120deg, var(--color-paper) 0%, rgba(250, 250, 248, 0.88) 45%, var(--color-glow-cyan) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .zine-masthead__title :global(.motion-char) {
+    display: inline-block;
+    transform-origin: 50% 100%;
+  }
+
+  .zine-masthead__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1rem;
+    background: rgba(20, 20, 23, 0.85);
+    border-top: 1px solid rgba(250, 250, 248, 0.08);
+    color: rgba(250, 250, 248, 0.55);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .zine-masthead__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-glow);
+    box-shadow: 0 0 8px rgba(77, 168, 255, 0.5);
+  }
+</style>

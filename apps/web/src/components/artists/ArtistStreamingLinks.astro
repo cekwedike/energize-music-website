@@ -1,0 +1,336 @@
+---
+import type { StreamingLinks } from '@energize/shared';
+
+interface Props {
+  streaming: StreamingLinks;
+  artistName: string;
+  layout?: 'inline' | 'stack';
+}
+
+const { streaming, artistName, layout = 'inline' } = Astro.props;
+
+const platforms: {
+  key: keyof StreamingLinks;
+  label: string;
+  accent: string;
+}[] = [
+  { key: 'spotify', label: 'Spotify', accent: '#1DB954' },
+  { key: 'appleMusic', label: 'Apple Music', accent: '#FA2D48' },
+  { key: 'youtube', label: 'YouTube', accent: '#FF0000' },
+  { key: 'instagram', label: 'Instagram', accent: '#E4405F' },
+];
+
+const entries = platforms.filter(({ key }) => Boolean(streaming[key]));
+const count = entries.length;
+
+const gridCols = count === 1 ? 1 : count === 4 ? 2 : count;
+const gridRows = count <= 3 ? 1 : 2;
+
+const cornerClass = (index: number): string => {
+  if (count === 1) return 'streaming-grid__link--solo';
+  if (count === 2) return index === 0 ? 'streaming-grid__link--left' : 'streaming-grid__link--right';
+  if (count === 3) {
+    if (index === 0) return 'streaming-grid__link--left';
+    if (index === 2) return 'streaming-grid__link--right';
+    return 'streaming-grid__link--middle';
+  }
+  const corners = ['streaming-grid__link--tl', 'streaming-grid__link--tr', 'streaming-grid__link--bl', 'streaming-grid__link--br'];
+  return corners[index] ?? '';
+};
+---
+
+{
+  entries.length > 0 && (
+    <div
+      class:list={['streaming-grid', `streaming-grid--count-${count}`, layout === 'stack' && 'streaming-grid--stack']}
+      style={`--grid-cols: ${gridCols}; --grid-rows: ${gridRows};`}
+      role="group"
+      aria-label={`${artistName} streaming and social links`}
+    >
+      {entries.map(({ key, label, accent }, index) => (
+        <div class="streaming-grid__cell">
+          <a
+            href={streaming[key]}
+            target="_blank"
+            rel="noopener noreferrer"
+            class:list={['streaming-grid__link', cornerClass(index), key === 'appleMusic' && 'streaming-grid__link--apple']}
+            aria-label={`${artistName} on ${label}`}
+            data-platform={key}
+            style={`--platform-accent: ${accent}`}
+          >
+            <span class="streaming-grid__icon-wrap" aria-hidden="true">
+            {key === 'spotify' && (
+              <svg class="streaming-grid__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+              </svg>
+            )}
+            {key === 'appleMusic' && (
+              <svg class="streaming-grid__icon streaming-grid__icon--apple" viewBox="0 0 24 24" aria-hidden="true">
+                <defs>
+                  <linearGradient id={`apple-music-grad-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FA243C" />
+                    <stop offset="100%" stop-color="#FB5864" />
+                  </linearGradient>
+                </defs>
+                <rect x="2" y="2" width="20" height="20" rx="4.5" fill={`url(#apple-music-grad-${index})`} />
+                <path
+                  fill="#FFFFFF"
+                  d="M16.291 5.197c-.058.001-.118.008-.18.023l-6.223 1.557c-.492.123-.889.669-.889 1.223v6.27a2 2 0 0 0-1-.27 2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2v-6.25l6-1.502v5.022a2 2 0 0 0-1-.27 2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2V6.395c0-.485-.303-.811-.708-.803z"
+                />
+              </svg>
+            )}
+            {key === 'youtube' && (
+              <svg class="streaming-grid__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+            )}
+            {key === 'instagram' && (
+              <svg class="streaming-grid__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+              </svg>
+            )}
+            </span>
+            <span class="streaming-grid__label">{label}</span>
+          </a>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .streaming-grid {
+    --cell-size: 2.5rem;
+    --grid-gap: 0;
+    --label-max: 7.5rem;
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: repeat(var(--grid-cols), var(--cell-size));
+    grid-template-rows: repeat(var(--grid-rows), var(--cell-size));
+    gap: var(--grid-gap);
+    transition: gap 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .streaming-grid--stack {
+    --cell-size: 2.75rem;
+  }
+
+  .streaming-grid__cell {
+    position: relative;
+    width: var(--cell-size);
+    height: var(--cell-size);
+  }
+
+  .streaming-grid__link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: var(--cell-size);
+    min-width: var(--cell-size);
+    height: var(--cell-size);
+    padding-inline: 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: var(--platform-accent);
+    overflow: hidden;
+    transition:
+      width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      padding-inline 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease,
+      z-index 0s;
+  }
+
+  .streaming-grid__icon-wrap {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .streaming-grid__label {
+    display: block;
+    flex-shrink: 0;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transform: translateX(-4px);
+    padding-left: 0;
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: inherit;
+    transition:
+      max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.25s ease,
+      transform 0.25s ease,
+      padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .streaming-grid__link--solo {
+    border-radius: 0.5rem;
+  }
+
+  .streaming-grid__link--left {
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
+
+  .streaming-grid__link--right {
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .streaming-grid__link--middle {
+    border-radius: 0;
+  }
+
+  .streaming-grid__link--tl {
+    border-radius: 0.5rem 0 0 0;
+  }
+
+  .streaming-grid__link--tr {
+    border-radius: 0 0.5rem 0 0;
+  }
+
+  .streaming-grid__link--bl {
+    border-radius: 0 0 0 0.5rem;
+  }
+
+  .streaming-grid__link--br {
+    border-radius: 0 0 0.5rem 0;
+  }
+
+  .streaming-grid__icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .streaming-grid__link--apple,
+  .streaming-grid__icon--apple {
+    color: transparent;
+  }
+
+  .streaming-grid__link:hover,
+  .streaming-grid__link:focus-visible {
+    z-index: 4;
+    width: max-content;
+    max-width: calc(var(--cell-size) + var(--label-max) + 1.25rem);
+    padding-inline: 0.625rem;
+    justify-content: flex-start;
+    border-radius: 0.5rem;
+    overflow: visible;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .streaming-grid__link:hover .streaming-grid__label,
+  .streaming-grid__link:focus-visible .streaming-grid__label {
+    max-width: var(--label-max);
+    opacity: 1;
+    transform: translateX(0);
+    padding-left: 0.375rem;
+  }
+
+  .streaming-grid__link:focus-visible {
+    outline: 2px solid var(--color-glow);
+    outline-offset: 2px;
+  }
+
+  .streaming-grid__link[data-platform='spotify']:hover,
+  .streaming-grid__link[data-platform='spotify']:focus-visible {
+    background: rgba(29, 185, 84, 0.18);
+    border-color: rgba(29, 185, 84, 0.55);
+    color: #1db954;
+  }
+
+  .streaming-grid__link[data-platform='appleMusic']:hover,
+  .streaming-grid__link[data-platform='appleMusic']:focus-visible {
+    background: rgba(250, 45, 72, 0.18);
+    border-color: rgba(250, 45, 72, 0.55);
+  }
+
+  .streaming-grid__link[data-platform='youtube']:hover,
+  .streaming-grid__link[data-platform='youtube']:focus-visible {
+    background: rgba(255, 0, 0, 0.18);
+    border-color: rgba(255, 0, 0, 0.55);
+    color: #ff0000;
+  }
+
+  .streaming-grid__link[data-platform='instagram']:hover,
+  .streaming-grid__link[data-platform='instagram']:focus-visible {
+    background: rgba(228, 64, 95, 0.18);
+    border-color: rgba(228, 64, 95, 0.55);
+    color: #e4405f;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .streaming-grid:hover,
+    .streaming-grid:focus-within {
+      --grid-gap: 0.375rem;
+    }
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .streaming-grid {
+      --grid-gap: 0.375rem;
+    }
+
+    .streaming-grid__link {
+      position: relative;
+      width: auto;
+      max-width: none;
+      padding-inline: 0.625rem;
+      justify-content: flex-start;
+      border-radius: 0.5rem;
+      overflow: visible;
+    }
+
+    .streaming-grid__cell {
+      width: auto;
+      height: auto;
+    }
+
+    .streaming-grid {
+      display: inline-flex;
+      flex-wrap: wrap;
+    }
+
+    .streaming-grid__label {
+      max-width: var(--label-max);
+      opacity: 1;
+      transform: translateX(0);
+      padding-left: 0.375rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .streaming-grid {
+      --grid-gap: 0.375rem;
+      transition: none;
+    }
+
+    .streaming-grid__link {
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .streaming-grid__label {
+      transition: none;
+    }
+
+    .streaming-grid__link:hover,
+    .streaming-grid__link:focus-visible {
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+  }
+</style>

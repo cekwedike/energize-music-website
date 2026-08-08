@@ -2,6 +2,7 @@
 import SEO from '../components/ui/SEO.astro';
 import SiteHeader from '../components/ui/SiteHeader.astro';
 import SiteFooter from '../components/ui/SiteFooter.astro';
+import FooterMarquee from '../components/ui/FooterMarquee.astro';
 import AmbientBackground, { type AmbientVariant } from '../components/ui/AmbientBackground.astro';
 import '../styles/global.css';
 
@@ -11,17 +12,26 @@ interface Props {
   ogImage?: string;
   hideHeader?: boolean;
   hideFooter?: boolean;
+  showTopMarquee?: boolean;
   ambientVariant?: AmbientVariant;
 }
 
-const { title, description, ogImage, hideHeader = false, hideFooter = false, ambientVariant } = Astro.props;
+const {
+  title,
+  description,
+  ogImage,
+  hideHeader = false,
+  hideFooter = false,
+  showTopMarquee = false,
+  ambientVariant,
+} = Astro.props;
 
 const pathname = Astro.url.pathname;
 
 function resolveAmbientVariant(): AmbientVariant {
   if (ambientVariant) return ambientVariant;
   if (pathname === '/') return 'home';
-  if (pathname.startsWith('/about')) return 'editorial';
+  if (pathname.startsWith('/about') || pathname.startsWith('/artists')) return 'editorial';
   if (pathname.startsWith('/next')) return 'pulse';
   if (pathname.startsWith('/energize-kids') || pathname.startsWith('/energize-fest')) return 'warm';
   return 'cosmic';
@@ -46,6 +56,7 @@ function resolveAmbientVariant(): AmbientVariant {
     <AmbientBackground variant={resolveAmbientVariant()} />
     <a href="#main-content" class="skip-link">Skip to content</a>
     {!hideHeader && <SiteHeader />}
+    {showTopMarquee && <FooterMarquee placement="top" />}
     <main id="main-content" class="relative">
       <slot />
     </main>

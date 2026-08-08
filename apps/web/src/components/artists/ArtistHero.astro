@@ -1,0 +1,216 @@
+---
+import type { Artist } from '@energize/shared';
+import { urlForImage } from '../../lib/sanity/client';
+import ArtistStreamingLinks from './ArtistStreamingLinks.astro';
+
+interface Props {
+  artist: Artist;
+}
+
+const { artist } = Astro.props;
+
+const heroUrl = urlForImage(artist.photo).width(1920).height(1080).fit('crop').auto('format').url();
+const portraitUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').auto('format').url();
+
+const tierLabel: Record<Artist['tier'], string> = {
+  official: 'Official artist',
+  legacy: 'Legacy catalog',
+};
+---
+
+<section class="artist-profile-hero relative min-h-[92vh] overflow-hidden">
+  <div class="artist-profile-hero__photo-wrap" aria-hidden="true">
+    <img src={heroUrl} alt="" class="artist-profile-hero__photo" loading="eager" decoding="async" />
+  </div>
+  <div class="artist-profile-hero__vignette" aria-hidden="true"></div>
+  <div class="artist-profile-hero__grain" aria-hidden="true"></div>
+
+  <div class="artist-profile-hero__content relative flex min-h-[92vh] flex-col">
+    <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col px-5 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-12">
+      <a
+        href="/artists"
+        class="artist-profile-hero__back inline-flex min-h-10 w-fit items-center gap-2 rounded-full border border-white/15 bg-black/20 px-4 py-2 text-sm font-medium text-paper/70 backdrop-blur-sm transition hover:border-[var(--color-glow)]/40 hover:text-[var(--color-glow)]"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        All artists
+      </a>
+
+      <div class="mt-auto grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:items-end lg:gap-16">
+        <div class="min-w-0">
+          <p class="artist-hero-reveal artist-hero-reveal-1 text-xs font-bold uppercase tracking-[0.3em] text-[var(--color-glow)]">
+            {tierLabel[artist.tier]}
+          </p>
+          <h1 class="artist-profile-hero__headline mt-4 font-display leading-[0.88] tracking-tight">
+            <span class="block text-[clamp(2.75rem,2rem+5vw,6.5rem)] text-paper" data-split-line>{artist.name}</span>
+          </h1>
+          {
+            artist.tagline && (
+              <p class="artist-hero-reveal artist-hero-reveal-3 text-lead mt-5 max-w-2xl text-paper/78">{artist.tagline}</p>
+            )
+          }
+          {
+            artist.genres && artist.genres.length > 0 && (
+              <ul class="artist-hero-reveal artist-hero-reveal-4 mt-6 flex flex-wrap gap-2" aria-label="Genres">
+                {artist.genres.map((genre) => (
+                  <li class="rounded-full border border-white/18 bg-black/25 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-paper/80 backdrop-blur-sm">
+                    {genre}
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </div>
+
+        <div class="artist-hero-reveal artist-hero-reveal-5 hidden lg:block">
+          <div class="overflow-hidden rounded-2xl border border-white/15 shadow-[0_32px_90px_rgba(0,0,0,0.55)]">
+            <img
+              src={portraitUrl}
+              alt={artist.photo.alt ?? artist.name}
+              width={420}
+              height={420}
+              class="aspect-square w-full object-cover"
+              loading="eager"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="artist-profile-hero__scroll-hint" aria-hidden="true">
+      <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-paper/35">Scroll</span>
+      <span class="artist-profile-hero__scroll-line"></span>
+    </div>
+  </div>
+</section>
+
+<section class="relative border-b border-white/8 bg-[var(--color-ink-raised)]/40">
+  <div class="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:gap-16">
+    <div class="scroll-reveal min-w-0">
+      <p class="text-xs font-bold uppercase tracking-[0.28em] text-[var(--color-glow)]">The story</p>
+      <h2 class="text-h2 mt-3 font-display">About {artist.name}</h2>
+      <p class="mt-6 max-w-2xl text-paper/72 leading-relaxed">{artist.bio}</p>
+    </div>
+
+    {
+      artist.streaming && (
+        <div class="scroll-reveal lg:sticky lg:top-28 lg:self-start" style="--reveal-delay: 100ms">
+          <div class="artist-streaming-panel rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-paper/45">Listen and follow</p>
+            <p class="mt-2 font-display text-xl text-paper">Stream {artist.name}</p>
+            <div class="mt-6">
+              <ArtistStreamingLinks streaming={artist.streaming} artistName={artist.name} layout="stack" />
+            </div>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .artist-profile-hero__photo-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .artist-profile-hero__headline {
+    perspective: 900px;
+  }
+
+  .artist-profile-hero__headline :global(.motion-char) {
+    display: inline-block;
+    transform-origin: 50% 100%;
+    will-change: transform, opacity;
+  }
+
+  .artist-profile-hero__photo {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    transform: scale(1.04);
+    will-change: transform;
+  }
+
+  .artist-profile-hero__vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(11, 11, 13, 0.55) 0%, rgba(11, 11, 13, 0.25) 35%, rgba(11, 11, 13, 0.88) 78%, var(--color-ink) 100%),
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(77, 168, 255, 0.12), transparent 60%);
+  }
+
+  .artist-profile-hero__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.28;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  .artist-hero-reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .artist-profile-hero.is-visible .artist-hero-reveal-1 { transition-delay: 0ms; }
+  .artist-profile-hero.is-visible .artist-hero-reveal-2 { transition-delay: 100ms; }
+  .artist-profile-hero.is-visible .artist-hero-reveal-3 { transition-delay: 200ms; }
+  .artist-profile-hero.is-visible .artist-hero-reveal-4 { transition-delay: 300ms; }
+  .artist-profile-hero.is-visible .artist-hero-reveal-5 { transition-delay: 400ms; }
+
+  .artist-profile-hero.is-visible .artist-hero-reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .artist-profile-hero__scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .artist-profile-hero__scroll-line {
+    width: 1px;
+    height: 2.5rem;
+    background: linear-gradient(180deg, rgba(77, 168, 255, 0.5), transparent);
+    animation: artist-scroll-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes artist-scroll-pulse {
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scaleY(0.85);
+    }
+    50% {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+
+  .artist-streaming-panel {
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .artist-hero-reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+
+    .artist-profile-hero__scroll-line {
+      animation: none;
+    }
+  }
+</style>

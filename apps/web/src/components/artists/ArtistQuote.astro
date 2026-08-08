@@ -1,0 +1,109 @@
+---
+interface Props {
+  quote: string;
+  name: string;
+}
+
+const { quote, name } = Astro.props;
+const words = quote.split(/\s+/);
+---
+
+<section class="monument-quote" data-monument-quote aria-label={`Quote from ${name}`}>
+  <div class="monument-quote__bleed" aria-hidden="true">
+    <span class="monument-quote__ghost">{name.split(' ')[0]}</span>
+  </div>
+
+  <blockquote class="monument-quote__block">
+    <p class="monument-quote__text">
+      {
+        words.map((word, i) => (
+          <span class="monument-quote__word" data-quote-word style={`--word-i: ${i}`}>
+            {word}
+          </span>
+        ))
+      }
+    </p>
+    <footer class="monument-quote__footer">
+      <cite class="monument-quote__cite">{name}</cite>
+    </footer>
+  </blockquote>
+</section>
+
+<style>
+  .monument-quote {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(4rem, 3rem + 6vw, 10rem) 1.25rem;
+    border-block: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--color-ink);
+  }
+
+  .monument-quote__ghost {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-display);
+    font-size: clamp(8rem, 4rem + 20vw, 22rem);
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1;
+    color: rgba(77, 168, 255, 0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .monument-quote__block {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+    max-width: 56rem;
+    text-align: center;
+  }
+
+  .monument-quote__text {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.2rem + 2.5vw, 3.75rem);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.25;
+    color: rgba(250, 250, 248, 0.92);
+  }
+
+  .monument-quote__word {
+    display: inline-block;
+    margin-inline: 0.12em;
+    will-change: transform, opacity;
+  }
+
+  .monument-quote__word::before {
+    content: '\201C';
+    opacity: 0;
+  }
+
+  .monument-quote__word:first-child::before {
+    opacity: 1;
+    color: var(--color-glow);
+    margin-right: 0.05em;
+  }
+
+  .monument-quote__word:last-child::after {
+    content: '\201D';
+    color: var(--color-glow);
+    margin-left: 0.05em;
+  }
+
+  .monument-quote__footer {
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  .monument-quote__cite {
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-style: normal;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(77, 168, 255, 0.65);
+  }
+</style>

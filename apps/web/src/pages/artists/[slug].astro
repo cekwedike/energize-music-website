@@ -1,98 +1,74 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ReleaseCard from '../../components/releases/ReleaseCard.astro';
+import ArtistProfileHero from '../../components/artists/ArtistProfileHero.astro';
+import ArtistQuote from '../../components/artists/ArtistQuote.astro';
+import ArtistDiscography from '../../components/artists/ArtistDiscography.astro';
+import ArtistExploreMore from '../../components/artists/ArtistExploreMore.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient, urlForImage } from '../../lib/sanity/client';
+import { enrichReleases } from '../../lib/metadata/enrichReleases';
 import {
-  allArtistsQuery,
+  artistSlugsQuery,
   artistBySlugQuery,
+  allArtistsQuery,
   releasesByArtistSlugQuery,
   type Artist,
+  type ArtistCard,
   type Release,
 } from '@energize/shared';
 
+/** Build one static page per Sanity artist slug. New artists get a page on the next deploy. */
 export async function getStaticPaths() {
-  const artists = await sanityClient.fetch<Pick<Artist, 'slug'>[]>(allArtistsQuery);
-  return artists.map((artist) => ({ params: { slug: artist.slug } }));
+  const slugs = await sanityClient.fetch<{ slug: string }[]>(artistSlugsQuery);
+  return slugs
+    .filter((entry) => Boolean(entry.slug))
+    .map((entry) => ({ params: { slug: entry.slug } }));
 }
 
 const { slug } = Astro.params;
-const artist = await sanityClient.fetch<Artist>(artistBySlugQuery, { slug });
-const discography = await sanityClient.fetch<Release[]>(releasesByArtistSlugQuery, { slug });
+const [artist, discography, allArtists] = await Promise.all([
+  sanityClient.fetch<Artist | null>(artistBySlugQuery, { slug }),
+  sanityClient.fetch<Release[]>(releasesByArtistSlugQuery, { slug }),
+  sanityClient.fetch<ArtistCard[]>(allArtistsQuery),
+]);
 
-const photoUrl = urlForImage(artist.photo).width(900).height(900).fit('crop').auto('format').url();
+if (!artist) {
+  return Astro.redirect('/404');
+}
 
-const tierLabel: Record<Artist['tier'], string> = {
-  official: 'Official',
-  legacy: 'Legacy',
-};
+const enrichedDiscography = await enrichReleases(discography);
 
-const streamingLabels: Record<string, string> = {
-  spotify: 'Spotify',
-  appleMusic: 'Apple Music',
-  youtube: 'YouTube',
-  instagram: 'Instagram',
-};
-const streamingEntries = Object.entries(artist.streaming ?? {}).filter(([, url]) => Boolean(url));
-
+const photoUrl = urlForImage(artist.photo).width(1200).height(630).fit('crop').auto('format').url();
 const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
+const pageUrl = new URL(`/artists/${artist.slug}`, siteUrl).toString();
+
+const description =
+  artist.tagline && artist.bio
+    ? `${artist.tagline} ${artist.bio}`.slice(0, 160)
+    : artist.bio.slice(0, 160);
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'MusicGroup',
   name: artist.name,
   description: artist.bio,
   image: photoUrl,
-  url: new URL(`/artists/${artist.slug}`, siteUrl).toString(),
+  url: pageUrl,
+  genre: artist.genres,
   sameAs: Object.values(artist.streaming ?? {}).filter(Boolean),
 };
 ---
 
-<BaseLayout title={artist.name} description={artist.bio}>
+<BaseLayout title={artist.name} description={description} ogImage={photoUrl} ambientVariant="pulse">
   <JsonLd data={jsonLd} />
-  <section class="mx-auto max-w-6xl px-5 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-16">
-    <div class="grid gap-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] sm:items-start sm:gap-10">
-      <img
-        src={photoUrl}
-        alt={artist.photo.alt ?? artist.name}
-        class="aspect-square w-full max-w-md rounded-lg object-cover sm:max-w-none"
-      />
-      <div class="min-w-0">
-        <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-glow)]">
-          {tierLabel[artist.tier]}
-        </p>
-        <h1 class="text-h1 mt-2 break-words">{artist.name}</h1>
-        <p class="text-lead mt-4 max-w-xl text-paper/75 sm:mt-6">{artist.bio}</p>
-
-        {
-          streamingEntries.length > 0 && (
-            <div class="mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-3">
-              {streamingEntries.map(([key, url]) => (
-                <a
-                  href={url as string}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex min-h-10 items-center rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-paper transition hover:border-[var(--color-glow)] hover:text-[var(--color-glow)] sm:px-5 sm:py-2.5"
-                >
-                  {streamingLabels[key] ?? key}
-                </a>
-              ))}
-            </div>
-          )
-        }
-      </div>
-    </div>
-
-    {
-      discography.length > 0 && (
-        <div class="mt-14 sm:mt-20">
-          <h2 class="text-h3">Discography</h2>
-          <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-            {discography.map((release) => (
-              <ReleaseCard release={release} />
-            ))}
-          </div>
-        </div>
-      )
-    }
-  </section>
+  <ArtistProfileHero artist={artist} />
+  {artist.quote && <ArtistQuote quote={artist.quote} name={artist.name} />}
+  <ArtistDiscography releases={enrichedDiscography} artistName={artist.name} />
+  <ArtistExploreMore artists={allArtists} currentSlug={artist.slug} />
 </BaseLayout>
+
+<script>
+  import { initArtistProfile } from '../../lib/motion/artists/initProfile';
+
+  initArtistProfile();
+</script>

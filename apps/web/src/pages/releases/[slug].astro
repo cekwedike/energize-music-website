@@ -12,7 +12,9 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const release = await sanityClient.fetch<Release>(releaseBySlugQuery, { slug });
 
-const coverUrl = urlForImage(release.cover).width(1000).height(1000).fit('crop').auto('format').url();
+const coverUrl = release.cover
+  ? urlForImage(release.cover).width(1000).height(1000).fit('crop').auto('format').url()
+  : undefined;
 
 const typeLabel: Record<Release['type'], string> = {
   single: 'Single',
@@ -54,11 +56,19 @@ const jsonLd = {
   <JsonLd data={jsonLd} />
   <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
     <div class="grid gap-10 sm:grid-cols-[1fr_1.2fr] sm:items-start">
-      <img
-        src={coverUrl}
-        alt={release.cover.alt ?? release.title}
-        class="aspect-square w-full rounded-lg object-cover"
-      />
+      {
+        coverUrl ? (
+          <img
+            src={coverUrl}
+            alt={release.cover?.alt ?? release.title}
+            class="aspect-square w-full rounded-lg object-cover"
+          />
+        ) : (
+          <div class="flex aspect-square w-full items-center justify-center rounded-lg bg-white/[0.04] text-paper/40">
+            No cover available
+          </div>
+        )
+      }
       <div>
         <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
           {typeLabel[release.type]} &middot; {releaseDate}
