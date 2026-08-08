@@ -18,7 +18,9 @@ import {
   type Release,
 } from '@energize/shared';
 
-/** Build one static page per Sanity artist slug. New artists get a page on the next deploy. */
+/** Build one static page per Sanity artist slug. Production needs a rebuild for new slugs. */
+export const dynamicParams = true;
+
 export async function getStaticPaths() {
   const slugs = await sanityClient.fetch<{ slug: string }[]>(artistSlugsQuery);
   return slugs

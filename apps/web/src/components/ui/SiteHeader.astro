@@ -259,18 +259,31 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
     -webkit-backdrop-filter: blur(6px);
   }
 
-  .site-header--ambient.is-scrolled {
-    background: rgba(11, 11, 13, 0.72);
+  .site-header--overlay {
+    background: linear-gradient(180deg, rgba(11, 11, 13, 0.24) 0%, rgba(11, 11, 13, 0.04) 100%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .site-header--ambient.is-scrolled { background: rgba(11, 11, 13, 0.72); }
+  .site-header--overlay.is-scrolled { background: rgba(11, 11, 13, 0.82); }
+
+  .site-header--ambient.is-scrolled,
+  .site-header--overlay.is-scrolled {
     border-bottom-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   }
 
-  .site-header--ambient.is-menu-open {
+  .site-header--ambient.is-menu-open,
+  .site-header--overlay.is-menu-open {
     background: rgba(11, 11, 13, 0.96);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
   }
 
   .site-header--ambient .nav-link,
-  .site-header--ambient .site-header__logo {
+  .site-header--ambient .site-header__logo,
+  .site-header--overlay .nav-link,
+  .site-header--overlay .site-header__logo {
     text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
   }
 
@@ -281,36 +294,6 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
       0 8px 24px rgba(0, 0, 0, 0.2);
   }
 
-  .site-header--ambient.is-scrolled .nav-outline-group,
-  .site-header--ambient.is-menu-open .nav-outline-group {
-    background: rgba(255, 255, 255, 0.03);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 8px 24px rgba(0, 0, 0, 0.12);
-  }
-
-  .site-header--overlay {
-    background: linear-gradient(180deg, rgba(11, 11, 13, 0.24) 0%, rgba(11, 11, 13, 0.04) 100%);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-
-  .site-header--overlay.is-scrolled {
-    background: rgba(11, 11, 13, 0.82);
-    border-bottom-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-  }
-
-  .site-header--overlay.is-menu-open {
-    background: rgba(11, 11, 13, 0.96);
-    border-bottom-color: rgba(255, 255, 255, 0.08);
-  }
-
-  .site-header--overlay .nav-link,
-  .site-header--overlay .site-header__logo {
-    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
-  }
-
   .site-header--overlay .nav-outline-group {
     background: rgba(11, 11, 13, 0.28);
     box-shadow:
@@ -318,6 +301,8 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
       0 8px 24px rgba(0, 0, 0, 0.22);
   }
 
+  .site-header--ambient.is-scrolled .nav-outline-group,
+  .site-header--ambient.is-menu-open .nav-outline-group,
   .site-header--overlay.is-scrolled .nav-outline-group,
   .site-header--overlay.is-menu-open .nav-outline-group {
     background: rgba(255, 255, 255, 0.03);

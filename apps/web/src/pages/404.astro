@@ -1,8 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PagePlaceholder from '../components/ui/PagePlaceholder.astro';
+import NotFoundHero from '../components/ui/NotFoundHero.astro';
 ---
 
-<BaseLayout title="Page not found" description="The page you're looking for doesn't exist.">
-  <PagePlaceholder heading="404: Page not found" note="Try the navigation above to find your way." />
+<BaseLayout
+  title="Page not found"
+  description="This page isn't on the Energize Music roster. Head home, browse artists, or contact the team."
+  ambientVariant="editorial"
+>
+  <NotFoundHero />
 </BaseLayout>

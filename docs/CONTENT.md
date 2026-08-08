@@ -19,8 +19,8 @@
 ## Artists
 
 1. **Artist** → fill in name, slug, photo, bio (required), optional tagline, genres, streaming links
-2. **Publish** (not just Save). Draft changes do not appear on the site.
-3. Local dev: refresh the page. If content still looks old, restart `pnpm dev` (dev now bypasses the Sanity CDN).
+2. **Publish** (not just Save). Draft artists redirect to the 404 page because the site only reads published content.
+3. Local dev: new artist profile URLs usually work on first visit after publish. If `/artists/their-slug` still 404s, restart `pnpm dev` so static routes refresh.
 4. Production: run `pnpm build` and deploy, or push to `main` so CI rebuilds. Each published artist gets `/artists/their-slug` automatically.
 
 **Photo tips:** Use a portrait at least 1200px wide. TY Bello's first upload was 640×640, which can look soft when cropped large.

@@ -16,6 +16,7 @@ energize_label_website_a612350f.plan.md
 
 # Agent / Playwright screenshots (dev artifacts)
 **/.playwright-screenshots*/
+**/.playwright-artifacts*/
 nav-*.png
 *hero*-before.png
 *hero*-after.png
