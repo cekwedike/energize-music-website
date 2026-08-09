@@ -2,9 +2,11 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ReleaseCard from '../../components/releases/ReleaseCard.astro';
 import { sanityClient } from '../../lib/sanity/client';
+import { enrichReleases } from '../../lib/metadata/enrichReleases';
 import { allReleasesQuery, type Release } from '@energize/shared';
 
-const releases = await sanityClient.fetch<Release[]>(allReleasesQuery);
+const rawReleases = await sanityClient.fetch<Release[]>(allReleasesQuery);
+const releases = await enrichReleases(rawReleases);
 ---
 
 <BaseLayout

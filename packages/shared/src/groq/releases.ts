@@ -8,7 +8,7 @@ export const releaseCardFragment = /* groq */ `{
   type,
   releaseDate,
   cover${imageFragment},
-  artists[]->${artistCardFragment},
+  "artists": coalesce(artists[]->${artistCardFragment}, [])[defined(_id)],
   links,
   sourceUrl,
   featured
@@ -21,7 +21,7 @@ export const releaseDetailFragment = /* groq */ `{
   type,
   releaseDate,
   cover${imageFragment},
-  artists[]->${artistCardFragment},
+  "artists": coalesce(artists[]->${artistCardFragment}, [])[defined(_id)],
   links,
   sourceUrl
 }`;

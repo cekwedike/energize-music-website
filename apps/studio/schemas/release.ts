@@ -26,7 +26,7 @@ export default defineType({
       title: 'Primary streaming URL',
       type: 'url',
       description:
-        'Spotify, Apple Music, or YouTube link. Cover art and title can be fetched from this URL at build time if cover is missing.',
+        'Preferred Spotify, Apple Music, or YouTube link. If Cover is empty, the website pulls artwork from this URL (then falls back through Streaming links).',
     }),
     defineField({
       name: 'cover',
@@ -34,23 +34,40 @@ export default defineType({
       type: 'image',
       options: { hotspot: true },
       fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
+      description:
+        'Optional if a streaming URL is set. Leave empty to auto-pull cover art from the primary streaming URL / streaming links.',
       validation: (rule) =>
         rule.custom((cover, context) => {
-          const doc = context.document as { sourceUrl?: string } | undefined;
-          const hasSourceUrl = Boolean(doc?.sourceUrl?.trim());
+          const doc = context.document as {
+            sourceUrl?: string;
+            links?: { spotify?: string; appleMusic?: string; youtube?: string };
+          } | undefined;
+
+          const hasStreamingUrl = Boolean(
+            doc?.sourceUrl?.trim() ||
+              doc?.links?.spotify?.trim() ||
+              doc?.links?.appleMusic?.trim() ||
+              doc?.links?.youtube?.trim(),
+          );
 
           if (!cover) {
-            return hasSourceUrl || 'Add a cover image or a primary streaming URL.';
+            return (
+              hasStreamingUrl ||
+              'Add a cover image, or set a primary streaming URL / streaming link so artwork can be pulled automatically.'
+            );
           }
 
           const asset = (cover as { asset?: { _ref?: string } | null }).asset;
           if (!asset?._ref) {
-            return 'Cover upload incomplete. Re-upload the image or remove the cover field and use a primary streaming URL instead.';
+            return hasStreamingUrl
+              ? true
+              : 'Cover upload incomplete. Re-upload the image, or clear Cover and rely on a streaming URL.';
           }
 
           return true;
         }),
     }),
+
     defineField({
       name: 'artists',
       title: 'Artists',
@@ -63,12 +80,15 @@ export default defineType({
       name: 'links',
       title: 'Streaming links',
       type: 'object',
+      description:
+        'Used for play buttons on the site. Also used as cover-art fallbacks (Spotify first, then Apple Music, then YouTube) when Cover is empty.',
       fields: [
         defineField({ name: 'spotify', type: 'url', title: 'Spotify' }),
         defineField({ name: 'appleMusic', type: 'url', title: 'Apple Music' }),
         defineField({ name: 'youtube', type: 'url', title: 'YouTube' }),
       ],
     }),
+
     defineField({ name: 'featured', title: 'Featured on homepage', type: 'boolean', initialValue: false }),
   ],
   preview: {

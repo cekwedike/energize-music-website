@@ -1,5 +1,5 @@
 import type { StructureResolver } from 'sanity/structure';
-import { DocumentTextIcon, UsersIcon } from '@sanity/icons';
+import { DocumentIcon, DocumentTextIcon, UsersIcon } from '@sanity/icons';
 
 /** Document types with custom sidebar entries (hide auto-generated duplicates). */
 const HIDDEN_FROM_NAV = ['aboutPage', 'volunteerInfo', 'teamMember', 'page'];
@@ -12,6 +12,10 @@ export const structure: StructureResolver = (S) =>
         .title('About Page')
         .icon(DocumentTextIcon)
         .child(S.document().schemaType('aboutPage').documentId('aboutPage').title('About Page')),
+      S.listItem()
+        .title('Pages')
+        .icon(DocumentIcon)
+        .child(S.documentTypeList('page').title('Pages')),
       S.listItem()
         .title('Team Members')
         .icon(UsersIcon)

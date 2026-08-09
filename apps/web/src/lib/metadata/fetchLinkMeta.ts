@@ -97,6 +97,35 @@ async function fetchOpenGraph(url: string, timeoutMs: number): Promise<LinkMeta 
   return meta.title || meta.thumbnailUrl ? meta : null;
 }
 
+/** Normalize storefront URLs so oEmbed endpoints accept them more reliably. */
+export function normalizeStreamingUrl(url: string): string {
+  try {
+    const parsed = new URL(url.trim());
+    const host = parsed.hostname.replace(/^www\./, '');
+
+    // Apple Music oEmbed often 404s on less-common storefronts (e.g. /rw/).
+    // Prefer the US storefront path while keeping the rest of the URL.
+    if (host === 'music.apple.com') {
+      const parts = parsed.pathname.split('/').filter(Boolean);
+      if (parts.length >= 2 && /^[a-z]{2}$/i.test(parts[0]) && parts[0].toLowerCase() !== 'us') {
+        parts[0] = 'us';
+        parsed.pathname = `/${parts.join('/')}`;
+      }
+      return parsed.toString();
+    }
+
+    // Spotify share URLs with ?si= work, but strip tracking noise for cache friendliness.
+    if (host === 'open.spotify.com') {
+      parsed.searchParams.delete('si');
+      return parsed.toString();
+    }
+
+    return parsed.toString();
+  } catch {
+    return url.trim();
+  }
+}
+
 function resolveOEmbedEndpoint(url: string): string | null {
   try {
     const parsed = new URL(url);
@@ -104,7 +133,7 @@ function resolveOEmbedEndpoint(url: string): string | null {
 
     if (host === 'open.spotify.com') return `https://open.spotify.com/oembed?url=`;
     if (host === 'music.apple.com') return `https://music.apple.com/oembed?url=`;
-    if (host === 'youtube.com' || host === 'youtu.be' || host === 'www.youtube.com') {
+    if (host === 'youtube.com' || host === 'youtu.be' || host === 'm.youtube.com') {
       return `https://www.youtube.com/oembed?format=json&url=`;
     }
   } catch {
@@ -115,7 +144,7 @@ function resolveOEmbedEndpoint(url: string): string | null {
 }
 
 /**
- * Fetch link metadata at build time via oEmbed or Open Graph tags.
+ * Fetch link metadata at build/dev time via oEmbed or Open Graph tags.
  * Returns partial metadata; callers should fall back to Sanity fields.
  */
 export async function fetchLinkMeta(
@@ -124,14 +153,16 @@ export async function fetchLinkMeta(
 ): Promise<LinkMeta | null> {
   if (!url?.trim()) return null;
 
+  const normalized = normalizeStreamingUrl(url);
+
   try {
-    const oembedEndpoint = resolveOEmbedEndpoint(url);
+    const oembedEndpoint = resolveOEmbedEndpoint(normalized);
     if (oembedEndpoint) {
-      const oembedMeta = await fetchOEmbed(oembedEndpoint, url, timeoutMs);
+      const oembedMeta = await fetchOEmbed(oembedEndpoint, normalized, timeoutMs);
       if (oembedMeta?.title || oembedMeta?.thumbnailUrl) return oembedMeta;
     }
 
-    return await fetchOpenGraph(url, timeoutMs);
+    return await fetchOpenGraph(normalized, timeoutMs);
   } catch {
     return null;
   }

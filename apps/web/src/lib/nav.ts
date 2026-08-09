@@ -7,12 +7,16 @@ export interface NavLink {
 export const primaryNav: NavLink[] = [
   { label: 'About Us', href: '/about' },
   { label: 'Artists', href: '/artists' },
+  { label: 'Releases', href: '/releases' },
   { label: 'Blogs', href: '/blogs' },
   { label: 'Careers', href: '/careers' },
   { label: 'Contact', href: '/contact' },
 ];
 
 export const secondaryNav: NavLink[] = [
+  { label: 'Energize Kids', href: '/energize-kids' },
+  { label: 'NEXT', href: '/next' },
+  { label: 'Energize Fest', href: '/energize-fest' },
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
 ];

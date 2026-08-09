@@ -19,7 +19,17 @@ This project’s Studio only uses Structure + Vision tools. The toast comes from
 3. Toggle **Featured on homepage** if it should appear in New music
 4. **Publish** (not just Save). Draft releases are invisible on the site.
 5. Rebuild and deploy the site (`pnpm build`, then upload `apps/web/dist/`). The live WordPress site at energize-music.com does not read Sanity until the Astro rebuild is deployed.
-6. Local dev: new release URLs usually work on first visit after publish. If `/releases/their-slug` still 404s, restart `pnpm dev`.
+6. Local dev: hard-refresh the page after publish (`Ctrl+Shift+R`). If artists or cover still look stale, restart `pnpm dev`.
+7. Cover art: optional. If Cover is empty (or incomplete), the site auto-pulls artwork from **Primary streaming URL**, then Spotify → Apple Music → YouTube links, at build/dev time for `/releases`, release detail, and artist discography.
+
+## Privacy and Terms pages
+
+1. Studio → **Pages**
+2. Create or edit documents with slug `privacy` and `terms`
+3. Write content with Heading 2 / Heading 3 styles for sections
+4. **Publish**, then hard-refresh `/privacy` and `/terms` locally (rebuild for production)
+
+Seed starter copy once with: `pnpm --filter @energize/studio seed:legal`
 
 ## Publish news
 

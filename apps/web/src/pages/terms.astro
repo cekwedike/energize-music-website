@@ -1,16 +1,13 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHero from '../components/ui/PageHero.astro';
+import LegalPage from '../components/legal/LegalPage.astro';
+import { sanityClient } from '../lib/sanity/client';
+import { termsFallbackBlocks } from '../lib/legal/fallbackContent';
+import { pageBySlugQuery, type Page } from '@energize/shared';
+
+const page = await sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'terms' });
+const blocks = page?.blocks?.length ? page.blocks : termsFallbackBlocks;
+const title = page?.title ?? 'Terms of Service';
+const description = 'Terms governing use of Energize Music websites, content, and related digital services.';
 ---
 
-<BaseLayout title="Terms of Service" description="Energize Music terms of service.">
-  <PageHero
-    size="slim"
-    title="Terms of Service"
-    description="The terms governing use of Energize Music websites and services."
-  />
-
-  <section class="mx-auto max-w-3xl px-5 pb-16 pt-10 sm:px-6 sm:pb-24 sm:pt-12">
-    <p class="text-paper/60">Full terms content wires up in Phase 2.</p>
-  </section>
-</BaseLayout>
+<LegalPage title={title} description={description} blocks={blocks} eyebrow="Terms" />

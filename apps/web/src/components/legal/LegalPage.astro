@@ -1,0 +1,193 @@
+---
+import type { PortableTextBlock } from '@energize/shared';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../ui/PageHero.astro';
+import PortableText from '../portable/PortableText.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  blocks: PortableTextBlock[];
+  eyebrow?: string;
+}
+
+const { title, description, blocks, eyebrow = 'Legal' } = Astro.props;
+const updated = new Date().toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={title} description={description} ambientVariant="editorial">
+  <PageHero size="slim" eyebrow={eyebrow} title={title} description={description} />
+
+  <section class="legal-page">
+    <div class="legal-page__shell mx-auto max-w-6xl px-5 pb-20 pt-10 sm:px-6 sm:pb-28 sm:pt-14">
+      <div class="legal-page__layout">
+        <aside class="legal-page__rail" aria-hidden="true">
+          <p class="legal-page__rail-label">Energize Music</p>
+          <p class="legal-page__rail-meta">{eyebrow}</p>
+        </aside>
+
+        <article class="legal-page__article">
+          <p class="legal-page__updated">Effective {updated}</p>
+          <div class="legal-page__prose">
+            <PortableText value={blocks} />
+          </div>
+          <footer class="legal-page__footer">
+            <p>
+              Questions about this page?
+              <a href="/contact">Contact Energize Music</a>.
+            </p>
+          </footer>
+        </article>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal-page {
+    position: relative;
+  }
+
+  .legal-page__layout {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .legal-page__layout {
+      grid-template-columns: 11rem minmax(0, 42rem);
+      gap: 3.5rem;
+      justify-content: center;
+    }
+  }
+
+  .legal-page__rail {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .legal-page__rail {
+      display: block;
+      padding-top: 0.35rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  .legal-page__rail-label {
+    margin: 1rem 0 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(245, 242, 234, 0.42);
+  }
+
+  .legal-page__rail-meta {
+    margin: 0.55rem 0 0;
+    font-family: var(--font-display, Georgia, serif);
+    font-size: 1.35rem;
+    line-height: 1.15;
+    color: var(--color-glow);
+  }
+
+  .legal-page__article {
+    min-width: 0;
+  }
+
+  .legal-page__updated {
+    margin: 0 0 1.75rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(245, 242, 234, 0.45);
+  }
+
+  .legal-page__prose :global(h2) {
+    margin: 2.5rem 0 0.85rem;
+    font-family: var(--font-display, Georgia, serif);
+    font-size: clamp(1.5rem, 1.25rem + 0.8vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--color-paper, #f5f2ea);
+  }
+
+  .legal-page__prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .legal-page__prose :global(h3) {
+    margin: 1.75rem 0 0.65rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .legal-page__prose :global(p) {
+    margin: 0.85rem 0 0;
+    font-size: clamp(1rem, 0.96rem + 0.2vw, 1.1rem);
+    line-height: 1.75;
+    color: rgba(245, 242, 234, 0.78);
+  }
+
+  .legal-page__prose :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .legal-page__prose :global(ul),
+  .legal-page__prose :global(ol) {
+    margin: 0.85rem 0 0;
+    padding-left: 1.25rem;
+    color: rgba(245, 242, 234, 0.78);
+  }
+
+  .legal-page__prose :global(li) {
+    margin-top: 0.45rem;
+    line-height: 1.65;
+  }
+
+  .legal-page__prose :global(blockquote) {
+    margin: 1.5rem 0 0;
+    padding: 0.85rem 0 0.85rem 1.1rem;
+    border-left: 2px solid var(--color-glow);
+    color: rgba(245, 242, 234, 0.7);
+    font-style: italic;
+  }
+
+  .legal-page__prose :global(a) {
+    color: var(--color-paper, #f5f2ea);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.18em;
+  }
+
+  .legal-page__prose :global(a:hover) {
+    color: var(--color-accent);
+  }
+
+  .legal-page__footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(245, 242, 234, 0.55);
+  }
+
+  .legal-page__footer a {
+    color: var(--color-paper, #f5f2ea);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.18em;
+  }
+
+  .legal-page__footer a:hover {
+    color: var(--color-accent);
+  }
+</style>

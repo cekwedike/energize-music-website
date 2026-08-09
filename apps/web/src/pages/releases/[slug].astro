@@ -17,6 +17,9 @@ const { slug } = Astro.params;
 const release = await sanityClient.fetch<Release>(releaseBySlugQuery, { slug });
 const enriched = await enrichRelease(release);
 const coverUrl = enriched.coverUrl;
+const artists = (release.artists ?? []).filter(
+  (artist): artist is NonNullable<typeof artist> => Boolean(artist?._id && artist.slug && artist.name),
+);
 
 const typeLabel: Record<Release['type'], string> = {
   single: 'Single',
@@ -47,7 +50,7 @@ const jsonLd = {
   image: coverUrl,
   datePublished: release.releaseDate,
   url: new URL(`/releases/${release.slug}`, siteUrl).toString(),
-  byArtist: release.artists.map((artist) => ({
+  byArtist: artists.map((artist) => ({
     '@type': 'MusicGroup',
     name: artist.name,
     url: new URL(`/artists/${artist.slug}`, siteUrl).toString(),
@@ -79,14 +82,14 @@ const jsonLd = {
         <h1 class="text-h1 mt-2">{release.title}</h1>
 
         {
-          release.artists.length > 0 && (
+          artists.length > 0 && (
             <p class="text-lead mt-4 text-paper/75">
-              {release.artists.map((artist, index) => (
+              {artists.map((artist, index) => (
                 <>
                   <a href={`/artists/${artist.slug}`} class="underline decoration-[var(--color-accent)] underline-offset-4 hover:text-[var(--color-accent)]">
                     {artist.name}
                   </a>
-                  {index < release.artists.length - 1 && ', '}
+                  {index < artists.length - 1 && ', '}
                 </>
               ))}
             </p>
