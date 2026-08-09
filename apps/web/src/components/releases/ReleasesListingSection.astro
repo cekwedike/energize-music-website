@@ -27,18 +27,19 @@ function artistPhotoUrl(
       Releases will appear here once you add them in Sanity Studio.
     </p>
   ) : (
-    <div class="releases-listing" data-releases-listing data-filter-active="all">
-      <div class="releases-listing__filters-wrap">
-        <div
-          class="releases-listing__filters"
-          role="toolbar"
-          aria-label="Filter releases by artist"
-        >
+    <div class="releases-listing" data-releases-listing data-filter-active="all" data-view-mode="list">
+      <div class="releases-listing__toolbar">
+        <div class="releases-listing__filters-wrap">
+          <div
+            class="releases-listing__filters"
+            role="toolbar"
+            aria-label="Filter releases by artist"
+          >
           <button
             type="button"
             class="releases-filter__pill"
             data-releases-filter
-            data-releases-filter="all"
+            data-filter-slug="all"
             aria-current="true"
           >
             <span>All</span>
@@ -51,7 +52,7 @@ function artistPhotoUrl(
                   type="button"
                   class="releases-filter__pill"
                   data-releases-filter
-                  data-releases-filter={group.slug}
+                  data-filter-slug={group.slug}
                   aria-current="false"
                 >
                   {
@@ -73,6 +74,34 @@ function artistPhotoUrl(
             })
           }
         </div>
+        </div>
+
+        <div class="releases-listing__view-modes" role="group" aria-label="Release view mode">
+          <button
+            type="button"
+            class="releases-view__btn"
+            data-releases-view="grid"
+            aria-pressed="false"
+          >
+            Grid
+          </button>
+          <button
+            type="button"
+            class="releases-view__btn"
+            data-releases-view="list"
+            aria-pressed="true"
+          >
+            List
+          </button>
+          <button
+            type="button"
+            class="releases-view__btn"
+            data-releases-view="compact"
+            aria-pressed="false"
+          >
+            Compact
+          </button>
+        </div>
       </div>
 
       <div class="releases-listing__stages">
@@ -82,6 +111,43 @@ function artistPhotoUrl(
           ))
         }
       </div>
+
+      <script is:inline>
+        {
+          `(function () {
+            var root = document.querySelector('[data-releases-listing]');
+            if (!root) return;
+            var storageKey = 'energize-releases-view-mode';
+            var mode = null;
+            try {
+              mode = sessionStorage.getItem(storageKey);
+            } catch (e) {}
+            if (mode !== 'grid' && mode !== 'list' && mode !== 'compact') {
+              mode = window.matchMedia('(max-width: 1023px)').matches ? 'list' : 'grid';
+            }
+            function applyViewMode(nextMode) {
+              root.setAttribute('data-view-mode', nextMode);
+              root.querySelectorAll('[data-releases-view]').forEach(function (btn) {
+                btn.setAttribute(
+                  'aria-pressed',
+                  btn.getAttribute('data-releases-view') === nextMode ? 'true' : 'false',
+                );
+              });
+            }
+            applyViewMode(mode);
+            root.querySelectorAll('[data-releases-view]').forEach(function (btn) {
+              btn.addEventListener('click', function () {
+                var nextMode = btn.getAttribute('data-releases-view');
+                if (nextMode !== 'grid' && nextMode !== 'list' && nextMode !== 'compact') return;
+                try {
+                  sessionStorage.setItem(storageKey, nextMode);
+                } catch (e) {}
+                applyViewMode(nextMode);
+              });
+            });
+          })();`
+        }
+      </script>
 
       <ReleasesListingMotion client:load />
     </div>
@@ -93,10 +159,27 @@ function artistPhotoUrl(
     margin: 0;
   }
 
-  .releases-listing__filters-wrap {
-    margin-bottom: clamp(2rem, 4.5vw, 3rem);
+  .releases-listing__toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+  }
+
+  @media (min-width: 1024px) {
+    .releases-listing__toolbar {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+  }
+
+  .releases-listing__filters-wrap {
+    min-width: 0;
+    flex: 1;
   }
 
   .releases-listing__filters {
@@ -192,10 +275,389 @@ function artistPhotoUrl(
     z-index: 1;
   }
 
+  .releases-listing__view-modes {
+    display: none;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  @media (min-width: 1024px) {
+    .releases-listing__view-modes {
+      display: inline-flex;
+    }
+  }
+
+  .releases-view__btn {
+    min-height: 2.25rem;
+    padding: 0.375rem 0.875rem;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.55);
+    cursor: pointer;
+    transition:
+      color 0.2s ease,
+      background 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .releases-view__btn:hover,
+  .releases-view__btn:focus-visible {
+    color: var(--color-paper);
+  }
+
+  .releases-view__btn[aria-pressed='true'] {
+    color: var(--color-paper);
+    background: rgba(77, 168, 255, 0.14);
+    box-shadow: 0 0 12px rgba(77, 168, 255, 0.18);
+  }
+
+  /* View mode styles use :global() so they reach child Astro components. */
+
+  .releases-listing {
+    --catalog-scroll-gap: clamp(0.75rem, 2vw, 1rem);
+  }
+
+  .releases-listing :global(.catalog-card__artist),
+  .releases-listing :global(.catalog-card__listen) {
+    display: none;
+  }
+
+  /* Mobile and tablet default to list: stacked rows with thumbnails. */
+  @media (max-width: 1023px) {
+    .releases-listing[data-view-mode='list'] :global(.artist-stage__catalog-row) {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.artist-stage__catalog-row > li) {
+      width: 100%;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card) {
+      display: grid;
+      grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+      gap: 0.75rem 0.875rem;
+      align-items: center;
+      padding: 0.625rem 0.75rem;
+      border-radius: 0.875rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card:hover) {
+      transform: none;
+      border-color: rgba(77, 168, 255, 0.28);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__cover) {
+      display: block;
+      width: 3.5rem;
+      border-radius: 0.5rem;
+      grid-row: 1 / span 2;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__meta) {
+      display: block;
+      margin-top: 0;
+      padding-bottom: 0;
+      grid-column: 2;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__meta::after) {
+      display: none;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__title) {
+      font-size: 0.9375rem;
+      -webkit-line-clamp: 1;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__artist) {
+      display: block;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__type) {
+      margin-top: 0.2rem;
+      font-size: 0.6875rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__listen) {
+      display: inline-flex;
+      grid-column: 3;
+      grid-row: 1 / span 2;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.artist-stage__catalog-row) {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.artist-stage__catalog-row > li) {
+      width: 100%;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card) {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      padding: 0.375rem 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid transparent;
+      background: transparent;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card:hover) {
+      transform: none;
+      border-color: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__cover) {
+      display: none;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__meta) {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.375rem 0.625rem;
+      margin-top: 0;
+      padding-bottom: 0;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__meta::after) {
+      display: none;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__title) {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      -webkit-line-clamp: 1;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__type) {
+      margin-top: 0;
+      font-size: 0.625rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .releases-listing[data-view-mode='list'] :global(.artist-stage__catalog-row) {
+      gap: 0.375rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card) {
+      grid-template-columns: 3rem minmax(0, 1fr) auto;
+      gap: 0.5rem 0.625rem;
+      padding: 0.5rem 0.625rem;
+      border-radius: 0.75rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__cover) {
+      width: 3rem;
+      border-radius: 0.4375rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__title) {
+      font-size: 0.875rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__artist) {
+      margin-top: 0.125rem;
+      font-size: 0.75rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__type) {
+      margin-top: 0.125rem;
+      font-size: 0.625rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__listen) {
+      padding: 0.3125rem 0.5625rem;
+      font-size: 0.5625rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .releases-listing[data-view-mode='grid'] :global(.artist-stage__catalog-row) {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: clamp(0.875rem, 1.5vw, 1.125rem);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 0.35rem;
+      align-items: flex-start;
+    }
+
+    .releases-listing[data-view-mode='grid'] :global(.artist-stage__catalog-row::-webkit-scrollbar) {
+      display: none;
+    }
+
+    .releases-listing[data-view-mode='grid'] :global(.artist-stage__catalog-row > li) {
+      flex: 0 0 clamp(180px, 12vw, 208px);
+      scroll-snap-align: start;
+    }
+
+  .releases-listing[data-view-mode='grid'] :global(.catalog-card) {
+    display: block;
+  }
+
+  .releases-listing[data-view-mode='list'] :global(.artist-stage__catalog-row) {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.artist-stage__catalog-row > li) {
+      width: 100%;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card) {
+      display: grid;
+      grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+      gap: 0.75rem 0.875rem;
+      align-items: center;
+      padding: 0.625rem 0.75rem;
+      border-radius: 0.875rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card:hover) {
+      transform: none;
+      border-color: rgba(77, 168, 255, 0.28);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__cover) {
+      width: 3.5rem;
+      border-radius: 0.5rem;
+      grid-row: 1 / span 2;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__meta) {
+      margin-top: 0;
+      padding-bottom: 0;
+      grid-column: 2;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__meta::after) {
+      display: none;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__title) {
+      font-size: 0.9375rem;
+      -webkit-line-clamp: 1;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__artist) {
+      display: block;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__type) {
+      margin-top: 0.2rem;
+      font-size: 0.6875rem;
+    }
+
+    .releases-listing[data-view-mode='list'] :global(.catalog-card__listen) {
+      display: inline-flex;
+      grid-column: 3;
+      grid-row: 1 / span 2;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.artist-stage__catalog-row) {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.artist-stage__catalog-row > li) {
+      width: 100%;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card) {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      padding: 0.375rem 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid transparent;
+      background: transparent;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card:hover) {
+      transform: none;
+      border-color: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__cover) {
+      display: none;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__meta) {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.375rem 0.625rem;
+      margin-top: 0;
+      padding-bottom: 0;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__meta::after) {
+      display: none;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__title) {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      -webkit-line-clamp: 1;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__artist),
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__listen) {
+      display: none;
+    }
+
+    .releases-listing[data-view-mode='compact'] :global(.catalog-card__type) {
+      margin-top: 0;
+      font-size: 0.625rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+  }
+
   .releases-listing__stages {
     display: flex;
     flex-direction: column;
-    gap: clamp(3.5rem, 8vw, 5.5rem);
+    gap: clamp(2.5rem, 5vw, 3.5rem);
   }
 
   .releases-listing[data-filter-active]:not([data-filter-active='all']) .releases-listing__stages {

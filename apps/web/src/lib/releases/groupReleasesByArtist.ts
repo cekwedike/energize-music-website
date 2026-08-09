@@ -10,6 +10,9 @@ export interface GroupedArtistReleases {
   latestReleaseDate: string;
 }
 
+/** Max releases shown per artist on the releases listing page. */
+export const MAX_RELEASES_PER_ARTIST_LISTING = 20;
+
 export function groupReleasesByArtist(releases: EnrichedRelease[]): GroupedArtistReleases[] {
   const map = new Map<string, GroupedArtistReleases>();
 
@@ -45,9 +48,11 @@ export function groupReleasesByArtist(releases: EnrichedRelease[]): GroupedArtis
     .filter((group) => group.releases.length > 0)
     .map((group) => ({
       ...group,
-      releases: [...group.releases].sort(
-        (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
-      ),
+      releases: [...group.releases]
+        .sort(
+          (a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime(),
+        )
+        .slice(0, MAX_RELEASES_PER_ARTIST_LISTING),
     }))
     .sort(
       (a, b) => new Date(b.latestReleaseDate).getTime() - new Date(a.latestReleaseDate).getTime(),

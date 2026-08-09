@@ -27,7 +27,7 @@ const slideCount = values.length;
 ---
 
 <section
-  class="about-values-section border-b border-white/10 bg-[var(--color-ink)]"
+  class="about-values-section overflow-x-clip border-b border-white/10 bg-[var(--color-ink)]"
   aria-labelledby="about-values-heading"
   style={`--slide-count: ${slideCount}`}
 >
@@ -462,21 +462,70 @@ const slideCount = values.length;
   /* Mobile & tablet: horizontal swipe snap */
   @media (max-width: 1023px) {
     .about-values-viewport {
-      height: 100svh;
-      min-height: 100svh;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      min-height: 0;
+      margin-inline: 0;
+      overflow: hidden;
+    }
+
+    .about-value-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
     }
 
     .about-value-slide__watermark {
-      font-size: clamp(3.5rem, 1.5rem + 10vw, 6rem);
-      top: clamp(3.5rem, 8vh, 5rem);
+      font-size: clamp(3rem, 1.25rem + 9vw, 5.5rem);
+      top: clamp(3rem, 7vh, 4.5rem);
+      max-width: calc(100% - 2rem);
+      overflow: hidden;
     }
 
     .about-value-slide__layout {
-      padding-bottom: clamp(6rem, 14vh, 8rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 0.875rem;
+      height: auto;
+      min-height: 0;
+      padding-top: clamp(2.75rem, 7vh, 3.75rem);
+      padding-bottom: clamp(4.5rem, 10vh, 5.5rem);
+    }
+
+    .about-value-slide__frame {
+      flex: 0 0 auto;
+      width: 100%;
+      height: clamp(9rem, 28svh, 12.5rem);
+      min-height: 8.5rem;
+      max-height: 32svh;
+    }
+
+    .about-value-slide__diagonal {
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      transform: rotate(-6deg);
+      transform-origin: left bottom;
     }
 
     .about-value-slide__content {
-      margin-top: -2rem;
+      flex: 0 0 auto;
+      margin-top: 0;
+      padding-inline: 0;
+      z-index: 2;
+    }
+
+    .about-value-slide__glass {
+      overflow: visible;
+    }
+
+    .about-values-sticky {
+      height: auto;
+      min-height: 0;
     }
 
     .about-values-track {
@@ -493,11 +542,6 @@ const slideCount = values.length;
       display: none;
     }
 
-    .about-value-slide {
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-    }
-
     .about-values-scroll-hint span:first-child {
       display: none;
     }
@@ -506,8 +550,85 @@ const slideCount = values.length;
       transform: rotate(-90deg);
     }
 
+    .about-values-nav {
+      bottom: max(1rem, env(safe-area-inset-bottom, 0px) + 0.75rem);
+      left: 50%;
+      width: max-content;
+      max-width: calc(100% - 1.5rem);
+      gap: 0.375rem;
+      padding: 0.375rem 0.5rem;
+    }
+
     .about-values-nav__item {
       cursor: pointer;
+      min-height: 2.75rem;
+      padding: 0.5rem 0.625rem;
+    }
+
+    .about-values-nav__label {
+      font-size: 0.5625rem;
+      letter-spacing: 0.12em;
+    }
+  }
+
+  /* Mobile: tighter spacing and smaller image frame */
+  @media (max-width: 639px) {
+    .about-value-slide__watermark {
+      font-size: clamp(2.5rem, 1rem + 11vw, 3.75rem);
+      top: clamp(2.75rem, 6vh, 3.5rem);
+    }
+
+    .about-value-slide__layout {
+      gap: 0.75rem;
+      padding-top: clamp(2.5rem, 6vh, 3.25rem);
+      padding-bottom: clamp(4rem, 9vh, 5rem);
+    }
+
+    .about-value-slide__frame {
+      height: clamp(8rem, 26svh, 11rem);
+      min-height: 7.5rem;
+      max-height: 30svh;
+    }
+
+    .about-value-slide__glass {
+      padding: 1rem 1.125rem;
+    }
+
+    .about-value-slide__title {
+      font-size: clamp(1.375rem, 1.1rem + 1vw, 1.625rem);
+    }
+
+    .about-values-nav {
+      max-width: calc(100% - 1rem);
+      gap: 0.25rem;
+      padding: 0.3125rem 0.375rem;
+    }
+
+    .about-values-nav__item {
+      gap: 0.25rem;
+      padding: 0.4375rem 0.5rem;
+    }
+  }
+
+  /* Tablet: slightly taller image frame and roomier nav */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .about-value-slide__frame {
+      height: clamp(10rem, 32svh, 14.5rem);
+      max-height: 36svh;
+    }
+
+    .about-value-slide__layout {
+      gap: 0.875rem;
+      padding-bottom: clamp(4.5rem, 10vh, 6rem);
+    }
+
+    .about-values-nav {
+      gap: 0.625rem;
+      padding: 0.4375rem 0.75rem;
+    }
+
+    .about-values-nav__label {
+      font-size: 0.625rem;
     }
   }
 

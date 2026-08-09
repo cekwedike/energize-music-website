@@ -6,6 +6,7 @@ import teamMember from './teamMember';
 import aboutPage from './aboutPage';
 import volunteerInfo from './volunteerInfo';
 import page from './page';
+import releasesPage from './releasesPage';
 
 export const schemaTypes = [
   artist,
@@ -16,4 +17,5 @@ export const schemaTypes = [
   aboutPage,
   volunteerInfo,
   page,
+  releasesPage,
 ];

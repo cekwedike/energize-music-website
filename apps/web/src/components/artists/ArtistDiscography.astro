@@ -24,17 +24,21 @@ const sorted = [...releases].sort(
 {
   sorted.length > 0 && (
     <section class="discography mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20" aria-labelledby="discography-heading">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
+      <div class="discography__header">
+        <div class="discography__intro">
           <h2 id="discography-heading" class="font-display text-2xl text-paper sm:text-3xl">
             Discography
           </h2>
           <p class="mt-2 text-sm text-paper/50">Releases by {artistName}</p>
         </div>
-        <EditorialSectionLink href="/releases" label="View All Releases" />
+        <EditorialSectionLink
+          href="/releases"
+          label="View All Releases"
+          class="discography__cta"
+        />
       </div>
 
-      <ul class="discography__grid mt-8">
+      <ul class="discography__row">
         {
           sorted.map((release) => {
             const year = new Date(release.releaseDate).getFullYear();
@@ -44,7 +48,7 @@ const sorted = [...releases].sort(
               release.artistNames.length > 0 ? release.artistNames.join(', ') : artistName;
 
             return (
-              <li>
+              <li class="discography__item">
                 <a
                   href={href}
                   class="discography__card group"
@@ -84,31 +88,85 @@ const sorted = [...releases].sort(
 }
 
 <style>
-  .discography__grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .discography__header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     gap: 1rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
   }
 
-  @media (min-width: 640px) {
-    .discography__grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+  @media (max-width: 1023px) {
+    .discography__header {
       gap: 1.25rem;
     }
   }
 
-  @media (min-width: 1024px) {
-    .discography__grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+  @media (min-width: 640px) {
+    .discography__header {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1.25rem;
     }
   }
 
-  @media (min-width: 1280px) {
-    .discography__grid {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+  .discography__intro {
+    min-width: 0;
+  }
+
+  :global(.discography__cta) {
+    width: 100%;
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+
+  @media (min-width: 640px) {
+    :global(.discography__cta) {
+      width: auto;
+      flex-shrink: 0;
+    }
+  }
+
+  .discography__row {
+    display: flex;
+    gap: 0.875rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    list-style: none;
+    padding: 0 0 0.35rem;
+    margin-inline: 0;
+    margin-bottom: 0;
+    margin-top: 2.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .discography__row {
+      margin-top: 2rem;
+    }
+  }
+
+  .discography__row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .discography__item {
+    flex: 0 0 clamp(140px, 38vw, 168px);
+    scroll-snap-align: start;
+  }
+
+  @media (min-width: 640px) {
+    .discography__item {
+      flex-basis: clamp(156px, 20vw, 180px);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .discography__item {
+      flex-basis: clamp(168px, 12vw, 200px);
     }
   }
 

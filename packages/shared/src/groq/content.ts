@@ -1,7 +1,13 @@
 import { imageFragment } from './fragments';
+import { releaseCardFragment } from './releases';
 
 export const allNewsQuery = /* groq */ `*[_type == "newsPost"] | order(date desc){
   _id, title, "slug": slug.current, date, cover${imageFragment}, tags
+}`;
+
+export const allNewsListQuery = /* groq */ `*[_type == "newsPost"] | order(date desc){
+  _id, title, "slug": slug.current, date, cover${imageFragment}, tags,
+  "excerpt": pt::text(body)
 }`;
 
 export const newsBySlugQuery = /* groq */ `*[_type == "newsPost" && slug.current == $slug][0]{
@@ -26,4 +32,9 @@ export const allTeamMembersQuery = /* groq */ `*[_type == "teamMember" && define
 
 export const volunteerInfoQuery = /* groq */ `*[_type == "volunteerInfo"][0]{
   heading, intro, roleOptions, platforms, signupUrl, ctaLabel
+}`;
+
+export const releasesPageQuery = /* groq */ `*[_id == "releasesPage"][0]{
+  _id,
+  "releaseSpotlights": releaseSpotlights[]->${releaseCardFragment}
 }`;

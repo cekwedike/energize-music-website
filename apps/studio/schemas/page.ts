@@ -2,8 +2,10 @@ import { defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'page',
-  title: 'Page',
+  title: 'Important Pages',
   type: 'document',
+  description:
+    'Legal and utility pages such as Terms, Privacy, and other slug-based routes. For the main About experience, edit the About Page singleton instead.',
   fields: [
     defineField({ name: 'title', title: 'Title', type: 'string', validation: (r) => r.required() }),
     defineField({

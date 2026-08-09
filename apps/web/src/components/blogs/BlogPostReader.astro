@@ -1,74 +1,271 @@
 ---
-import type { NewsPost } from '@energize/shared';
+import type { NewsPost, PortableTextBlock } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
+
+interface RelatedPost {
+  title: string;
+  slug: string;
+  dateLabel: string;
+  readMinutes: number;
+  coverUrl: string;
+  category: string;
+}
 
 interface Props {
   post: NewsPost;
   coverUrl: string;
-  date: string;
+  publishedLabel: string;
+  readMinutes: number;
+  lead: string | null;
+  body: PortableTextBlock[];
+  shareUrl: string;
+  category: string;
+  related?: RelatedPost[];
 }
 
-const { post, coverUrl, date } = Astro.props;
+const {
+  post,
+  coverUrl,
+  publishedLabel,
+  readMinutes,
+  lead,
+  body,
+  shareUrl,
+  category,
+  related = [],
+} = Astro.props;
+
+const encodedUrl = encodeURIComponent(shareUrl);
+const encodedTitle = encodeURIComponent(post.title);
+const shareLinks = [
+  {
+    label: 'X',
+    href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+    icon: 'x',
+  },
+  {
+    label: 'Facebook',
+    href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+    icon: 'facebook',
+  },
+  {
+    label: 'LinkedIn',
+    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    icon: 'linkedin',
+  },
+] as const;
 ---
 
-<article class="zine-reader" data-zine-reader>
-  <div class="zine-reader__progress" aria-hidden="true">
-    <div class="zine-reader__progress-fill" data-read-progress></div>
+<article class="dispatch" data-blog-dispatch data-zine-reader>
+  <div class="dispatch__progress" aria-hidden="true">
+    <div class="dispatch__progress-fill" data-read-progress></div>
   </div>
 
-  <header class="zine-reader__hero">
-    <div class="zine-reader__hero-bg" aria-hidden="true">
-      <img src={coverUrl} alt="" class="zine-reader__hero-img" />
-      <div class="zine-reader__hero-mask"></div>
+  <header class="dispatch__hero" data-dispatch-hero>
+    <div class="dispatch__hero-media" aria-hidden="true">
+      <img
+        src={coverUrl}
+        alt=""
+        class="dispatch__hero-img"
+        width="1920"
+        height="1080"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+      />
+      <div class="dispatch__hero-shade"></div>
+      <div class="dispatch__hero-grain"></div>
+      <div class="dispatch__hero-glow"></div>
     </div>
 
-    <div class="zine-reader__hero-content mx-auto max-w-4xl px-5 pt-32 pb-16 sm:px-6 sm:pt-40 sm:pb-24">
-      <a href="/blogs" class="zine-reader__back text-xs font-bold uppercase tracking-[0.25em] text-paper/50 transition hover:text-[var(--color-glow)]">
-        ← All blogs
-      </a>
-      <time class="zine-reader__date mt-10 block text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-glow)]" datetime={post.date}>
-        {date}
-      </time>
-      <h1 class="zine-reader__title mt-6 font-display text-[clamp(2.25rem,1.5rem+3vw,4.5rem)] leading-[0.95] tracking-tight">
+    <div class="dispatch__hero-content">
+      <a href="/blogs" class="dispatch__back">← All stories</a>
+
+      <div class="dispatch__hero-meta" data-dispatch-reveal>
+        <span class="dispatch__pill">{category}</span>
+        <time datetime={post.date}>{publishedLabel}</time>
+        <span aria-hidden="true">·</span>
+        <span>{readMinutes} min read</span>
+      </div>
+
+      <h1 class="dispatch__title font-display" data-dispatch-title>
         {post.title}
       </h1>
+
+      {
+        lead && (
+          <p class="dispatch__lead font-instrument" data-dispatch-reveal>
+            {lead}
+          </p>
+        )
+      }
+
       {
         post.tags && post.tags.length > 0 && (
-          <ul class="zine-reader__tags mt-8 flex flex-wrap gap-2">
+          <ul class="dispatch__tags" data-dispatch-reveal aria-label="Tags">
             {post.tags.map((tag) => (
-              <li class="zine-reader__tag">{tag}</li>
+              <li>{tag}</li>
             ))}
           </ul>
         )
       }
     </div>
+
+    <div class="dispatch__scroll" aria-hidden="true">
+      <span>Read</span>
+      <span class="dispatch__scroll-line"></span>
+    </div>
   </header>
 
-  <div class="zine-reader__layout mx-auto max-w-6xl px-5 pb-24 sm:px-6 sm:pb-32">
-    <div class="zine-reader__columns">
-      <aside class="zine-reader__margin hidden lg:block" aria-hidden="true">
-        <p class="zine-reader__margin-text">Energize Music Dispatch</p>
-        <p class="zine-reader__margin-num">{date.split(' ').pop()}</p>
+  <div class="dispatch__stage">
+    <div class="dispatch__stage-inner">
+      <aside class="dispatch__rail" aria-label="Story details">
+        <div class="dispatch__rail-sticky">
+          <p class="dispatch__rail-label">From the label</p>
+          <p class="dispatch__rail-brand">Energize Music</p>
+          <p class="dispatch__rail-role">Dispatch desk</p>
+
+          <div class="dispatch__share">
+            <p class="dispatch__rail-label">Pass it on</p>
+            <button type="button" class="dispatch__copy" data-copy-link data-copy-url={shareUrl}>
+              <span data-copy-label>Copy link</span>
+            </button>
+            <ul class="dispatch__share-list">
+              {
+                shareLinks.map((link) => (
+                  <li>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="dispatch__share-link"
+                      aria-label={`Share on ${link.label}`}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          <p class="dispatch__rail-mark" aria-hidden="true">Dispatch</p>
+        </div>
       </aside>
 
-      <div class="zine-reader__body" data-zine-body>
-        <figure class="zine-reader__figure">
-          <img src={coverUrl} alt={post.cover.alt ?? post.title} class="zine-reader__figure-img" />
+      <div class="dispatch__body" data-zine-body data-dispatch-body>
+        <figure class="dispatch__cover">
+          <img
+            src={coverUrl}
+            alt={post.cover.alt ?? post.title}
+            width="1400"
+            height="788"
+            class="dispatch__cover-img"
+            loading="lazy"
+            decoding="async"
+          />
         </figure>
-        <div class="zine-reader__prose">
-          <PortableText value={post.body} />
+
+        <div class="dispatch__prose">
+          <PortableText value={body} />
         </div>
       </div>
     </div>
   </div>
-</article>
 
-<style>
-  .zine-reader {
-    position: relative;
+  {
+    related.length > 0 && (
+      <section class="dispatch__next" aria-labelledby="dispatch-next-heading">
+        <div class="dispatch__next-inner">
+          <div class="dispatch__next-head">
+            <p class="dispatch__next-eyebrow">Keep listening</p>
+            <h2 id="dispatch-next-heading" class="dispatch__next-title font-display">
+              More from the label
+            </h2>
+          </div>
+
+          <ul class="dispatch__next-list">
+            {
+              related.map((item) => (
+                <li>
+                  <a href={`/blogs/${item.slug}`} class="dispatch__next-card">
+                    <img
+                      src={item.coverUrl}
+                      alt=""
+                      class="dispatch__next-img"
+                      width="640"
+                      height="800"
+                      loading="lazy"
+                    />
+                    <span class="dispatch__next-scrim" aria-hidden="true"></span>
+                    <span class="dispatch__next-copy">
+                      <span class="dispatch__next-meta">
+                        {item.category}
+                        <span aria-hidden="true"> · </span>
+                        {item.dateLabel}
+                      </span>
+                      <span class="dispatch__next-card-title">{item.title}</span>
+                      <span class="dispatch__next-cta">Open story</span>
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </section>
+    )
   }
 
-  .zine-reader__progress {
+  <section class="dispatch__cta" aria-labelledby="dispatch-cta-heading">
+    <div class="dispatch__cta-glow" aria-hidden="true"></div>
+    <div class="dispatch__cta-inner">
+      <p class="dispatch__cta-eyebrow">Stay in the signal</p>
+      <h2 id="dispatch-cta-heading" class="dispatch__cta-title font-display">
+        The Energy Different
+      </h2>
+      <p class="dispatch__cta-lead font-instrument">
+        New releases, artist stories, and label news, always moving.
+      </p>
+      <div class="dispatch__cta-actions">
+        <a href="/releases" class="dispatch__cta-btn dispatch__cta-btn--primary">Browse releases</a>
+        <a href="/contact" class="dispatch__cta-btn dispatch__cta-btn--ghost">Get in touch</a>
+      </div>
+    </div>
+  </section>
+</article>
+
+<script>
+  const copyButton = document.querySelector<HTMLButtonElement>('[data-copy-link]');
+  if (copyButton) {
+    const label = copyButton.querySelector<HTMLElement>('[data-copy-label]');
+    const url = copyButton.dataset.copyUrl ?? window.location.href;
+
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        if (label) label.textContent = 'Copied';
+        window.setTimeout(() => {
+          if (label) label.textContent = 'Copy link';
+        }, 1800);
+      } catch {
+        if (label) label.textContent = 'Failed';
+        window.setTimeout(() => {
+          if (label) label.textContent = 'Copy link';
+        }, 1800);
+      }
+    });
+  }
+</script>
+
+<style>
+  .dispatch {
+    position: relative;
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  .dispatch__progress {
     position: fixed;
     top: 0;
     left: 0;
@@ -78,144 +275,641 @@ const { post, coverUrl, date } = Astro.props;
     background: rgba(255, 255, 255, 0.06);
   }
 
-  .zine-reader__progress-fill {
+  .dispatch__progress-fill {
     height: 100%;
     width: 0%;
-    background: var(--color-glow);
-    box-shadow: 0 0 12px rgba(77, 168, 255, 0.6);
+    background: linear-gradient(90deg, var(--color-glow), var(--color-glow-cyan));
+    box-shadow: 0 0 16px rgba(77, 168, 255, 0.55);
   }
 
-  .zine-reader__hero {
+  .dispatch__hero {
     position: relative;
-    min-height: 70vh;
+    min-height: min(92vh, 56rem);
+    display: flex;
+    align-items: flex-end;
     overflow: hidden;
-    border-bottom: 4px solid var(--color-glow);
+    isolation: isolate;
   }
 
-  .zine-reader__hero-bg {
+  .dispatch__hero-media {
     position: absolute;
     inset: 0;
+    z-index: 0;
   }
 
-  .zine-reader__hero-img {
-    height: 100%;
+  .dispatch__hero-img {
     width: 100%;
+    height: 100%;
     object-fit: cover;
-    opacity: 0.35;
-    filter: grayscale(0.3);
+    transform: scale(1.06);
     will-change: transform;
   }
 
-  .zine-reader__hero-mask {
+  .dispatch__hero-shade {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(11, 11, 13, 0.4) 0%, rgba(11, 11, 13, 0.85) 70%, var(--color-ink) 100%);
+    background:
+      linear-gradient(180deg, rgba(11, 11, 13, 0.35) 0%, rgba(11, 11, 13, 0.2) 35%, rgba(11, 11, 13, 0.88) 78%, var(--color-ink) 100%),
+      linear-gradient(90deg, rgba(11, 11, 13, 0.55) 0%, transparent 45%);
   }
 
-  .zine-reader__hero-content {
+  .dispatch__hero-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.18;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  .dispatch__hero-glow {
+    position: absolute;
+    left: -10%;
+    bottom: -20%;
+    width: min(70vw, 40rem);
+    height: min(70vw, 40rem);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(77, 168, 255, 0.28) 0%, transparent 68%);
+    filter: blur(20px);
+    pointer-events: none;
+  }
+
+  .dispatch__hero-content {
     position: relative;
     z-index: 1;
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding: 7.5rem 1.25rem 3.5rem;
   }
 
-  .zine-reader__tag {
-    border: 1px solid rgba(77, 168, 255, 0.4);
-    padding: 0.25rem 0.65rem;
-    font-size: 0.6rem;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-glow);
-  }
-
-  .zine-reader__columns {
-    display: grid;
-    gap: 3rem;
-  }
-
-  @media (min-width: 1024px) {
-    .zine-reader__columns {
-      grid-template-columns: 80px 1fr;
-      gap: 4rem;
+  @media (min-width: 640px) {
+    .dispatch__hero-content {
+      padding: 8.5rem 1.5rem 4.25rem;
     }
   }
 
-  .zine-reader__margin-text {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-size: 0.55rem;
-    font-weight: 800;
-    letter-spacing: 0.25em;
+  .dispatch__back {
+    display: inline-flex;
+    margin-bottom: 1.75rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: rgba(250, 250, 248, 0.2);
+    color: rgba(250, 250, 248, 0.55);
+    transition: color 160ms ease;
   }
 
-  .zine-reader__margin-num {
-    margin-top: 2rem;
+  .dispatch__back:hover,
+  .dispatch__back:focus-visible {
+    color: var(--color-glow);
+  }
+
+  .dispatch__hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.62);
+  }
+
+  .dispatch__pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.7rem;
+    padding: 0.2rem 0.7rem;
+    border: 1px solid rgba(77, 168, 255, 0.45);
+    border-radius: 999px;
+    color: var(--color-glow);
+    background: rgba(77, 168, 255, 0.08);
+  }
+
+  .dispatch__title {
+    margin: 1.1rem 0 0;
+    max-width: 14ch;
+    font-size: clamp(2.75rem, 1.4rem + 4.8vw, 5.75rem);
+    font-weight: 600;
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    color: var(--color-paper);
+    text-wrap: balance;
+  }
+
+  .dispatch__lead {
+    margin: 1.35rem 0 0;
+    max-width: 34rem;
+    font-size: clamp(1.2rem, 1rem + 0.7vw, 1.65rem);
+    font-style: italic;
+    line-height: 1.35;
+    color: rgba(250, 250, 248, 0.72);
+  }
+
+  .dispatch__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 1.4rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .dispatch__tags li {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.45);
+  }
+
+  .dispatch__scroll {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1.75rem;
+    z-index: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.35);
+  }
+
+  @media (min-width: 1024px) {
+    .dispatch__scroll {
+      display: flex;
+    }
+  }
+
+  .dispatch__scroll-line {
+    width: 1px;
+    height: 3.5rem;
+    background: linear-gradient(180deg, var(--color-glow), transparent);
+  }
+
+  .dispatch__stage {
+    position: relative;
+    background:
+      radial-gradient(ellipse 50% 40% at 0% 0%, rgba(77, 168, 255, 0.08), transparent 55%),
+      var(--color-ink);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .dispatch__stage-inner {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    display: grid;
+    gap: 2.5rem;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  @media (min-width: 640px) {
+    .dispatch__stage-inner {
+      padding: 3rem 1.5rem 5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .dispatch__stage-inner {
+      grid-template-columns: 12.5rem minmax(0, 1fr);
+      gap: 3.5rem;
+      padding-top: 3.75rem;
+    }
+  }
+
+  .dispatch__rail-sticky {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  @media (min-width: 1024px) {
+    .dispatch__rail-sticky {
+      position: sticky;
+      top: 6.5rem;
+    }
+  }
+
+  .dispatch__rail-label {
+    margin: 0;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.38);
+  }
+
+  .dispatch__rail-brand {
+    margin: 0.35rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--color-paper);
+  }
+
+  .dispatch__rail-role {
+    margin: 0.15rem 0 0;
+    font-size: 0.8125rem;
+    color: rgba(250, 250, 248, 0.48);
+  }
+
+  .dispatch__share {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .dispatch__copy {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 2.4rem;
+    align-items: center;
+    padding: 0.45rem 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    background: transparent;
+    color: rgba(250, 250, 248, 0.82);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      border-color 160ms ease,
+      color 160ms ease,
+      background 160ms ease;
+  }
+
+  .dispatch__copy:hover,
+  .dispatch__copy:focus-visible {
+    border-color: rgba(77, 168, 255, 0.55);
+    color: var(--color-glow);
+    background: rgba(77, 168, 255, 0.08);
+  }
+
+  .dispatch__share-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .dispatch__share-link {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.45);
+    transition: color 160ms ease;
+  }
+
+  .dispatch__share-link:hover,
+  .dispatch__share-link:focus-visible {
+    color: var(--color-glow);
+  }
+
+  .dispatch__rail-mark {
+    display: none;
+    margin: 2.5rem 0 0;
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font-family: var(--font-display);
-    font-size: 2rem;
-    color: rgba(77, 168, 255, 0.2);
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(77, 168, 255, 0.28);
   }
 
-  .zine-reader__figure {
-    margin: 0 0 2.5rem;
-    border: 3px solid rgba(255, 255, 255, 0.1);
+  @media (min-width: 1024px) {
+    .dispatch__rail-mark {
+      display: block;
+    }
+  }
+
+  .dispatch__body {
+    min-width: 0;
+  }
+
+  .dispatch__cover {
+    margin: 0 0 2.25rem;
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-ink-raised);
   }
 
-  .zine-reader__figure-img {
+  .dispatch__cover-img {
+    display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
-    display: block;
   }
 
-  .zine-reader__prose {
-    max-width: 42rem;
-    font-size: clamp(1.05rem, 1rem + 0.15vw, 1.15rem);
-    line-height: 1.8;
-    color: rgba(250, 250, 248, 0.82);
+  .dispatch__prose {
+    max-width: 40rem;
+    font-size: clamp(1.05rem, 1rem + 0.18vw, 1.15rem);
+    line-height: 1.85;
+    color: rgba(250, 250, 248, 0.84);
   }
 
-  .zine-reader__prose :global(p) {
-    margin-bottom: 1.5rem;
+  .dispatch__prose :global(p) {
+    margin: 0 0 1.45rem;
+    color: rgba(250, 250, 248, 0.84) !important;
   }
 
-  .zine-reader__prose :global(h2) {
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
+  .dispatch__prose :global(h2) {
+    margin: 2.75rem 0 1rem;
     font-family: var(--font-display);
-    font-size: 1.75rem;
-    color: var(--color-paper);
+    font-size: clamp(1.55rem, 1.3rem + 0.8vw, 2rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--color-paper) !important;
   }
 
-  .zine-reader__prose :global(h3) {
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
+  .dispatch__prose :global(h3),
+  .dispatch__prose :global(h4) {
+    margin: 2.1rem 0 0.8rem;
     font-family: var(--font-display);
-    font-size: 1.35rem;
-    color: var(--color-paper);
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--color-paper) !important;
   }
 
-  .zine-reader__prose :global(a) {
-    color: var(--color-glow);
+  .dispatch__prose :global(a) {
+    color: var(--color-glow) !important;
     text-decoration: underline;
     text-underline-offset: 3px;
   }
 
-  .zine-reader__prose :global(blockquote) {
-    margin: 2rem 0;
-    padding-left: 1.25rem;
+  .dispatch__prose :global(blockquote) {
+    margin: 2.25rem 0;
+    padding: 1.25rem 0 1.25rem 1.25rem;
     border-left: 3px solid var(--color-glow);
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.45rem;
+    font-style: italic;
+    line-height: 1.4;
+    color: rgba(250, 250, 248, 0.78) !important;
+  }
+
+  .dispatch__prose :global(ul),
+  .dispatch__prose :global(ol) {
+    margin: 0 0 1.45rem;
+    padding-left: 1.2rem;
+  }
+
+  .dispatch__prose :global(li) {
+    margin-bottom: 0.6rem;
+    color: rgba(250, 250, 248, 0.84) !important;
+  }
+
+  .dispatch__prose :global(strong) {
+    color: var(--color-paper) !important;
+  }
+
+  .dispatch__prose :global(img) {
+    margin: 2rem 0;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dispatch__next {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--color-ink-raised);
+  }
+
+  .dispatch__next-inner {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding: 3.5rem 1.25rem 4rem;
+  }
+
+  @media (min-width: 640px) {
+    .dispatch__next-inner {
+      padding: 4rem 1.5rem 4.5rem;
+    }
+  }
+
+  .dispatch__next-eyebrow {
+    margin: 0;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .dispatch__next-title {
+    margin: 0.7rem 0 0;
+    font-size: clamp(1.85rem, 1.4rem + 1.5vw, 2.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .dispatch__next-list {
+    display: grid;
+    gap: 1rem;
+    margin: 2rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 768px) {
+    .dispatch__next-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .dispatch__next-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .dispatch__next-card {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    min-height: 22rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-ink);
+    text-decoration: none;
+    transition:
+      border-color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .dispatch__next-card:hover,
+  .dispatch__next-card:focus-visible {
+    border-color: rgba(77, 168, 255, 0.45);
+    transform: translateY(-3px);
+  }
+
+  .dispatch__next-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 500ms ease;
+  }
+
+  .dispatch__next-card:hover .dispatch__next-img,
+  .dispatch__next-card:focus-visible .dispatch__next-img {
+    transform: scale(1.05);
+  }
+
+  .dispatch__next-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 11, 13, 0.1) 20%, rgba(11, 11, 13, 0.92) 100%);
+  }
+
+  .dispatch__next-copy {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 0.55rem;
+    padding: 1.25rem;
+  }
+
+  .dispatch__next-meta {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.55);
+  }
+
+  .dispatch__next-card-title {
     font-family: var(--font-display);
     font-size: 1.35rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--color-paper);
+  }
+
+  .dispatch__next-cta {
+    margin-top: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .dispatch__cta {
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--color-ink);
+  }
+
+  .dispatch__cta-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(80vw, 36rem);
+    height: min(80vw, 36rem);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(77, 168, 255, 0.16) 0%, transparent 68%);
+    pointer-events: none;
+  }
+
+  .dispatch__cta-inner {
+    position: relative;
+    width: min(100%, 42rem);
+    margin-inline: auto;
+    padding: 4rem 1.25rem 5rem;
+    text-align: center;
+  }
+
+  .dispatch__cta-eyebrow {
+    margin: 0;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .dispatch__cta-title {
+    margin: 0.85rem 0 0;
+    font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .dispatch__cta-lead {
+    margin: 1rem auto 0;
+    max-width: 28rem;
+    font-size: clamp(1.1rem, 1rem + 0.4vw, 1.4rem);
     font-style: italic;
-    color: rgba(250, 250, 248, 0.75);
+    line-height: 1.35;
+    color: rgba(250, 250, 248, 0.58);
+  }
+
+  .dispatch__cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .dispatch__cta-btn {
+    display: inline-flex;
+    min-height: 2.85rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.35rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    transition:
+      border-color 160ms ease,
+      color 160ms ease,
+      background 160ms ease;
+  }
+
+  .dispatch__cta-btn--primary {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  .dispatch__cta-btn--primary:hover,
+  .dispatch__cta-btn--primary:focus-visible {
+    background: transparent;
+    border-color: var(--color-glow);
+    color: var(--color-glow);
+  }
+
+  .dispatch__cta-btn--ghost {
+    border-color: rgba(255, 255, 255, 0.18);
+    color: var(--color-paper);
+  }
+
+  .dispatch__cta-btn--ghost:hover,
+  .dispatch__cta-btn--ghost:focus-visible {
+    border-color: var(--color-glow);
+    color: var(--color-glow);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .zine-reader__hero-img {
+    .dispatch__hero-img,
+    .dispatch__next-img,
+    .dispatch__next-card {
+      transition: none;
       will-change: auto;
     }
   }

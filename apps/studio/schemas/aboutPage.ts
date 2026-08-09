@@ -6,6 +6,8 @@ export default defineType({
   title: 'About Page',
   type: 'document',
   icon: DocumentTextIcon,
+  description:
+    'Main About page content: mission, vision, values, and team section intro. Not the same as slug-based pages under Important Pages.',
   fields: [
     defineField({
       name: 'title',

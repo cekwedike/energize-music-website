@@ -2,7 +2,7 @@ import { defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'release',
-  title: 'Release',
+  title: 'Releases',
   type: 'document',
   fields: [
     defineField({ name: 'title', title: 'Title', type: 'string', validation: (r) => r.required() }),
@@ -43,8 +43,42 @@ export default defineType({
       title: 'Artists',
       type: 'array',
       of: [{ type: 'reference', to: [{ type: 'artist' }] }],
-      validation: (r) => r.required().min(1).max(10),
-      description: 'Link up to 10 artists. Each artist profile shows their 10 most recent releases.',
+      validation: (rule) =>
+        rule
+          .required()
+          .min(1)
+          .max(10)
+          .custom(async (artistRefs, context) => {
+            if (!Array.isArray(artistRefs) || artistRefs.length === 0) return true;
+
+            const client = context.getClient({ apiVersion: '2024-01-01' });
+            const docId = context.document?._id ?? '';
+            const publishedId = docId.replace(/^drafts\./, '');
+            const draftId = publishedId ? `drafts.${publishedId}` : '';
+            const maxReleasesPerArtist = 20;
+
+            for (const ref of artistRefs) {
+              const artistId = ref?._ref;
+              if (!artistId) continue;
+
+              const count = await client.fetch<number>(
+                `count(*[
+                  _type == "release"
+                  && $artistId in artists[]._ref
+                  && !(_id in [$publishedId, $draftId])
+                ])`,
+                { artistId, publishedId, draftId },
+              );
+
+              if (count >= maxReleasesPerArtist) {
+                return `Each artist can appear on at most ${maxReleasesPerArtist} releases. One selected artist already has ${count}. Retire or reassign an older release before adding another.`;
+              }
+            }
+
+            return true;
+          }),
+      description:
+        'Link up to 10 artists. Each artist profile shows their 10 most recent releases. The releases page shows up to 20 per artist.',
     }),
     defineField({
       name: 'links',
@@ -59,7 +93,14 @@ export default defineType({
       ],
     }),
 
-    defineField({ name: 'featured', title: 'Featured on homepage', type: 'boolean', initialValue: false }),
+    defineField({
+      name: 'featured',
+      title: 'Homepage hero (coming soon)',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'Reserved for a future homepage hero. To feature releases on /releases, use Spotlight A Release in the sidebar.',
+    }),
   ],
   preview: {
     select: { title: 'title', subtitle: 'type', media: 'cover' },

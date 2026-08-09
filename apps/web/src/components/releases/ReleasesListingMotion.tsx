@@ -1,23 +1,70 @@
 import { useEffect } from 'react';
 import { animate, inView, stagger } from 'motion';
+import {
+  getDefaultViewMode,
+  isValidViewMode,
+  loadViewMode,
+  saveViewMode,
+  type ReleasesViewMode,
+} from '../../lib/releases/viewMode';
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function setActiveFilter(root: HTMLElement, slug: string) {
-  root.dataset.filterActive = slug;
+function normalizeFilterSlug(raw: string | undefined): string {
+  const trimmed = raw?.trim();
+  if (!trimmed) return 'all';
+  return trimmed;
+}
+
+function revealSectionContent(section: HTMLElement): void {
+  section.querySelectorAll<HTMLElement>('[data-motion]').forEach((el) => {
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+  });
+}
+
+function setActiveFilter(root: HTMLElement, slug: string, reduced: boolean): void {
+  const activeSlug = normalizeFilterSlug(slug);
+  root.dataset.filterActive = activeSlug;
 
   root.querySelectorAll<HTMLButtonElement>('[data-releases-filter]').forEach((pill) => {
-    const isActive = pill.dataset.releasesFilter === slug;
+    const pillSlug = normalizeFilterSlug(pill.dataset.filterSlug);
+    const isActive = pillSlug === activeSlug;
     pill.setAttribute('aria-current', isActive ? 'true' : 'false');
   });
 
+  const visibleSections: HTMLElement[] = [];
+
   root.querySelectorAll<HTMLElement>('[data-releases-section]').forEach((section) => {
     const artistSlug = section.dataset.artistSlug ?? '';
-    const show = slug === 'all' || artistSlug === slug;
+    const show = activeSlug === 'all' || artistSlug === activeSlug;
     section.dataset.filtered = show ? 'visible' : 'hidden';
     section.hidden = !show;
+
+    if (show) {
+      revealSectionContent(section);
+      visibleSections.push(section);
+    }
+  });
+
+  const scrollTarget = activeSlug === 'all' ? undefined : visibleSections[0];
+  if (scrollTarget) {
+    scrollTarget.scrollIntoView({
+      behavior: reduced ? 'auto' : 'smooth',
+      block: 'start',
+    });
+  }
+}
+
+function setViewMode(root: HTMLElement, mode: ReleasesViewMode): void {
+  root.dataset.viewMode = mode;
+
+  root.querySelectorAll<HTMLButtonElement>('[data-releases-view]').forEach((button) => {
+    const buttonMode = button.dataset.releasesView;
+    const isActive = buttonMode === mode;
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 }
 
@@ -27,17 +74,44 @@ export default function ReleasesListingMotion() {
     if (!root) return;
 
     const reduced = prefersReducedMotion();
-    setActiveFilter(root, 'all');
+    setActiveFilter(root, 'all', reduced);
+
+    const initialMode = loadViewMode();
+    setViewMode(root, initialMode);
 
     const filterCleanups: Array<() => void> = [];
     root.querySelectorAll<HTMLButtonElement>('[data-releases-filter]').forEach((pill) => {
       const onFilter = () => {
-        const slug = pill.dataset.releasesFilter ?? 'all';
-        setActiveFilter(root, slug);
+        const slug = pill.dataset.filterSlug ?? 'all';
+        setActiveFilter(root, slug, reduced);
       };
       pill.addEventListener('click', onFilter);
       filterCleanups.push(() => pill.removeEventListener('click', onFilter));
     });
+
+    const viewCleanups: Array<() => void> = [];
+    root.querySelectorAll<HTMLButtonElement>('[data-releases-view]').forEach((button) => {
+      const onView = () => {
+        const mode = button.dataset.releasesView;
+        if (!isValidViewMode(mode)) return;
+        saveViewMode(mode);
+        setViewMode(root, mode);
+      };
+      button.addEventListener('click', onView);
+      viewCleanups.push(() => button.removeEventListener('click', onView));
+    });
+
+    const mobileQuery = window.matchMedia('(max-width: 1023px)');
+    const onViewportChange = () => {
+      try {
+        if (sessionStorage.getItem('energize-releases-view-mode')) return;
+      } catch {
+        /* sessionStorage unavailable */
+      }
+      setViewMode(root, getDefaultViewMode());
+    };
+    mobileQuery.addEventListener('change', onViewportChange);
+    viewCleanups.push(() => mobileQuery.removeEventListener('change', onViewportChange));
 
     if (reduced) {
       root.querySelectorAll<HTMLElement>('[data-motion]').forEach((el) => {
@@ -45,6 +119,7 @@ export default function ReleasesListingMotion() {
       });
       return () => {
         filterCleanups.forEach((fn) => fn());
+        viewCleanups.forEach((fn) => fn());
       };
     }
 
@@ -85,6 +160,7 @@ export default function ReleasesListingMotion() {
 
     return () => {
       filterCleanups.forEach((fn) => fn());
+      viewCleanups.forEach((fn) => fn());
       motionCleanups.forEach((fn) => fn());
     };
   }, []);

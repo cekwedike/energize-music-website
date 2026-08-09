@@ -42,6 +42,12 @@
     flex-direction: column;
   }
 
+  body.site-body--light {
+    color-scheme: light;
+    background-color: #ffffff;
+    color: #111111;
+  }
+
   /* Keep the site footer pinned to the bottom of short pages. */
   .site-header {
     flex-shrink: 0;

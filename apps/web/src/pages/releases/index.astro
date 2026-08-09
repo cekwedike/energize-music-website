@@ -1,12 +1,29 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ReleasesHero from '../../components/releases/ReleasesHero.astro';
+import ReleaseSpotlight from '../../components/releases/ReleaseSpotlight.astro';
 import ReleasesListingSection from '../../components/releases/ReleasesListingSection.astro';
 import { sanityClient } from '../../lib/sanity/client';
-import { enrichReleases } from '../../lib/metadata/enrichReleases';
-import { allReleasesQuery, type Release } from '@energize/shared';
+import { enrichReleases, enrichRelease } from '../../lib/metadata/enrichReleases';
+import {
+  allReleasesQuery,
+  releasesPageQuery,
+  type Release,
+  type ReleasesPage,
+} from '@energize/shared';
 
 const rawReleases = await sanityClient.fetch<Release[]>(allReleasesQuery);
 const releases = await enrichReleases(rawReleases);
+
+const releasesPage = await sanityClient.fetch<ReleasesPage | null>(releasesPageQuery);
+
+const configuredSpotlights = releasesPage?.releaseSpotlights?.filter(Boolean) ?? [];
+const spotlightReleases =
+  configuredSpotlights.length > 0
+    ? await Promise.all(
+        configuredSpotlights.map((release) => enrichRelease(release, { coverSize: 800 })),
+      )
+    : [];
 ---
 
 <BaseLayout
@@ -14,17 +31,10 @@ const releases = await enrichReleases(rawReleases);
   description="Singles, EPs, and albums from Energize Music artists."
   ambientVariant="editorial"
 >
-  <section class="border-b border-white/10">
-    <div class="mx-auto max-w-7xl px-5 pb-10 pt-24 sm:px-6 sm:pb-14 sm:pt-32">
-      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">Catalog</p>
-      <h1 class="text-h1 mt-4 max-w-3xl">Releases</h1>
-      <p class="text-lead mt-5 max-w-2xl text-paper/70">
-        Browse every single, EP, and album on the Energize Music roster.
-      </p>
-    </div>
-  </section>
+  <ReleasesHero releases={releases} totalCount={releases.length} />
 
   <section class="mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20">
+    {spotlightReleases.length > 0 ? <ReleaseSpotlight releases={spotlightReleases} /> : null}
     <ReleasesListingSection releases={releases} />
   </section>
 </BaseLayout>

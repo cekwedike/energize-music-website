@@ -3,19 +3,58 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlogPostReader from '../../components/blogs/BlogPostReader.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient, urlForImage } from '../../lib/sanity/client';
-import { allNewsQuery, newsBySlugQuery, type NewsPost } from '@energize/shared';
+import { allNewsListQuery, newsBySlugQuery, type NewsPost, type NewsPostSummary } from '@energize/shared';
+import {
+  bodyWithoutLead,
+  estimateReadMinutes,
+  extractLeadParagraph,
+  formatPublishedDate,
+  formatRelatedDate,
+} from '../../lib/blogs/postMeta';
+import { getPostCategory } from '../../lib/blogs/display';
 
 export async function getStaticPaths() {
-  const posts = await sanityClient.fetch<Pick<NewsPost, 'slug'>[]>(allNewsQuery);
+  const posts = await sanityClient.fetch<Pick<NewsPostSummary, 'slug'>[]>(allNewsListQuery);
   return posts.map((post) => ({ params: { slug: post.slug } }));
 }
 
 const { slug } = Astro.params;
-const post = await sanityClient.fetch<NewsPost>(newsBySlugQuery, { slug });
+const post = await sanityClient.fetch<NewsPost | null>(newsBySlugQuery, { slug });
 
-const coverUrl = urlForImage(post.cover).width(1200).height(675).fit('crop').auto('format').url();
-const date = new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+if (!post) {
+  return Astro.redirect('/blogs');
+}
+
+const coverUrl = urlForImage(post.cover).width(1920).height(1080).fit('crop').auto('format').url();
+const publishedLabel = formatPublishedDate(post.date);
+const readMinutes = estimateReadMinutes(post.body);
+const lead = extractLeadParagraph(post.body);
+const body = bodyWithoutLead(post.body);
+const category = getPostCategory(post);
 const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
+const shareUrl = new URL(`/blogs/${post.slug}`, siteUrl).toString();
+
+const allPosts = await sanityClient.fetch<NewsPostSummary[]>(allNewsListQuery);
+const related = allPosts
+  .filter((item) => item.slug !== post.slug)
+  .slice(0, 3)
+  .map((item) => ({
+    title: item.title,
+    slug: item.slug,
+    dateLabel: formatRelatedDate(item.date),
+    readMinutes: estimateReadMinutes([]),
+    coverUrl: urlForImage(item.cover).width(720).height(900).fit('crop').auto('format').url(),
+    category: getPostCategory(item),
+  }));
+
+// Prefer real read-time when we have excerpt word counts as a cheap proxy.
+for (const item of related) {
+  const source = allPosts.find((entry) => entry.slug === item.slug);
+  if (source?.excerpt) {
+    const words = source.excerpt.trim().split(/\s+/).filter(Boolean).length;
+    item.readMinutes = Math.max(1, Math.round(words / 200));
+  }
+}
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -23,7 +62,7 @@ const jsonLd = {
   headline: post.title,
   datePublished: post.date,
   image: [coverUrl],
-  url: new URL(`/blogs/${post.slug}`, siteUrl).toString(),
+  url: shareUrl,
   publisher: {
     '@type': 'Organization',
     name: 'Energize Music',
@@ -31,9 +70,25 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout title={post.title} description={post.title} ogImage={coverUrl} ambientVariant="editorial">
+<BaseLayout
+  title={post.title}
+  description={lead ?? post.title}
+  ogImage={coverUrl}
+  ambientVariant="editorial"
+  headerVariant="overlay"
+>
   <JsonLd data={jsonLd} />
-  <BlogPostReader post={post} coverUrl={coverUrl} date={date} />
+  <BlogPostReader
+    post={post}
+    coverUrl={coverUrl}
+    publishedLabel={publishedLabel}
+    readMinutes={readMinutes}
+    lead={lead}
+    body={body}
+    shareUrl={shareUrl}
+    category={category}
+    related={related}
+  />
 </BaseLayout>
 
 <script>

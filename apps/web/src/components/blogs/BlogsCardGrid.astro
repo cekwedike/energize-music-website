@@ -1,0 +1,208 @@
+---
+import type { NewsPostSummary } from '@energize/shared';
+import {
+  getPostCategory,
+  getPostCoverUrl,
+  truncateExcerpt,
+} from '../../lib/blogs/display';
+
+interface Props {
+  posts: NewsPostSummary[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="blogs-grid" data-blogs-grid>
+  <header class="blogs-grid__header">
+    <h2 class="blogs-grid__title font-display">Latest from the label</h2>
+    <span class="blogs-grid__rule" aria-hidden="true"></span>
+  </header>
+
+  {
+    posts.length === 0 ? (
+      <p class="blogs-grid__fallback">New stories are on the way. Check back soon.</p>
+    ) : (
+      <ul class="blogs-grid__list">
+        {
+          posts.map((post) => {
+            const coverUrl = getPostCoverUrl(post, 720, 960);
+            const category = getPostCategory(post);
+            const excerpt = truncateExcerpt(post.excerpt);
+
+            return (
+              <li class="blogs-grid__item">
+                <a
+                  href={`/blogs/${post.slug}`}
+                  class="blogs-grid__card group"
+                  data-blogs-card
+                  data-title={post.title.toLowerCase()}
+                >
+                  <img
+                    src={coverUrl}
+                    alt={post.cover.alt ?? post.title}
+                    width={720}
+                    height={960}
+                    loading="lazy"
+                    decoding="async"
+                    class="blogs-grid__image"
+                  />
+                  <span class="blogs-grid__scrim" aria-hidden="true"></span>
+                  <span class="blogs-grid__pill">{category}</span>
+                  <span class="blogs-grid__copy">
+                    <span class="blogs-grid__card-title">{post.title}</span>
+                    {excerpt ? <span class="blogs-grid__excerpt">{excerpt}</span> : null}
+                  </span>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    )
+  }
+
+  <p class="blogs-grid__empty" data-blogs-empty hidden>
+    No stories match your search. Try another title or clear the field.
+  </p>
+</div>
+
+<style>
+  .blogs-grid__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .blogs-grid__title {
+    flex-shrink: 0;
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    line-height: 1.1;
+    color: var(--color-paper);
+  }
+
+  .blogs-grid__rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04));
+  }
+
+  .blogs-grid__list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  @media (min-width: 640px) {
+    .blogs-grid__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.125rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .blogs-grid__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .blogs-grid__card {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--color-ink-raised);
+    text-decoration: none;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+
+  .blogs-grid__card:hover {
+    border-color: rgba(77, 168, 255, 0.35);
+    transform: translateY(-2px);
+  }
+
+  .blogs-grid__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+  }
+
+  .blogs-grid__card:hover .blogs-grid__image {
+    transform: scale(1.04);
+  }
+
+  .blogs-grid__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(11, 11, 13, 0.08) 0%,
+      rgba(11, 11, 13, 0.15) 35%,
+      rgba(11, 11, 13, 0.92) 100%
+    );
+    pointer-events: none;
+  }
+
+  .blogs-grid__pill {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem;
+    z-index: 1;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(11, 11, 13, 0.55);
+    backdrop-filter: blur(8px);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.88);
+  }
+
+  .blogs-grid__copy {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.1rem;
+  }
+
+  .blogs-grid__card-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.125rem, 1rem + 0.4vw, 1.375rem);
+    line-height: 1.15;
+    color: var(--color-paper);
+  }
+
+  .blogs-grid__excerpt {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: rgba(250, 250, 248, 0.72);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blogs-grid__fallback,
+  .blogs-grid__empty {
+    margin: 0;
+    padding: 2rem 0;
+    text-align: center;
+    color: rgba(250, 250, 248, 0.58);
+  }
+</style>

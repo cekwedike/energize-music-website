@@ -1,20 +1,73 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import BlogsZineHero from '../../components/blogs/BlogsZineHero.astro';
-import BlogsZineSpread from '../../components/blogs/BlogsZineSpread.astro';
+import BlogsPageHeader from '../../components/blogs/BlogsPageHeader.astro';
+import BlogsCardGrid from '../../components/blogs/BlogsCardGrid.astro';
+import BlogsSidebar from '../../components/blogs/BlogsSidebar.astro';
 import { sanityClient } from '../../lib/sanity/client';
-import { allNewsQuery, type NewsPost } from '@energize/shared';
+import { allNewsListQuery, type NewsPostSummary } from '@energize/shared';
 
-const posts = await sanityClient.fetch<NewsPost[]>(allNewsQuery);
+const posts = await sanityClient.fetch<NewsPostSummary[]>(allNewsListQuery);
+
+const featuredPosts = posts.slice(0, 3);
+const latestPosts = posts.slice(featuredPosts.length, featuredPosts.length + 6);
 ---
 
-<BaseLayout title="Blogs" description="Announcements and stories from Energize Music, filed like a zine." ambientVariant="editorial">
-  <BlogsZineHero posts={posts} />
-  <BlogsZineSpread posts={posts} />
+<BaseLayout
+  title="Blogs"
+  description="Announcements and stories from Energize Music."
+  ambientVariant="editorial"
+>
+  <BlogsPageHeader totalCount={posts.length} />
+
+  <section class="blogs-index" data-blogs-index aria-label="Blog listings">
+    <div class="blogs-index__inner mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-12 lg:py-14">
+      <div class="blogs-index__layout">
+        <div class="blogs-index__main">
+          <BlogsCardGrid posts={posts} />
+        </div>
+
+        {
+          posts.length > 0 ? (
+            <BlogsSidebar featuredPosts={featuredPosts} latestPosts={latestPosts} />
+          ) : null
+        }
+      </div>
+    </div>
+  </section>
 </BaseLayout>
 
-<script>
-  import { initBlogsIndex } from '../../lib/motion/blogs/initBlogsIndex';
+<style>
+  .blogs-index {
+    background: linear-gradient(180deg, var(--color-ink-raised) 0%, var(--color-ink) 100%);
+  }
 
-  initBlogsIndex();
-</script>
+  .blogs-index__layout {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .blogs-index__main {
+    order: 2;
+    min-width: 0;
+  }
+
+  :global(.blogs-sidebar) {
+    order: 1;
+  }
+
+  @media (min-width: 1024px) {
+    .blogs-index__layout {
+      grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
+      align-items: start;
+      gap: 3rem;
+    }
+
+    .blogs-index__main {
+      order: 1;
+    }
+
+    :global(.blogs-sidebar) {
+      order: 2;
+    }
+  }
+</style>

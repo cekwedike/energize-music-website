@@ -1,4 +1,5 @@
 import type { SanityImage, PortableTextBlock } from './common';
+import type { Release } from './release';
 
 export interface NewsPost {
   _id: string;
@@ -8,6 +9,16 @@ export interface NewsPost {
   cover: SanityImage;
   body: PortableTextBlock[];
   tags?: string[];
+}
+
+export interface NewsPostSummary {
+  _id: string;
+  title: string;
+  slug: string;
+  date: string;
+  cover: SanityImage;
+  tags?: string[];
+  excerpt?: string;
 }
 
 export interface CareerOpening {
@@ -56,4 +67,9 @@ export interface VolunteerInfo {
   platforms?: string[];
   signupUrl?: string;
   ctaLabel?: string;
+}
+
+export interface ReleasesPage {
+  _id: string;
+  releaseSpotlights?: Release[];
 }

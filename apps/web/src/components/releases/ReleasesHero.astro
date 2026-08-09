@@ -1,0 +1,218 @@
+---
+import type { EnrichedRelease } from '@energize/shared';
+
+interface Props {
+  releases: EnrichedRelease[];
+  totalCount: number;
+}
+
+const { releases } = Astro.props;
+
+const collageReleases = releases
+  .filter((release) => release.coverUrl)
+  .slice(0, 10);
+---
+
+<section class="releases-hero relative overflow-hidden border-b border-white/8" data-releases-hero>
+  <div class="releases-hero__mesh" aria-hidden="true"></div>
+  <div class="releases-hero__grain" aria-hidden="true"></div>
+  <div class="releases-hero__glow releases-hero__glow--a" aria-hidden="true"></div>
+  <div class="releases-hero__glow releases-hero__glow--b" aria-hidden="true"></div>
+  <div class="releases-hero__line" aria-hidden="true"></div>
+
+  {
+    collageReleases.length > 0 && (
+      <div class="releases-hero__collage" aria-hidden="true">
+        {
+          collageReleases.map((release, index) => (
+            <div
+              class="releases-hero__collage-item"
+              style={`--collage-index: ${index}; --collage-rotate: ${(index % 5) - 2}deg;`}
+            >
+              <img
+                src={release.coverUrl}
+                alt=""
+                width={160}
+                height={160}
+                loading={index < 4 ? 'eager' : 'lazy'}
+                decoding="async"
+                referrerpolicy="no-referrer"
+                class="releases-hero__collage-cover"
+              />
+            </div>
+          ))
+        }
+      </div>
+    )
+  }
+
+  <div class="relative mx-auto max-w-7xl px-5 pb-8 pt-20 sm:px-6 sm:pb-10 sm:pt-24">
+    <div class="max-w-2xl">
+      <p class="releases-hero__reveal releases-hero__reveal-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">
+        Catalog
+      </p>
+
+      <h1 class="releases-hero__headline releases-hero__reveal releases-hero__reveal-2 mt-5 font-display text-[clamp(2.75rem,2rem+5vw,5.5rem)] leading-[0.9] tracking-tight text-paper">
+        Releases
+      </h1>
+
+      <p class="releases-hero__reveal releases-hero__reveal-3 text-lead mt-5 max-w-xl text-paper/68">
+        Browse every single, EP, and album on the Energize Music roster. Filter by artist or scroll the full stage lineup.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('[data-releases-hero]');
+  if (hero) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      hero.classList.add('is-visible');
+    } else {
+      requestAnimationFrame(() => hero.classList.add('is-visible'));
+    }
+  }
+</script>
+
+<style>
+  .releases-hero {
+    min-height: 0;
+  }
+
+  .releases-hero__mesh {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 75% 60% at 8% 12%, rgba(77, 168, 255, 0.18), transparent 55%),
+      radial-gradient(ellipse 55% 45% at 95% 65%, rgba(103, 232, 249, 0.1), transparent 50%),
+      linear-gradient(165deg, var(--color-ink) 0%, #0e0e11 50%, var(--color-ink-raised) 100%);
+  }
+
+  .releases-hero__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.32;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  .releases-hero__glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .releases-hero__glow--a {
+    top: 5%;
+    right: -4%;
+    width: 280px;
+    height: 280px;
+    background: rgba(77, 168, 255, 0.16);
+  }
+
+  .releases-hero__glow--b {
+    bottom: 15%;
+    left: -6%;
+    width: 220px;
+    height: 220px;
+    background: rgba(37, 99, 235, 0.12);
+  }
+
+  .releases-hero__line {
+    position: absolute;
+    top: 28%;
+    left: 0;
+    width: 38%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(77, 168, 255, 0.35), transparent);
+    opacity: 0.6;
+  }
+
+  .releases-hero__collage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    mask-image: linear-gradient(180deg, black 0%, black 50%, transparent 100%);
+  }
+
+  .releases-hero__collage-item {
+    position: absolute;
+    width: clamp(56px, 6vw, 96px);
+    aspect-ratio: 1;
+    border-radius: 0.65rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    opacity: 0.24;
+    transform: rotate(var(--collage-rotate, 0deg));
+    animation: releases-collage-float 14s ease-in-out infinite;
+    animation-delay: calc(var(--collage-index, 0) * -0.85s);
+  }
+
+  .releases-hero__collage-item:nth-child(1) { top: 14%; left: 58%; }
+  .releases-hero__collage-item:nth-child(2) { top: 10%; left: 72%; }
+  .releases-hero__collage-item:nth-child(3) { top: 24%; left: 84%; }
+  .releases-hero__collage-item:nth-child(4) { top: 36%; left: 66%; }
+  .releases-hero__collage-item:nth-child(5) { top: 20%; left: 48%; }
+  .releases-hero__collage-item:nth-child(6) { top: 44%; left: 78%; }
+  .releases-hero__collage-item:nth-child(7) { top: 54%; left: 58%; }
+  .releases-hero__collage-item:nth-child(8) { top: 48%; left: 88%; }
+  .releases-hero__collage-item:nth-child(n + 9) { display: none; }
+
+  .releases-hero__collage-cover {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @keyframes releases-collage-float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(var(--collage-rotate, 0deg));
+    }
+    50% {
+      transform: translateY(-8px) rotate(calc(var(--collage-rotate, 0deg) + 2deg));
+    }
+  }
+
+  .releases-hero__headline {
+    position: relative;
+    z-index: 1;
+  }
+
+  .releases-hero__reveal {
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .releases-hero.is-visible .releases-hero__reveal-1 { transition-delay: 0ms; }
+  .releases-hero.is-visible .releases-hero__reveal-2 { transition-delay: 80ms; }
+  .releases-hero.is-visible .releases-hero__reveal-3 { transition-delay: 160ms; }
+
+  .releases-hero.is-visible .releases-hero__reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .releases-hero__reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+
+    .releases-hero__collage-item {
+      animation: none;
+    }
+  }
+</style>
