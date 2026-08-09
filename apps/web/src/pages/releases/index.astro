@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ReleaseCard from '../../components/releases/ReleaseCard.astro';
+import ReleasesListingSection from '../../components/releases/ReleasesListingSection.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { enrichReleases } from '../../lib/metadata/enrichReleases';
 import { allReleasesQuery, type Release } from '@energize/shared';
@@ -25,50 +25,6 @@ const releases = await enrichReleases(rawReleases);
   </section>
 
   <section class="mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20">
-    {
-      releases.length === 0 ? (
-        <p class="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-8 py-16 text-center text-paper/55">
-          Releases will appear here once you add them in Sanity Studio.
-        </p>
-      ) : (
-        <ul class="releases-index__grid">
-          {releases.map((release) => (
-            <li>
-              <ReleaseCard release={release} />
-            </li>
-          ))}
-        </ul>
-      )
-    }
+    <ReleasesListingSection releases={releases} />
   </section>
 </BaseLayout>
-
-<style>
-  .releases-index__grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  @media (min-width: 640px) {
-    .releases-index__grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1.25rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .releases-index__grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 1280px) {
-    .releases-index__grid {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-    }
-  }
-</style>

@@ -1,0 +1,154 @@
+---
+import type { EnrichedRelease, ReleaseType } from '@energize/shared';
+
+interface Props {
+  release: EnrichedRelease;
+}
+
+const { release } = Astro.props;
+const coverUrl = release.coverUrl;
+const year = new Date(release.releaseDate).getFullYear();
+
+const typeLabel: Record<ReleaseType, string> = {
+  single: 'Single',
+  ep: 'EP',
+  album: 'Album',
+  compilation: 'Compilation',
+};
+const releaseTypeLabel = typeLabel[release.type];
+---
+
+<a
+  href={`/releases/${release.slug}`}
+  data-type={release.type}
+  data-year={year}
+  class="catalog-card group block"
+  style="--release-accent: var(--color-glow);"
+>
+  <div class="catalog-card__cover aspect-square overflow-hidden">
+    {
+      coverUrl ? (
+        <img
+          src={coverUrl}
+          alt={release.cover?.alt ?? release.displayTitle}
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          decoding="async"
+          class="catalog-card__image"
+        />
+      ) : (
+        <div class="catalog-card__placeholder">No cover</div>
+      )
+    }
+  </div>
+  <div class="catalog-card__meta">
+    <p class="catalog-card__title">{release.displayTitle}</p>
+    <p class="catalog-card__type">
+      {releaseTypeLabel} &middot; {year}
+    </p>
+  </div>
+</a>
+
+<style>
+  .catalog-card {
+    border-radius: 0.875rem;
+    background: transparent;
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.35s ease;
+  }
+
+  .catalog-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .catalog-card__cover {
+    border-radius: 0.875rem;
+    line-height: 0;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.05) inset,
+      0 12px 36px rgba(0, 0, 0, 0.38);
+    transition: box-shadow 0.35s ease;
+  }
+
+  .catalog-card:hover .catalog-card__cover {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.07) inset,
+      0 20px 48px rgba(0, 0, 0, 0.48),
+      0 0 28px color-mix(in srgb, var(--release-accent) 16%, transparent);
+  }
+
+  .catalog-card__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .catalog-card:hover .catalog-card__image {
+    transform: scale(1.05);
+  }
+
+  .catalog-card__placeholder {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 0.75rem;
+    color: rgba(250, 250, 248, 0.4);
+  }
+
+  .catalog-card__meta {
+    position: relative;
+    margin-top: 0.75rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .catalog-card__meta::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: var(--release-accent);
+    transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .catalog-card:hover .catalog-card__meta::after {
+    width: 2.5rem;
+  }
+
+  .catalog-card__title {
+    font-size: clamp(0.875rem, 0.8rem + 0.25vw, 1rem);
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--color-paper);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .catalog-card__type {
+    margin-top: 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.45);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .catalog-card:hover {
+      transform: none;
+    }
+
+    .catalog-card:hover .catalog-card__image {
+      transform: none;
+    }
+  }
+</style>

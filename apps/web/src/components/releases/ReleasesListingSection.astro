@@ -1,0 +1,211 @@
+---
+import type { EnrichedRelease } from '@energize/shared';
+import { sanityImageUrl } from '../../lib/sanity/client';
+import { groupReleasesByArtist } from '../../lib/releases/groupReleasesByArtist';
+import ReleasesArtistStage from './ReleasesArtistStage.astro';
+import ReleasesListingMotion from './ReleasesListingMotion';
+
+interface Props {
+  releases: EnrichedRelease[];
+}
+
+const { releases } = Astro.props;
+
+const artistGroups = groupReleasesByArtist(releases);
+
+function artistPhotoUrl(
+  photo: (typeof artistGroups)[number]['photo'],
+  size: number,
+): string | undefined {
+  return sanityImageUrl(photo, { width: size, height: size, fit: 'crop' });
+}
+---
+
+{
+  artistGroups.length === 0 ? (
+    <p class="releases-listing__empty rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-8 py-16 text-center text-paper/55">
+      Releases will appear here once you add them in Sanity Studio.
+    </p>
+  ) : (
+    <div class="releases-listing" data-releases-listing data-filter-active="all">
+      <div class="releases-listing__filters-wrap">
+        <div
+          class="releases-listing__filters"
+          role="toolbar"
+          aria-label="Filter releases by artist"
+        >
+          <button
+            type="button"
+            class="releases-filter__pill"
+            data-releases-filter
+            data-releases-filter="all"
+            aria-current="true"
+          >
+            <span>All</span>
+          </button>
+          {
+            artistGroups.map((group) => {
+              const filterPhoto = artistPhotoUrl(group.photo, 64);
+              return (
+                <button
+                  type="button"
+                  class="releases-filter__pill"
+                  data-releases-filter
+                  data-releases-filter={group.slug}
+                  aria-current="false"
+                >
+                  {
+                    filterPhoto ? (
+                      <img
+                        src={filterPhoto}
+                        alt=""
+                        width={32}
+                        height={32}
+                        loading="lazy"
+                        decoding="async"
+                        class="releases-filter__photo"
+                      />
+                    ) : null
+                  }
+                  <span>{group.name}</span>
+                </button>
+              );
+            })
+          }
+        </div>
+      </div>
+
+      <div class="releases-listing__stages">
+        {
+          artistGroups.map((group, index) => (
+            <ReleasesArtistStage group={group} index={index} />
+          ))
+        }
+      </div>
+
+      <ReleasesListingMotion client:load />
+    </div>
+  )
+}
+
+<style>
+  .releases-listing__empty {
+    margin: 0;
+  }
+
+  .releases-listing__filters-wrap {
+    margin-bottom: clamp(2rem, 4.5vw, 3rem);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 1.5rem;
+  }
+
+  .releases-listing__filters {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 0.15rem;
+  }
+
+  .releases-listing__filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .releases-listing__filters {
+      flex-wrap: wrap;
+    }
+  }
+
+  .releases-filter__pill {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5625rem 1.125rem;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.72);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.25s ease;
+  }
+
+  .releases-filter__pill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    border: 1.25px solid transparent;
+    background: transparent;
+    pointer-events: none;
+    transition:
+      border-color 0.3s ease,
+      background 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .releases-filter__pill:hover,
+  .releases-filter__pill:focus-visible {
+    color: var(--color-paper);
+  }
+
+  .releases-filter__pill:hover::after,
+  .releases-filter__pill:focus-visible::after {
+    border-color: var(--color-glow);
+    background: rgba(77, 168, 255, 0.06);
+    box-shadow: 0 0 10px rgba(77, 168, 255, 0.24);
+  }
+
+  .releases-filter__pill[aria-current='true'] {
+    color: var(--color-paper);
+  }
+
+  .releases-filter__pill[aria-current='true']::after {
+    border-color: var(--color-glow);
+    background: rgba(77, 168, 255, 0.1);
+    box-shadow: 0 0 12px rgba(77, 168, 255, 0.32);
+  }
+
+  .releases-filter__photo {
+    position: relative;
+    z-index: 1;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .releases-filter__pill span {
+    position: relative;
+    z-index: 1;
+  }
+
+  .releases-listing__stages {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3.5rem, 8vw, 5.5rem);
+  }
+
+  .releases-listing[data-filter-active]:not([data-filter-active='all']) .releases-listing__stages {
+    gap: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .releases-filter__pill,
+    .releases-filter__pill::after {
+      transition: none !important;
+    }
+  }
+</style>

@@ -466,6 +466,7 @@ const isReversed = index % 2 === 1;
 
     .roster-card__eyebrow--desktop {
       display: block;
+      text-shadow: 0 1px 10px rgba(11, 11, 13, 0.55);
     }
 
     .roster-card__info-body {
@@ -480,11 +481,51 @@ const isReversed = index % 2 === 1;
     .roster-card__info-panel[data-collapsed='false'] {
       padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
     }
+
+    .roster-card__info-panel {
+      background: rgba(11, 11, 13, 0.12);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .roster-card__content {
+      position: relative;
+      isolation: isolate;
+    }
+
+    .roster-card__content::before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      inset: auto -0.75rem -0.5rem;
+      top: 28%;
+      background: linear-gradient(
+        to top,
+        rgba(11, 11, 13, 0.58) 0%,
+        rgba(11, 11, 13, 0.2) 52%,
+        transparent 100%
+      );
+      pointer-events: none;
+      border-radius: 0.35rem;
+    }
+
+    .roster-card__bio {
+      color: rgba(250, 250, 248, 0.86);
+      text-shadow:
+        0 1px 3px rgba(11, 11, 13, 0.78),
+        0 2px 18px rgba(11, 11, 13, 0.52);
+    }
   }
 
   @supports not (backdrop-filter: blur(1px)) {
     .roster-card__info-panel {
       background: rgba(11, 11, 13, 0.72);
+    }
+
+    @media (min-width: 1024px) {
+      .roster-card__info-panel {
+        background: rgba(11, 11, 13, 0.34);
+      }
     }
   }
 
