@@ -32,6 +32,8 @@ const artistLine = release.artistNames.slice(0, 3).join(', ');
           src={coverUrl}
           alt={release.cover?.alt ?? release.displayTitle}
           loading="lazy"
+          referrerpolicy="no-referrer"
+          decoding="async"
           class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
       ) : (

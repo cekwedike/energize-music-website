@@ -67,6 +67,8 @@ const jsonLd = {
           <img
             src={coverUrl}
             alt={release.cover?.alt ?? release.title}
+            referrerpolicy="no-referrer"
+            decoding="async"
             class="aspect-square w-full rounded-lg object-cover"
           />
         ) : (

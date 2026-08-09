@@ -6,6 +6,7 @@
     "dev": "sanity dev",
     "build": "sanity build",
     "deploy": "sanity deploy",
+    "deploy:studio": "sanity deploy",
     "seed:team": "node --env-file=.env scripts/seed-team.mjs",
     "seed:legal": "node --env-file=.env scripts/seed-legal-pages.mjs",
     "lint": "eslint . --config ../../eslint.config.mjs",

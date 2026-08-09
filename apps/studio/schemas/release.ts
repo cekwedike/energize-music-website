@@ -35,37 +35,7 @@ export default defineType({
       options: { hotspot: true },
       fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
       description:
-        'Optional if a streaming URL is set. Leave empty to auto-pull cover art from the primary streaming URL / streaming links.',
-      validation: (rule) =>
-        rule.custom((cover, context) => {
-          const doc = context.document as {
-            sourceUrl?: string;
-            links?: { spotify?: string; appleMusic?: string; youtube?: string };
-          } | undefined;
-
-          const hasStreamingUrl = Boolean(
-            doc?.sourceUrl?.trim() ||
-              doc?.links?.spotify?.trim() ||
-              doc?.links?.appleMusic?.trim() ||
-              doc?.links?.youtube?.trim(),
-          );
-
-          if (!cover) {
-            return (
-              hasStreamingUrl ||
-              'Add a cover image, or set a primary streaming URL / streaming link so artwork can be pulled automatically.'
-            );
-          }
-
-          const asset = (cover as { asset?: { _ref?: string } | null }).asset;
-          if (!asset?._ref) {
-            return hasStreamingUrl
-              ? true
-              : 'Cover upload incomplete. Re-upload the image, or clear Cover and rely on a streaming URL.';
-          }
-
-          return true;
-        }),
+        'Optional. Leave empty to auto-pull cover art from Primary streaming URL, then Spotify → Apple Music → YouTube.',
     }),
 
     defineField({
