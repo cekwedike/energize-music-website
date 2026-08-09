@@ -1,23 +1,22 @@
 ---
-import type { Release } from '@energize/shared';
-import { urlForImage } from '../../lib/sanity/client';
+import type { Release, ReleaseType } from '@energize/shared';
+import { sanityImageUrl } from '../../lib/sanity/client';
 
 interface Props {
   release: Release;
 }
 
-const { release } = Astro.props;
-const coverUrl = release.cover
-  ? urlForImage(release.cover).width(600).height(600).fit('crop').auto('format').url()
-  : undefined;
+const { release } = Astro.props as Props;
+const coverUrl = sanityImageUrl(release.cover, { width: 600, height: 600, fit: 'crop' });
 const year = new Date(release.releaseDate).getFullYear();
 
-const typeLabel: Record<Release['type'], string> = {
+const typeLabel: Record<ReleaseType, string> = {
   single: 'Single',
   ep: 'EP',
   album: 'Album',
   compilation: 'Compilation',
 };
+const releaseTypeLabel = typeLabel[release.type];
 ---
 
 <a
@@ -43,7 +42,7 @@ const typeLabel: Record<Release['type'], string> = {
   <div class="p-4">
     <p class="font-medium text-paper">{release.title}</p>
     <p class="mt-1 text-xs uppercase tracking-wide text-paper/50">
-      {typeLabel[release.type]} &middot; {year}
+      {releaseTypeLabel} &middot; {year}
     </p>
   </div>
 </a>

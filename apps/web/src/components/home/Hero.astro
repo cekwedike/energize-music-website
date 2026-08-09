@@ -1,5 +1,15 @@
 ---
 import Logo from '../ui/Logo.astro';
+import { HERO_VIDEO_POSTER, HERO_VIDEO_SRC } from '../../lib/hero-video';
+
+const videoAttrs = {
+  autoplay: true,
+  muted: true,
+  loop: true,
+  playsinline: true,
+  preload: 'metadata' as const,
+  poster: HERO_VIDEO_POSTER,
+};
 ---
 
 <section class="relative h-screen w-full overflow-hidden">
@@ -7,21 +17,15 @@ import Logo from '../ui/Logo.astro';
     id="hero-video-a"
     class="fixed inset-0 -z-10 h-screen w-full object-cover"
     style="transform-origin: 50% 100%; backface-visibility: hidden;"
-    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260613_180732_a54afbf6-b30d-470e-861f-669871f09f67.mp4"
-    autoplay
-    muted
-    loop
-    playsinline
+    src={HERO_VIDEO_SRC}
+    {...videoAttrs}
   />
   <video
     id="hero-video-b"
     class="fixed inset-0 -z-10 h-screen w-full object-cover opacity-0"
     style="transform-origin: 50% 100%; backface-visibility: hidden;"
-    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260613_180732_a54afbf6-b30d-470e-861f-669871f09f67.mp4"
-    autoplay
-    muted
-    loop
-    playsinline
+    src={HERO_VIDEO_SRC}
+    {...videoAttrs}
   />
   <div class="absolute inset-0 bg-black/20"></div>
 
@@ -155,5 +159,13 @@ import Logo from '../ui/Logo.astro';
 
     rafId = requestAnimationFrame(tick);
     window.addEventListener('pagehide', () => cancelAnimationFrame(rafId));
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(rafId);
+      } else {
+        rafId = requestAnimationFrame(tick);
+      }
+    });
   }
 </script>

@@ -5,5 +5,7 @@
       "@energize/shared": ["../../packages/shared/src/index.ts"],
       "@energize/shared/*": ["../../packages/shared/src/*"]
     }
-  }
+  },
+  "include": [".astro/types.d.ts", "src/**/*", "tests/**/*"],
+  "exclude": ["dist"]
 }

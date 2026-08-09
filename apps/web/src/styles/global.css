@@ -24,6 +24,7 @@
   html {
     color-scheme: dark;
     overflow-x: clip;
+    max-width: 100%;
   }
 
   body {
@@ -33,6 +34,7 @@
     font-size: var(--text-body-lg);
     line-height: 1.6;
     overflow-x: clip;
+    max-width: 100%;
   }
 
   h1,
@@ -189,9 +191,12 @@
   position: fixed;
   inset: 0;
   z-index: -20;
+  width: 100%;
+  max-width: 100%;
   overflow: hidden;
   pointer-events: none;
   isolation: isolate;
+  contain: strict;
 }
 
 .ambient-bg__base {

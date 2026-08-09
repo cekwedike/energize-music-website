@@ -7,12 +7,13 @@ interface Props {
   artist: Artist;
 }
 
-const { artist } = Astro.props;
+const { artist } = Astro.props as Props;
 
 const heroUrl = urlForImage(artist.photo).width(1920).height(1280).fit('crop').auto('format').url();
 const portraitUrl = urlForImage(artist.photo).width(900).height(1200).fit('crop').auto('format').url();
 
-const nameParts = artist.name.split(' ');
+const nameParts: string[] = artist.name.split(' ');
+const genres: string[] = artist.genres ?? [];
 ---
 
 <section class="chroma-hero" data-chroma-hero aria-label={`${artist.name} profile`}>
@@ -29,7 +30,7 @@ const nameParts = artist.name.split(' ');
         <div class="chroma-hero__intro">
           <h1 class="chroma-hero__name font-display leading-[0.82] tracking-tight">
             {
-              nameParts.map((part, index) => (
+              nameParts.map((part: string, index: number) => (
                 <span
                   class="chroma-hero__name-line block text-[clamp(2.75rem,1.5rem+7vw,7.5rem)] text-paper"
                   data-split-line
@@ -51,9 +52,9 @@ const nameParts = artist.name.split(' ');
           }
 
           {
-            artist.genres && artist.genres.length > 0 && (
+            genres.length > 0 && (
               <ul class="chroma-hero__genres chroma-hero__reveal mt-8 flex flex-wrap gap-2" aria-label="Genres">
-                {artist.genres.map((genre) => (
+                {genres.map((genre: string) => (
                   <li class="chroma-hero__genre">{genre}</li>
                 ))}
               </ul>

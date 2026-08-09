@@ -1,12 +1,25 @@
 # Editor workflow (Sanity)
 
+## Studio "No response received" toast
+
+If hosted Studio shows **Uncaught error: No response received** every ~45 seconds, publishing usually still works. This is a known Sanity dashboard SSE issue ([sanity-io/sanity#13239](https://github.com/sanity-io/sanity/issues/13239)): the Studio tries to sync dashboard "pinned items" and the connection times out.
+
+**What to do:**
+
+1. After **Publish**, refresh the document and confirm changes saved (or check the live site after deploy).
+2. Hard refresh Studio (`Ctrl+Shift+R`) if the toast covers the Publish button.
+3. Ignore the toast if publish succeeds. It is noise from a background connection, not a failed save.
+
+This project’s Studio only uses Structure + Vision tools. The toast comes from Sanity’s hosted monitoring bundle, not from your content schema.
+
 ## Publish a release
 
-1. Open Studio (`pnpm --filter studio dev` or hosted `*.sanity.studio`)
+1. Open Studio (`pnpm --filter studio dev` or hosted `energize-music-studio.sanity.studio`)
 2. **Release** → New → title, slug, type, date, cover, artists, streaming URLs
-3. Toggle **Featured on home** if it should appear in New music
-4. **Publish**
-5. Wait for deploy (~5–15 min if webhook/CI configured) or ask dev to run `pnpm build`
+3. Toggle **Featured on homepage** if it should appear in New music
+4. **Publish** (not just Save). Draft releases are invisible on the site.
+5. Rebuild and deploy the site (`pnpm build`, then upload `apps/web/dist/`). The live WordPress site at energize-music.com does not read Sanity until the Astro rebuild is deployed.
+6. Local dev: new release URLs usually work on first visit after publish. If `/releases/their-slug` still 404s, restart `pnpm dev`.
 
 ## Publish news
 

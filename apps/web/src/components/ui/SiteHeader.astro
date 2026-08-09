@@ -39,7 +39,7 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
       <Logo size="sm" animated={false} />
     </a>
 
-    <div class="hidden items-center gap-2 sm:flex lg:gap-3">
+    <div class="hidden items-center gap-2 lg:flex lg:gap-3">
       <div class="nav-outline-group">
         <nav aria-label="Primary">
           <ul class="flex items-center gap-0.5 lg:gap-1">
@@ -144,7 +144,7 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
       id="nav-toggle"
       aria-expanded="false"
       aria-controls="mobile-nav"
-      class="nav-toggle sm:hidden"
+      class="nav-toggle lg:hidden"
     >
       <span class="nav-toggle__shell">
         <span class="nav-toggle__label" data-label-closed="Menu" data-label-open="Close">Menu</span>
@@ -158,9 +158,9 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
     </button>
   </div>
 
-  <div id="mobile-nav-backdrop" class="mobile-nav-backdrop sm:hidden" aria-hidden="true"></div>
+  <div id="mobile-nav-backdrop" class="mobile-nav-backdrop lg:hidden" aria-hidden="true"></div>
 
-  <nav id="mobile-nav" aria-label="Primary mobile" class="mobile-nav sm:hidden" inert>
+  <nav id="mobile-nav" aria-label="Primary mobile" class="mobile-nav lg:hidden" inert>
     <ul class="mobile-nav__list">
       {
         navEntries.map((entry) =>
@@ -403,7 +403,7 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
     transform: rotate(180deg);
   }
 
-  @media (hover: hover) and (min-width: 640px) {
+  @media (hover: hover) and (min-width: 1024px) {
     .initiatives-dropdown::after {
       content: '';
       position: absolute;
@@ -616,6 +616,8 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
   .nav-toggle {
     position: relative;
     flex-shrink: 0;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 0.5rem;
     background: #040f16;
@@ -1029,7 +1031,7 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
   const initiativesTrigger = document.getElementById('initiatives-trigger');
   const initiativesMenu = document.getElementById('initiatives-menu');
   const initiativesDropdown = initiativesTrigger?.closest('.initiatives-dropdown');
-  const desktopInitiativesHover = window.matchMedia('(hover: hover) and (min-width: 640px)');
+  const desktopInitiativesHover = window.matchMedia('(hover: hover) and (min-width: 1024px)');
   let initiativesCloseTimer: ReturnType<typeof setTimeout> | null = null;
 
   function isInitiativesOpen() {

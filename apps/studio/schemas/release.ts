@@ -37,8 +37,18 @@ export default defineType({
       validation: (rule) =>
         rule.custom((cover, context) => {
           const doc = context.document as { sourceUrl?: string } | undefined;
-          if (cover || doc?.sourceUrl) return true;
-          return 'Add a cover image or a primary streaming URL.';
+          const hasSourceUrl = Boolean(doc?.sourceUrl?.trim());
+
+          if (!cover) {
+            return hasSourceUrl || 'Add a cover image or a primary streaming URL.';
+          }
+
+          const asset = (cover as { asset?: { _ref?: string } | null }).asset;
+          if (!asset?._ref) {
+            return 'Cover upload incomplete. Re-upload the image or remove the cover field and use a primary streaming URL instead.';
+          }
+
+          return true;
         }),
     }),
     defineField({

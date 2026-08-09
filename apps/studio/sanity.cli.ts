@@ -6,4 +6,7 @@ export default defineCliConfig({
     dataset: process.env.SANITY_STUDIO_DATASET ?? 'production',
   },
   studioHost: 'energize-music-studio',
+  deployment: {
+    appId: 'oojy90ywsjocked0vz4gw4gr',
+  },
 });

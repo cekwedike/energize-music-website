@@ -1,6 +1,17 @@
 import { defineField, defineType } from 'sanity';
 import { UsersIcon } from '@sanity/icons';
 
+function optionalHttpUrl(value: unknown) {
+  if (value === undefined || value === null || value === '') return true;
+  if (typeof value !== 'string') return 'Must be a valid URL';
+  try {
+    const url = new URL(value);
+    return ['http:', 'https:'].includes(url.protocol) || 'Must be an http(s) URL';
+  } catch {
+    return 'Must be a valid URL';
+  }
+}
+
 export default defineType({
   name: 'teamMember',
   title: 'Team Members',
@@ -48,9 +59,24 @@ export default defineType({
       type: 'object',
       description: 'Optional. Only filled links appear on the site.',
       fields: [
-        defineField({ name: 'linkedin', title: 'LinkedIn', type: 'url' }),
-        defineField({ name: 'instagram', title: 'Instagram', type: 'url' }),
-        defineField({ name: 'twitter', title: 'X (Twitter)', type: 'url' }),
+        defineField({
+          name: 'linkedin',
+          title: 'LinkedIn',
+          type: 'string',
+          validation: (rule) => rule.custom(optionalHttpUrl),
+        }),
+        defineField({
+          name: 'instagram',
+          title: 'Instagram',
+          type: 'string',
+          validation: (rule) => rule.custom(optionalHttpUrl),
+        }),
+        defineField({
+          name: 'twitter',
+          title: 'X (Twitter)',
+          type: 'string',
+          validation: (rule) => rule.custom(optionalHttpUrl),
+        }),
       ],
     }),
     defineField({

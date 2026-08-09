@@ -1,8 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
-import { sanityClient, urlForImage } from '../../lib/sanity/client';
+import { sanityClient } from '../../lib/sanity/client';
+import { enrichRelease } from '../../lib/metadata/enrichReleases';
 import { allReleasesQuery, releaseBySlugQuery, type Release } from '@energize/shared';
+
+/** Build one static page per published release slug. Dev can still resolve new slugs after publish. */
+export const dynamicParams = true;
 
 export async function getStaticPaths() {
   const releases = await sanityClient.fetch<Pick<Release, 'slug'>[]>(allReleasesQuery);
@@ -11,10 +15,8 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const release = await sanityClient.fetch<Release>(releaseBySlugQuery, { slug });
-
-const coverUrl = release.cover
-  ? urlForImage(release.cover).width(1000).height(1000).fit('crop').auto('format').url()
-  : undefined;
+const enriched = await enrichRelease(release);
+const coverUrl = enriched.coverUrl;
 
 const typeLabel: Record<Release['type'], string> = {
   single: 'Single',
@@ -22,6 +24,7 @@ const typeLabel: Record<Release['type'], string> = {
   album: 'Album',
   compilation: 'Compilation',
 };
+const releaseTypeLabel = typeLabel[release.type];
 
 const linkLabels: Record<string, string> = {
   spotify: 'Play on Spotify',
@@ -52,7 +55,7 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout title={release.title} description={`${release.title}: ${typeLabel[release.type]} on Energize Music.`}>
+<BaseLayout title={release.title} description={`${release.title}: ${releaseTypeLabel} on Energize Music.`}>
   <JsonLd data={jsonLd} />
   <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
     <div class="grid gap-10 sm:grid-cols-[1fr_1.2fr] sm:items-start">
@@ -71,7 +74,7 @@ const jsonLd = {
       }
       <div>
         <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
-          {typeLabel[release.type]} &middot; {releaseDate}
+          {releaseTypeLabel} &middot; {releaseDate}
         </p>
         <h1 class="text-h1 mt-2">{release.title}</h1>
 

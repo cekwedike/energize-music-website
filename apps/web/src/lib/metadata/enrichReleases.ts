@@ -1,5 +1,5 @@
 import type { EnrichedRelease, Release } from '@energize/shared';
-import { urlForImage } from '../sanity/client';
+import { sanityImageUrl } from '../sanity/client';
 import { fetchLinkMeta } from './fetchLinkMeta';
 
 function pickSourceUrl(release: Release): string | undefined {
@@ -10,8 +10,7 @@ function pickSourceUrl(release: Release): string | undefined {
 }
 
 function sanityCoverUrl(release: Release): string | undefined {
-  if (!release.cover?.asset?.url) return undefined;
-  return urlForImage(release.cover).width(600).height(600).fit('crop').auto('format').url();
+  return sanityImageUrl(release.cover, { width: 600, height: 600, fit: 'crop' });
 }
 
 function artistNamesFromSanity(release: Release): string[] {

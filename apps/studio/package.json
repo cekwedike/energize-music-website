@@ -11,15 +11,15 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@sanity/client": "^6.28.4",
+    "@sanity/client": "^7.26.2",
     "@sanity/icons": "^3.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sanity": "^3.69.0",
+    "sanity": "^6.9.1",
     "styled-components": "^6.1.15"
   },
   "devDependencies": {
-    "@sanity/vision": "^3.69.0",
+    "@sanity/vision": "^6.9.1",
     "@types/node": "^22.10.2",
     "typescript": "^5.7.2"
   }
