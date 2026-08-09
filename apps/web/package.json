@@ -4,11 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro check && astro build",
+    "dev": "astro sync && astro dev",
+    "build": "astro sync && astro check && astro build",
     "preview": "astro preview",
     "lint": "eslint . --config ../../eslint.config.mjs",
-    "typecheck": "astro check",
+    "sync": "astro sync",
+    "typecheck": "astro sync && astro check",
     "test:mobile": "playwright test tests/mobile-responsiveness.spec.ts",
     "test:mobile:ui": "playwright test tests/mobile-responsiveness.spec.ts --ui"
   },

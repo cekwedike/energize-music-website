@@ -54,12 +54,12 @@ function resolveAmbientVariant(): AmbientVariant {
     />
     <SEO title={title} description={description} path={Astro.url.pathname} ogImage={ogImage} />
   </head>
-  <body>
+  <body class="site-body">
     <AmbientBackground variant={resolveAmbientVariant()} />
     <a href="#main-content" class="skip-link">Skip to content</a>
     {!hideHeader && <SiteHeader variant={headerVariant} />}
     {showTopMarquee && <FooterMarquee placement="top" />}
-    <main id="main-content" class="relative">
+    <main id="main-content" class="site-main relative">
       <slot />
     </main>
     {!hideFooter && <SiteFooter />}

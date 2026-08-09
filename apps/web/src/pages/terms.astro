@@ -2,12 +2,14 @@
 import LegalPage from '../components/legal/LegalPage.astro';
 import { sanityClient } from '../lib/sanity/client';
 import { termsFallbackBlocks } from '../lib/legal/fallbackContent';
+import { resolveLegalBlocks } from '../lib/legal/resolveLegalBlocks';
 import { pageBySlugQuery, type Page } from '@energize/shared';
 
 const page = await sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'terms' });
-const blocks = page?.blocks?.length ? page.blocks : termsFallbackBlocks;
-const title = page?.title ?? 'Terms of Service';
-const description = 'Terms governing use of Energize Music websites, content, and related digital services.';
+const blocks = resolveLegalBlocks(page, termsFallbackBlocks);
+const title = page?.title?.trim() || 'Terms of Service';
+const description =
+  'Terms governing use of Energize Music websites, content, and related digital services.';
 ---
 
 <LegalPage title={title} description={description} blocks={blocks} eyebrow="Terms" />

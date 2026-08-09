@@ -77,24 +77,47 @@ const isReversed = index % 2 === 1;
     </div>
 
     <div class="roster-card__info">
-      <div class="roster-card__info-panel">
-        <p class="roster-card__eyebrow" data-motion="reveal">Profile</p>
+      <div class="roster-card__info-panel" data-roster-info-panel data-collapsed="true">
+        <p class="roster-card__eyebrow roster-card__eyebrow--desktop" data-motion="reveal">Profile</p>
 
-        <div class="roster-card__content">
-          {
-            bio && (
-              <p class="roster-card__bio" data-motion="reveal">
-                {bio}
-              </p>
-            )
-          }
+        <button
+          type="button"
+          class="roster-card__info-toggle"
+          data-roster-info-toggle
+          aria-expanded="false"
+          aria-controls={`roster-info-${artist.slug}`}
+        >
+          <span class="roster-card__eyebrow">Profile</span>
+          <span class="roster-card__toggle-label">Show bio</span>
+          <svg
+            class="roster-card__toggle-chevron"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </button>
 
-          <a href={`/artists/${artist.slug}`} class="roster-card__cta" data-motion="reveal">
-            View full profile
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6"></path>
-            </svg>
-          </a>
+        <div id={`roster-info-${artist.slug}`} class="roster-card__info-body" data-roster-info-body hidden>
+          <div class="roster-card__content">
+            {
+              bio && (
+                <p class="roster-card__bio" data-motion="reveal">
+                  {bio}
+                </p>
+              )
+            }
+
+            <a href={`/artists/${artist.slug}`} class="roster-card__cta" data-motion="reveal">
+              View full profile
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6"></path>
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -180,7 +203,7 @@ const isReversed = index % 2 === 1;
   .roster-card__info {
     display: flex;
     flex-direction: column;
-    min-height: min(48svh, 480px);
+    min-height: auto;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -188,11 +211,69 @@ const isReversed = index % 2 === 1;
     display: flex;
     flex: 1;
     flex-direction: column;
-    padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
+    padding: clamp(1rem, 3vh, 1.35rem) clamp(1.25rem, 4vw, 2.5rem);
     color: var(--color-paper);
-    background: rgba(11, 11, 13, 0.42);
-    backdrop-filter: blur(18px) saturate(1.15);
-    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+    background: rgba(11, 11, 13, 0.26);
+    backdrop-filter: blur(8px) saturate(1.08);
+    -webkit-backdrop-filter: blur(8px) saturate(1.08);
+    transition:
+      background 0.3s ease,
+      padding 0.3s ease;
+  }
+
+  .roster-card__info-panel[data-collapsed='false'] {
+    padding-block: clamp(1.75rem, 4vh, 2.5rem) clamp(2rem, 5vh, 2.75rem);
+  }
+
+  .roster-card__info-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    touch-action: manipulation;
+  }
+
+  .roster-card__info-toggle:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--roster-accent) 55%, white 10%);
+    outline-offset: 3px;
+    border-radius: 0.25rem;
+  }
+
+  .roster-card__toggle-label {
+    margin-left: auto;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.62);
+  }
+
+  .roster-card__toggle-chevron {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    color: rgba(250, 250, 248, 0.55);
+    transition: transform 0.25s ease;
+  }
+
+  .roster-card__info-panel[data-collapsed='false'] .roster-card__toggle-chevron {
+    transform: rotate(180deg);
+  }
+
+  .roster-card__info-body {
+    overflow: hidden;
+  }
+
+  .roster-card__info-body[hidden] {
+    display: none;
   }
 
   .roster-card__marker {
@@ -267,6 +348,10 @@ const isReversed = index % 2 === 1;
     letter-spacing: 0.32em;
     text-transform: uppercase;
     color: rgba(250, 250, 248, 0.52);
+  }
+
+  .roster-card__eyebrow--desktop {
+    display: none;
   }
 
   .roster-card__content {
@@ -348,7 +433,7 @@ const isReversed = index % 2 === 1;
     }
 
     .roster-card__info-panel {
-      padding-bottom: clamp(2rem, 5vh, 3rem);
+      padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
     }
 
     .roster-card__photo {
@@ -370,9 +455,36 @@ const isReversed = index % 2 === 1;
     }
   }
 
+  @media (min-width: 1024px) {
+    .roster-card__info {
+      min-height: min(48svh, 480px);
+    }
+
+    .roster-card__info-toggle {
+      display: none;
+    }
+
+    .roster-card__eyebrow--desktop {
+      display: block;
+    }
+
+    .roster-card__info-body {
+      display: block !important;
+    }
+
+    .roster-card__info-body[hidden] {
+      display: block !important;
+    }
+
+    .roster-card__info-panel[data-collapsed='true'],
+    .roster-card__info-panel[data-collapsed='false'] {
+      padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
+    }
+  }
+
   @supports not (backdrop-filter: blur(1px)) {
     .roster-card__info-panel {
-      background: rgba(11, 11, 13, 0.88);
+      background: rgba(11, 11, 13, 0.72);
     }
   }
 
@@ -431,6 +543,14 @@ const isReversed = index % 2 === 1;
     .roster-card__cta:hover,
     .roster-card__cta:focus-visible {
       transform: none;
+    }
+
+    .roster-card__toggle-chevron {
+      transition: none;
+    }
+
+    .roster-card__info-panel {
+      transition: none;
     }
   }
 </style>

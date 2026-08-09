@@ -143,6 +143,9 @@ function resolveOEmbedEndpoint(url: string): string | null {
   return null;
 }
 
+/** Session cache so list + detail pages do not re-hit oEmbed for the same URL. */
+const linkMetaCache = new Map<string, Promise<LinkMeta | null>>();
+
 /**
  * Fetch link metadata at build/dev time via oEmbed or Open Graph tags.
  * Returns partial metadata; callers should fall back to Sanity fields.
@@ -154,16 +157,23 @@ export async function fetchLinkMeta(
   if (!url?.trim()) return null;
 
   const normalized = normalizeStreamingUrl(url);
+  const cached = linkMetaCache.get(normalized);
+  if (cached) return cached;
 
-  try {
-    const oembedEndpoint = resolveOEmbedEndpoint(normalized);
-    if (oembedEndpoint) {
-      const oembedMeta = await fetchOEmbed(oembedEndpoint, normalized, timeoutMs);
-      if (oembedMeta?.title || oembedMeta?.thumbnailUrl) return oembedMeta;
+  const pending = (async (): Promise<LinkMeta | null> => {
+    try {
+      const oembedEndpoint = resolveOEmbedEndpoint(normalized);
+      if (oembedEndpoint) {
+        const oembedMeta = await fetchOEmbed(oembedEndpoint, normalized, timeoutMs);
+        if (oembedMeta?.title || oembedMeta?.thumbnailUrl) return oembedMeta;
+      }
+
+      return await fetchOpenGraph(normalized, timeoutMs);
+    } catch {
+      return null;
     }
+  })();
 
-    return await fetchOpenGraph(normalized, timeoutMs);
-  } catch {
-    return null;
-  }
+  linkMetaCache.set(normalized, pending);
+  return pending;
 }

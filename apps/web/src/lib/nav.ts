@@ -3,7 +3,7 @@ export interface NavLink {
   href: string;
 }
 
-// Used by the footer's "Explore" column. Order doesn't need to match the header.
+// Used by the footer's "Explore" column.
 export const primaryNav: NavLink[] = [
   { label: 'About Us', href: '/about' },
   { label: 'Artists', href: '/artists' },
@@ -59,6 +59,7 @@ export const headerNav: HeaderNavEntry[] = [
   { type: 'link', label: 'Home', href: '/' },
   { type: 'link', label: 'About Us', href: '/about' },
   { type: 'link', label: 'Artists', href: '/artists' },
+  { type: 'link', label: 'Releases', href: '/releases' },
   { type: 'link', label: 'Blogs', href: '/blogs' },
   { type: 'dropdown', label: 'Initiatives', items: initiativesNav },
   { type: 'link', label: 'Careers', href: '/careers' },

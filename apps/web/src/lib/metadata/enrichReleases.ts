@@ -2,7 +2,7 @@ import type { EnrichedRelease, Release } from '@energize/shared';
 import { sanityImageUrl } from '../sanity/client';
 import { fetchLinkMeta, type LinkMeta } from './fetchLinkMeta';
 
-/** Prefer primary sourceUrl, then Spotify → Apple Music → YouTube. */
+/** Prefer primary sourceUrl, then Spotify → Apple Music → YouTube (for listen CTA). */
 export function collectStreamingUrls(release: Release): string[] {
   const urls: string[] = [];
   const push = (value?: string) => {
@@ -18,8 +18,27 @@ export function collectStreamingUrls(release: Release): string[] {
   return urls;
 }
 
-function sanityCoverUrl(release: Release): string | undefined {
-  return sanityImageUrl(release.cover, { width: 600, height: 600, fit: 'crop' });
+/**
+ * Cover artwork candidates. Spotify oEmbed is the most reliable thumbnail source,
+ * so it is tried before Apple / YouTube even when sourceUrl points elsewhere.
+ */
+export function collectCoverCandidateUrls(release: Release): string[] {
+  const urls: string[] = [];
+  const push = (value?: string) => {
+    const trimmed = value?.trim();
+    if (!trimmed) return;
+    if (!urls.includes(trimmed)) urls.push(trimmed);
+  };
+
+  push(release.links?.spotify);
+  push(release.sourceUrl);
+  push(release.links?.appleMusic);
+  push(release.links?.youtube);
+  return urls;
+}
+
+function sanityCoverUrl(release: Release, size = 600): string | undefined {
+  return sanityImageUrl(release.cover, { width: size, height: size, fit: 'crop' });
 }
 
 function artistNamesFromSanity(release: Release): string[] {
@@ -61,23 +80,25 @@ async function fetchBestLinkMeta(urls: string[]): Promise<LinkMeta | null> {
   return best;
 }
 
-export async function enrichRelease(release: Release): Promise<EnrichedRelease> {
+export async function enrichRelease(
+  release: Release,
+  options?: { coverSize?: number },
+): Promise<EnrichedRelease> {
   const streamingUrls = collectStreamingUrls(release);
+  const coverUrls = collectCoverCandidateUrls(release);
   const primaryUrl = streamingUrls[0];
-  const sanityCover = sanityCoverUrl(release);
+  const coverSize = options?.coverSize ?? 600;
+  const sanityCover = sanityCoverUrl(release, coverSize);
 
   // Always attempt link metadata when a Sanity cover asset is missing so
   // Spotify / Apple Music / YouTube can supply artwork automatically.
-  const meta = !sanityCover && streamingUrls.length > 0 ? await fetchBestLinkMeta(streamingUrls) : null;
+  const meta = !sanityCover && coverUrls.length > 0 ? await fetchBestLinkMeta(coverUrls) : null;
 
   const displayTitle = release.title || meta?.title;
   const coverUrl = sanityCover ?? meta?.thumbnailUrl;
+  const sanityArtists = artistNamesFromSanity(release);
   const artistNames =
-    artistNamesFromSanity(release).length > 0
-      ? artistNamesFromSanity(release)
-      : meta?.artistName
-        ? [meta.artistName]
-        : [];
+    sanityArtists.length > 0 ? sanityArtists : meta?.artistName ? [meta.artistName] : [];
 
   return {
     ...release,

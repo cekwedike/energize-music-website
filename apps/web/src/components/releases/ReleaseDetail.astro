@@ -1,0 +1,269 @@
+---
+import type { EnrichedRelease, ReleaseType, StreamingLinks } from '@energize/shared';
+import EditorialSectionLink from '../ui/EditorialSectionLink.astro';
+import ArtistStreamingLinks from '../artists/ArtistStreamingLinks.astro';
+
+interface Props {
+  release: EnrichedRelease;
+}
+
+const { release } = Astro.props as Props;
+
+const typeLabel: Record<ReleaseType, string> = {
+  single: 'Single',
+  ep: 'EP',
+  album: 'Album',
+  compilation: 'Compilation',
+};
+
+const releaseTypeLabel = typeLabel[release.type];
+const coverUrl = release.coverUrl;
+const coverAlt = release.cover?.alt ?? release.displayTitle;
+
+const artists = (release.artists ?? []).filter(
+  (artist): artist is NonNullable<typeof artist> => Boolean(artist?._id && artist.slug && artist.name),
+);
+
+const releaseDate = new Date(release.releaseDate).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const streaming: StreamingLinks = {
+  spotify: release.links?.spotify,
+  appleMusic: release.links?.appleMusic,
+  youtube: release.links?.youtube,
+};
+const hasStreaming = Boolean(streaming.spotify || streaming.appleMusic || streaming.youtube);
+const primaryListenUrl = release.externalUrl;
+---
+
+<section class="release-detail" data-release-detail>
+  {
+    coverUrl && (
+      <div class="release-detail__atmosphere" aria-hidden="true">
+        <img src={coverUrl} alt="" class="release-detail__atmosphere-img" decoding="async" referrerpolicy="no-referrer" />
+        <div class="release-detail__atmosphere-veil"></div>
+      </div>
+    )
+  }
+
+  <div class="relative mx-auto flex w-full max-w-7xl flex-col px-5 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
+    <EditorialSectionLink
+      href="/releases"
+      label="All Releases"
+      variant="back"
+      class="release-detail__back release-reveal release-reveal-1"
+    />
+
+    <div class="mt-10 grid items-start gap-10 lg:mt-14 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-16 xl:gap-20">
+      <figure class="release-detail__cover release-reveal release-reveal-2">
+        {
+          coverUrl ? (
+            <img
+              src={coverUrl}
+              alt={coverAlt}
+              width={960}
+              height={960}
+              decoding="async"
+              fetchpriority="high"
+              referrerpolicy="no-referrer"
+              class="release-detail__cover-img"
+            />
+          ) : (
+            <div class="release-detail__cover-fallback" role="img" aria-label="No cover available">
+              <span>No cover</span>
+            </div>
+          )
+        }
+      </figure>
+
+      <div class="release-detail__copy min-w-0 lg:pt-4">
+        <p class="release-reveal release-reveal-3 text-xs font-bold uppercase tracking-[0.28em] text-[var(--color-glow)]">
+          {releaseTypeLabel} &middot; {releaseDate}
+        </p>
+
+        <h1 class="release-reveal release-reveal-4 mt-4 font-display text-[clamp(2.25rem,1.4rem+3.2vw,4.25rem)] leading-[0.95] tracking-tight text-paper">
+          {release.displayTitle}
+        </h1>
+
+        {
+          artists.length > 0 ? (
+            <ul class="release-reveal release-reveal-5 mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1" aria-label="Artists">
+              {artists.map((artist, index) => (
+                <li class="inline-flex items-baseline text-lg text-paper/80 sm:text-xl">
+                  <a
+                    href={`/artists/${artist.slug}`}
+                    class="release-detail__artist-link font-display italic underline decoration-[var(--color-glow)]/50 underline-offset-[0.22em] transition hover:text-[var(--color-glow)] hover:decoration-[var(--color-glow)]"
+                  >
+                    {artist.name}
+                  </a>
+                  {index < artists.length - 1 && <span class="ml-2 text-paper/35" aria-hidden="true">/</span>}
+                </li>
+              ))}
+            </ul>
+          ) : release.artistNames.length > 0 ? (
+            <p class="release-reveal release-reveal-5 mt-6 font-display text-lg italic text-paper/70 sm:text-xl">
+              {release.artistNames.join(' / ')}
+            </p>
+          ) : null
+        }
+
+        {
+          hasStreaming && (
+            <div class="release-reveal release-reveal-6 mt-10 max-w-md">
+              <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-paper/45">Listen</p>
+              <div class="mt-4">
+                <ArtistStreamingLinks
+                  streaming={streaming}
+                  artistName={release.displayTitle}
+                  layout="stack"
+                />
+              </div>
+            </div>
+          )
+        }
+
+        {
+          primaryListenUrl && !hasStreaming && (
+            <div class="release-reveal release-reveal-6 mt-10">
+              <a
+                href={primaryListenUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center rounded-full bg-paper px-7 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-paper/90"
+              >
+                Listen now
+              </a>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector('[data-release-detail]');
+  if (root) {
+    requestAnimationFrame(() => root.classList.add('is-visible'));
+  }
+</script>
+
+<style>
+  .release-detail {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: min(92vh, 920px);
+  }
+
+  .release-detail__atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .release-detail__atmosphere-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.12);
+    filter: blur(48px) saturate(1.15);
+    opacity: 0.35;
+  }
+
+  .release-detail__atmosphere-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 55% at 20% 30%, rgba(77, 168, 255, 0.12), transparent 55%),
+      linear-gradient(180deg, rgba(11, 11, 13, 0.55) 0%, rgba(11, 11, 13, 0.82) 45%, var(--color-ink) 100%);
+  }
+
+  .release-detail__cover {
+    position: relative;
+    margin: 0;
+    max-width: 34rem;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 0.35rem;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 28px 80px rgba(0, 0, 0, 0.55);
+  }
+
+  .release-detail__cover-img,
+  .release-detail__cover-fallback {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .release-detail__cover-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(250, 250, 248, 0.4);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .release-detail__artist-link {
+    color: inherit;
+    text-decoration-thickness: 1px;
+  }
+
+  .release-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .release-detail.is-visible .release-reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .release-detail.is-visible .release-reveal-1 { transition-delay: 40ms; }
+  .release-detail.is-visible .release-reveal-2 { transition-delay: 120ms; }
+  .release-detail.is-visible .release-reveal-3 { transition-delay: 200ms; }
+  .release-detail.is-visible .release-reveal-4 { transition-delay: 280ms; }
+  .release-detail.is-visible .release-reveal-5 { transition-delay: 360ms; }
+  .release-detail.is-visible .release-reveal-6 { transition-delay: 440ms; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .release-reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .release-detail__cover {
+      max-width: 22rem;
+      margin-inline: auto;
+    }
+
+    .release-detail__copy {
+      text-align: center;
+    }
+
+    .release-detail__copy ul {
+      justify-content: center;
+    }
+
+    .release-detail__copy .max-w-md {
+      margin-inline: auto;
+    }
+  }
+</style>

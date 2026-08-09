@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
+import ReleaseDetail from '../../components/releases/ReleaseDetail.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { enrichRelease } from '../../lib/metadata/enrichReleases';
 import { allReleasesQuery, releaseBySlugQuery, type Release } from '@energize/shared';
@@ -15,11 +16,12 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const release = await sanityClient.fetch<Release>(releaseBySlugQuery, { slug });
-const enriched = await enrichRelease(release);
-const coverUrl = enriched.coverUrl;
-const artists = (release.artists ?? []).filter(
-  (artist): artist is NonNullable<typeof artist> => Boolean(artist?._id && artist.slug && artist.name),
-);
+
+if (!release) {
+  return Astro.redirect('/404');
+}
+
+const enriched = await enrichRelease(release, { coverSize: 1200 });
 
 const typeLabel: Record<Release['type'], string> = {
   single: 'Single',
@@ -29,25 +31,16 @@ const typeLabel: Record<Release['type'], string> = {
 };
 const releaseTypeLabel = typeLabel[release.type];
 
-const linkLabels: Record<string, string> = {
-  spotify: 'Play on Spotify',
-  appleMusic: 'Play on Apple Music',
-  youtube: 'Watch on YouTube',
-};
-const linkEntries = Object.entries(release.links ?? {}).filter(([, url]) => Boolean(url));
-
-const releaseDate = new Date(release.releaseDate).toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
+const artists = (enriched.artists ?? []).filter(
+  (artist): artist is NonNullable<typeof artist> => Boolean(artist?._id && artist.slug && artist.name),
+);
 
 const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'MusicAlbum',
-  name: release.title,
-  image: coverUrl,
+  name: enriched.displayTitle,
+  image: enriched.coverUrl,
   datePublished: release.releaseDate,
   url: new URL(`/releases/${release.slug}`, siteUrl).toString(),
   byArtist: artists.map((artist) => ({
@@ -56,65 +49,19 @@ const jsonLd = {
     url: new URL(`/artists/${artist.slug}`, siteUrl).toString(),
   })),
 };
+
+const seoDescription =
+  artists.length > 0
+    ? `${enriched.displayTitle} by ${artists.map((a) => a.name).join(', ')}. ${releaseTypeLabel} on Energize Music.`
+    : `${enriched.displayTitle}: ${releaseTypeLabel} on Energize Music.`;
 ---
 
-<BaseLayout title={release.title} description={`${release.title}: ${releaseTypeLabel} on Energize Music.`}>
+<BaseLayout
+  title={enriched.displayTitle}
+  description={seoDescription}
+  ogImage={enriched.coverUrl}
+  ambientVariant="editorial"
+>
   <JsonLd data={jsonLd} />
-  <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
-    <div class="grid gap-10 sm:grid-cols-[1fr_1.2fr] sm:items-start">
-      {
-        coverUrl ? (
-          <img
-            src={coverUrl}
-            alt={release.cover?.alt ?? release.title}
-            referrerpolicy="no-referrer"
-            decoding="async"
-            class="aspect-square w-full rounded-lg object-cover"
-          />
-        ) : (
-          <div class="flex aspect-square w-full items-center justify-center rounded-lg bg-white/[0.04] text-paper/40">
-            No cover available
-          </div>
-        )
-      }
-      <div>
-        <p class="text-sm font-medium uppercase tracking-wide text-[var(--color-accent)]">
-          {releaseTypeLabel} &middot; {releaseDate}
-        </p>
-        <h1 class="text-h1 mt-2">{release.title}</h1>
-
-        {
-          artists.length > 0 && (
-            <p class="text-lead mt-4 text-paper/75">
-              {artists.map((artist, index) => (
-                <>
-                  <a href={`/artists/${artist.slug}`} class="underline decoration-[var(--color-accent)] underline-offset-4 hover:text-[var(--color-accent)]">
-                    {artist.name}
-                  </a>
-                  {index < artists.length - 1 && ', '}
-                </>
-              ))}
-            </p>
-          )
-        }
-
-        {
-          linkEntries.length > 0 && (
-            <div class="mt-8 flex flex-wrap gap-3">
-              {linkEntries.map(([key, url]) => (
-                <a
-                  href={url as string}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
-                >
-                  {linkLabels[key] ?? key}
-                </a>
-              ))}
-            </div>
-          )
-        }
-      </div>
-    </div>
-  </section>
+  <ReleaseDetail release={enriched} />
 </BaseLayout>

@@ -1,8 +1,47 @@
 import { useEffect } from 'react';
 import { animate, inView, scroll, stagger } from 'motion';
 
+const COLLAPSE_BREAKPOINT = 1024;
+
 function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function isCollapsibleViewport(): boolean {
+  return window.matchMedia(`(max-width: ${COLLAPSE_BREAKPOINT - 1}px)`).matches;
+}
+
+function setPanelCollapsed(
+  panel: HTMLElement,
+  toggle: HTMLButtonElement,
+  body: HTMLElement,
+  collapsed: boolean,
+) {
+  panel.dataset.collapsed = collapsed ? 'true' : 'false';
+  toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  body.hidden = collapsed;
+
+  const label = toggle.querySelector<HTMLElement>('.roster-card__toggle-label');
+  if (label) {
+    label.textContent = collapsed ? 'Show bio' : 'Hide bio';
+  }
+}
+
+function syncRosterInfoPanels() {
+  const collapsible = isCollapsibleViewport();
+
+  document.querySelectorAll<HTMLElement>('[data-roster-info-panel]').forEach((panel) => {
+    const toggle = panel.querySelector<HTMLButtonElement>('[data-roster-info-toggle]');
+    const body = panel.querySelector<HTMLElement>('[data-roster-info-body]');
+    if (!toggle || !body) return;
+
+    if (collapsible) {
+      const collapsed = panel.dataset.collapsed !== 'false';
+      setPanelCollapsed(panel, toggle, body, collapsed);
+    } else {
+      setPanelCollapsed(panel, toggle, body, false);
+    }
+  });
 }
 
 export default function ArtistsRosterMotion() {
@@ -18,7 +57,35 @@ export default function ArtistsRosterMotion() {
       });
     });
 
-    if (reduced) return;
+    syncRosterInfoPanels();
+
+    const collapseQuery = window.matchMedia(`(max-width: ${COLLAPSE_BREAKPOINT - 1}px)`);
+    const onCollapseChange = () => syncRosterInfoPanels();
+    collapseQuery.addEventListener('change', onCollapseChange);
+
+    const toggleCleanups: Array<() => void> = [];
+
+    document.querySelectorAll<HTMLButtonElement>('[data-roster-info-toggle]').forEach((toggle) => {
+      const panel = toggle.closest<HTMLElement>('[data-roster-info-panel]');
+      const body = panel?.querySelector<HTMLElement>('[data-roster-info-body]');
+      if (!panel || !body) return;
+
+      const onToggle = () => {
+        if (!isCollapsibleViewport()) return;
+        const collapsed = panel.dataset.collapsed !== 'false';
+        setPanelCollapsed(panel, toggle, body, !collapsed);
+      };
+
+      toggle.addEventListener('click', onToggle);
+      toggleCleanups.push(() => toggle.removeEventListener('click', onToggle));
+    });
+
+    if (reduced) {
+      return () => {
+        collapseQuery.removeEventListener('change', onCollapseChange);
+        toggleCleanups.forEach((fn) => fn());
+      };
+    }
 
     const cleanups: Array<() => void> = [];
 
@@ -61,7 +128,11 @@ export default function ArtistsRosterMotion() {
       });
     });
 
-    return () => cleanups.forEach((fn) => fn());
+    return () => {
+      collapseQuery.removeEventListener('change', onCollapseChange);
+      toggleCleanups.forEach((fn) => fn());
+      cleanups.forEach((fn) => fn());
+    };
   }, []);
 
   return null;

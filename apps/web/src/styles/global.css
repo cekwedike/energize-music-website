@@ -25,6 +25,7 @@
     color-scheme: dark;
     overflow-x: clip;
     max-width: 100%;
+    height: 100%;
   }
 
   body {
@@ -35,6 +36,26 @@
     line-height: 1.6;
     overflow-x: clip;
     max-width: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Keep the site footer pinned to the bottom of short pages. */
+  .site-header {
+    flex-shrink: 0;
+  }
+
+  #main-content {
+    flex: 1 0 auto;
+    width: 100%;
+  }
+
+  .site-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+    width: 100%;
   }
 
   h1,

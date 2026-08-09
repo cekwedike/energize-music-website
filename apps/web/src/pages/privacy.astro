@@ -2,11 +2,12 @@
 import LegalPage from '../components/legal/LegalPage.astro';
 import { sanityClient } from '../lib/sanity/client';
 import { privacyFallbackBlocks } from '../lib/legal/fallbackContent';
+import { resolveLegalBlocks } from '../lib/legal/resolveLegalBlocks';
 import { pageBySlugQuery, type Page } from '@energize/shared';
 
 const page = await sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'privacy' });
-const blocks = page?.blocks?.length ? page.blocks : privacyFallbackBlocks;
-const title = page?.title ?? 'Privacy Policy';
+const blocks = resolveLegalBlocks(page, privacyFallbackBlocks);
+const title = page?.title?.trim() || 'Privacy Policy';
 const description =
   'How Energize Music collects, uses, and protects your information on energize-music.com and related services.';
 ---
