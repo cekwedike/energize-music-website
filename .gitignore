@@ -14,12 +14,16 @@ coverage
 # Energize Label Website
 energize_label_website_a612350f.plan.md
 
-# Agent / Playwright screenshots (dev artifacts)
-**/.playwright-screenshots*/
-**/.playwright-artifacts*/
-nav-*.png
-*hero*-before.png
-*hero*-after.png
-*hero*-desktop.png
-*hero*-mobile.png
-
+# Playwright / agent screenshots and test artifacts
+**/playwright-artifacts/
+**/playwright-report/
+**/playwright-screenshots/
+**/.playwright-artifacts/
+**/.playwright-screenshots/
+**/test-results/
+**/blob-report/
+apps/web/**/*.png
+apps/web/**/*.jpg
+apps/web/**/*.jpeg
+apps/web/**/*.webp
+!apps/web/public/**
