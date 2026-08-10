@@ -2,7 +2,31 @@ import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import { parseSanityEnv } from '@energize/shared';
 
-const env = parseSanityEnv(import.meta.env as unknown as Record<string, string | undefined>);
+/** Prefer Vite/Astro PUBLIC_ inlines; fall back to process.env for CI/Vercel. */
+function readSanityEnv() {
+  const fromMeta = import.meta.env as unknown as Record<string, string | undefined>;
+  const raw = {
+    PUBLIC_SANITY_PROJECT_ID:
+      fromMeta.PUBLIC_SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID,
+    PUBLIC_SANITY_DATASET:
+      fromMeta.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET,
+    PUBLIC_SANITY_API_VERSION:
+      fromMeta.PUBLIC_SANITY_API_VERSION || process.env.PUBLIC_SANITY_API_VERSION,
+  };
+  try {
+    return parseSanityEnv(raw);
+  } catch {
+    const missing = (
+      ['PUBLIC_SANITY_PROJECT_ID', 'PUBLIC_SANITY_API_VERSION'] as const
+    ).filter((key) => !raw[key]);
+    throw new Error(
+      `Missing Sanity env: ${missing.join(', ') || 'invalid values'}. ` +
+        'Set them in Vercel → Settings → Environment Variables for Production and Preview, then redeploy.',
+    );
+  }
+}
+
+const env = readSanityEnv();
 
 export const sanityClient = createClient({
   projectId: env.PUBLIC_SANITY_PROJECT_ID,
