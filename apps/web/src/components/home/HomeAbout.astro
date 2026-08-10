@@ -1,18 +1,34 @@
 ---
+const quote =
+  'Music can carry hope without losing its edge. From Lagos, we create Afro-gospel and soul-fusion sound that is uplifting, family-friendly, and made to travel.';
+const words = quote.split(' ');
 ---
 
-<section class="home-about" aria-labelledby="home-about-title">
-  <div class="home-about__glow" aria-hidden="true"></div>
-  <div class="home-about__inner scroll-reveal">
-    <p class="home-kicker">The belief</p>
+<section class="home-about" data-home-about aria-labelledby="home-about-title">
+  <div class="home-about__orb" aria-hidden="true"></div>
+  <div class="home-about__inner">
+    <p class="home-kicker" data-home-reveal>The belief</p>
+    <h2 id="home-about-title" class="sr-only">Why Energize Music exists</h2>
     <blockquote class="home-about__quote">
-      <p id="home-about-title">
-        Music can carry hope without losing its edge. From Lagos, we create Afro-gospel and
-        soul-fusion sound that is uplifting, family-friendly, and made to travel.
+      <p>
+        {
+          words.map((word) => (
+            <span class="home-about__word" data-home-word>
+              {word}
+            </span>
+          ))
+        }
       </p>
     </blockquote>
-    <p class="home-about__by">Tochukwu Macfoy, Founder</p>
-    <a href="/about" class="home-btn home-btn--ghost home-about__cta">
+    <p class="home-about__by" data-home-reveal data-home-reveal-delay="120">
+      Tochukwu Macfoy, Founder
+    </p>
+    <a
+      href="/about"
+      class="home-btn home-btn--ghost home-about__cta"
+      data-home-reveal
+      data-home-reveal-delay="180"
+    >
       More about us
     </a>
   </div>
@@ -22,61 +38,89 @@
   .home-about {
     position: relative;
     overflow: hidden;
-    padding: 5rem 1.25rem;
+    padding: 6rem 1.25rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-    background:
-      radial-gradient(ellipse 70% 80% at 50% 120%, rgba(77, 168, 255, 0.16), transparent 55%),
-      #070a0e;
+    background: #070a0f;
   }
 
   @media (min-width: 640px) {
     .home-about {
-      padding: 6.5rem 1.5rem;
+      padding: 7.5rem 1.5rem;
     }
   }
 
-  .home-about__glow {
+  .home-about__orb {
     position: absolute;
-    inset: auto 20% -30% 20%;
-    height: 18rem;
-    background: rgba(77, 168, 255, 0.12);
-    filter: blur(80px);
+    left: 50%;
+    bottom: -35%;
+    width: min(70vw, 34rem);
+    height: min(70vw, 34rem);
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(77, 168, 255, 0.28), transparent 68%);
+    filter: blur(10px);
     pointer-events: none;
+    animation: home-about-pulse 5.5s ease-in-out infinite;
+  }
+
+  @keyframes home-about-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scale(0.92);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.08);
+    }
   }
 
   .home-about__inner {
     position: relative;
     z-index: 1;
-    width: min(100%, 46rem);
+    width: min(100%, 48rem);
     margin-inline: auto;
     text-align: center;
   }
 
   .home-about__quote {
-    margin: 1.25rem 0 0;
+    margin: 1.5rem 0 0;
   }
 
   .home-about__quote p {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem 0.55rem;
     font-family: 'Instrument Serif', Georgia, serif;
-    font-size: clamp(1.65rem, 1.2rem + 2.2vw, 2.75rem);
+    font-size: clamp(1.7rem, 1.2rem + 2.4vw, 2.9rem);
     font-weight: 400;
     font-style: italic;
-    line-height: 1.28;
+    line-height: 1.3;
     letter-spacing: -0.015em;
     color: #fff;
-    text-wrap: balance;
+  }
+
+  .home-about__word {
+    display: inline-block;
   }
 
   .home-about__by {
-    margin-top: 1.35rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
+    margin-top: 1.6rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: rgba(250, 250, 248, 0.48);
+    color: rgba(250, 250, 248, 0.45);
   }
 
   .home-about__cta {
-    margin-top: 1.75rem;
+    margin-top: 1.85rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-about__orb {
+      animation: none;
+    }
   }
 </style>

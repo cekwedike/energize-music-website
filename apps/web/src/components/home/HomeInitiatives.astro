@@ -4,51 +4,51 @@ import { initiativesNav } from '../../lib/nav';
 const items = initiativesNav;
 ---
 
-<section class="home-initiatives" aria-labelledby="home-initiatives-title">
-  <div class="home-initiatives__head scroll-reveal">
-    <p class="home-kicker">Beyond the catalog</p>
-    <h2 id="home-initiatives-title" class="home-initiatives__title">Initiatives with reach</h2>
-    <p class="home-initiatives__lead">
-      Kids entertainment, pan-African talent, and live stages: the Energy moves further than a release date.
+<section class="home-initiatives" data-home-initiatives aria-labelledby="home-initiatives-title">
+  <div class="home-initiatives__head">
+    <div data-home-reveal>
+      <p class="home-kicker">Beyond the catalog</p>
+      <h2 id="home-initiatives-title" class="home-title">
+        Initiatives<br />with voltage
+      </h2>
+    </div>
+    <p class="home-initiatives__lead" data-home-reveal data-home-reveal-delay="70">
+      Kids entertainment, pan-African talent, and live stages. Scroll sideways through the movement.
     </p>
   </div>
 
-  <ul class="home-initiatives__stack">
-    {
-      items.map((item, index) => (
-        <li class="home-initiatives__panel scroll-reveal" style={`--reveal-delay: ${80 + index * 60}ms`}>
-          <a href={item.href} class="home-initiatives__link">
-            <img
-              src={item.image}
-              alt=""
-              class="home-initiatives__img"
-              loading="lazy"
-              decoding="async"
-            />
+  <div class="home-initiatives__stage">
+    <div class="home-initiatives__track" data-home-initiatives-track>
+      {
+        items.map((item) => (
+          <a href={item.href} class="home-initiatives__panel" data-home-initiative>
+            <img src={item.image} alt="" class="home-initiatives__img" loading="lazy" decoding="async" />
             <div class="home-initiatives__veil" aria-hidden="true"></div>
             <div class="home-initiatives__content">
-              <p class="home-initiatives__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</p>
               <h3 class="home-initiatives__name">{item.label}</h3>
               <p class="home-initiatives__blurb">{item.blurb}</p>
-              <span class="home-initiatives__cta">
+              <span class="home-link">
+                <span class="home-link__line" aria-hidden="true"></span>
                 Enter
-                <span aria-hidden="true">→</span>
               </span>
             </div>
           </a>
-        </li>
-      ))
-    }
-  </ul>
+        ))
+      }
+    </div>
+  </div>
 </section>
 
 <style>
   .home-initiatives {
-    padding: 4.5rem 0 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 5rem 0 0;
+    background: #05070a;
+    overflow: clip;
   }
 
   .home-initiatives__head {
+    display: grid;
+    gap: 1.25rem;
     width: min(100%, 80rem);
     margin-inline: auto;
     padding: 0 1.25rem 2rem;
@@ -56,53 +56,37 @@ const items = initiativesNav;
 
   @media (min-width: 640px) {
     .home-initiatives__head {
-      padding-inline: 1.5rem;
-      padding-bottom: 2.5rem;
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: end;
+      padding: 0 1.5rem 2.5rem;
     }
   }
 
-  .home-initiatives__title {
-    margin-top: 0.65rem;
-    max-width: 14ch;
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.4rem);
-    font-weight: 500;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-  }
-
   .home-initiatives__lead {
-    margin-top: 0.9rem;
-    max-width: 36rem;
+    max-width: 28rem;
     font-size: 1rem;
     line-height: 1.6;
     color: rgba(250, 250, 248, 0.62);
   }
 
-  .home-initiatives__stack {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  .home-initiatives__stage {
+    overflow: hidden;
+  }
+
+  .home-initiatives__track {
+    display: flex;
+    width: max-content;
   }
 
   .home-initiatives__panel {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .home-initiatives__link {
     position: relative;
-    display: grid;
-    min-height: clamp(16rem, 42vw, 22rem);
+    flex: 0 0 auto;
+    width: min(100vw, 42rem);
+    min-height: clamp(22rem, 70vh, 34rem);
     overflow: hidden;
     color: inherit;
     text-decoration: none;
-  }
-
-  @media (min-width: 900px) {
-    .home-initiatives__link {
-      grid-template-columns: 1.15fr 1fr;
-      min-height: 20rem;
-    }
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .home-initiatives__img {
@@ -111,7 +95,7 @@ const items = initiativesNav;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transform: scale(1.05);
+    transform: scale(1.08);
     transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
@@ -119,85 +103,56 @@ const items = initiativesNav;
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(90deg, rgba(6, 9, 13, 0.92) 0%, rgba(6, 9, 13, 0.55) 55%, rgba(6, 9, 13, 0.28) 100%),
-      linear-gradient(180deg, transparent 40%, rgba(6, 9, 13, 0.75) 100%);
+      linear-gradient(180deg, rgba(5, 8, 12, 0.15) 0%, rgba(5, 8, 12, 0.88) 78%),
+      linear-gradient(90deg, rgba(5, 8, 12, 0.55), transparent 50%);
   }
 
   .home-initiatives__content {
     position: relative;
     z-index: 1;
     display: flex;
+    height: 100%;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 1.5rem 1.25rem 1.65rem;
-    max-width: 36rem;
+    padding: 1.75rem 1.4rem 2rem;
   }
 
   @media (min-width: 640px) {
     .home-initiatives__content {
-      padding: 2rem 1.5rem;
+      padding: 2.25rem;
     }
-  }
-
-  @media (min-width: 900px) {
-    .home-initiatives__content {
-      grid-column: 1;
-      justify-content: center;
-      padding-left: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem));
-    }
-  }
-
-  .home-initiatives__index {
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.24em;
-    color: rgba(77, 168, 255, 0.8);
   }
 
   .home-initiatives__name {
-    margin-top: 0.55rem;
     font-family: var(--font-display);
-    font-size: clamp(1.85rem, 1.3rem + 2vw, 3rem);
+    font-size: clamp(2.1rem, 1.5rem + 2.4vw, 3.5rem);
     font-weight: 500;
     letter-spacing: -0.03em;
-    line-height: 1.05;
+    line-height: 1;
   }
 
   .home-initiatives__blurb {
-    margin-top: 0.75rem;
-    max-width: 32rem;
+    margin: 0.9rem 0 1.35rem;
+    max-width: 28rem;
     font-size: 0.95rem;
     line-height: 1.55;
     color: rgba(250, 250, 248, 0.72);
   }
 
-  .home-initiatives__cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 1.15rem;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #fff;
+  .home-initiatives__panel:hover .home-initiatives__img {
+    transform: scale(1.14);
   }
 
-  .home-initiatives__cta::before {
-    content: '';
-    width: 1.75rem;
-    height: 1px;
-    background: var(--color-glow);
-    transition: width 0.25s ease;
-  }
+  @media (max-width: 899px) {
+    .home-initiatives__stage {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+    }
 
-  .home-initiatives__link:hover .home-initiatives__img,
-  .home-initiatives__link:focus-visible .home-initiatives__img {
-    transform: scale(1.1);
-  }
-
-  .home-initiatives__link:hover .home-initiatives__cta::before,
-  .home-initiatives__link:focus-visible .home-initiatives__cta::before {
-    width: 2.75rem;
+    .home-initiatives__panel {
+      width: min(88vw, 28rem);
+      scroll-snap-align: start;
+    }
   }
 </style>

@@ -99,7 +99,8 @@ export default defineType({
       title: 'Featured / spotlight candidate',
       type: 'boolean',
       initialValue: false,
-      description: 'Marks this event for spotlight consideration on /events.',
+      description:
+        'When on, this event can appear in the /events spotlight and on the homepage Live Spotlight. Homepage only shows events with this toggle enabled.',
     }),
     defineField({
       name: 'cover',

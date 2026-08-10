@@ -395,7 +395,7 @@ Delete `apps/web/src/components/home/HomeNewMusic.astro` and `apps/web/src/lib/m
 
 - [ ] **Step 3: Repoint the hero CTA**
 
-In `apps/web/src/components/home/HomeHero.astro`, change the second button from linking to `/releases` to `/artists`, and reword it since "Meet the roster" already covers artists — point it at Blogs instead, which is a real remaining section:
+In `apps/web/src/components/home/HomeHero.astro`, change the second button from linking to `/releases` to `/artists`, and reword it since "Meet The Roster" already covers artists — point it at Blogs instead, which is a real remaining section:
 
 ```astro
   <div class="flex flex-wrap gap-4">
@@ -403,7 +403,7 @@ In `apps/web/src/components/home/HomeHero.astro`, change the second button from 
       href="/artists"
       class="rounded-full bg-[var(--color-gold)] px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:opacity-90"
     >
-      Meet the roster
+      Meet The Roster
     </a>
     <a
       href="/blogs"

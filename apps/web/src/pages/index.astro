@@ -1,6 +1,62 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/home/Hero.astro';
+import HomeArtists from '../components/home/HomeArtists.astro';
+import HomeReleases from '../components/home/HomeReleases.astro';
+import HomeInitiatives from '../components/home/HomeInitiatives.astro';
+import HomeEvents from '../components/home/HomeEvents.astro';
+import HomeAbout from '../components/home/HomeAbout.astro';
+import HomeNewsletter from '../components/home/HomeNewsletter.astro';
+import { sanityClient } from '../lib/sanity/client';
+import { enrichRelease } from '../lib/metadata/enrichReleases';
+import { isValidEventCard } from '../lib/events/format';
+import {
+  allArtistsQuery,
+  allReleasesQuery,
+  featuredArtistsQuery,
+  featuredEventsQuery,
+  featuredReleasesQuery,
+  type ArtistCard,
+  type EventCard,
+  type Release,
+} from '@energize/shared';
+import '../styles/home.css';
+
+let featuredArtists: ArtistCard[] = [];
+let rosterFallback: ArtistCard[] = [];
+let featuredReleases: Release[] = [];
+let latestReleases: Release[] = [];
+let featuredEvents: EventCard[] = [];
+
+try {
+  [featuredArtists, rosterFallback, featuredReleases, latestReleases, featuredEvents] =
+    await Promise.all([
+      sanityClient.fetch<ArtistCard[]>(featuredArtistsQuery),
+      sanityClient.fetch<ArtistCard[]>(allArtistsQuery),
+      sanityClient.fetch<Release[]>(featuredReleasesQuery),
+      sanityClient.fetch<Release[]>(allReleasesQuery),
+      sanityClient.fetch<EventCard[]>(featuredEventsQuery),
+    ]);
+} catch {
+  featuredArtists = [];
+  rosterFallback = [];
+  featuredReleases = [];
+  latestReleases = [];
+  featuredEvents = [];
+}
+
+const artists =
+  featuredArtists.length > 0
+    ? featuredArtists
+    : rosterFallback.filter((artist) => artist.photo?.asset).slice(0, 8);
+
+const releaseSource =
+  featuredReleases.length > 0 ? featuredReleases.slice(0, 4) : latestReleases.slice(0, 4);
+const releases = await Promise.all(
+  releaseSource.map((release) => enrichRelease(release, { coverSize: 900 })),
+);
+
+const homeEvents = featuredEvents.filter(isValidEventCard);
 ---
 
 <BaseLayout
@@ -8,5 +64,27 @@ import Hero from '../components/home/Hero.astro';
   description="Energize Music is a global Afro-gospel and soul-fusion label: artists, releases, and initiatives."
   showTopMarquee
 >
-  <Hero />
+  <div data-home-page>
+    <Hero />
+    <HomeReleases releases={releases} />
+    <HomeInitiatives />
+    <HomeEvents events={homeEvents} />
+    <HomeArtists artists={artists} />
+    <HomeAbout />
+    <HomeNewsletter />
+  </div>
 </BaseLayout>
+
+<script>
+  import { initHomePage } from '../lib/motion/home/initHome';
+
+  const boot = () => initHomePage();
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+
+  document.addEventListener('astro:page-load', boot);
+</script>

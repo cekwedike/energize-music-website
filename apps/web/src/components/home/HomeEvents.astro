@@ -1,0 +1,295 @@
+---
+import type { EventCard } from '@energize/shared';
+import { formatEventDate, formatEventType, isValidEventCard } from '../../lib/events/format';
+import { getEventCardCover } from '../../lib/events/media';
+
+interface Props {
+  events: EventCard[];
+}
+
+const { events } = Astro.props;
+const spotlight = events.filter(isValidEventCard).slice(0, 3);
+const lead = spotlight[0];
+const rest = spotlight.slice(1);
+---
+
+{
+  lead && (
+    <section class="home-events" data-home-events aria-labelledby="home-events-title">
+      <div class="home-events__inner">
+        <div class="home-events__head" data-home-reveal>
+          <div>
+            <p class="home-kicker">Live spotlight</p>
+            <h2 id="home-events-title" class="home-title">
+              On stage<br />soon
+            </h2>
+          </div>
+          <a href="/events" class="home-link">
+            <span class="home-link__line" aria-hidden="true"></span>
+            All events
+          </a>
+        </div>
+
+        <div class="home-events__stage">
+          <a
+            href={`/events/${lead.slug}`}
+            class="home-events__lead"
+            data-home-reveal
+            data-home-reveal-delay="60"
+          >
+            {getEventCardCover(lead, 1400, 900) ? (
+              <img
+                src={getEventCardCover(lead, 1400, 900)!}
+                alt={lead.cover?.alt ?? lead.title}
+                class="home-events__lead-img"
+                width="1400"
+                height="900"
+                loading="lazy"
+              />
+            ) : (
+              <div class="home-events__fallback" aria-hidden="true" />
+            )}
+            <span class="home-events__scrim" aria-hidden="true" />
+            <span class="home-events__copy">
+              <span class="home-events__date">{formatEventDate(lead.startDate)}</span>
+              <span class="home-events__name">{lead.title}</span>
+              <span class="home-events__meta">
+                {[lead.location || 'Venue TBA', formatEventType(lead.eventType)].join(' · ')}
+              </span>
+              {lead.summary && <span class="home-events__summary">{lead.summary}</span>}
+              <span class="home-link home-events__cta">
+                <span class="home-link__line" aria-hidden="true"></span>
+                Open event
+              </span>
+            </span>
+          </a>
+
+          {rest.length > 0 && (
+            <ul class="home-events__rail">
+              {rest.map((event, index) => {
+                const cover = getEventCardCover(event, 640, 640);
+                return (
+                  <li data-home-reveal data-home-reveal-delay={String(120 + index * 60)}>
+                    <a href={`/events/${event.slug}`} class="home-events__rail-item">
+                      <span class="home-events__rail-art">
+                        {cover ? (
+                          <img src={cover} alt="" width="160" height="160" loading="lazy" />
+                        ) : (
+                          <span class="home-events__rail-fallback" aria-hidden="true" />
+                        )}
+                      </span>
+                      <span class="home-events__rail-meta">
+                        <span class="home-events__date">{formatEventDate(event.startDate)}</span>
+                        <span class="home-events__rail-title">{event.title}</span>
+                        <span class="home-events__rail-loc">
+                          {event.location || 'Venue TBA'}
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .home-events {
+    padding: 5rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      radial-gradient(ellipse 70% 55% at 100% 0%, rgba(77, 168, 255, 0.1), transparent 55%),
+      #070a0e;
+  }
+
+  .home-events__inner {
+    width: min(100%, 80rem);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-events__inner {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .home-events__head {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-events__head {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+  }
+
+  .home-events__stage {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 960px) {
+    .home-events__stage {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+      gap: 1.25rem;
+      align-items: stretch;
+    }
+  }
+
+  .home-events__lead {
+    position: relative;
+    display: block;
+    min-height: clamp(20rem, 52vw, 28rem);
+    overflow: hidden;
+    color: inherit;
+    text-decoration: none;
+    background: #10141b;
+  }
+
+  .home-events__lead-img,
+  .home-events__fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .home-events__fallback {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(77, 168, 255, 0.35), transparent 55%),
+      #151a22;
+  }
+
+  .home-events__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(5, 8, 12, 0.15) 20%, rgba(5, 8, 12, 0.92) 100%);
+  }
+
+  .home-events__copy {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    height: 100%;
+    min-height: inherit;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-events__copy {
+      padding: 2rem;
+    }
+  }
+
+  .home-events__date {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .home-events__name {
+    margin-top: 0.55rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 1.3rem + 2vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .home-events__meta,
+  .home-events__summary {
+    margin-top: 0.65rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: rgba(250, 250, 248, 0.68);
+  }
+
+  .home-events__summary {
+    max-width: 34rem;
+  }
+
+  .home-events__cta {
+    margin-top: 1.25rem;
+  }
+
+  .home-events__lead:hover .home-events__lead-img {
+    transform: scale(1.05);
+  }
+
+  .home-events__rail {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .home-events__rail-item {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: 0.9rem;
+    align-items: center;
+    min-height: 6.5rem;
+    padding: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(8, 12, 18, 0.7);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 0.25s ease,
+      background 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .home-events__rail-item:hover {
+    border-color: rgba(77, 168, 255, 0.45);
+    background: rgba(77, 168, 255, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .home-events__rail-art,
+  .home-events__rail-fallback {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #151a22;
+  }
+
+  .home-events__rail-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .home-events__rail-title {
+    display: block;
+    margin-top: 0.3rem;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1.15;
+  }
+
+  .home-events__rail-loc {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
+    color: rgba(250, 250, 248, 0.5);
+  }
+</style>

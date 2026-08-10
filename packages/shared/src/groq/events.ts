@@ -19,6 +19,11 @@ export const allEventsQuery = /* groq */ `*[_type == "event" && defined(slug.cur
   ${eventCardFields}
 }`;
 
+/** Events toggled Featured in Studio. Used for homepage Live Spotlight. */
+export const featuredEventsQuery = /* groq */ `*[_type == "event" && featured == true && defined(slug.current)] | order(startDate asc){
+  ${eventCardFields}
+}`;
+
 export const allEventSlugsQuery = /* groq */ `*[_type == "event" && defined(slug.current)]{
   "slug": slug.current
 }`;
