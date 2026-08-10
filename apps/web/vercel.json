@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @energize/shared build && pnpm --filter @energize/web build",
-  "outputDirectory": "apps/web/dist",
+  "installCommand": "cd ../.. && pnpm install",
+  "buildCommand": "cd ../.. && pnpm --filter @energize/shared build && pnpm --filter @energize/web build",
+  "outputDirectory": "dist",
   "headers": [
     {
       "source": "/(.*)",

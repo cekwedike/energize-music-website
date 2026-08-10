@@ -11,17 +11,23 @@ Output: `apps/web/dist/`
 
 ## Vercel (preview / share links)
 
-Repo root `vercel.json` sets install, build, and output directory.
+Config lives in `apps/web/vercel.json` (and a root fallback `vercel.json`).
 
-1. Import the GitHub repo in Vercel
-2. Add env vars (Preview):
+**Important:** Vercel may auto-detect Sanity Studio. Force the marketing site:
+
+1. Project Settings → General → **Root Directory** = `apps/web` (not `apps/studio`)
+2. Framework Preset = **Other**
+3. Leave Build / Output / Install blank so `apps/web/vercel.json` wins
+4. Env vars (Preview):
    - `PUBLIC_SANITY_PROJECT_ID`
    - `PUBLIC_SANITY_DATASET=production`
    - `PUBLIC_SANITY_API_VERSION=2024-01-01`
    - `PUBLIC_SITE_URL=https://energize-music.com`
    - `PUBLIC_FORM_ENDPOINT` (optional)
-3. Add the Vercel preview origin in Sanity Manage → CORS
-4. Share the `*.vercel.app` deployment URL
+5. Sanity Manage → CORS → add your `*.vercel.app` origin
+6. Redeploy and share the preview URL
+
+If the build log shows `sanity build` / `@energize/studio`, Root Directory is still pointing at Studio.
 
 Production domain can stay on Hostinger; Vercel is fine as preview-only.
 
