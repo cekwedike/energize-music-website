@@ -53,3 +53,7 @@ pnpm typecheck
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs install, lint, and build on `main` and pull requests. pnpm version is taken from `package.json` `packageManager`.
+
+## Preview (Vercel)
+
+`vercel.json` is configured for this monorepo. See `docs/DEPLOY.md` for env vars and Sanity CORS.
