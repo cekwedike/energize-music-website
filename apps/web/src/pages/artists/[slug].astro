@@ -8,6 +8,8 @@ import ArtistExploreMore from '../../components/artists/ArtistExploreMore.astro'
 import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient, urlForImage } from '../../lib/sanity/client';
 import { enrichReleases } from '../../lib/metadata/enrichReleases';
+import { crumbs, organizationId } from '../../lib/seo/schema';
+import { absoluteUrl } from '../../lib/seo/site';
 import {
   artistSlugsQuery,
   artistBySlugQuery,
@@ -43,23 +45,30 @@ const enrichedDiscography = await enrichReleases(discography);
 
 const photoUrl = urlForImage(artist.photo).width(1200).height(630).fit('crop').auto('format').url();
 const profileBgUrl = urlForImage(artist.photo).width(2400).height(1350).fit('crop').auto('format').url();
-const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
-const pageUrl = new URL(`/artists/${artist.slug}`, siteUrl).toString();
+const pageUrl = absoluteUrl(`/artists/${artist.slug}`);
+const pageId = `${pageUrl}#artist`;
 
 const description =
   artist.tagline && artist.bio
     ? `${artist.tagline} ${artist.bio}`.slice(0, 160)
     : artist.bio.slice(0, 160);
 
+const sameAs = Object.values(artist.streaming ?? {}).filter(
+  (value): value is string => typeof value === 'string' && value.length > 0,
+);
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'MusicGroup',
+  '@id': pageId,
   name: artist.name,
   description: artist.bio,
   image: photoUrl,
   url: pageUrl,
-  genre: artist.genres,
-  sameAs: Object.values(artist.streaming ?? {}).filter(Boolean),
+  genre: artist.genres?.length ? artist.genres : ['Afro-gospel', 'Soul fusion'],
+  sameAs,
+  memberOf: { '@id': organizationId() },
+  recordLabel: { '@id': organizationId() },
 };
 ---
 
@@ -67,6 +76,9 @@ const jsonLd = {
   title={artist.name}
   description={description}
   ogImage={photoUrl}
+  ogType="profile"
+  keywords={[artist.name, 'Energize Music', 'Afro-gospel', ...(artist.genres ?? [])]}
+  breadcrumbs={crumbs({ name: 'Artists', path: '/artists' }, { name: artist.name, path: `/artists/${artist.slug}` })}
   ambientVariant="pulse"
   headerVariant="overlay"
 >

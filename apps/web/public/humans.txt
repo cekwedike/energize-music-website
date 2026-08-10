@@ -1,0 +1,10 @@
+/* TEAM */
+Organization: Energize Music
+Site: https://energize-music.com
+Contact: https://energize-music.com/contact
+
+/* SITE */
+Standards: HTML5, CSS3, Schema.org JSON-LD
+Stack: Astro, Sanity CMS, Tailwind CSS
+Components: GSAP / Motion for interaction
+Last update: 2026

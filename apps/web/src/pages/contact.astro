@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/ui/PageHero.astro';
 import { contactIntents } from '@energize/shared';
+import { crumbs } from '../lib/seo/schema';
 
 const intentLabels: Record<(typeof contactIntents)[number], string> = {
   'a&r': 'A&R',
@@ -17,6 +18,8 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
 <BaseLayout
   title="Contact"
   description="Reach Energize Music for A&R, press, partnerships, booking, and general inquiries."
+  keywords={['contact Energize Music', 'A&R', 'press', 'booking']}
+  breadcrumbs={crumbs({ name: 'Contact', path: '/contact' })}
 >
   <PageHero
     size="slim"

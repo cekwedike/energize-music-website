@@ -8,6 +8,9 @@ import {
   type CareerOpening,
   type PortableTextBlock,
 } from '@energize/shared';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import { crumbs, organizationId } from '../../lib/seo/schema';
+import { absoluteUrl } from '../../lib/seo/site';
 
 export async function getStaticPaths() {
   const openings = await sanityClient.fetch<Pick<CareerOpening, 'slug'>[]>(allCareerOpeningsQuery);
@@ -22,12 +25,38 @@ const role = await sanityClient.fetch<
 if (!role) {
   return Astro.redirect('/careers');
 }
+
+const pageUrl = absoluteUrl(`/careers/${role.slug}`);
+const jobSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'JobPosting',
+  title: role.title,
+  description: `${role.title} at Energize Music. ${role.location}. ${role.type}.`,
+  employmentType: role.type?.toUpperCase().replace(/\s+/g, '_'),
+  hiringOrganization: { '@id': organizationId() },
+  jobLocation: {
+    '@type': 'Place',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: role.location || 'Lagos',
+      addressCountry: 'NG',
+    },
+  },
+  url: pageUrl,
+  directApply: Boolean(role.applyUrl),
+};
 ---
 
 <BaseLayout
   title={role.title}
   description={`${role.title} at Energize Music. ${role.location}. ${role.type}.`}
+  keywords={[role.title, 'Energize Music careers', role.location, role.type].filter(Boolean) as string[]}
+  breadcrumbs={crumbs(
+    { name: 'Careers', path: '/careers' },
+    { name: role.title, path: `/careers/${role.slug}` },
+  )}
   ambientVariant="editorial"
 >
+  <JsonLd data={jobSchema} />
   <CareersRoleDetail role={role} />
 </BaseLayout>

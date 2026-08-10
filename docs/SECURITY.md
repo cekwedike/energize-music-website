@@ -2,35 +2,48 @@
 
 ## Secrets
 
-Never commit `.env`. Use GitHub Actions secrets for CI:
+Never commit `.env` files. Use GitHub Actions secrets for CI:
 
-- `SANITY_READ_TOKEN`
-- `HOSTINGER_SFTP_HOST`, `HOSTINGER_SFTP_USER`, `HOSTINGER_SFTP_PASSWORD`
-- `SANITY_WEBHOOK_SECRET`
-- `PUBLIC_FORM_ENDPOINT` (or Formspree ID)
+- `PUBLIC_SANITY_PROJECT_ID`
+- `SANITY_READ_TOKEN` (optional; build currently uses the public Sanity API)
+- `FORM_ENDPOINT` / `PUBLIC_FORM_ENDPOINT`
+- Hostinger / deploy secrets only when deploy automation is restored
 
-Rotate any credentials embedded in git remotes; use SSH or `gh auth`.
+Rotate any credential that may have been shared outside a private machine.
+Local Studio write tokens (`SANITY_WRITE_TOKEN`) are for seed scripts only and must stay gitignored.
 
 ## Sanity
 
-- Read token for build only; editors use Studio login.
-- Restrict CORS to production domain, localhost, and Studio host.
+- Public project id + dataset are expected for a public marketing site.
+- Restrict CORS in Sanity Manage to production domain, localhost, and Studio host.
+- Do not put write tokens in `PUBLIC_*` env vars or client-side code.
 
-## Static site
+## Static site headers
 
-- CSP and security headers via `apps/web/public/.htaccess`
-- External links: `rel="noopener noreferrer"`
-- Forms: honeypot + provider spam filtering
+Security headers ship in `apps/web/public/.htaccess` for Apache / Hostinger:
+
+- `Content-Security-Policy`
+- `Strict-Transport-Security`
+- `X-Content-Type-Options`
+- `X-Frame-Options`
+- `Referrer-Policy`
+- `Permissions-Policy`
+- HTTPS redirect
+
+External links use `rel="noopener noreferrer"`. Contact form includes a honeypot field.
+
+## Disclosure
+
+`/.well-known/security.txt` points security contacts to the public contact page.
 
 ## CI
 
 - `pnpm install --frozen-lockfile`
-- `pnpm audit --audit-level=high` (fail on high/critical)
+- `pnpm audit --audit-level=high` (currently `continue-on-error` because Sanity CLI toolchain advisories are upstream / not shipped in `apps/web/dist`)
 
-## Known waived advisories (Phase 1)
+## Known waived advisories
 
-`pnpm audit` still flags advisories inside `apps/studio`'s `sanity` CLI toolchain
-(`decompress`, `adm-zip`, `glob`/`brace-expansion` via `@sanity/cli` → `@architect/*`).
-These are dev-only build/deploy tooling, not shipped in `apps/web/dist` or the
-production bundle, and no patched `sanity` release exists yet upstream. Tracked via
-Dependabot; re-check on every `sanity` version bump and remove this note once resolved.
+`pnpm audit` may flag advisories inside `apps/studio`'s Sanity CLI toolchain
+(`decompress`, `adm-zip`, `glob` / `brace-expansion` via `@sanity/cli`).
+These are dev-only build/deploy tooling, not shipped in the production static site.
+Tracked via Dependabot; re-check on Sanity version bumps.

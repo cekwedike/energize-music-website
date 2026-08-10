@@ -14,6 +14,7 @@ import {
   type Page,
   type TeamMember,
 } from '@energize/shared';
+import { crumbs } from '../lib/seo/schema';
 
 const [aboutPage, legacyPage, team] = await Promise.all([
   sanityClient.fetch<AboutPage | null>(aboutPageQuery),
@@ -24,7 +25,12 @@ const [aboutPage, legacyPage, team] = await Promise.all([
 const pageTitle = aboutPage?.title ?? legacyPage?.title ?? 'About Energize Music';
 ---
 
-<BaseLayout title="About Us" description="Energize Music's mission, vision, values, and the team behind it.">
+<BaseLayout
+  title="About Us"
+  description="Energize Music's mission, vision, values, and the team behind the Afro-gospel and soul-fusion label."
+  keywords={['About Energize Music', 'Afro-gospel label', 'mission', 'Lagos']}
+  breadcrumbs={crumbs({ name: 'About Us', path: '/about' })}
+>
   <AboutHero title={pageTitle} />
   <AboutValues />
   <AboutStory aboutPage={aboutPage} legacyPage={legacyPage} />

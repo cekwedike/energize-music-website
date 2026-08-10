@@ -1,9 +1,15 @@
 ---
 interface Props {
-  data: Record<string, unknown>;
+  data: Record<string, unknown> | Array<Record<string, unknown>>;
 }
 
 const { data } = Astro.props;
+const payload = Array.isArray(data) ? data.filter(Boolean) : data;
+const blocks = Array.isArray(payload) ? payload : [payload];
 ---
 
-<script type="application/ld+json" is:inline set:html={JSON.stringify(data)} />
+{
+  blocks.map((block) => (
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(block)} />
+  ))
+}

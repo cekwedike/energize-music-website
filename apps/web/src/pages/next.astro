@@ -1,10 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
 import NextLogo from '../components/next/NextLogo.astro';
 import NextMusicPlayer from '../components/next/NextMusicPlayer.astro';
 import { sanityClient } from '../lib/sanity/client';
 import { nextPageQuery, type NextPageSettings } from '@energize/shared';
 import { mergeNextPageSettings } from '../lib/next/pageDefaults';
+import { buildFaqPageSchema, crumbs } from '../lib/seo/schema';
+import { absoluteUrl } from '../lib/seo/site';
 
 let pageSettings: NextPageSettings | null = null;
 try {
@@ -70,14 +73,19 @@ const faqs = [
     a: 'A place on the ENERGIZE Afrogospel Album and a performance at the pan-African launch concert.',
   },
 ];
+
+const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
 ---
 
 <BaseLayout
   title="NEXT: New Era Xceptional Talent"
   description="Africa's boldest Afrogospel talent competition and music incubator by Energize Music."
   ogImage="/next/takit.webp"
+  keywords={['NEXT', 'New Era Xceptional Talent', 'Afrogospel', 'talent competition', 'Energize Music']}
+  breadcrumbs={crumbs({ name: 'NEXT', path: '/next' })}
   headerVariant="overlay"
 >
+  {faqSchema && <JsonLd data={faqSchema} />}
   <section id="next-hero" class="next-hero" aria-labelledby="next-hero-title">
     <div id="next-hero-carousel" class="next-hero__stage" aria-hidden="true">
       {

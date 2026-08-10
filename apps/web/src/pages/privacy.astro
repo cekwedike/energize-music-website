@@ -4,6 +4,7 @@ import { sanityClient } from '../lib/sanity/client';
 import { privacyFallbackBlocks } from '../lib/legal/fallbackContent';
 import { resolveLegalBlocks } from '../lib/legal/resolveLegalBlocks';
 import { pageBySlugQuery, type Page } from '@energize/shared';
+import { crumbs } from '../lib/seo/schema';
 
 const page = await sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'privacy' });
 const blocks = resolveLegalBlocks(page, privacyFallbackBlocks);
@@ -12,4 +13,10 @@ const description =
   'How Energize Music collects, uses, and protects your information on energize-music.com and related services.';
 ---
 
-<LegalPage title={title} description={description} blocks={blocks} eyebrow="Privacy" />
+<LegalPage
+  title={title}
+  description={description}
+  blocks={blocks}
+  eyebrow="Privacy"
+  breadcrumbs={crumbs({ name: 'Privacy Policy', path: '/privacy' })}
+/>

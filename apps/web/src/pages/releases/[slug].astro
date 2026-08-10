@@ -4,6 +4,8 @@ import JsonLd from '../../components/seo/JsonLd.astro';
 import ReleaseDetail from '../../components/releases/ReleaseDetail.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { enrichRelease } from '../../lib/metadata/enrichReleases';
+import { crumbs, organizationId } from '../../lib/seo/schema';
+import { absoluteUrl } from '../../lib/seo/site';
 import { allReleasesQuery, releaseBySlugQuery, type Release } from '@energize/shared';
 
 /** Build one static page per published release slug. Dev can still resolve new slugs after publish. */
@@ -35,19 +37,41 @@ const artists = (enriched.artists ?? []).filter(
   (artist): artist is NonNullable<typeof artist> => Boolean(artist?._id && artist.slug && artist.name),
 );
 
-const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
+const pageUrl = absoluteUrl(`/releases/${release.slug}`);
+const schemaType = release.type === 'single' ? 'MusicRecording' : 'MusicAlbum';
+const albumReleaseType =
+  release.type === 'ep'
+    ? 'EPRelease'
+    : release.type === 'compilation'
+      ? 'CompilationAlbum'
+      : release.type === 'album'
+        ? 'AlbumRelease'
+        : undefined;
+
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'MusicAlbum',
+  '@type': schemaType,
+  '@id': `${pageUrl}#release`,
   name: enriched.displayTitle,
   image: enriched.coverUrl,
   datePublished: release.releaseDate,
-  url: new URL(`/releases/${release.slug}`, siteUrl).toString(),
+  url: pageUrl,
+  ...(albumReleaseType ? { albumReleaseType } : {}),
   byArtist: artists.map((artist) => ({
     '@type': 'MusicGroup',
+    '@id': absoluteUrl(`/artists/${artist.slug}#artist`),
     name: artist.name,
-    url: new URL(`/artists/${artist.slug}`, siteUrl).toString(),
+    url: absoluteUrl(`/artists/${artist.slug}`),
   })),
+  recordLabel: { '@id': organizationId() },
+  ...(enriched.externalUrl
+    ? {
+        potentialAction: {
+          '@type': 'ListenAction',
+          target: enriched.externalUrl,
+        },
+      }
+    : {}),
 };
 
 const seoDescription =
@@ -60,6 +84,18 @@ const seoDescription =
   title={enriched.displayTitle}
   description={seoDescription}
   ogImage={enriched.coverUrl}
+  ogType={release.type === 'single' ? 'music.song' : 'music.album'}
+  keywords={[
+    enriched.displayTitle,
+    ...artists.map((artist) => artist.name),
+    releaseTypeLabel,
+    'Energize Music',
+    'Afro-gospel',
+  ]}
+  breadcrumbs={crumbs(
+    { name: 'Releases', path: '/releases' },
+    { name: enriched.displayTitle, path: `/releases/${release.slug}` },
+  )}
   ambientVariant="editorial"
 >
   <JsonLd data={jsonLd} />

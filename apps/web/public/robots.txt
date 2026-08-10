@@ -1,4 +1,33 @@
+# Energize Music
 User-agent: *
+Allow: /
+Disallow: /404
+Disallow: /404.html
+
+# Common AI / answer-engine crawlers (explicit allow for GEO/AEO)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
 Allow: /
 
 Sitemap: https://energize-music.com/sitemap-index.xml
+LLMs-Txt: https://energize-music.com/llms.txt

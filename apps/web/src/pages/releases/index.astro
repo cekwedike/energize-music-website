@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
 import ReleasesHero from '../../components/releases/ReleasesHero.astro';
 import ReleaseSpotlight from '../../components/releases/ReleaseSpotlight.astro';
 import ReleasesListingSection from '../../components/releases/ReleasesListingSection.astro';
@@ -11,6 +12,8 @@ import {
   type Release,
   type ReleasesPage,
 } from '@energize/shared';
+import { crumbs } from '../../lib/seo/schema';
+import { absoluteUrl } from '../../lib/seo/site';
 
 const rawReleases = await sanityClient.fetch<Release[]>(allReleasesQuery);
 const releases = await enrichReleases(rawReleases);
@@ -24,13 +27,31 @@ const spotlightReleases =
         configuredSpotlights.map((release) => enrichRelease(release, { coverSize: 800 })),
       )
     : [];
+
+const itemList =
+  releases.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'Energize Music Releases',
+        itemListElement: releases.slice(0, 50).map((release, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          url: absoluteUrl(`/releases/${release.slug}`),
+          name: release.displayTitle,
+        })),
+      }
+    : null;
 ---
 
 <BaseLayout
   title="Releases"
-  description="Singles, EPs, and albums from Energize Music artists."
+  description="Singles, EPs, and albums from Energize Music artists across Afro-gospel and soul fusion."
+  keywords={['Energize Music releases', 'Afro-gospel albums', 'gospel singles', 'catalog']}
+  breadcrumbs={crumbs({ name: 'Releases', path: '/releases' })}
   ambientVariant="editorial"
 >
+  {itemList && <JsonLd data={itemList} />}
   <ReleasesHero releases={releases} totalCount={releases.length} />
 
   <section class="mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20">

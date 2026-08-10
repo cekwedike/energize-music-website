@@ -12,6 +12,8 @@ import {
   formatRelatedDate,
 } from '../../lib/blogs/postMeta';
 import { getPostCategory } from '../../lib/blogs/display';
+import { crumbs, organizationId } from '../../lib/seo/schema';
+import { absoluteUrl } from '../../lib/seo/site';
 
 export async function getStaticPaths() {
   const posts = await sanityClient.fetch<Pick<NewsPostSummary, 'slug'>[]>(allNewsListQuery);
@@ -31,8 +33,7 @@ const readMinutes = estimateReadMinutes(post.body);
 const lead = extractLeadParagraph(post.body);
 const body = bodyWithoutLead(post.body);
 const category = getPostCategory(post);
-const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
-const shareUrl = new URL(`/blogs/${post.slug}`, siteUrl).toString();
+const shareUrl = absoluteUrl(`/blogs/${post.slug}`);
 
 const allPosts = await sanityClient.fetch<NewsPostSummary[]>(allNewsListQuery);
 const related = allPosts
@@ -59,13 +60,28 @@ for (const item of related) {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'NewsArticle',
+  '@id': `${shareUrl}#article`,
   headline: post.title,
+  description: lead ?? post.title,
   datePublished: post.date,
+  dateModified: post.date,
   image: [coverUrl],
   url: shareUrl,
-  publisher: {
+  mainEntityOfPage: shareUrl,
+  articleSection: category,
+  inLanguage: 'en',
+  author: {
     '@type': 'Organization',
+    '@id': organizationId(),
     name: 'Energize Music',
+  },
+  publisher: {
+    '@id': organizationId(),
+  },
+  isPartOf: {
+    '@type': 'Blog',
+    name: 'Energize Music Blog',
+    url: absoluteUrl('/blogs'),
   },
 };
 ---
@@ -74,6 +90,14 @@ const jsonLd = {
   title={post.title}
   description={lead ?? post.title}
   ogImage={coverUrl}
+  ogType="article"
+  publishedTime={post.date}
+  modifiedTime={post.date}
+  keywords={[post.title, 'Energize Music', category, 'Afro-gospel']}
+  breadcrumbs={crumbs(
+    { name: 'Blogs', path: '/blogs' },
+    { name: post.title, path: `/blogs/${post.slug}` },
+  )}
   ambientVariant="editorial"
   headerVariant="overlay"
 >

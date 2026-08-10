@@ -5,6 +5,7 @@ import CareersRoleList from '../components/careers/CareersRoleList.astro';
 import CareersVolunteer from '../components/careers/CareersVolunteer.astro';
 import { sanityClient } from '../lib/sanity/client';
 import { careersPageQuery, type CareersPageData } from '@energize/shared';
+import { crumbs } from '../lib/seo/schema';
 
 const { openings, volunteer } = await sanityClient.fetch<CareersPageData>(careersPageQuery);
 ---
@@ -12,6 +13,8 @@ const { openings, volunteer } = await sanityClient.fetch<CareersPageData>(career
 <BaseLayout
   title="Careers"
   description="Open roles and volunteer opportunities at Energize Music."
+  keywords={['Energize Music careers', 'jobs', 'volunteer', 'music industry']}
+  breadcrumbs={crumbs({ name: 'Careers', path: '/careers' })}
   ambientVariant="editorial"
 >
   <CareersHero />

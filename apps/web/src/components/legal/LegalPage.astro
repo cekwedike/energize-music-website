@@ -3,15 +3,17 @@ import type { PortableTextBlock } from '@energize/shared';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../ui/PageHero.astro';
 import PortableText from '../portable/PortableText.astro';
+import type { BreadcrumbItem } from '../../lib/seo/site';
 
 interface Props {
   title: string;
   description: string;
   blocks: PortableTextBlock[];
   eyebrow?: string;
+  breadcrumbs?: BreadcrumbItem[];
 }
 
-const { title, description, blocks, eyebrow = 'Legal' } = Astro.props;
+const { title, description, blocks, eyebrow = 'Legal', breadcrumbs } = Astro.props;
 const updated = new Date().toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
@@ -19,7 +21,12 @@ const updated = new Date().toLocaleDateString('en-US', {
 });
 ---
 
-<BaseLayout title={title} description={description} ambientVariant="editorial">
+<BaseLayout
+  title={title}
+  description={description}
+  breadcrumbs={breadcrumbs}
+  ambientVariant="editorial"
+>
   <PageHero size="slim" eyebrow={eyebrow} title={title} description={description} />
 
   <section class="legal-page">

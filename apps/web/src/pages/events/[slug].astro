@@ -5,6 +5,8 @@ import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { allEventSlugsQuery, eventBySlugQuery, type EventDetail } from '@energize/shared';
 import { getEventCoverUrl } from '../../lib/events/media';
+import { crumbs, organizationId } from '../../lib/seo/schema';
+import { absoluteUrl } from '../../lib/seo/site';
 
 export async function getStaticPaths() {
   let slugs: { slug: string }[] = [];
@@ -35,28 +37,50 @@ if (!event) {
 const shareImage = getEventCoverUrl(event.shareImage, 1200, 630);
 const coverUrl = getEventCoverUrl(event.cover, 1200, 630);
 const ogImage = shareImage || coverUrl || undefined;
-const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
-const shareUrl = new URL(`/events/${event.slug}`, siteUrl).toString();
+const shareUrl = absoluteUrl(`/events/${event.slug}`);
+
+const performers = (event.lineup ?? [])
+  .map((entry) => entry.name?.trim())
+  .filter((name): name is string => Boolean(name))
+  .map((name) => ({
+    '@type': 'PerformingGroup',
+    name,
+  }));
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'MusicEvent',
+  '@id': `${shareUrl}#event`,
   name: event.title,
   startDate: event.startDate,
-  endDate: event.endDate,
+  endDate: event.endDate || event.startDate,
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   image: ogImage ? [ogImage] : undefined,
   url: shareUrl,
+  description: event.summary ?? event.title,
+  inLanguage: 'en',
   location: event.location
     ? {
         '@type': 'Place',
         name: event.location,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: event.location,
+        },
       }
     : undefined,
-  description: event.summary ?? event.title,
-  organizer: {
-    '@type': 'Organization',
-    name: 'Energize Music',
-  },
+  organizer: { '@id': organizationId() },
+  performer: performers.length > 0 ? performers : undefined,
+  ...(event.ticketUrl
+    ? {
+        offers: {
+          '@type': 'Offer',
+          url: event.ticketUrl,
+          availability: 'https://schema.org/InStock',
+        },
+      }
+    : {}),
 };
 ---
 
@@ -64,6 +88,11 @@ const jsonLd = {
   title={event.title}
   description={event.summary ?? `${event.title} by Energize Music`}
   ogImage={ogImage}
+  keywords={[event.title, 'Energize Music', 'live event', 'Afro-gospel', event.location].filter(Boolean) as string[]}
+  breadcrumbs={crumbs(
+    { name: 'Events', path: '/events' },
+    { name: event.title, path: `/events/${event.slug}` },
+  )}
   ambientVariant="editorial"
   headerVariant="overlay"
 >

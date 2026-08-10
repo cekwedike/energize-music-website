@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { crumbs } from '../lib/seo/schema';
 
 const LIVE_SITE = 'https://energize-kids.com/';
 
@@ -31,6 +32,8 @@ const pillars = [
   title="Energize Kids"
   description="Fun, engaging experiences for amazing kids: clean music, movement, learning, and joy from Energize Music."
   ogImage="/initiatives/energize-kids.webp"
+  keywords={['Energize Kids', 'kids music', 'clean entertainment', 'Energize Music']}
+  breadcrumbs={crumbs({ name: 'Energize Kids', path: '/energize-kids' })}
 >
   <!-- Hero -->
   <section class="relative min-h-[32rem] overflow-hidden border-b border-white/10 sm:min-h-[38rem] lg:min-h-[42rem]">

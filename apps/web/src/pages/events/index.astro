@@ -14,6 +14,7 @@ import {
 } from '@energize/shared';
 import { isPastEvent, isValidEventCard } from '../../lib/events/format';
 import { mergeEventsPageSettings } from '../../lib/events/pageDefaults';
+import { crumbs } from '../../lib/seo/schema';
 
 let events: EventCard[] = [];
 let pageSettings: EventsPageSettings | null = null;
@@ -54,6 +55,8 @@ const upcomingSorted = [...upcoming].sort(
 <BaseLayout
   title="Events"
   description={settings.heroLead || 'Live nights from Energize Music: festivals, showcases, and community stages.'}
+  keywords={['Energize Music events', 'Energize Fest', 'live gospel', 'concerts']}
+  breadcrumbs={crumbs({ name: 'Events', path: '/events' })}
   ambientVariant="editorial"
 >
   <EventsHero settings={settings} spotlightAvailable={spotlight.length > 0} />

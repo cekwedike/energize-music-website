@@ -1,10 +1,22 @@
 ---
+import {
+  SITE_LOCALE,
+  SITE_NAME,
+  absoluteImageUrl,
+  absoluteUrl,
+  formatTitle,
+} from '../../lib/seo/site';
+
 interface Props {
   title: string;
   description: string;
   path?: string;
   ogImage?: string;
-  ogType?: 'website' | 'article' | 'music.song' | 'profile';
+  ogType?: 'website' | 'article' | 'music.song' | 'music.album' | 'profile' | 'music.playlist';
+  noindex?: boolean;
+  publishedTime?: string;
+  modifiedTime?: string;
+  keywords?: string[];
 }
 
 const {
@@ -13,22 +25,25 @@ const {
   path = '/',
   ogImage,
   ogType = 'website',
+  noindex = false,
+  publishedTime,
+  modifiedTime,
+  keywords = [],
 } = Astro.props;
 
-const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
-const siteName = 'Energize Music';
-const canonical = new URL(path, siteUrl).toString();
-const fullTitle = title.includes('Energize') ? title : `${title} · ${siteName}`;
-
-const defaultOgPath = '/brand/logo.webp';
-const rawOg = (ogImage?.trim() || defaultOgPath);
-const absoluteOg = rawOg.startsWith('http://') || rawOg.startsWith('https://')
-  ? rawOg
-  : new URL(rawOg.startsWith('/') ? rawOg : `/${rawOg}`, siteUrl).toString();
+const canonical = absoluteUrl(path);
+const fullTitle = formatTitle(title);
+const absoluteOg = absoluteImageUrl(ogImage);
+const robots = noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+const keywordContent = keywords.filter(Boolean).join(', ');
 ---
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
+{keywordContent && <meta name="keywords" content={keywordContent} />}
+<meta name="author" content={SITE_NAME} />
+<meta name="robots" content={robots} />
+<meta name="googlebot" content={robots} />
 <link rel="canonical" href={canonical} />
 
 <meta name="theme-color" content="#0b0b0d" />
@@ -36,16 +51,21 @@ const absoluteOg = rawOg.startsWith('http://') || rawOg.startsWith('https://')
 <link rel="apple-touch-icon" href="/brand/logo.webp" />
 
 <meta property="og:type" content={ogType} />
-<meta property="og:site_name" content={siteName} />
-<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:locale" content={SITE_LOCALE} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={absoluteOg} />
 <meta property="og:image:alt" content={fullTitle} />
+{publishedTime && <meta property="article:published_time" content={publishedTime} />}
+{modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+{ogType === 'article' && <meta property="article:publisher" content={SITE_NAME} />}
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={absoluteOg} />
 <meta name="twitter:image:alt" content={fullTitle} />
+
+<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM summary" />

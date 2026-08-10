@@ -1,15 +1,24 @@
 ---
 import SEO from '../components/ui/SEO.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
 import SiteHeader, { type HeaderVariant } from '../components/ui/SiteHeader.astro';
 import SiteFooter from '../components/ui/SiteFooter.astro';
 import FooterMarquee from '../components/ui/FooterMarquee.astro';
 import AmbientBackground, { type AmbientVariant } from '../components/ui/AmbientBackground.astro';
+import { buildBreadcrumbSchema, buildSiteGraph } from '../lib/seo/schema';
+import type { BreadcrumbItem } from '../lib/seo/site';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  ogType?: 'website' | 'article' | 'music.song' | 'music.album' | 'profile' | 'music.playlist';
+  noindex?: boolean;
+  publishedTime?: string;
+  modifiedTime?: string;
+  keywords?: string[];
+  breadcrumbs?: BreadcrumbItem[];
   hideHeader?: boolean;
   hideFooter?: boolean;
   showTopMarquee?: boolean;
@@ -22,6 +31,12 @@ const {
   title,
   description,
   ogImage,
+  ogType = 'website',
+  noindex = false,
+  publishedTime,
+  modifiedTime,
+  keywords,
+  breadcrumbs,
   hideHeader = false,
   hideFooter = false,
   showTopMarquee = false,
@@ -31,6 +46,8 @@ const {
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
+const siteGraph = buildSiteGraph();
+const breadcrumbGraph = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs) : null;
 
 function resolveAmbientVariant(): AmbientVariant {
   if (ambientVariant) return ambientVariant;
@@ -55,13 +72,26 @@ function resolveAmbientVariant(): AmbientVariant {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="author" type="text/plain" href="/humans.txt" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <SEO title={title} description={description} path={Astro.url.pathname} ogImage={ogImage} />
+    <SEO
+      title={title}
+      description={description}
+      path={Astro.url.pathname}
+      ogImage={ogImage}
+      ogType={ogType}
+      noindex={noindex}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      keywords={keywords}
+    />
+    <JsonLd data={siteGraph} />
+    {breadcrumbGraph && <JsonLd data={breadcrumbGraph} />}
   </head>
   <body class:list={['site-body', pageTheme === 'light' && 'site-body--light']}>
     {pageTheme === 'light' ? null : <AmbientBackground variant={resolveAmbientVariant()} />}

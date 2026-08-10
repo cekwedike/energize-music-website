@@ -5,6 +5,7 @@ import BlogsCardGrid from '../../components/blogs/BlogsCardGrid.astro';
 import BlogsSidebar from '../../components/blogs/BlogsSidebar.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { allNewsListQuery, type NewsPostSummary } from '@energize/shared';
+import { crumbs } from '../../lib/seo/schema';
 
 const posts = await sanityClient.fetch<NewsPostSummary[]>(allNewsListQuery);
 
@@ -14,7 +15,9 @@ const latestPosts = posts.slice(featuredPosts.length, featuredPosts.length + 6);
 
 <BaseLayout
   title="Blogs"
-  description="Announcements and stories from Energize Music."
+  description="Announcements, stories, and label news from Energize Music."
+  keywords={['Energize Music blog', 'gospel music news', 'label announcements']}
+  breadcrumbs={crumbs({ name: 'Blogs', path: '/blogs' })}
   ambientVariant="editorial"
 >
   <BlogsPageHeader totalCount={posts.length} />
