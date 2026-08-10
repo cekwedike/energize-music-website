@@ -1,5 +1,8 @@
 ---
 import {
+  SITE_DEFAULT_OG,
+  SITE_DEFAULT_OG_HEIGHT,
+  SITE_DEFAULT_OG_WIDTH,
   SITE_LOCALE,
   SITE_NAME,
   absoluteImageUrl,
@@ -33,7 +36,9 @@ const {
 
 const canonical = absoluteUrl(path);
 const fullTitle = formatTitle(title);
-const absoluteOg = absoluteImageUrl(ogImage);
+const ogPath = ogImage?.trim() || SITE_DEFAULT_OG;
+const absoluteOg = absoluteImageUrl(ogPath);
+const isDefaultOg = ogPath === SITE_DEFAULT_OG || absoluteOg === absoluteImageUrl(SITE_DEFAULT_OG);
 const robots = noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 const keywordContent = keywords.filter(Boolean).join(', ');
 ---
@@ -58,6 +63,9 @@ const keywordContent = keywords.filter(Boolean).join(', ');
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={absoluteOg} />
 <meta property="og:image:alt" content={fullTitle} />
+{isDefaultOg && <meta property="og:image:type" content="image/jpeg" />}
+{isDefaultOg && <meta property="og:image:width" content={String(SITE_DEFAULT_OG_WIDTH)} />}
+{isDefaultOg && <meta property="og:image:height" content={String(SITE_DEFAULT_OG_HEIGHT)} />}
 {publishedTime && <meta property="article:published_time" content={publishedTime} />}
 {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
 {ogType === 'article' && <meta property="article:publisher" content={SITE_NAME} />}

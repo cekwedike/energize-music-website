@@ -14,4 +14,4 @@ const Tag = blockTagByStyle[value.style ?? 'normal'] ?? 'p';
 const html = renderBlockHtml(value as never);
 ---
 
-<Tag class="mt-4 text-paper/80 [&_a]:text-[var(--color-glow)] first:mt-0" set:html={html} />
+<Tag class="mt-4 text-paper [&_a]:text-[var(--color-glow)] first:mt-0" set:html={html} />

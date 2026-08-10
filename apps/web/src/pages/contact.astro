@@ -35,7 +35,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
       data-endpoint-configured={formEndpoint ? 'true' : 'false'}
     >
       <div>
-        <label for="name" class="block text-sm font-medium text-paper/80">Name</label>
+        <label for="name" class="block text-sm font-medium text-paper">Name</label>
         <input
           id="name"
           name="name"
@@ -46,7 +46,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
       </div>
 
       <div>
-        <label for="email" class="block text-sm font-medium text-paper/80">Email</label>
+        <label for="email" class="block text-sm font-medium text-paper">Email</label>
         <input
           id="email"
           name="email"
@@ -57,7 +57,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
       </div>
 
       <div>
-        <label for="intent" class="block text-sm font-medium text-paper/80">I'm reaching out about</label>
+        <label for="intent" class="block text-sm font-medium text-paper">I'm reaching out about</label>
         <select
           id="intent"
           name="intent"
@@ -70,7 +70,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
       </div>
 
       <div>
-        <label for="message" class="block text-sm font-medium text-paper/80">Message</label>
+        <label for="message" class="block text-sm font-medium text-paper">Message</label>
         <textarea
           id="message"
           name="message"
@@ -93,7 +93,7 @@ const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
         Send message
       </button>
 
-      <p id="contact-form-status" class="text-sm text-paper/60" role="status"></p>
+      <p id="contact-form-status" class="text-sm text-paper" role="status"></p>
     </form>
   </section>
 </BaseLayout>

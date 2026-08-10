@@ -23,7 +23,7 @@ function artistPhotoUrl(
 
 {
   artistGroups.length === 0 ? (
-    <p class="releases-listing__empty rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-8 py-16 text-center text-paper/55">
+    <p class="releases-listing__empty rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-8 py-16 text-center text-paper">
       Releases will appear here once you add them in Sanity Studio.
     </p>
   ) : (
@@ -218,7 +218,7 @@ function artistPhotoUrl(
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(250, 250, 248, 0.72);
+    color: var(--color-paper);
     cursor: pointer;
     white-space: nowrap;
     transition: color 0.25s ease;
@@ -303,7 +303,7 @@ function artistPhotoUrl(
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(250, 250, 248, 0.55);
+    color: var(--color-paper);
     cursor: pointer;
     transition:
       color 0.2s ease,

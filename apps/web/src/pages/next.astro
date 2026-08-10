@@ -166,7 +166,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
       <div class="next-scroll-reveal mx-auto max-w-2xl text-center">
         <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">The Journey</p>
         <h2 class="text-h2 mt-3">From submission to stage</h2>
-        <p class="mt-3 text-sm text-paper/65">May to October 2026</p>
+        <p class="mt-3 text-sm text-paper">May to October 2026</p>
       </div>
       <ol class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {
@@ -174,10 +174,10 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
             <li class="next-scroll-reveal next-glass-card rounded-2xl p-6" style={`--reveal-delay: ${i * 50}ms`}>
               <div class="flex items-baseline justify-between gap-3">
                 <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-glow)]">{phase.number}</p>
-                <p class="text-xs font-semibold uppercase tracking-wider text-paper/45">{phase.period}</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-paper">{phase.period}</p>
               </div>
               <h3 class="mt-2 font-display text-xl font-medium">{phase.title}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-paper/70">{phase.body}</p>
+              <p class="mt-2 text-sm leading-relaxed text-paper">{phase.body}</p>
             </li>
           ))
         }
@@ -205,7 +205,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
               {steps.map((step) => (
                 <li class="flex gap-4 border-b border-white/8 pb-4 last:border-0">
                   <span class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">{step.num}</span>
-                  <p class="font-medium text-paper/90">{step.title}</p>
+                  <p class="font-medium text-paper">{step.title}</p>
                 </li>
               ))}
             </ol>
@@ -234,7 +234,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
           faqs.map((item, i) => (
             <article class="next-scroll-reveal next-glass-card rounded-2xl px-6 py-5" style={`--reveal-delay: ${i * 40}ms`}>
               <h3 class="text-base font-semibold leading-snug sm:text-lg">{item.q}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-paper/75">{item.a}</p>
+              <p class="mt-2 text-sm leading-relaxed text-paper">{item.a}</p>
             </article>
           ))
         }
@@ -247,8 +247,8 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
       <div class="mx-auto max-w-[7.5rem] opacity-90">
         <NextLogo animated={false} />
       </div>
-      <p class="mt-4 text-sm text-paper/50">by Energize Music</p>
-      <p class="mx-auto mt-4 max-w-md text-sm leading-relaxed text-paper/60">
+      <p class="mt-4 text-sm text-paper">by Energize Music</p>
+      <p class="mx-auto mt-4 max-w-md text-sm leading-relaxed text-paper">
         Entrants also join the Kingdom Creatives Academy ecosystem for long-term growth beyond the season.
       </p>
       {
@@ -265,7 +265,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
           <p class="mt-6 text-sm font-semibold uppercase tracking-[0.14em] text-[var(--color-glow)]">{closedLabel}</p>
         )
       }
-      <p class="mt-10 text-xs text-paper/40">&copy; 2026 NEXT by Energize Music. All rights reserved.</p>
+      <p class="mt-10 text-xs text-paper">&copy; 2026 NEXT by Energize Music. All rights reserved.</p>
     </div>
   </section>
 
@@ -363,7 +363,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
     margin: 1rem auto 0;
     font-size: clamp(0.98rem, 2.1vw, 1.15rem);
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.78);
+    color: #ffffff;
   }
 
   .next-hero__closed-msg {
@@ -371,7 +371,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
     margin: 0.85rem auto 0;
     font-size: 0.9rem;
     line-height: 1.5;
-    color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
   }
 
   .next-hero__actions {
@@ -441,7 +441,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
     font-weight: 800;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.42);
+    color: #ffffff;
     animation: next-hero-rail 28s linear infinite;
   }
 

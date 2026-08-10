@@ -19,7 +19,7 @@ const hasLegacy = legacyPage && legacyPage.blocks.length > 0;
       <div class="about-scroll-reveal lg:sticky lg:top-28 lg:self-start">
         <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">Our story</p>
         <h2 class="text-h2 mt-4">Music with meaning</h2>
-        <p class="mt-5 text-paper/60">
+        <p class="mt-5 text-paper">
           From Lagos to the world: we create and curate sounds that carry faith, culture, and excellence.
         </p>
 
@@ -35,7 +35,7 @@ const hasLegacy = legacyPage && legacyPage.blocks.length > 0;
         <div class="mt-8 hidden h-24 w-px bg-gradient-to-b from-[var(--color-glow)]/60 to-transparent lg:block" aria-hidden="true"></div>
       </div>
 
-      <div id="about-story-content" class="about-scroll-reveal about-story-content space-y-6 text-paper/80" style="--reveal-delay: 120ms">
+      <div id="about-story-content" class="about-scroll-reveal about-story-content space-y-6 text-paper" style="--reveal-delay: 120ms">
         {
           hasIntro ? (
             <PortableText value={aboutPage!.intro!} />
@@ -43,7 +43,7 @@ const hasLegacy = legacyPage && legacyPage.blocks.length > 0;
             <PortableText value={legacyPage!.blocks} />
           ) : (
             <>
-              <p class="text-lead text-paper/90">
+              <p class="text-lead text-paper">
                 Energize Music is an Afro-gospel &amp; soul-fusion record label providing high-quality,
                 family-friendly, uplifting music, built on the belief that music has the power to connect
                 people and speak to audiences everywhere.

@@ -16,9 +16,11 @@ export interface ArtistCard {
   _id: string;
   name: string;
   slug: string;
-/** Internal CMS roster status. Not displayed on the public website. */
+  /** Internal CMS roster status. Not displayed on the public website. */
   tier: ArtistTier;
   featured?: boolean;
+  /** Optional sitewide sort key (1 = first). Unset artists sort after numbered ones. */
+  displayOrder?: number;
   photo: SanityImage;
   tagline?: string;
   bio?: string;

@@ -175,13 +175,7 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
   }
 
   .artist-stage__identity {
-    padding: 0 clamp(0.25rem, 1vw, 0.5rem);
-  }
-
-  @media (min-width: 1024px) {
-    .artist-stage__identity {
-      padding: 0;
-    }
+    padding: 0;
   }
 
   .artist-stage__eyebrow {
@@ -220,7 +214,7 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
     max-width: 28rem;
     font-size: clamp(1rem, 0.95rem + 0.35vw, 1.25rem);
     line-height: 1.55;
-    color: rgba(250, 250, 248, 0.62);
+    color: var(--color-paper);
   }
 
   .artist-stage__count {
@@ -230,27 +224,13 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(250, 250, 248, 0.45);
+    color: var(--color-paper);
   }
 
   .artist-stage__catalog {
     min-width: 0;
     width: 100%;
     overflow: hidden;
-  }
-
-  @media (max-width: 1023px) {
-    .artist-stage__catalog {
-      margin-inline: -1.25rem;
-      padding-inline: 1.25rem;
-    }
-  }
-
-  @media (min-width: 640px) and (max-width: 1023px) {
-    .artist-stage__catalog {
-      margin-inline: -1.5rem;
-      padding-inline: 1.5rem;
-    }
   }
 
   .artist-stage__catalog-row {

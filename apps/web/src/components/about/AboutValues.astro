@@ -35,7 +35,7 @@ const slideCount = values.length;
     <div class="about-scroll-reveal max-w-2xl">
       <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">What drives us</p>
       <h2 id="about-values-heading" class="text-h2 mt-4">Rooted in purpose</h2>
-      <p class="mt-5 max-w-md text-paper/70">
+      <p class="mt-5 max-w-md text-paper">
         Energize Music is an Afro-gospel &amp; soul-fusion record label providing high-quality, family-friendly, uplifting music.
       </p>
     </div>
@@ -351,7 +351,7 @@ const slideCount = values.length;
     margin-top: 0.875rem;
     font-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1.0625rem);
     line-height: 1.65;
-    color: color-mix(in srgb, var(--color-paper) 72%, transparent);
+    color: var(--color-paper);
   }
 
   .about-values-scroll-hint {
@@ -368,7 +368,7 @@ const slideCount = values.length;
     font-weight: 600;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-glow) 70%, transparent);
+    color: var(--color-glow);
     pointer-events: none;
   }
 
@@ -433,7 +433,7 @@ const slideCount = values.length;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-paper) 45%, transparent);
+    color: var(--color-paper);
     transition: color 0.4s ease;
   }
 

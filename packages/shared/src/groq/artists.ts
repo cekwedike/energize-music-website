@@ -6,6 +6,7 @@ export const artistCardFragment = /* groq */ `{
   "slug": slug.current,
   tier,
   featured,
+  displayOrder,
   photo${imageFragment},
   tagline,
   bio,
@@ -19,6 +20,7 @@ export const artistDetailFragment = /* groq */ `{
   "slug": slug.current,
   tier,
   featured,
+  displayOrder,
   photo${imageFragment},
   coverImage${imageFragment},
   tagline,
@@ -28,10 +30,13 @@ export const artistDetailFragment = /* groq */ `{
   streaming
 }`;
 
-export const allArtistsQuery = /* groq */ `*[_type == "artist"] | order(featured desc, tier asc, name asc) ${artistCardFragment}`;
-// tier in order() is internal CMS sorting only; the website does not display artist tiers.
+/** Numbered artists first (1, 2, …), then unnumbered, then name. */
+const artistListOrder = /* groq */ `order(coalesce(displayOrder, 1000000) asc, name asc)`;
 
-export const featuredArtistsQuery = /* groq */ `*[_type == "artist" && featured == true] | order(name asc) ${artistCardFragment}`;
+export const allArtistsQuery = /* groq */ `*[_type == "artist"] | ${artistListOrder} ${artistCardFragment}`;
+// tier is internal CMS metadata only; public sort is displayOrder then name.
+
+export const featuredArtistsQuery = /* groq */ `*[_type == "artist" && featured == true] | ${artistListOrder} ${artistCardFragment}`;
 
 export const artistSlugsQuery = /* groq */ `*[_type == "artist" && defined(slug.current)]{ "slug": slug.current }`;
 

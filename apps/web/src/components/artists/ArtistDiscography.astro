@@ -29,7 +29,7 @@ const sorted = [...releases].sort(
           <h2 id="discography-heading" class="font-display text-2xl text-paper sm:text-3xl">
             Discography
           </h2>
-          <p class="mt-2 text-sm text-paper/50">Releases by {artistName}</p>
+          <p class="mt-2 text-sm text-paper">Releases by {artistName}</p>
         </div>
         <EditorialSectionLink
           href="/releases"
@@ -201,7 +201,7 @@ const sorted = [...releases].sort(
     align-items: center;
     justify-content: center;
     font-size: 0.75rem;
-    color: rgba(250, 250, 248, 0.35);
+    color: var(--color-paper);
   }
 
   .discography__meta {
@@ -223,7 +223,7 @@ const sorted = [...releases].sort(
     margin-top: 0.2rem;
     font-size: 0.75rem;
     line-height: 1.35;
-    color: rgba(250, 250, 248, 0.42);
+    color: var(--color-paper);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;

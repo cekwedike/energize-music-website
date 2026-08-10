@@ -31,6 +31,14 @@ export default defineType({
     }),
     defineField({ name: 'featured', title: 'Featured on homepage', type: 'boolean', initialValue: false }),
     defineField({
+      name: 'displayOrder',
+      title: 'Display order',
+      type: 'number',
+      description:
+        'Optional. Controls artist order across the site (1 = first, 2 = second, …). Artists without a number appear after those with a number.',
+      validation: (rule) => rule.integer().min(1).max(999),
+    }),
+    defineField({
       name: 'photo',
       title: 'Photo',
       type: 'image',
@@ -86,7 +94,32 @@ export default defineType({
       ],
     }),
   ],
+  orderings: [
+    {
+      title: 'Display order',
+      name: 'displayOrderAsc',
+      by: [
+        { field: 'displayOrder', direction: 'asc' },
+        { field: 'name', direction: 'asc' },
+      ],
+    },
+    {
+      title: 'Name',
+      name: 'nameAsc',
+      by: [{ field: 'name', direction: 'asc' }],
+    },
+  ],
   preview: {
-    select: { title: 'name', subtitle: 'tier', media: 'photo' },
+    select: { title: 'name', subtitle: 'tier', media: 'photo', displayOrder: 'displayOrder' },
+    prepare: ({ title, subtitle, media, displayOrder }) => ({
+      title,
+      subtitle:
+        displayOrder != null
+          ? `#${displayOrder} · ${subtitle ?? 'artist'}`
+          : subtitle
+            ? `${subtitle} · unnumbered`
+            : 'unnumbered',
+      media,
+    }),
   },
 });

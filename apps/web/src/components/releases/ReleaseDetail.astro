@@ -95,19 +95,19 @@ const primaryListenUrl = release.externalUrl;
           artists.length > 0 ? (
             <ul class="release-reveal release-reveal-5 mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1" aria-label="Artists">
               {artists.map((artist, index) => (
-                <li class="inline-flex items-baseline text-lg text-paper/80 sm:text-xl">
+                <li class="inline-flex items-baseline text-lg text-paper sm:text-xl">
                   <a
                     href={`/artists/${artist.slug}`}
                     class="release-detail__artist-link font-display italic underline decoration-[var(--color-glow)]/50 underline-offset-[0.22em] transition hover:text-[var(--color-glow)] hover:decoration-[var(--color-glow)]"
                   >
                     {artist.name}
                   </a>
-                  {index < artists.length - 1 && <span class="ml-2 text-paper/35" aria-hidden="true">/</span>}
+                  {index < artists.length - 1 && <span class="ml-2 text-paper" aria-hidden="true">/</span>}
                 </li>
               ))}
             </ul>
           ) : release.artistNames.length > 0 ? (
-            <p class="release-reveal release-reveal-5 mt-6 font-display text-lg italic text-paper/70 sm:text-xl">
+            <p class="release-reveal release-reveal-5 mt-6 font-display text-lg italic text-paper sm:text-xl">
               {release.artistNames.join(' / ')}
             </p>
           ) : null
@@ -116,7 +116,7 @@ const primaryListenUrl = release.externalUrl;
         {
           hasStreaming && (
             <div class="release-reveal release-reveal-6 mt-10 max-w-md">
-              <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-paper/45">Listen</p>
+              <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-paper">Listen</p>
               <div class="mt-4">
                 <ArtistStreamingLinks
                   streaming={streaming}
@@ -212,7 +212,7 @@ const primaryListenUrl = release.externalUrl;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.04);
-    color: rgba(250, 250, 248, 0.4);
+    color: var(--color-paper);
     font-size: 0.75rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;

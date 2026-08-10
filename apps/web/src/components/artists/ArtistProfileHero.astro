@@ -50,13 +50,13 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
         <h1 class="font-display text-[clamp(2rem,1.2rem+4vw,3.75rem)] leading-none tracking-tight text-paper">
           {artist.name}
         </h1>
-        {artist.tagline && <p class="mt-3 max-w-xl text-base text-paper/65 sm:text-lg">{artist.tagline}</p>}
+        {artist.tagline && <p class="mt-3 max-w-xl text-base text-paper sm:text-lg">{artist.tagline}</p>}
 
         {
           artist.genres && artist.genres.length > 0 && (
             <ul class="mt-4 flex flex-wrap gap-2" aria-label="Genres">
               {artist.genres.map((genre) => (
-                <li class="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-medium text-paper/75">{genre}</li>
+                <li class="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-medium text-paper">{genre}</li>
               ))}
             </ul>
           )

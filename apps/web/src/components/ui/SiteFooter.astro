@@ -22,7 +22,7 @@ const year = new Date().getFullYear();
           <Logo size="sm" animated={false} />
         </a>
 
-        <p class="site-footer__tagline font-instrument mt-3 text-[clamp(1rem,0.92rem+0.35vw,1.375rem)] italic leading-snug text-paper/55">
+        <p class="site-footer__tagline font-instrument mt-3 text-[clamp(1rem,0.92rem+0.35vw,1.375rem)] italic leading-snug text-paper">
           The Energy Different
         </p>
 
@@ -46,7 +46,7 @@ const year = new Date().getFullYear();
               </button>
             </div>
           </form>
-          <p class="mt-2 text-[11px] leading-snug text-paper/35">
+          <p class="mt-2 text-[11px] leading-snug text-paper">
             Releases, shows, and label news. No spam.
           </p>
         </div>
@@ -259,7 +259,7 @@ const year = new Date().getFullYear();
   }
 
   .site-footer__input::placeholder {
-    color: rgba(250, 250, 248, 0.38);
+    color: var(--color-paper);
   }
 
   .site-footer__input:focus-visible {
@@ -310,7 +310,7 @@ const year = new Date().getFullYear();
     justify-content: center;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.14);
-    color: rgba(250, 250, 248, 0.65);
+    color: var(--color-paper);
     background: rgba(255, 255, 255, 0.02);
     transition:
       border-color 0.2s ease,
@@ -408,7 +408,7 @@ const year = new Date().getFullYear();
     min-height: 2.75rem;
     padding-block: 0.25rem;
     text-decoration: none;
-    color: rgba(250, 250, 248, 0.72);
+    color: var(--color-paper);
     transition: color 0.2s ease;
   }
 
@@ -516,24 +516,24 @@ const year = new Date().getFullYear();
     font-size: clamp(0.875rem, 0.82rem + 0.2vw, 0.9375rem);
     font-style: italic;
     line-height: 1.4;
-    color: rgba(250, 250, 248, 0.58);
+    color: var(--color-paper);
   }
 
   .site-footer__copyright-symbol {
     font-style: normal;
-    color: rgba(250, 250, 248, 0.62);
+    color: var(--color-paper);
   }
 
   .site-footer__copyright-year {
     font-style: normal;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: rgba(250, 250, 248, 0.62);
+    color: var(--color-paper);
   }
 
   .site-footer__copyright-brand {
     font-weight: 500;
-    color: rgba(250, 250, 248, 0.55);
+    color: var(--color-paper);
   }
 
   .site-footer__copyright-secondary {
@@ -543,7 +543,7 @@ const year = new Date().getFullYear();
     letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1.5;
-    color: rgba(250, 250, 248, 0.32);
+    color: var(--color-paper);
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -77,7 +77,7 @@ const { role } = Astro.props;
     display: inline-flex;
     font-size: 0.875rem;
     font-weight: 500;
-    color: rgba(250, 250, 248, 0.62);
+    color: var(--color-paper);
     text-decoration: none;
     transition: color 0.2s ease;
   }
@@ -106,7 +106,7 @@ const { role } = Astro.props;
   .career-detail__location {
     margin-top: 0.85rem;
     font-size: 1rem;
-    color: rgba(250, 250, 248, 0.68);
+    color: var(--color-paper);
   }
 
   .career-detail__actions {
@@ -143,7 +143,7 @@ const { role } = Astro.props;
 
   .career-detail__cta--ghost {
     border: 1px solid rgba(255, 255, 255, 0.14);
-    color: rgba(250, 250, 248, 0.82);
+    color: var(--color-paper);
     background: rgba(255, 255, 255, 0.03);
   }
 
@@ -178,7 +178,7 @@ const { role } = Astro.props;
     margin-top: 1.25rem;
     font-size: 1rem;
     line-height: 1.7;
-    color: rgba(250, 250, 248, 0.78);
+    color: var(--color-paper);
   }
 
   .career-detail__description :global(p + p) {
@@ -214,6 +214,6 @@ const { role } = Astro.props;
 
   .career-detail__apply-copy {
     font-size: 0.9375rem;
-    color: rgba(250, 250, 248, 0.62);
+    color: var(--color-paper);
   }
 </style>

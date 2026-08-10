@@ -131,7 +131,7 @@
   font-weight: 800;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
+  color: #ffffff;
   animation: home-marquee-x var(--home-marquee-duration, 26s) linear infinite;
 }
 
@@ -216,5 +216,5 @@
   font-weight: 800;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(250, 250, 248, 0.4);
+  color: var(--color-paper);
 }

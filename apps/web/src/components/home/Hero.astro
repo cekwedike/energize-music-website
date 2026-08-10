@@ -12,7 +12,7 @@ const videoAttrs = {
   muted: true,
   loop: true,
   playsinline: true,
-  preload: 'metadata' as const,
+  preload: 'none' as const,
   poster: HERO_VIDEO_POSTER,
 };
 
@@ -21,15 +21,8 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
 
 <section class="hero" data-hero>
   <video
-    id="hero-video-a"
+    id="hero-video"
     class="hero-video"
-    style="transform-origin: 50% 100%; backface-visibility: hidden;"
-    src={HERO_VIDEO_SRC}
-    {...videoAttrs}
-  />
-  <video
-    id="hero-video-b"
-    class="hero-video hero-video--b"
     style="transform-origin: 50% 100%; backface-visibility: hidden;"
     src={HERO_VIDEO_SRC}
     {...videoAttrs}
@@ -65,13 +58,13 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
 
   <div id="hero-content" class="hero-content" data-hero-parallax data-parallax-depth="8">
     <Logo />
-    <p class="hero-text-el font-inter mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/60 sm:mt-6 sm:text-xs">
+    <p class="hero-text-el font-inter mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-white sm:mt-6 sm:text-xs">
       The Energy Different
     </p>
     <h1 class="hero-text-el hero-text-el-heading font-instrument text-glow-pulse mt-5 max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-white sm:mt-8 sm:max-w-2xl md:mt-9 md:max-w-4xl">
       Rooted In Lagos. Reaching The World.
     </h1>
-    <p class="hero-text-el hero-text-el-sub font-inter mt-4 max-w-xl text-sm text-white/70 sm:mt-5 md:mt-7 md:text-base">
+    <p class="hero-text-el hero-text-el-sub font-inter mt-4 max-w-xl text-sm text-white sm:mt-5 md:mt-7 md:text-base">
       Afro-gospel and soul-fusion music, carried from Lagos to every corner of the earth.
     </p>
 
@@ -129,10 +122,6 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-
-  .hero-video--b {
-    opacity: 0;
   }
 
   .hero-veil {
@@ -202,7 +191,7 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     font-weight: 800;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.42);
+    color: #ffffff;
     white-space: nowrap;
     pointer-events: none;
   }
@@ -397,7 +386,7 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     font-weight: 800;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7);
+    color: #ffffff;
     text-decoration: none;
     opacity: 0;
     transform: translateY(10px);
@@ -566,50 +555,46 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     heroVideoUsesCdnFallback: HERO_VIDEO_USES_CDN_FALLBACK,
   }}
 >
-  const videoA = document.getElementById('hero-video-a');
-  const videoB = document.getElementById('hero-video-b');
+  const video = document.getElementById('hero-video');
 
-  if (videoA && videoB) {
-    const applyLocalFallback = (video) => {
-      if (video.dataset.heroFallback === 'local') return;
-      video.dataset.heroFallback = 'local';
-      video.src = heroVideoLocal;
-      video.load();
-    };
-
+  if (video instanceof HTMLVideoElement) {
     if (heroVideoUsesCdnFallback) {
-      for (const video of [videoA, videoB]) {
-        video.addEventListener('error', () => applyLocalFallback(video), { once: true });
-      }
+      video.addEventListener(
+        'error',
+        () => {
+          if (video.dataset.heroFallback === 'local') return;
+          video.dataset.heroFallback = 'local';
+          video.src = heroVideoLocal;
+          video.load();
+        },
+        { once: true },
+      );
+    }
+
+    // Start loading after first paint so the poster can show immediately.
+    const startPlayback = () => {
+      if (video.getAttribute('preload') === 'auto') return;
+      video.preload = 'auto';
+      video.load();
+      video.play().catch(() => {});
+    };
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(startPlayback, { timeout: 900 });
+    } else {
+      window.setTimeout(startPlayback, 200);
     }
 
     const clamp01 = (value) => Math.min(1, Math.max(0, value));
     const lerp = (current, target, factor) => current + (target - current) * factor;
-    const FADE_WINDOW = 0.8;
-
-    let offsetApplied = false;
-    videoB.addEventListener('loadedmetadata', () => {
-      if (!offsetApplied && videoB.duration) {
-        videoB.currentTime = videoB.duration / 2;
-        offsetApplied = true;
-      }
-    });
-
-    videoA.style.opacity = '1';
-    videoB.style.opacity = '0';
-
     const startScale = 1.001;
     const endScale = 1.12;
     let scale = startScale;
     let rafId = 0;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const applyTransform = (value) => {
-      const transform = `translateZ(0) scale(${value})`;
-      videoA.style.transform = transform;
-      videoB.style.transform = transform;
+      video.style.transform = `translateZ(0) scale(${value})`;
     };
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const tick = () => {
       if (!prefersReducedMotion) {
@@ -619,36 +604,23 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
         scale = lerp(scale, targetScale, 0.06);
         applyTransform(scale);
       }
-
-      if (videoA.duration && videoB.duration) {
-        const remainingA = videoA.duration - videoA.currentTime;
-        const remainingB = videoB.duration - videoB.currentTime;
-
-        if (remainingA >= 0 && remainingA < FADE_WINDOW) {
-          const t = clamp01(1 - remainingA / FADE_WINDOW);
-          videoA.style.opacity = String(1 - t);
-          videoB.style.opacity = String(t);
-        } else if (remainingB >= 0 && remainingB < FADE_WINDOW) {
-          const t = clamp01(1 - remainingB / FADE_WINDOW);
-          videoB.style.opacity = String(1 - t);
-          videoA.style.opacity = String(t);
-        }
-      }
-
       rafId = requestAnimationFrame(tick);
     };
 
     if (prefersReducedMotion) {
       applyTransform(startScale);
+      video.pause();
+    } else {
+      rafId = requestAnimationFrame(tick);
     }
 
-    rafId = requestAnimationFrame(tick);
     window.addEventListener('pagehide', () => cancelAnimationFrame(rafId));
-
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         cancelAnimationFrame(rafId);
-      } else {
+        video.pause();
+      } else if (!prefersReducedMotion) {
+        video.play().catch(() => {});
         rafId = requestAnimationFrame(tick);
       }
     });

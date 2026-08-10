@@ -105,6 +105,7 @@ async function auditPage(page: Page, route: string, viewportName: string): Promi
 }
 
 test.beforeEach(async ({ page }) => {
+  await page.route('**/*.webm', (route) => route.abort());
   await page.route('**/*.mp4', (route) => route.abort());
   await page.route('**/*.mp3', (route) => route.abort());
 });
