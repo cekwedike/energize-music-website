@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # version comes from package.json "packageManager" (pnpm@10.30.3)
       - uses: pnpm/action-setup@v4
