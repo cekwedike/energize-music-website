@@ -1,0 +1,280 @@
+---
+import type { EnrichedRelease } from '@energize/shared';
+
+interface Props {
+  releases: EnrichedRelease[];
+}
+
+const { releases } = Astro.props;
+const [lead, ...rest] = releases.slice(0, 4);
+const side = rest.slice(0, 3);
+
+function formatDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+}
+---
+
+{
+  lead && (
+    <section class="home-releases" aria-labelledby="home-releases-title">
+      <div class="home-releases__inner">
+        <div class="home-releases__head scroll-reveal">
+          <p class="home-kicker">On the catalog</p>
+          <h2 id="home-releases-title" class="home-releases__title">Fresh from the label</h2>
+        </div>
+
+        <div class="home-releases__stage scroll-reveal" style="--reveal-delay: 70ms">
+          <a href={`/releases/${lead.slug}`} class="home-releases__cover">
+            {lead.coverUrl ? (
+              <img
+                src={lead.coverUrl}
+                alt=""
+                class="home-releases__cover-img"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
+              />
+            ) : (
+              <div class="home-releases__cover-fallback" aria-hidden="true"></div>
+            )}
+          </a>
+
+          <div class="home-releases__copy">
+            <p class="home-releases__type">
+              {lead.type}
+              {lead.releaseDate && <span aria-hidden="true"> · </span>}
+              {lead.releaseDate && <time datetime={lead.releaseDate}>{formatDate(lead.releaseDate)}</time>}
+            </p>
+            <h3 class="home-releases__name">
+              <a href={`/releases/${lead.slug}`}>{lead.displayTitle || lead.title}</a>
+            </h3>
+            {lead.artistNames.length > 0 && (
+              <p class="home-releases__artists">{lead.artistNames.join(', ')}</p>
+            )}
+            <div class="home-releases__actions">
+              {lead.externalUrl && (
+                <a
+                  href={lead.externalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="home-btn home-btn--solid"
+                >
+                  Listen now
+                </a>
+              )}
+              <a href="/releases" class="home-btn home-btn--ghost">
+                Browse releases
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {side.length > 0 && (
+          <ul class="home-releases__rail scroll-reveal" style="--reveal-delay: 120ms">
+            {side.map((release) => (
+              <li>
+                <a href={`/releases/${release.slug}`} class="home-releases__rail-item">
+                  <span class="home-releases__rail-art">
+                    {release.coverUrl ? (
+                      <img
+                        src={release.coverUrl}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        referrerpolicy="no-referrer"
+                      />
+                    ) : null}
+                  </span>
+                  <span class="home-releases__rail-meta">
+                    <span class="home-releases__rail-title">{release.displayTitle || release.title}</span>
+                    <span class="home-releases__rail-artists">
+                      {release.artistNames.join(', ') || 'Energize Music'}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .home-releases {
+    padding: 4.5rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: #090c10;
+  }
+
+  .home-releases__inner {
+    width: min(100%, 80rem);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-releases__inner {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .home-releases__title {
+    margin-top: 0.65rem;
+    max-width: 14ch;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.4rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .home-releases__stage {
+    display: grid;
+    gap: 1.75rem;
+    margin-top: 2.25rem;
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .home-releases__stage {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 3rem;
+    }
+  }
+
+  .home-releases__cover {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #12161c;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 30px 80px rgba(0, 0, 0, 0.45);
+  }
+
+  .home-releases__cover-img,
+  .home-releases__cover-fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .home-releases__cover-fallback {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(77, 168, 255, 0.35), transparent 55%),
+      #151a22;
+  }
+
+  .home-releases__cover:hover .home-releases__cover-img {
+    transform: scale(1.04);
+  }
+
+  .home-releases__type {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .home-releases__name {
+    margin-top: 0.85rem;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(2.1rem, 1.5rem + 2.8vw, 3.75rem);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .home-releases__name a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .home-releases__name a:hover {
+    color: color-mix(in srgb, var(--color-glow) 70%, white);
+  }
+
+  .home-releases__artists {
+    margin-top: 0.85rem;
+    font-size: 1rem;
+    color: rgba(250, 250, 248, 0.68);
+  }
+
+  .home-releases__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .home-releases__rail {
+    display: grid;
+    gap: 0.75rem;
+    margin: 2.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 700px) {
+    .home-releases__rail {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  .home-releases__rail-item {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.85rem;
+    align-items: center;
+    padding: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease;
+  }
+
+  .home-releases__rail-item:hover {
+    border-color: rgba(77, 168, 255, 0.4);
+    background: rgba(77, 168, 255, 0.05);
+  }
+
+  .home-releases__rail-art {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #151a22;
+  }
+
+  .home-releases__rail-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .home-releases__rail-title {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .home-releases__rail-artists {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: rgba(250, 250, 248, 0.5);
+  }
+</style>

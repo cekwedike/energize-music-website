@@ -1,8 +1,26 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import NextLogo from '../components/next/NextLogo.astro';
 import NextMusicPlayer from '../components/next/NextMusicPlayer.astro';
+import { sanityClient } from '../lib/sanity/client';
+import { nextPageQuery, type NextPageSettings } from '@energize/shared';
+import { mergeNextPageSettings } from '../lib/next/pageDefaults';
 
-const SUBMIT_URL = 'https://tally.so/r/ob7Px1';
+let pageSettings: NextPageSettings | null = null;
+try {
+  pageSettings = await sanityClient.fetch<NextPageSettings | null>(nextPageQuery);
+} catch {
+  pageSettings = null;
+}
+
+const settings = mergeNextPageSettings(pageSettings);
+const submissionsOpen = Boolean(settings.submissionsOpen && settings.submitUrl);
+const submitUrl = settings.submitUrl || '#';
+const submitLabel = settings.submitLabel || 'Submit Your Music';
+const closedLabel = settings.closedLabel || 'Submissions Closed';
+const closedMessage =
+  settings.closedMessage ||
+  'Registration for this season has ended. Follow Energize Music for the next drop.';
 
 const heroImages = [
   '/next/takit.webp',
@@ -12,382 +30,203 @@ const heroImages = [
   '/next/greatman.webp',
 ];
 
-const pillars = [
-  {
-    title: 'Discover',
-    icon: 'mic',
-    body: 'We surface gifted Afrogospel artists from across five African nations who would never otherwise get this platform.',
-  },
-  {
-    title: 'Develop',
-    icon: 'users',
-    body: 'Top artists receive mentorship, coaching, and access to the Kingdom Creatives Academy ecosystem built for long-term growth.',
-  },
-  {
-    title: 'Launch',
-    icon: 'music',
-    body: 'Finalists are recorded on the ENERGIZE Afrogospel Album and performed live at the pan-African launch concert in October.',
-  },
-];
-
-const phases = [
-  {
-    number: '01',
-    title: 'Launch and Submissions',
-    period: 'May 4 – May 31',
-    body: 'Artists across five nations submit original Afrogospel tracks and create their public profiles on the platform.',
-  },
-  {
-    number: '02',
-    title: 'Social Showcase',
-    period: 'June 1 – June 21',
-    body: 'The top 50 artists are revealed and showcased across Energize Music social media platforms. As the public votes, the field narrows from 50 to 20. Every artist gets their moment in front of Africa.',
-  },
-  {
-    number: '03',
-    title: 'Public Voting',
-    period: 'June 1 – July 13',
-    body: 'The African diaspora and fans worldwide vote for their favorites. Community decides who advances to the album.',
-  },
-  {
-    number: '04',
-    title: 'Album Creation',
-    period: 'July to August',
-    body: 'Top artists enter the studio. The ENERGIZE Afrogospel Album is produced, engineered, and mastered for global release.',
-  },
-  {
-    number: '05',
-    title: 'Pan-African Block Parties',
-    period: 'September',
-    body: 'Community celebration events across all five participating nations. Album previews, artist showcases, and live worship experiences.',
-  },
-  {
-    number: '06',
-    title: 'Album Launch Concert',
-    period: 'October',
-    body: "The definitive moment. A full-scale pan-African concert launches the album and the careers of Africa's next generation of Afrogospel voices.",
-  },
+const journey = [
+  { number: '01', title: 'Submissions', period: 'May', body: 'Artists across Africa enter with a performance video and artist profile.' },
+  { number: '02', title: 'Showcase', period: 'June', body: 'Top 50 are revealed. Public voting narrows the field to 20.' },
+  { number: '03', title: 'Finalists', period: 'July', body: 'Community votes crown the final 10 for the album.' },
+  { number: '04', title: 'Album', period: 'Jul-Aug', body: 'Finalists record the ENERGIZE Afrogospel Album.' },
+  { number: '05', title: 'Block Parties', period: 'Sep', body: 'Community nights across participating nations.' },
+  { number: '06', title: 'Launch Concert', period: 'Oct', body: 'Pan-African concert launches the album and the artists.' },
 ];
 
 const steps = [
-  { num: '01', title: 'Create your artist profile', icon: 'user' },
-  {
-    num: '02',
-    title: 'Submit your links',
-    icon: 'link',
-    detail:
-      'Share a link to a video of yourself performing a song rendition. This is what gets featured on our social media platforms during the showcase. If you have an original song, include that link too.',
-  },
-  { num: '03', title: 'Fill in your artist details', icon: 'file' },
-  { num: '04', title: 'Submit and wait for results', icon: 'send' },
-];
-
-const tiers = [
-  {
-    tier: 'All Entrants',
-    title: 'Get Involved',
-    body: 'Submit your music to Energize Music and step into the NEXT movement. Every artist who enters becomes part of something bigger than a competition.',
-  },
-  {
-    tier: 'Top 50',
-    title: 'Get Your Music Heard',
-    body: 'The top 50 artists have their performances showcased across our social media platforms. This is your chance to shine on a global stage.',
-  },
-  {
-    tier: 'Top 20',
-    title: 'Your Voice, Your Choice',
-    body: 'The public votes for their favorites, narrowing down to the top 20. Your community becomes your campaign.',
-  },
-  {
-    tier: 'Top 10',
-    title: 'Make History',
-    body: 'The top 10 artists collaborate with renowned Afrogospel musicians to create the ENERGIZE Afrogospel Album. This is history in the making.',
-    featured: true,
-  },
+  { num: '01', title: 'Create your artist profile' },
+  { num: '02', title: 'Drop your performance video link' },
+  { num: '03', title: 'Add your artist details' },
+  { num: '04', title: 'Submit and wait for results' },
 ];
 
 const faqs = [
   {
-    q: 'Do I need to be based in Nigeria to apply?',
-    a: 'No. NEXT is open to artists across Africa. It does not matter where you are on the continent. If you make Afrogospel music, this platform is for you.',
+    q: 'Who can enter?',
+    a: 'NEXT is open to Afrogospel singers and rappers across Africa. You do not need to be based in Nigeria.',
   },
   {
-    q: 'Do I need to be a singer to enter NEXT?',
-    a: 'Not at all. NEXT is open to singers and rappers. Afrogospel is a genre, not a format. If your music carries faith and the Afrogospel sound, you belong here.',
+    q: 'Do I need an original song?',
+    a: 'No. A video of you performing a rendition works. Originals are welcome, but not required.',
   },
   {
-    q: 'Do I need to have an original song to apply?',
-    a: 'No. You can submit a video of yourself performing a rendition of any song. If you have an original, you can include that link too. But it is not a requirement to enter.',
+    q: 'How do I submit?',
+    a: submissionsOpen
+      ? 'Use the Submit button on this page. Fill in your artist details and drop your links.'
+      : 'Submissions for this season are closed. Follow Energize Music for the next open window.',
   },
   {
-    q: 'How do I submit my music?',
-    a: 'Click the "Submit Your Music" button on this page. It takes you to a short form where you fill in your artist details and drop your links.',
+    q: 'How does voting work?',
+    a: 'We select the top 50. Public voting then narrows to 20, then to the final 10. Anyone can vote, including the diaspora.',
   },
   {
-    q: 'What kind of video should I submit?',
-    a: 'A video of you performing a song. It can be a cover or an original. Let your voice and presence do the talking. This is what our judges will use to evaluate you in the first stage of the competition.',
-  },
-  {
-    q: 'Can I submit more than one entry?',
-    a: 'No. Each artist gets one submission. Make it count.',
-  },
-  {
-    q: 'How does voting work and who can vote?',
-    a: 'Our team selects the top 50 from the submission pool. From there, the public votes to narrow the field to 20, then to the final 10. Anyone can vote, including the African diaspora and fans worldwide.',
-  },
-  {
-    q: 'What happens after I submit? When will I hear back?',
-    a: 'If you are selected as part of the top 50, you will be notified directly about your next steps in the competition.',
-  },
-  {
-    q: 'What exactly do I get if I make the top 10?',
-    a: 'The top 10 artists get recorded on the ENERGIZE Afrogospel Album and perform live at the pan-African launch concert in October.',
-  },
-  {
-    q: 'Is NEXT free to enter?',
-    a: 'Yes. Completely free. No entry fee, no hidden cost. Just submit and let your music speak.',
+    q: 'What do top 10 artists get?',
+    a: 'A place on the ENERGIZE Afrogospel Album and a performance at the pan-African launch concert.',
   },
 ];
 ---
 
 <BaseLayout
   title="NEXT: New Era Xceptional Talent"
-  description="Africa's boldest Afrogospel talent competition and music incubator by Energize Music. Submit your music, vote for your favorites, and be part of history."
+  description="Africa's boldest Afrogospel talent competition and music incubator by Energize Music."
   ogImage="/next/takit.webp"
+  headerVariant="overlay"
 >
-  <!-- Hero -->
-  <section id="next-hero" class="relative min-h-[80vh] overflow-hidden sm:min-h-[92vh]">
-    <div id="next-hero-carousel" class="absolute inset-0" aria-hidden="true">
+  <section id="next-hero" class="next-hero" aria-labelledby="next-hero-title">
+    <div id="next-hero-carousel" class="next-hero__stage" aria-hidden="true">
       {
         heroImages.map((src, i) => (
           <div
-            class:list={['next-hero-slide absolute inset-0 bg-cover bg-center transition-opacity duration-[1500ms]', i === 0 && 'opacity-100']}
+            class:list={['next-hero-slide', i === 0 && 'is-active']}
             data-src={src}
             style={i === 0 ? `background-image: url('${src}')` : undefined}
           />
         ))
       }
-      <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-ink)]/75 via-[var(--color-ink)]/50 to-[var(--color-ink)]"></div>
+      <div class="next-hero__veil"></div>
+      <div class="next-hero__grain"></div>
     </div>
 
-    <div class="relative mx-auto grid max-w-6xl gap-10 px-5 pb-16 pt-24 sm:gap-12 sm:px-6 sm:pb-20 sm:pt-32 lg:grid-cols-[1fr_380px] lg:items-center lg:gap-16 lg:pb-28 lg:pt-36">
-      <div>
-        <div class="next-reveal">
-          <p class="text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">Energize Music Presents</p>
-          <div class="mt-2 h-px w-10 bg-[var(--color-glow)]" aria-hidden="true"></div>
-        </div>
-        <img
-          src="/next/logo-white.svg"
-          alt="NEXT: New Era Xceptional Talent"
-          class="next-reveal mt-5 w-full max-w-[min(100%,18rem)] sm:mt-6 sm:max-w-lg"
-          style="--reveal-delay: 80ms"
-          width="400"
-          height="80"
-        />
-        <p class="next-reveal mt-6 max-w-lg text-lg text-paper/80" style="--reveal-delay: 160ms">
-          Africa's boldest Afrogospel talent competition. Submit your music. Get your community to vote. Rise to the top.
-        </p>
-        <div class="next-reveal mt-8 flex flex-wrap gap-3" style="--reveal-delay: 240ms">
-          <a
-            href={SUBMIT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="rounded-lg bg-[var(--color-glow)] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
-          >
-            Submit Your Music
-          </a>
-          <a
-            href="#phases"
-            class="rounded-lg border border-white/35 px-6 py-3.5 text-sm font-semibold text-paper transition hover:border-white/55 hover:bg-white/5"
-          >
-            How It Works
-          </a>
-        </div>
+    <div class="next-hero__content">
+      <p class="next-reveal next-hero__eyebrow">Energize Music Presents</p>
+
+      <div class="next-reveal next-hero__logo" style="--reveal-delay: 90ms">
+        <NextLogo animated={true} />
       </div>
 
-      <div class="next-reveal next-glass-card rounded-2xl border border-[var(--color-glow)]/30 p-6 backdrop-blur-sm sm:p-8" style="--reveal-delay: 320ms">
-        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-glow)]">Afrogospel Has A New Stage</p>
-        <h2 class="text-h3 mt-3">Your Voice. Your Faith. Your Moment.</h2>
-        <p class="mt-4 text-paper/75">
-          NEXT is Africa's first pan-African Afrogospel talent competition. One submission could put you in front of an entire continent.
-        </p>
-        <div class="mt-6 flex items-baseline gap-2">
-          <span class="text-4xl font-semibold text-paper">6</span>
-          <span class="text-sm text-paper/60">Months to Impact</span>
-        </div>
-        <a
-          href={SUBMIT_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mt-8 flex w-full items-center justify-center rounded-lg bg-[var(--color-glow)] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
-        >
-          Submit Your Music Now
+      <h1 id="next-hero-title" class="next-reveal next-hero__title" style="--reveal-delay: 180ms">
+        Your Voice. Your Faith. Your Moment.
+      </h1>
+
+      <p class="next-reveal next-hero__lead" style="--reveal-delay: 260ms">
+        Africa's boldest Afrogospel talent competition. Rise from community votes onto the ENERGIZE Afrogospel Album.
+      </p>
+
+      {
+        !submissionsOpen && (
+          <p class="next-reveal next-hero__closed-msg" style="--reveal-delay: 300ms">
+            {closedMessage}
+          </p>
+        )
+      }
+
+      <div class="next-reveal next-hero__actions" style="--reveal-delay: 340ms">
+        {
+          submissionsOpen ? (
+            <a
+              href={submitUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="next-hero__cta next-hero__cta--primary"
+            >
+              {submitLabel}
+            </a>
+          ) : (
+            <span class="next-closed__badge">{closedLabel}</span>
+          )
+        }
+        <a href="#journey" class="next-hero__cta next-hero__cta--ghost">
+          How It Works
         </a>
       </div>
     </div>
-  </section>
 
-  <!-- Vision -->
-  <section id="what-is-next" class="scroll-mt-24 border-t border-white/10 bg-[var(--color-ink-raised)]">
-    <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
-      <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
-        <div class="next-scroll-reveal">
-          <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">The Vision</p>
-          <h2 class="text-h2 mt-3">This Is Bigger Than A Competition</h2>
-          <p class="mt-6 text-paper/75">
-            NEXT is a pan-African Afrogospel talent competition and creative incubator. Artists from across the continent submit original music. Fans vote. The top talent is not just celebrated: they are showcased, mentored, recorded, and launched to Africa and the world through the ENERGIZE Afrogospel Album and a landmark concert that will define the sound of a generation.
-          </p>
-        </div>
-        <div class="flex flex-col gap-4">
-          {
-            pillars.map((item, i) => (
-              <div class="next-scroll-reveal next-glass-card flex gap-5 rounded-2xl p-7" style={`--reveal-delay: ${i * 80}ms`}>
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--color-glow)]/25 bg-[var(--color-glow)]/10 text-[var(--color-glow)]">
-                  {item.icon === 'mic' && (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-                  )}
-                  {item.icon === 'users' && (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  )}
-                  {item.icon === 'music' && (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                  )}
-                </div>
-                <div>
-                  <h3 class="text-lg font-semibold">{item.title}</h3>
-                  <p class="mt-2 text-sm text-paper/70">{item.body}</p>
-                </div>
-              </div>
-            ))
-          }
-        </div>
+    <div class="next-hero__rail" aria-hidden="true">
+      <div class="next-hero__rail-track">
+        <span>Submit</span>
+        <span>Vote</span>
+        <span>Rise</span>
+        <span>Album</span>
+        <span>Stage</span>
+        <span>Submit</span>
+        <span>Vote</span>
+        <span>Rise</span>
+        <span>Album</span>
+        <span>Stage</span>
       </div>
     </div>
   </section>
 
-  <!-- Phases -->
-  <section id="phases" class="scroll-mt-24">
-    <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
+  <section id="journey" class="scroll-mt-24 border-t border-white/10 bg-[var(--color-ink-raised)]">
+    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
       <div class="next-scroll-reveal mx-auto max-w-2xl text-center">
-        <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">The Process</p>
-        <h2 class="text-h2 mt-3">The Six Phase Journey</h2>
-        <p class="mt-3 text-sm font-semibold uppercase tracking-wider text-[var(--color-glow)]">May to October 2026</p>
+        <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">The Journey</p>
+        <h2 class="text-h2 mt-3">From submission to stage</h2>
+        <p class="mt-3 text-sm text-paper/65">May to October 2026</p>
       </div>
-      <div class="mt-12 grid gap-4 sm:grid-cols-2">
+      <ol class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {
-          phases.map((phase, i) => (
-            <article class="next-scroll-reveal next-glass-card rounded-2xl p-7" style={`--reveal-delay: ${i * 70}ms`}>
-              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-glow)]">Phase {phase.number}</p>
+          journey.map((phase, i) => (
+            <li class="next-scroll-reveal next-glass-card rounded-2xl p-6" style={`--reveal-delay: ${i * 50}ms`}>
+              <div class="flex items-baseline justify-between gap-3">
+                <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-glow)]">{phase.number}</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-paper/45">{phase.period}</p>
+              </div>
               <h3 class="mt-2 font-display text-xl font-medium">{phase.title}</h3>
-              <p class="mt-1 text-sm font-semibold text-[var(--color-glow)]">{phase.period}</p>
-              <p class="mt-3 text-sm text-paper/70">{phase.body}</p>
-            </article>
+              <p class="mt-2 text-sm leading-relaxed text-paper/70">{phase.body}</p>
+            </li>
           ))
         }
-      </div>
+      </ol>
     </div>
   </section>
 
-  <!-- For Artists -->
-  <section id="artists" class="scroll-mt-24 border-t border-white/10 bg-[var(--color-ink-raised)]">
-    <div class="grid lg:grid-cols-2">
-      <div class="relative min-h-[360px] overflow-hidden lg:min-h-[560px]">
-        <img
-          src="/next/korale.jpg"
-          alt="Afrogospel artist performing on stage"
-          loading="lazy"
-          class="absolute inset-0 h-full w-full object-cover object-top"
-        />
-        <div class="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/80 via-[var(--color-ink)]/45 to-[var(--color-ink)]/70 lg:bg-gradient-to-r lg:from-[var(--color-ink)]/78 lg:via-[var(--color-ink)]/45 lg:to-[var(--color-ink)]/72"></div>
-      </div>
-      <div class="flex items-stretch p-5 sm:p-12 lg:p-14">
-        <div class="next-scroll-reveal next-glass-card flex w-full flex-col justify-center rounded-2xl p-8">
-          <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">For Artists</p>
-          <h2 class="text-h2 mt-3">Are You The Next Afrogospel Star?</h2>
-          <ol class="mt-8 space-y-5">
-            {
-              steps.map((step) => (
-                <li class="flex gap-4">
-                  <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--color-glow)]/20 bg-[var(--color-glow)]/8 text-[var(--color-glow)]">
-                    {step.icon === 'user' && (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
-                    )}
-                    {step.icon === 'link' && (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    )}
-                    {step.icon === 'file' && (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                    )}
-                    {step.icon === 'send' && (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                    )}
-                  </span>
-                  <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.08em] text-paper/50">Step {step.num}</p>
-                    <p class="font-medium">{step.title}</p>
-                    {step.detail && <p class="mt-1 text-sm text-paper/60">{step.detail}</p>}
-                  </div>
+  {
+    submissionsOpen ? (
+      <section id="enter" class="scroll-mt-24 border-t border-white/10">
+        <div class="mx-auto grid max-w-6xl gap-8 px-5 py-16 sm:grid-cols-[0.9fr_1.1fr] sm:px-6 sm:py-20 lg:gap-12">
+          <div class="next-scroll-reveal relative min-h-[240px] overflow-hidden rounded-2xl sm:min-h-full">
+            <img
+              src="/next/korale.jpg"
+              alt="Afrogospel artist performing on stage"
+              loading="lazy"
+              class="absolute inset-0 h-full w-full object-cover object-top"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)] via-[var(--color-ink)]/35 to-transparent"></div>
+          </div>
+          <div class="next-scroll-reveal">
+            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">Enter NEXT</p>
+            <h2 class="text-h2 mt-3">Four steps. Free to join.</h2>
+            <ol class="mt-8 space-y-4">
+              {steps.map((step) => (
+                <li class="flex gap-4 border-b border-white/8 pb-4 last:border-0">
+                  <span class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">{step.num}</span>
+                  <p class="font-medium text-paper/90">{step.title}</p>
                 </li>
-              ))
-            }
-          </ol>
-          <a
-            href={SUBMIT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="mt-8 inline-flex w-full items-center justify-center rounded-lg bg-[var(--color-glow)] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90 sm:w-auto"
-          >
-            Submit Your Music
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- KCA -->
-  <section id="kca" class="scroll-mt-24">
-    <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
-      <div class="next-scroll-reveal mx-auto max-w-3xl text-center">
-        <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">Beyond The Competition</p>
-        <h2 class="text-h2 mt-3">NEXT Is Just The Beginning</h2>
-        <p class="mt-2 text-lg font-bold text-[var(--color-glow)]">Kingdom Creatives Academy</p>
-        <p class="mt-4 text-paper/70">
-          Every artist who enters NEXT becomes part of the KCA ecosystem. The competition ends. The growth does not. Regardless of where you place, entering NEXT opens a door to a long-term creative community built for serious Afrogospel artists.
-        </p>
-      </div>
-      <div class="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-2">
-        {
-          tiers.map((item, i) => (
-            <article
-              class:list={[
-                'next-scroll-reveal next-glass-card rounded-2xl p-8',
-                item.featured && 'border-[var(--color-glow)]/40 bg-[var(--color-glow)]/10',
-              ]}
-              style={`--reveal-delay: ${i * 80}ms`}
+              ))}
+            </ol>
+            <a
+              href={submitUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-8 inline-flex min-h-12 items-center justify-center rounded-lg bg-[var(--color-glow)] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
             >
-              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-glow)]">{item.tier}</p>
-              <h3 class="mt-2 font-display text-xl font-medium">{item.title}</h3>
-              <p class="mt-2 text-sm text-paper/70">{item.body}</p>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
+              {submitLabel}
+            </a>
+          </div>
+        </div>
+      </section>
+    ) : null
+  }
 
-  <!-- FAQ -->
   <section id="faq" class="scroll-mt-24 border-t border-white/10 bg-[var(--color-ink-raised)]">
-    <div class="mx-auto max-w-3xl px-5 py-20 sm:px-6 sm:py-28">
+    <div class="mx-auto max-w-3xl px-5 py-16 sm:px-6 sm:py-20">
       <div class="next-scroll-reveal text-center">
-        <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">Frequently Asked Questions</p>
-        <h2 class="text-h2 mt-3">Got Questions? We've Got Answers</h2>
+        <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-glow)]">FAQ</p>
+        <h2 class="text-h2 mt-3">Quick answers</h2>
       </div>
-      <div class="mt-10 space-y-4">
+      <div class="mt-8 space-y-3">
         {
           faqs.map((item, i) => (
-            <article class="next-scroll-reveal next-glass-card rounded-2xl px-7 py-6" style={`--reveal-delay: ${i * 50}ms`}>
-              <h3 class="text-lg font-semibold leading-snug">{item.q}</h3>
-              <p class="mt-3 text-sm leading-relaxed text-paper/80">{item.a}</p>
+            <article class="next-scroll-reveal next-glass-card rounded-2xl px-6 py-5" style={`--reveal-delay: ${i * 40}ms`}>
+              <h3 class="text-base font-semibold leading-snug sm:text-lg">{item.q}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-paper/75">{item.a}</p>
             </article>
           ))
         }
@@ -395,19 +234,29 @@ const faqs = [
     </div>
   </section>
 
-  <!-- Final CTA -->
   <section class="border-t border-white/10">
-    <div class="mx-auto max-w-6xl px-5 py-16 text-center sm:px-6 sm:py-20">
-      <img src="/next/logo-white.svg" alt="NEXT" class="mx-auto h-8 w-auto opacity-90" width="120" height="24" />
+    <div class="mx-auto max-w-3xl px-5 py-14 text-center sm:px-6 sm:py-16">
+      <div class="mx-auto max-w-[7.5rem] opacity-90">
+        <NextLogo animated={false} />
+      </div>
       <p class="mt-4 text-sm text-paper/50">by Energize Music</p>
-      <a
-        href={SUBMIT_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="button-glow mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
-      >
-        Submit Your Music
-      </a>
+      <p class="mx-auto mt-4 max-w-md text-sm leading-relaxed text-paper/60">
+        Entrants also join the Kingdom Creatives Academy ecosystem for long-term growth beyond the season.
+      </p>
+      {
+        submissionsOpen ? (
+          <a
+            href={submitUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="button-glow mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+          >
+            {submitLabel}
+          </a>
+        ) : (
+          <p class="mt-6 text-sm font-semibold uppercase tracking-[0.14em] text-[var(--color-glow)]">{closedLabel}</p>
+        )
+      }
       <p class="mt-10 text-xs text-paper/40">&copy; 2026 NEXT by Energize Music. All rights reserved.</p>
     </div>
   </section>
@@ -416,6 +265,191 @@ const faqs = [
 </BaseLayout>
 
 <style>
+  .next-hero {
+    position: relative;
+    display: flex;
+    min-height: 100svh;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .next-hero__stage {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .next-hero-slide {
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-size: cover;
+    opacity: 0;
+    transform: scale(1.08);
+    transition:
+      opacity 1.6s ease,
+      transform 7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .next-hero-slide.is-active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .next-hero__veil {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(6, 10, 14, 0.55) 0%, rgba(6, 10, 14, 0.28) 38%, rgba(6, 10, 14, 0.72) 72%, var(--color-ink) 100%),
+      radial-gradient(ellipse 80% 55% at 50% 100%, rgba(77, 168, 255, 0.18), transparent 60%);
+  }
+
+  .next-hero__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.18;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .next-hero__content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 7.5rem 1.25rem 2.75rem;
+    text-align: center;
+  }
+
+  .next-hero__eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .next-hero__logo {
+    width: min(100%, 34rem);
+    margin: 1.25rem auto 0;
+  }
+
+  .next-hero__title {
+    margin-top: 1.5rem;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(1.85rem, 5vw, 3.15rem);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #fff;
+    text-wrap: balance;
+  }
+
+  .next-hero__lead {
+    max-width: 34rem;
+    margin: 1rem auto 0;
+    font-size: clamp(0.98rem, 2.1vw, 1.15rem);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .next-hero__closed-msg {
+    max-width: 28rem;
+    margin: 0.85rem auto 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .next-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .next-hero__cta {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.5rem;
+    border-radius: 0.55rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .next-hero__cta--primary {
+    background: var(--color-glow);
+    color: #fff;
+    box-shadow: 0 0 0 1px rgba(77, 168, 255, 0.35), 0 12px 40px rgba(77, 168, 255, 0.28);
+  }
+
+  .next-hero__cta--primary:hover {
+    background: color-mix(in srgb, var(--color-glow) 88%, white);
+    transform: translateY(-1px);
+  }
+
+  .next-hero__cta--ghost {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #fff;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+  }
+
+  .next-hero__cta--ghost:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .next-hero__rail {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.35));
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .next-hero__rail-track {
+    display: flex;
+    width: max-content;
+    gap: 2.5rem;
+    padding: 0.85rem 0 1.1rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.42);
+    animation: next-hero-rail 28s linear infinite;
+  }
+
+  .next-hero__rail-track span:nth-child(odd) {
+    color: rgba(77, 168, 255, 0.65);
+  }
+
+  @keyframes next-hero-rail {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
   .next-glass-card {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -427,20 +461,12 @@ const faqs = [
     box-shadow: 0 0 32px rgba(77, 168, 255, 0.08);
   }
 
-  .next-hero-slide {
-    opacity: 0;
-  }
-
-  .next-hero-slide.is-active {
-    opacity: 1;
-  }
-
   .next-reveal {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(22px);
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 0.75s ease,
+      transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
     transition-delay: var(--reveal-delay, 0ms);
   }
 
@@ -463,6 +489,26 @@ const faqs = [
     transform: translateY(0);
   }
 
+  .next-closed__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0.75rem 1.15rem;
+    border: 1px solid rgba(77, 168, 255, 0.5);
+    background: rgba(77, 168, 255, 0.12);
+    color: var(--color-glow);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 640px) {
+    .next-hero__content {
+      padding: 8.5rem 1.5rem 3.25rem;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .next-reveal,
     .next-scroll-reveal,
@@ -470,6 +516,10 @@ const faqs = [
       opacity: 1 !important;
       transform: none !important;
       transition: none !important;
+    }
+
+    .next-hero__rail-track {
+      animation: none;
     }
   }
 </style>

@@ -1,0 +1,844 @@
+---
+import type { EventDetail } from '@energize/shared';
+import PortableText from '../portable/PortableText.astro';
+import {
+  formatEventDate,
+  formatEventDateLong,
+  formatEventLocation,
+  formatEventType,
+  isPastEvent,
+  lineupBadgeLabel,
+  lineupDisplayName,
+} from '../../lib/events/format';
+import { getEventCoverUrl } from '../../lib/events/media';
+
+interface Props {
+  event: EventDetail;
+  shareUrl: string;
+}
+
+const { event, shareUrl } = Astro.props;
+const coverUrl = getEventCoverUrl(event.cover, 1800, 1200);
+const sharePreviewUrl =
+  getEventCoverUrl(event.shareImage, 720, 405) || getEventCoverUrl(event.cover, 720, 405);
+const ctaHref = event.ticketUrl || '/contact?intent=general';
+const ctaLabel = event.ctaLabel || 'Get tickets';
+const secondaryHref = event.secondaryCtaUrl || '/contact?intent=partnership';
+const secondaryLabel = event.secondaryCtaLabel || 'Partner with us';
+const highlights = event.highlights ?? [];
+const lineup = event.lineup ?? [];
+
+const encodedUrl = encodeURIComponent(shareUrl);
+const encodedText = encodeURIComponent(event.summary || event.title);
+const shareLinks = [
+  {
+    label: 'X',
+    icon: 'x',
+    href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
+  },
+  {
+    label: 'Facebook',
+    icon: 'facebook',
+    href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+  },
+  {
+    label: 'LinkedIn',
+    icon: 'linkedin',
+    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+  },
+  {
+    label: 'WhatsApp',
+    icon: 'whatsapp',
+    href: `https://wa.me/?text=${encodeURIComponent(`${event.title} ${shareUrl}`)}`,
+  },
+] as const;
+---
+
+<article class="event-detail">
+  <header class="event-detail__hero">
+    <div class="event-detail__media" aria-hidden="true">
+      {
+        coverUrl ? (
+          <img src={coverUrl} alt="" class="event-detail__bg" width="1800" height="1200" />
+        ) : (
+          <div class="event-detail__bg-fallback" />
+        )
+      }
+      <div class="event-detail__shade"></div>
+    </div>
+
+    <div class="event-detail__hero-inner">
+      <a href="/events" class="event-detail__back">← All events</a>
+      <p class="event-detail__date">{formatEventDate(event.startDate)}</p>
+      <h1 class="event-detail__title font-display">{event.title}</h1>
+      {event.subtitle && <p class="event-detail__subtitle">{event.subtitle}</p>}
+      <div class="event-detail__facts">
+        <span>{formatEventDateLong(event.startDate)}</span>
+        <span>{formatEventLocation(event.location)}</span>
+        <span class="event-detail__status">
+          {isPastEvent(event.status, event.startDate)
+            ? 'Past'
+            : formatEventType(event.eventType)}
+        </span>
+      </div>
+      <div class="event-detail__actions">
+        <a href={ctaHref} class="event-detail__cta event-detail__cta--primary">{ctaLabel}</a>
+        <a href={secondaryHref} class="event-detail__cta event-detail__cta--ghost">{secondaryLabel}</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="event-detail__share-band" aria-label="Share this event">
+    <div class="event-detail__share-inner">
+      <div class="event-detail__share-card">
+        {
+          sharePreviewUrl ? (
+            <img
+              src={sharePreviewUrl}
+              alt=""
+              class="event-detail__share-thumb"
+              width="720"
+              height="405"
+              loading="lazy"
+            />
+          ) : (
+            <div class="event-detail__share-thumb event-detail__share-thumb--empty" aria-hidden="true" />
+          )
+        }
+        <div class="event-detail__share-meta">
+          <p class="event-detail__share-label">Share this night</p>
+          <p class="event-detail__share-title">{event.title}</p>
+          {
+            event.summary ? (
+              <p class="event-detail__share-summary">{event.summary}</p>
+            ) : (
+              <p class="event-detail__share-summary">{formatEventDateLong(event.startDate)}{event.location ? ` · ${event.location}` : ''}</p>
+            )
+          }
+        </div>
+      </div>
+      <div class="event-detail__share-row">
+        <p class="event-detail__share-actions-label">Share</p>
+        <ul class="event-detail__share-list">
+          <li>
+            <button
+              type="button"
+              class="event-detail__share-icon"
+              data-copy-link
+              data-copy-url={shareUrl}
+              aria-label="Copy link"
+              title="Copy link"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path
+                  d="M10 13a5 5 0 0 0 7.54.54l1.92-1.92a5 5 0 0 0-7.07-7.07l-1.1 1.1"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M14 11a5 5 0 0 0-7.54-.54L4.54 12.38a5 5 0 0 0 7.07 7.07l1.1-1.1"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </li>
+          {
+            shareLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="event-detail__share-icon"
+                  aria-label={`Share on ${link.label}`}
+                  title={link.label}
+                >
+                  {link.icon === 'x' && (
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L2.25 2.25h7.09l4.261 5.669L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                      />
+                    </svg>
+                  )}
+                  {link.icon === 'facebook' && (
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 5.02 3.66 9.18 8.44 9.93v-7.02H7.9v-2.91h2.4V9.84c0-2.37 1.41-3.68 3.57-3.68 1.03 0 2.11.18 2.11.18v2.32h-1.19c-1.17 0-1.54.73-1.54 1.48v1.78h2.62l-.42 2.91h-2.2V22c4.78-.75 8.44-4.91 8.44-9.93z"
+                      />
+                    </svg>
+                  )}
+                  {link.icon === 'linkedin' && (
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4V8.5zM8.5 8.5h3.8v2h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V23h-4v-6.4c0-1.53-.03-3.5-2.13-3.5-2.13 0-2.46 1.66-2.46 3.38V23h-4V8.5z"
+                      />
+                    </svg>
+                  )}
+                  {link.icon === 'whatsapp' && (
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+                      />
+                    </svg>
+                  )}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {
+    highlights.length > 0 && (
+      <section class="event-detail__highlights" aria-labelledby="event-highlights-title">
+        <div class="event-detail__section-inner">
+          <div class="event-detail__section-head">
+            <h2 id="event-highlights-title">Event details</h2>
+            <span aria-hidden="true" />
+          </div>
+          <ul class="event-detail__highlight-grid">
+            {highlights.map((item, index) => (
+              <li class:list={[index === 0 && 'is-accent']}>
+                <strong>{item.title}</strong>
+                <p>{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    lineup.length > 0 && (
+      <section class="event-detail__lineup" aria-labelledby="event-lineup-title">
+        <div class="event-detail__section-inner">
+          <div class="event-detail__section-head">
+            <h2 id="event-lineup-title">Lineup</h2>
+            <span aria-hidden="true" />
+          </div>
+          <ul class="event-detail__lineup-grid">
+            {lineup.map((artist) => {
+              const reveal = artist.revealState || 'confirmed';
+              const label = lineupDisplayName(reveal, artist.name);
+              const badge = lineupBadgeLabel(reveal);
+              const workingTitle =
+                badge && artist.name?.trim() && artist.name.trim() !== label
+                  ? artist.name.trim()
+                  : null;
+              const photoUrl =
+                reveal === 'confirmed' && artist.photo
+                  ? getEventCoverUrl(artist.photo, 400, 400)
+                  : null;
+              const href =
+                reveal === 'confirmed' && artist.artistSlug
+                  ? `/artists/${artist.artistSlug}`
+                  : null;
+
+              const avatar = (
+                <span class:list={['event-detail__avatar', badge && 'event-detail__avatar--tag']}>
+                  {photoUrl ? (
+                    <img src={photoUrl} alt="" width="160" height="160" loading="lazy" />
+                  ) : (
+                    <span>{badge ? badge.slice(0, 1) : label.slice(0, 1)}</span>
+                  )}
+                </span>
+              );
+
+              return (
+                <li>
+                  {href ? (
+                    <a href={href} class="event-detail__artist">
+                      {avatar}
+                      {badge ? <span class="event-detail__badge">{badge}</span> : null}
+                      <span class="event-detail__artist-name">{label}</span>
+                      {workingTitle ? <span class="event-detail__artist-role">{workingTitle}</span> : null}
+                      {artist.role ? <span class="event-detail__artist-role">{artist.role}</span> : null}
+                    </a>
+                  ) : (
+                    <div class="event-detail__artist">
+                      {avatar}
+                      {badge ? <span class="event-detail__badge">{badge}</span> : null}
+                      <span class="event-detail__artist-name">{label}</span>
+                      {workingTitle ? <span class="event-detail__artist-role">{workingTitle}</span> : null}
+                      {artist.role ? <span class="event-detail__artist-role">{artist.role}</span> : null}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    (event.summary || (event.body && event.body.length > 0)) && (
+      <section class="event-detail__story" aria-labelledby="event-story-title">
+        <div class="event-detail__story-inner">
+          <h2 id="event-story-title" class="font-display">About the night</h2>
+          {event.summary ? <p class="event-detail__summary font-instrument">{event.summary}</p> : null}
+          {event.body && event.body.length > 0 ? (
+            <div class="event-detail__prose">
+              <PortableText value={event.body} />
+            </div>
+          ) : null}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="event-detail__footer-cta" aria-labelledby="event-footer-cta-title">
+    <div class="event-detail__footer-inner">
+      <p class="event-detail__footer-eyebrow">Stay in the signal</p>
+      <h2 id="event-footer-cta-title" class="font-display">Ready for the stage?</h2>
+      <div class="event-detail__actions">
+        <a href={ctaHref} class="event-detail__cta event-detail__cta--primary">{ctaLabel}</a>
+        <a href="/events" class="event-detail__cta event-detail__cta--ghost">Browse events</a>
+      </div>
+    </div>
+  </section>
+</article>
+
+<script>
+  const copyButton = document.querySelector<HTMLButtonElement>('[data-copy-link]');
+  if (copyButton) {
+    const url = copyButton.dataset.copyUrl ?? window.location.href;
+    const idleLabel = 'Copy link';
+
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        copyButton.setAttribute('aria-label', 'Link copied');
+        copyButton.setAttribute('title', 'Link copied');
+        copyButton.classList.add('is-copied');
+        window.setTimeout(() => {
+          copyButton.setAttribute('aria-label', idleLabel);
+          copyButton.setAttribute('title', idleLabel);
+          copyButton.classList.remove('is-copied');
+        }, 1800);
+      } catch {
+        copyButton.setAttribute('aria-label', 'Copy failed');
+        copyButton.setAttribute('title', 'Copy failed');
+        window.setTimeout(() => {
+          copyButton.setAttribute('aria-label', idleLabel);
+          copyButton.setAttribute('title', idleLabel);
+        }, 1800);
+      }
+    });
+  }
+</script>
+
+<style>
+  .event-detail {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  .event-detail__hero {
+    position: relative;
+    min-height: min(88vh, 52rem);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  .event-detail__media {
+    position: absolute;
+    inset: 0;
+  }
+
+  .event-detail__bg,
+  .event-detail__bg-fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .event-detail__bg-fallback {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(77, 168, 255, 0.28), transparent 45%),
+      #141417;
+  }
+
+  .event-detail__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(11, 11, 13, 0.25) 0%, rgba(11, 11, 13, 0.78) 70%, var(--color-ink) 100%),
+      linear-gradient(90deg, rgba(11, 11, 13, 0.5) 0%, transparent 55%);
+  }
+
+  .event-detail__hero-inner {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding: 7.5rem 1.25rem 3.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .event-detail__hero-inner {
+      padding: 8.5rem 1.5rem 4rem;
+    }
+  }
+
+  .event-detail__back {
+    display: inline-flex;
+    margin-bottom: 1.5rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.55);
+  }
+
+  .event-detail__back:hover,
+  .event-detail__back:focus-visible {
+    color: var(--color-glow);
+  }
+
+  .event-detail__date {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    color: var(--color-glow);
+  }
+
+  .event-detail__title {
+    margin: 0.7rem 0 0;
+    max-width: 12ch;
+    font-size: clamp(2.8rem, 1.5rem + 5vw, 5.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+  }
+
+  .event-detail__subtitle {
+    margin: 1rem 0 0;
+    max-width: 28rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.62);
+  }
+
+  .event-detail__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    margin-top: 1.35rem;
+    font-size: 0.9rem;
+    color: rgba(250, 250, 248, 0.7);
+  }
+
+  .event-detail__status {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--color-glow);
+  }
+
+  .event-detail__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .event-detail__cta {
+    display: inline-flex;
+    min-height: 2.9rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.35rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    transition:
+      background 160ms ease,
+      color 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .event-detail__cta--primary {
+    background: var(--color-glow);
+    color: #fff;
+  }
+
+  .event-detail__cta--primary:hover,
+  .event-detail__cta--primary:focus-visible {
+    background: var(--color-glow-deep);
+  }
+
+  .event-detail__cta--ghost {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--color-paper);
+  }
+
+  .event-detail__cta--ghost:hover,
+  .event-detail__cta--ghost:focus-visible {
+    border-color: var(--color-glow);
+    color: var(--color-glow);
+  }
+
+  .event-detail__share-band {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(20, 20, 23, 0.9);
+  }
+
+  .event-detail__share-inner {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.35rem 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .event-detail__share-inner {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .event-detail__share-inner {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+    }
+  }
+
+  .event-detail__share-card {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .event-detail__share-thumb {
+    width: 7.5rem;
+    height: 4.25rem;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #111114;
+  }
+
+  .event-detail__share-thumb--empty {
+    background:
+      radial-gradient(circle at 30% 30%, rgba(77, 168, 255, 0.35), transparent 55%),
+      #111114;
+  }
+
+  .event-detail__share-meta {
+    min-width: 0;
+  }
+
+  .event-detail__share-label {
+    margin: 0;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.45);
+  }
+
+  .event-detail__share-title {
+    margin: 0.35rem 0 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .event-detail__share-summary {
+    margin: 0.35rem 0 0;
+    max-width: 36rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: rgba(250, 250, 248, 0.62);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .event-detail__share-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+
+  .event-detail__share-actions-label {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.5);
+  }
+
+  .event-detail__share-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .event-detail__share-icon {
+    display: grid;
+    place-items: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    padding: 0;
+    color: rgba(250, 250, 248, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    transition:
+      color 160ms ease,
+      border-color 160ms ease,
+      background 160ms ease;
+  }
+
+  .event-detail__share-icon svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .event-detail__share-icon:hover,
+  .event-detail__share-icon:focus-visible,
+  .event-detail__share-icon.is-copied {
+    color: var(--color-glow);
+    border-color: rgba(77, 168, 255, 0.55);
+    background: rgba(77, 168, 255, 0.08);
+  }
+
+  .event-detail__section-inner,
+  .event-detail__story-inner,
+  .event-detail__footer-inner {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding: 3.25rem 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .event-detail__section-inner,
+    .event-detail__story-inner,
+    .event-detail__footer-inner {
+      padding: 3.75rem 1.5rem;
+    }
+  }
+
+  .event-detail__section-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .event-detail__section-head h2 {
+    margin: 0;
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .event-detail__section-head span {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .event-detail__highlights {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--color-ink-raised);
+  }
+
+  .event-detail__highlight-grid {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 900px) {
+    .event-detail__highlight-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .event-detail__highlight-grid li {
+    padding: 1.35rem 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .event-detail__highlight-grid li.is-accent {
+    border-top: 3px solid var(--color-glow);
+  }
+
+  .event-detail__highlight-grid strong {
+    display: block;
+    font-size: 1.1rem;
+  }
+
+  .event-detail__highlight-grid p {
+    margin: 0.65rem 0 0;
+    color: rgba(250, 250, 248, 0.6);
+    line-height: 1.65;
+  }
+
+  .event-detail__lineup {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .event-detail__lineup-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 768px) {
+    .event-detail__lineup-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .event-detail__artist {
+    display: grid;
+    justify-items: center;
+    gap: 0.55rem;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .event-detail__avatar {
+    display: grid;
+    place-items: center;
+    width: 6.5rem;
+    height: 6.5rem;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.14);
+    background: var(--color-ink-raised);
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+  }
+
+  .event-detail__avatar--tag {
+    border-color: rgba(77, 168, 255, 0.45);
+    color: var(--color-glow);
+  }
+
+  .event-detail__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .event-detail__badge {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .event-detail__artist-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .event-detail__artist-role {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.45);
+  }
+
+  .event-detail__story {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--color-ink-raised);
+  }
+
+  .event-detail__story-inner {
+    max-width: 46rem;
+  }
+
+  .event-detail__story h2 {
+    margin: 0;
+    font-size: clamp(1.8rem, 1.4rem + 1.4vw, 2.6rem);
+  }
+
+  .event-detail__summary {
+    margin: 1rem 0 0;
+    font-size: clamp(1.15rem, 1rem + 0.5vw, 1.45rem);
+    font-style: italic;
+    line-height: 1.4;
+    color: rgba(250, 250, 248, 0.7);
+  }
+
+  .event-detail__prose {
+    margin-top: 1.5rem;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: rgba(250, 250, 248, 0.82);
+  }
+
+  .event-detail__prose :global(p) {
+    margin: 0 0 1.25rem;
+    color: rgba(250, 250, 248, 0.82) !important;
+  }
+
+  .event-detail__footer-cta {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+  }
+
+  .event-detail__footer-inner {
+    max-width: 40rem;
+  }
+
+  .event-detail__footer-eyebrow {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .event-detail__footer-inner h2 {
+    margin: 0.75rem 0 0;
+    font-size: clamp(2rem, 1.5rem + 1.8vw, 3rem);
+  }
+
+  .event-detail__footer-inner .event-detail__actions {
+    justify-content: center;
+  }
+</style>

@@ -1,0 +1,333 @@
+---
+import type { VolunteerInfo } from '@energize/shared';
+import { mergeVolunteerInfo } from '../../lib/careers/volunteerDefaults';
+
+interface Props {
+  volunteer: VolunteerInfo | null;
+}
+
+const { volunteer: volunteerProp } = Astro.props;
+const volunteer = mergeVolunteerInfo(volunteerProp);
+
+const primaryCta =
+  volunteer.signupUrl && volunteer.ctaLabel
+    ? { href: volunteer.signupUrl, label: volunteer.ctaLabel, external: true }
+    : volunteer.fallbackCtaUrl && volunteer.fallbackCtaLabel
+      ? { href: volunteer.fallbackCtaUrl, label: volunteer.fallbackCtaLabel, external: false }
+      : null;
+
+const secondaryLink =
+  volunteer.secondaryLinkUrl && volunteer.secondaryLinkLabel
+    ? { href: volunteer.secondaryLinkUrl, label: volunteer.secondaryLinkLabel }
+    : null;
+---
+
+<section id="volunteer" class="careers-volunteer scroll-mt-24" aria-labelledby="careers-volunteer-title">
+  <div class="careers-volunteer__glow careers-volunteer__glow--left" aria-hidden="true" />
+  <div class="careers-volunteer__glow careers-volunteer__glow--right" aria-hidden="true" />
+
+  <div class="careers-volunteer__inner">
+    <div class="careers-volunteer__intro scroll-reveal">
+      {volunteer.eyebrow && <p class="careers-volunteer__eyebrow">{volunteer.eyebrow}</p>}
+      <h2 id="careers-volunteer-title" class="careers-volunteer__title font-display">
+        {volunteer.heading}
+      </h2>
+      <p class="careers-volunteer__lead">{volunteer.intro}</p>
+    </div>
+
+    <div class="careers-volunteer__card scroll-reveal" style="--reveal-delay: 100ms">
+      {
+        volunteer.roleOptions && volunteer.roleOptions.length > 0 && (
+          <div class="careers-volunteer__block">
+            {volunteer.roleOptionsLabel && (
+              <p class="careers-volunteer__label">{volunteer.roleOptionsLabel}</p>
+            )}
+            <ul class="careers-volunteer__chips">
+              {volunteer.roleOptions.map((role) => (
+                <li class="careers-volunteer__chip">{role}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        volunteer.platforms && volunteer.platforms.length > 0 && (
+          <div class="careers-volunteer__block">
+            {volunteer.platformsLabel && (
+              <p class="careers-volunteer__label">{volunteer.platformsLabel}</p>
+            )}
+            <ul class="careers-volunteer__chips">
+              {volunteer.platforms.map((platform) => (
+                <li class="careers-volunteer__chip careers-volunteer__chip--platform">{platform}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        (primaryCta || secondaryLink) && (
+          <div class="careers-volunteer__actions">
+            {primaryCta && (
+              <a
+                href={primaryCta.href}
+                target={primaryCta.external ? '_blank' : undefined}
+                rel={primaryCta.external ? 'noopener noreferrer' : undefined}
+                class:list={[
+                  'careers-volunteer__cta',
+                  { 'careers-volunteer__cta--secondary': !primaryCta.external },
+                ]}
+              >
+                {primaryCta.label}
+              </a>
+            )}
+            {secondaryLink && (
+              <a href={secondaryLink.href} class="careers-volunteer__link">
+                {secondaryLink.label}
+              </a>
+            )}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .careers-volunteer {
+    position: relative;
+    overflow: hidden;
+    padding: 3.75rem 0 4.75rem;
+    background:
+      radial-gradient(ellipse 55% 45% at 15% 20%, rgba(103, 232, 249, 0.08), transparent 60%),
+      linear-gradient(180deg, var(--color-ink) 0%, #0c1014 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  @media (min-width: 640px) {
+    .careers-volunteer {
+      padding: 5.5rem 0 6.5rem;
+    }
+  }
+
+  .careers-volunteer__glow {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(90px);
+    pointer-events: none;
+  }
+
+  .careers-volunteer__glow--left {
+    top: 8%;
+    left: -6%;
+    width: 18rem;
+    height: 18rem;
+    background: rgba(103, 232, 249, 0.12);
+  }
+
+  .careers-volunteer__glow--right {
+    bottom: 0;
+    right: -4%;
+    width: 16rem;
+    height: 16rem;
+    background: rgba(77, 168, 255, 0.08);
+  }
+
+  .careers-volunteer__inner {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding-inline: 1rem;
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .careers-volunteer__inner {
+      padding-inline: 1.5rem;
+      gap: 2rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .careers-volunteer__inner {
+      gap: 2.25rem;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .careers-volunteer__inner {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+      align-items: start;
+      gap: 2.5rem;
+    }
+  }
+
+  .careers-volunteer__intro {
+    text-align: left;
+  }
+
+  @media (max-width: 959px) {
+    .careers-volunteer__intro {
+      text-align: center;
+    }
+
+    .careers-volunteer__lead {
+      margin-inline: auto;
+    }
+  }
+
+  .careers-volunteer__eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-glow-cyan);
+  }
+
+  .careers-volunteer__title {
+    margin-top: 0.85rem;
+    font-size: clamp(1.625rem, 1.25rem + 1.4vw, 2.35rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--color-paper);
+  }
+
+  .careers-volunteer__lead {
+    margin-top: 1rem;
+    max-width: 34rem;
+    font-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+    line-height: 1.65;
+    color: rgba(250, 250, 248, 0.68);
+  }
+
+  .careers-volunteer__card {
+    border-radius: 1.35rem;
+    border: 1px solid rgba(103, 232, 249, 0.18);
+    background:
+      linear-gradient(145deg, rgba(103, 232, 249, 0.07), rgba(255, 255, 255, 0.02) 45%),
+      rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 24px 60px rgba(0, 0, 0, 0.28);
+    padding: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .careers-volunteer__card {
+      padding: 1.65rem;
+    }
+  }
+
+  .careers-volunteer__block + .careers-volunteer__block {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .careers-volunteer__label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.48);
+  }
+
+  .careers-volunteer__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .careers-volunteer__chip {
+    border-radius: 9999px;
+    border: 1px solid rgba(103, 232, 249, 0.28);
+    background: rgba(103, 232, 249, 0.06);
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8125rem;
+    color: rgba(250, 250, 248, 0.82);
+  }
+
+  .careers-volunteer__chip--platform {
+    border-color: rgba(77, 168, 255, 0.28);
+    background: rgba(77, 168, 255, 0.06);
+  }
+
+  .careers-volunteer__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+    margin-top: 1.5rem;
+    padding-top: 1.35rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  @media (min-width: 640px) {
+    .careers-volunteer__actions {
+      align-items: flex-start;
+    }
+  }
+
+  .careers-volunteer__cta {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, var(--color-glow-cyan), var(--color-glow));
+    padding: 0.65rem 1.35rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #041018;
+    text-decoration: none;
+    transition:
+      transform 0.2s ease,
+      filter 0.2s ease;
+  }
+
+  @media (max-width: 639px) {
+    .careers-volunteer__cta {
+      width: 100%;
+    }
+  }
+
+  .careers-volunteer__cta:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+
+  .careers-volunteer__cta--secondary {
+    background: rgba(103, 232, 249, 0.14);
+    color: var(--color-paper);
+    border: 1px solid rgba(103, 232, 249, 0.35);
+  }
+
+  .careers-volunteer__link {
+    display: inline-flex;
+    min-height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: rgba(250, 250, 248, 0.58);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  @media (max-width: 639px) {
+    .careers-volunteer__link {
+      width: 100%;
+    }
+  }
+
+  .careers-volunteer__link:hover {
+    color: var(--color-glow-cyan);
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventsHero from '../../components/events/EventsHero.astro';
+import EventsMarquee from '../../components/events/EventsMarquee.astro';
+import EventsQuality from '../../components/events/EventsQuality.astro';
+import EventsSpotlight from '../../components/events/EventsSpotlight.astro';
+import EventsListing from '../../components/events/EventsListing.astro';
+import { sanityClient } from '../../lib/sanity/client';
+import {
+  allEventsQuery,
+  eventsPageQuery,
+  type EventCard,
+  type EventsPageSettings,
+} from '@energize/shared';
+import { isPastEvent, isValidEventCard } from '../../lib/events/format';
+import { mergeEventsPageSettings } from '../../lib/events/pageDefaults';
+
+let events: EventCard[] = [];
+let pageSettings: EventsPageSettings | null = null;
+
+try {
+  [events, pageSettings] = await Promise.all([
+    sanityClient.fetch<EventCard[]>(allEventsQuery),
+    sanityClient.fetch<EventsPageSettings | null>(eventsPageQuery),
+  ]);
+} catch {
+  events = [];
+  pageSettings = null;
+}
+
+const settings = mergeEventsPageSettings(pageSettings);
+const validEvents = events.filter(isValidEventCard);
+
+const spotlightCandidates =
+  settings.spotlightEvents && settings.spotlightEvents.length > 0
+    ? settings.spotlightEvents
+    : validEvents.filter((event) => event.featured).slice(0, 4);
+
+const spotlight = spotlightCandidates.filter(isValidEventCard);
+
+const spotlightIds = new Set(spotlight.map((event) => event._id));
+const remaining = validEvents.filter((event) => !spotlightIds.has(event._id));
+
+const upcoming = remaining.filter((event) => !isPastEvent(event.status, event.startDate));
+const archive = remaining
+  .filter((event) => isPastEvent(event.status, event.startDate))
+  .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+
+const upcomingSorted = [...upcoming].sort(
+  (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+);
+---
+
+<BaseLayout
+  title="Events"
+  description={settings.heroLead || 'Live nights from Energize Music: festivals, showcases, and community stages.'}
+  ambientVariant="editorial"
+>
+  <EventsHero settings={settings} spotlightAvailable={spotlight.length > 0} />
+  <EventsMarquee text={settings.marqueeText || 'For Friends & Fans of Energize Music'} />
+  <EventsQuality
+    title={settings.qualityTitle || 'Our quality'}
+    items={settings.qualityItems || []}
+  />
+  {spotlight.length > 0 ? <EventsSpotlight events={spotlight} /> : null}
+  <EventsListing
+    upcoming={upcomingSorted}
+    archive={archive}
+    upcomingPageSize={settings.upcomingPageSize || 6}
+    archivePageSize={settings.archivePageSize || 6}
+  />
+</BaseLayout>

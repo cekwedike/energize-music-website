@@ -9,6 +9,8 @@
     "deploy:studio": "sanity deploy",
     "seed:team": "node --env-file=.env scripts/seed-team.mjs",
     "seed:legal": "node --env-file=.env scripts/seed-legal-pages.mjs",
+    "seed:events": "node --env-file=.env scripts/seed-events.mjs",
+    "seed:next": "node --env-file=.env scripts/seed-next-page.mjs",
     "lint": "eslint . --config ../../eslint.config.mjs",
     "typecheck": "tsc --noEmit"
   },

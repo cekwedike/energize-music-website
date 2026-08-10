@@ -1,5 +1,13 @@
 import type { StructureResolver } from 'sanity/structure';
-import { DocumentIcon, DocumentTextIcon, PlayIcon, StarIcon, UsersIcon } from '@sanity/icons';
+import {
+  CalendarIcon,
+  DocumentIcon,
+  DocumentTextIcon,
+  HeartIcon,
+  PlayIcon,
+  StarIcon,
+  UsersIcon,
+} from '@sanity/icons';
 
 /** Document types with custom sidebar entries (hide auto-generated duplicates). */
 const HIDDEN_FROM_NAV = [
@@ -9,6 +17,9 @@ const HIDDEN_FROM_NAV = [
   'page',
   'releasesPage',
   'release',
+  'event',
+  'eventsPage',
+  'nextPage',
 ];
 
 export const structure: StructureResolver = (S) =>
@@ -37,6 +48,41 @@ export const structure: StructureResolver = (S) =>
             .title('Spotlight A Release'),
         ),
       S.listItem()
+        .title('Events')
+        .icon(CalendarIcon)
+        .child(
+          S.list()
+            .title('Events')
+            .items([
+              S.listItem()
+                .title('All Events')
+                .icon(CalendarIcon)
+                .child(
+                  S.documentTypeList('event')
+                    .title('All Events')
+                    .defaultOrdering([{ field: 'startDate', direction: 'desc' }]),
+                ),
+              S.listItem()
+                .title('Landing Page')
+                .icon(DocumentTextIcon)
+                .child(
+                  S.document()
+                    .schemaType('eventsPage')
+                    .documentId('eventsPage')
+                    .title('Events Landing Page'),
+                ),
+            ]),
+        ),
+      S.listItem()
+        .title('NEXT Page')
+        .icon(StarIcon)
+        .child(
+          S.document()
+            .schemaType('nextPage')
+            .documentId('nextPage')
+            .title('NEXT Page'),
+        ),
+      S.listItem()
         .title('Important Pages')
         .icon(DocumentIcon)
         .child(S.documentTypeList('page').title('Important Pages')),
@@ -51,6 +97,7 @@ export const structure: StructureResolver = (S) =>
       S.divider(),
       S.listItem()
         .title('Volunteer Info')
+        .icon(HeartIcon)
         .child(S.document().schemaType('volunteerInfo').documentId('volunteerInfo').title('Volunteer Info')),
       S.divider(),
       ...S.documentTypeListItems().filter((item) => {

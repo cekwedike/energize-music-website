@@ -1,0 +1,251 @@
+---
+import type { EventCard } from '@energize/shared';
+import { formatEventDate } from '../../lib/events/format';
+import { getEventCardCover } from '../../lib/events/media';
+
+interface Props {
+  events: EventCard[];
+}
+
+const { events } = Astro.props;
+const usable = events.filter(
+  (event) =>
+    Boolean(event?._id && event.title?.trim() && event.slug?.trim() && event.startDate) &&
+    !Number.isNaN(new Date(event.startDate).getTime()),
+);
+const lead = usable[0];
+const rest = usable.slice(1);
+---
+
+{
+  lead && (
+    <section class="events-spotlight" id="events-spotlight" aria-labelledby="events-spotlight-title">
+      <div class="events-spotlight__inner">
+        <div class="events-spotlight__head">
+          <h2 id="events-spotlight-title">Spotlight</h2>
+          <span aria-hidden="true" />
+        </div>
+
+        <div class="events-spotlight__layout">
+          <a href={`/events/${lead.slug}`} class="events-spotlight__lead">
+            {getEventCardCover(lead, 1400, 900) ? (
+              <img
+                src={getEventCardCover(lead, 1400, 900)!}
+                alt={lead.cover?.alt ?? lead.title}
+                class="events-spotlight__lead-img"
+                width="1400"
+                height="900"
+              />
+            ) : (
+              <div class="events-spotlight__lead-fallback" />
+            )}
+            <span class="events-spotlight__scrim" aria-hidden="true" />
+            <span class="events-spotlight__copy">
+              <span class="events-spotlight__date">{formatEventDate(lead.startDate)}</span>
+              <span class="events-spotlight__title font-display">{lead.title}</span>
+              {(lead.subtitle || lead.location) && (
+                <span class="events-spotlight__meta">{lead.subtitle || lead.location}</span>
+              )}
+              {lead.summary && <span class="events-spotlight__summary">{lead.summary}</span>}
+              <span class="events-spotlight__cta">Open event</span>
+            </span>
+          </a>
+
+          {rest.length > 0 && (
+            <ul class="events-spotlight__side">
+              {rest.map((event) => {
+                const cover = getEventCardCover(event, 480, 480);
+                return (
+                  <li>
+                    <a href={`/events/${event.slug}`} class="events-spotlight__side-card">
+                      {cover ? (
+                        <img src={cover} alt="" width="160" height="160" loading="lazy" />
+                      ) : (
+                        <span class="events-spotlight__side-fallback" aria-hidden="true" />
+                      )}
+                      <span>
+                        <span class="events-spotlight__date">{formatEventDate(event.startDate)}</span>
+                        <span class="events-spotlight__side-title">{event.title}</span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .events-spotlight {
+    background: var(--color-ink-raised);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .events-spotlight__inner {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding: 3.25rem 1.25rem 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .events-spotlight__inner {
+      padding: 3.75rem 1.5rem 2.25rem;
+    }
+  }
+
+  .events-spotlight__head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .events-spotlight__head h2 {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .events-spotlight__head span {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .events-spotlight__layout {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    .events-spotlight__layout {
+      grid-template-columns: minmax(0, 1.7fr) minmax(16rem, 1fr);
+      gap: 1.25rem;
+    }
+  }
+
+  .events-spotlight__lead {
+    position: relative;
+    display: block;
+    min-height: 24rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+  }
+
+  .events-spotlight__lead-img,
+  .events-spotlight__lead-fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .events-spotlight__lead-fallback {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(77, 168, 255, 0.35), transparent 40%),
+      #141417;
+  }
+
+  .events-spotlight__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 11, 13, 0.1) 20%, rgba(11, 11, 13, 0.92) 100%);
+  }
+
+  .events-spotlight__copy {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 0.55rem;
+    padding: 1.4rem;
+  }
+
+  .events-spotlight__date {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--color-glow);
+  }
+
+  .events-spotlight__title {
+    font-size: clamp(1.8rem, 1.3rem + 1.5vw, 2.8rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: var(--color-paper);
+  }
+
+  .events-spotlight__meta {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.6);
+  }
+
+  .events-spotlight__summary {
+    max-width: 36rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: rgba(250, 250, 248, 0.72);
+  }
+
+  .events-spotlight__cta {
+    margin-top: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .events-spotlight__side {
+    display: grid;
+    gap: 0.85rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .events-spotlight__side-card {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(11, 11, 13, 0.45);
+    text-decoration: none;
+    transition: border-color 160ms ease;
+  }
+
+  .events-spotlight__side-card:hover,
+  .events-spotlight__side-card:focus-visible {
+    border-color: rgba(77, 168, 255, 0.45);
+  }
+
+  .events-spotlight__side-card img,
+  .events-spotlight__side-fallback {
+    width: 5rem;
+    height: 5rem;
+    object-fit: cover;
+    background: #1a1a1f;
+  }
+
+  .events-spotlight__side-title {
+    display: block;
+    margin-top: 0.35rem;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    line-height: 1.15;
+    color: var(--color-paper);
+  }
+</style>

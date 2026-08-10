@@ -1,0 +1,434 @@
+---
+import type { CareerOpening } from '@energize/shared';
+import CareersRoleRow from './CareersRoleRow.astro';
+import { slugifyEmploymentType } from '../../lib/careers/slugify';
+
+interface Props {
+  openings: CareerOpening[];
+}
+
+const { openings } = Astro.props;
+
+const categories = [...new Set(openings.map((role) => role.type).filter(Boolean))].sort((a, b) =>
+  a.localeCompare(b),
+);
+---
+
+<section id="open-roles" class="careers-roles scroll-mt-24" aria-labelledby="careers-roles-title">
+  <div class="careers-roles__glow" aria-hidden="true"></div>
+
+  <div class="careers-roles__inner">
+    <header class="careers-roles__header scroll-reveal">
+      <h2 id="careers-roles-title" class="careers-roles__title font-display">Explore Our Open Roles</h2>
+      <p class="careers-roles__subline">
+        Not in Lagos? No problem. Many roles are remote-friendly across time zones.
+      </p>
+    </header>
+
+    {
+      openings.length === 0 ? (
+        <div class="careers-roles__shell careers-roles__shell--empty scroll-reveal" style="--reveal-delay: 80ms">
+          <div class="careers-roles__shell-glow" aria-hidden="true"></div>
+          <p class="careers-roles__empty-eyebrow">Currently closed</p>
+          <p class="careers-roles__empty-title">No open roles right now</p>
+          <p class="careers-roles__empty-copy">
+            We are not hiring for specific positions at the moment, but we would still love to hear from you.
+          </p>
+          <div class="careers-roles__empty-actions">
+            <a href="/contact" class="careers-roles__empty-cta">
+              Introduce Yourself
+            </a>
+            <a href="#volunteer" class="careers-roles__empty-link">
+              Explore Volunteer Opportunities
+            </a>
+          </div>
+        </div>
+      ) : (
+        <div
+          class="careers-roles__shell scroll-reveal"
+          style="--reveal-delay: 80ms"
+          data-careers-roles
+          data-filter-active="all"
+        >
+          <div class="careers-roles__filters-wrap">
+            <div class="careers-roles__filters" role="toolbar" aria-label="Filter roles by employment type">
+              <button
+                type="button"
+                class="careers-roles__pill"
+                data-careers-filter
+                data-filter-type="all"
+                aria-current="true"
+              >
+                All
+              </button>
+              {
+                categories.map((category) => (
+                  <button
+                    type="button"
+                    class="careers-roles__pill"
+                    data-careers-filter
+                    data-filter-type={slugifyEmploymentType(category)}
+                    aria-current="false"
+                  >
+                    {category}
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="careers-roles__list">
+            {
+              openings.map((role) => (
+                <CareersRoleRow role={role} />
+              ))
+            }
+          </div>
+
+          <p class="careers-roles__footer">
+            The best way to know us is to build with us.
+            <a href="/contact" class="careers-roles__footer-link">
+              <span class="careers-roles__footer-dot" aria-hidden="true"></span>
+              Get in touch
+            </a>
+          </p>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var root = document.querySelector('[data-careers-roles]');
+    if (!root) return;
+
+    var pills = root.querySelectorAll('[data-careers-filter]');
+    var rows = root.querySelectorAll('[data-careers-role]');
+
+    function setActiveFilter(type) {
+      root.setAttribute('data-filter-active', type);
+
+      pills.forEach(function (pill) {
+        var isActive = pill.getAttribute('data-filter-type') === type;
+        pill.setAttribute('aria-current', isActive ? 'true' : 'false');
+      });
+
+      rows.forEach(function (row) {
+        var rowType = row.getAttribute('data-role-type') || '';
+        var visible = type === 'all' || rowType === type;
+        row.classList.toggle('is-filtered-out', !visible);
+      });
+    }
+
+    pills.forEach(function (pill) {
+      pill.addEventListener('click', function () {
+        setActiveFilter(pill.getAttribute('data-filter-type') || 'all');
+      });
+    });
+  })();
+</script>
+
+<style>
+  .careers-roles {
+    position: relative;
+    overflow: hidden;
+    padding: 3.5rem 0 4.5rem;
+    background:
+      radial-gradient(ellipse 50% 40% at 50% 0%, rgba(77, 168, 255, 0.06), transparent 65%),
+      var(--color-ink-raised);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  @media (min-width: 640px) {
+    .careers-roles {
+      padding: 5rem 0 6rem;
+    }
+  }
+
+  .careers-roles__glow {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    width: min(28rem, 80vw);
+    height: 12rem;
+    transform: translateX(-50%);
+    border-radius: 9999px;
+    background: rgba(77, 168, 255, 0.1);
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .careers-roles__inner {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 56rem);
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .careers-roles__inner {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .careers-roles__header {
+    text-align: center;
+  }
+
+  .careers-roles__title {
+    font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.5rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--color-paper);
+  }
+
+  .careers-roles__subline {
+    margin-top: 0.85rem;
+    max-width: 34rem;
+    margin-inline: auto;
+    font-size: clamp(0.875rem, 0.84rem + 0.2vw, 0.9375rem);
+    line-height: 1.6;
+    color: rgba(250, 250, 248, 0.58);
+  }
+
+  .careers-roles__shell {
+    position: relative;
+    margin-top: 2rem;
+    overflow: hidden;
+    border-radius: 1.35rem;
+    border: 1px solid rgba(77, 168, 255, 0.16);
+    background:
+      linear-gradient(145deg, rgba(77, 168, 255, 0.07), rgba(255, 255, 255, 0.02) 48%),
+      rgba(255, 255, 255, 0.025);
+    backdrop-filter: blur(12px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 24px 60px rgba(0, 0, 0, 0.24);
+    padding: 1.15rem;
+  }
+
+  @media (min-width: 640px) {
+    .careers-roles__shell {
+      margin-top: 2.25rem;
+      padding: 1.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .careers-roles__shell {
+      padding: 1.65rem 1.75rem;
+    }
+  }
+
+  .careers-roles__shell--empty {
+    padding: 2rem 1.25rem 2.25rem;
+    text-align: center;
+  }
+
+  @media (min-width: 640px) {
+    .careers-roles__shell--empty {
+      padding: 2.75rem 2rem 3rem;
+    }
+  }
+
+  .careers-roles__shell-glow {
+    position: absolute;
+    top: -3rem;
+    left: 50%;
+    width: 14rem;
+    height: 14rem;
+    transform: translateX(-50%);
+    border-radius: 9999px;
+    background: rgba(77, 168, 255, 0.14);
+    filter: blur(60px);
+    pointer-events: none;
+  }
+
+  .careers-roles__empty-eyebrow {
+    position: relative;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-glow);
+  }
+
+  .careers-roles__empty-title {
+    position: relative;
+    margin-top: 0.75rem;
+    font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
+    font-weight: 600;
+    color: var(--color-paper);
+  }
+
+  .careers-roles__empty-copy {
+    position: relative;
+    margin-top: 0.75rem;
+    max-width: 26rem;
+    margin-inline: auto;
+    font-size: clamp(0.875rem, 0.84rem + 0.15vw, 0.9375rem);
+    line-height: 1.6;
+    color: rgba(250, 250, 248, 0.58);
+  }
+
+  .careers-roles__empty-actions {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+    margin-top: 1.5rem;
+    width: 100%;
+    max-width: 20rem;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 480px) {
+    .careers-roles__empty-actions {
+      align-items: center;
+    }
+  }
+
+  .careers-roles__empty-cta {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, var(--color-glow), color-mix(in srgb, var(--color-glow) 82%, #041018));
+    padding: 0.65rem 1.35rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    box-shadow: 0 10px 28px rgba(77, 168, 255, 0.22);
+    transition:
+      transform 0.2s ease,
+      filter 0.2s ease;
+  }
+
+  .careers-roles__empty-cta:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+
+  .careers-roles__empty-link {
+    display: inline-flex;
+    min-height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-glow-cyan);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .careers-roles__empty-link:hover {
+    color: color-mix(in srgb, var(--color-glow-cyan) 85%, white);
+  }
+
+  .careers-roles__filters-wrap {
+    position: relative;
+    margin: -0.15rem -0.15rem 1.15rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, transparent, black 0.75rem, black calc(100% - 0.75rem), transparent);
+  }
+
+  @media (min-width: 768px) {
+    .careers-roles__filters-wrap {
+      overflow: visible;
+      mask-image: none;
+    }
+  }
+
+  .careers-roles__filters-wrap::-webkit-scrollbar {
+    display: none;
+  }
+
+  .careers-roles__filters {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    min-width: min-content;
+    padding: 0.15rem 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .careers-roles__filters {
+      flex-wrap: wrap;
+      min-width: 0;
+      padding: 0.15rem;
+    }
+  }
+
+  .careers-roles__pill {
+    flex: 0 0 auto;
+    min-height: 2.5rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.45rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: rgba(250, 250, 248, 0.68);
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .careers-roles__pill:hover,
+  .careers-roles__pill:focus-visible {
+    border-color: rgba(77, 168, 255, 0.35);
+    color: var(--color-paper);
+  }
+
+  .careers-roles__pill[aria-current='true'] {
+    border-color: transparent;
+    background: var(--color-glow);
+    color: white;
+    box-shadow: 0 8px 22px rgba(77, 168, 255, 0.28);
+  }
+
+  .careers-roles__list {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .careers-roles__footer {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    font-size: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+    line-height: 1.55;
+    color: rgba(250, 250, 248, 0.55);
+  }
+
+  .careers-roles__footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-left: 0.35rem;
+    font-weight: 600;
+    color: var(--color-glow);
+    text-decoration: none;
+  }
+
+  .careers-roles__footer-link:hover {
+    color: color-mix(in srgb, var(--color-glow) 85%, white);
+  }
+
+  .careers-roles__footer-dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 9999px;
+    background: var(--color-glow);
+  }
+</style>

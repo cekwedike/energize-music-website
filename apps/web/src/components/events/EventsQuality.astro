@@ -1,0 +1,123 @@
+---
+import type { EventsPageQualityItem } from '@energize/shared';
+
+interface Props {
+  title: string;
+  items: EventsPageQualityItem[];
+}
+
+const { title, items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section class="events-quality" aria-labelledby="events-quality-title">
+      <div class="events-quality__inner">
+        <div class="events-quality__head">
+          <h2 id="events-quality-title" class="events-quality__title">{title}</h2>
+          <span class="events-quality__rule" aria-hidden="true" />
+        </div>
+
+        <ul class="events-quality__grid">
+          {items.map((item, index) => (
+            <li class:list={['events-quality__card', index === 0 && 'events-quality__card--accent']}>
+              <span class="events-quality__index" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <h3 class="events-quality__card-title">{item.title}</h3>
+              <p class="events-quality__card-body">{item.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .events-quality {
+    background: var(--color-ink);
+  }
+
+  .events-quality__inner {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding: 3.5rem 1.25rem 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .events-quality__inner {
+      padding: 4rem 1.5rem 2rem;
+    }
+  }
+
+  .events-quality__head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .events-quality__title {
+    margin: 0;
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-paper);
+  }
+
+  .events-quality__rule {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .events-quality__grid {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 900px) {
+    .events-quality__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .events-quality__card {
+    padding: 1.4rem 1.25rem 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .events-quality__card--accent {
+    border-top: 3px solid var(--color-glow);
+  }
+
+  .events-quality__index {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    color: var(--color-glow);
+  }
+
+  .events-quality__card-title {
+    margin: 0.85rem 0 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-paper);
+  }
+
+  .events-quality__card-body {
+    margin: 0.7rem 0 0;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: rgba(250, 250, 248, 0.58);
+  }
+</style>

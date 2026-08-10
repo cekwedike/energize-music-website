@@ -1,0 +1,72 @@
+---
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+const phrase = text.trim() || 'For Friends & Fans of Energize Music';
+const items = Array.from({ length: 10 }, () => phrase);
+---
+
+<div class="events-marquee" aria-hidden="true">
+  <div class="events-marquee__track">
+    {
+      [...items, ...items].map((item) => (
+        <span class="events-marquee__item">
+          <span>{item}</span>
+          <span class="events-marquee__dot" />
+        </span>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .events-marquee {
+    overflow: hidden;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    border-block: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .events-marquee__track {
+    display: flex;
+    width: max-content;
+    gap: 1.5rem;
+    padding: 0.85rem 0;
+    animation: events-marquee 32s linear infinite;
+  }
+
+  .events-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .events-marquee__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--color-glow-deep);
+  }
+
+  @keyframes events-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .events-marquee__track {
+      animation: none;
+    }
+  }
+</style>

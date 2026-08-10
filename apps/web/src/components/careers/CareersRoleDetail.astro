@@ -1,0 +1,219 @@
+---
+import type { CareerOpening, PortableTextBlock } from '@energize/shared';
+import PortableText from '../portable/PortableText.astro';
+
+interface Props {
+  role: CareerOpening & { description: PortableTextBlock[] };
+}
+
+const { role } = Astro.props;
+---
+
+<article class="career-detail">
+  <header class="career-detail__hero">
+    <div class="career-detail__hero-inner">
+      <a href="/careers" class="career-detail__back">← All open roles</a>
+      <p class="career-detail__type">{role.type}</p>
+      <h1 class="career-detail__title font-display">{role.title}</h1>
+      <p class="career-detail__location">{role.location}</p>
+      <div class="career-detail__actions">
+        <a
+          href={role.applyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="career-detail__cta career-detail__cta--primary"
+        >
+          Apply for this role
+        </a>
+        <a href="/contact" class="career-detail__cta career-detail__cta--ghost">Questions? Contact us</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="career-detail__body" aria-label="Job description">
+    <div class="career-detail__body-inner">
+      <h2 class="career-detail__section-title">About this role</h2>
+      <div class="career-detail__description">
+        <PortableText value={role.description} />
+      </div>
+      <div class="career-detail__apply-band">
+        <p class="career-detail__apply-copy">Ready to join the team?</p>
+        <a
+          href={role.applyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="career-detail__cta career-detail__cta--primary"
+        >
+          Apply now
+        </a>
+      </div>
+    </div>
+  </section>
+</article>
+
+<style>
+  .career-detail__hero {
+    position: relative;
+    padding: 7rem 1.25rem 3rem;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 0%, rgba(77, 168, 255, 0.12), transparent 62%),
+      linear-gradient(180deg, var(--color-ink) 0%, var(--color-ink-raised) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  @media (min-width: 640px) {
+    .career-detail__hero {
+      padding-top: 8rem;
+      padding-bottom: 3.5rem;
+    }
+  }
+
+  .career-detail__hero-inner {
+    width: min(100%, 48rem);
+    margin-inline: auto;
+  }
+
+  .career-detail__back {
+    display: inline-flex;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(250, 250, 248, 0.62);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .career-detail__back:hover {
+    color: var(--color-glow);
+  }
+
+  .career-detail__type {
+    margin-top: 1.25rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-glow-cyan);
+  }
+
+  .career-detail__title {
+    margin-top: 0.75rem;
+    font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-paper);
+  }
+
+  .career-detail__location {
+    margin-top: 0.85rem;
+    font-size: 1rem;
+    color: rgba(250, 250, 248, 0.68);
+  }
+
+  .career-detail__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .career-detail__cta {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.65rem 1.35rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .career-detail__cta--primary {
+    background: var(--color-glow);
+    color: white;
+  }
+
+  .career-detail__cta--primary:hover {
+    background: color-mix(in srgb, var(--color-glow) 90%, white);
+    transform: translateY(-1px);
+  }
+
+  .career-detail__cta--ghost {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(250, 250, 248, 0.82);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .career-detail__cta--ghost:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+    color: var(--color-paper);
+  }
+
+  .career-detail__body {
+    padding: 3rem 1.25rem 5rem;
+    background: var(--color-ink-raised);
+  }
+
+  @media (min-width: 640px) {
+    .career-detail__body {
+      padding-bottom: 6rem;
+    }
+  }
+
+  .career-detail__body-inner {
+    width: min(100%, 48rem);
+    margin-inline: auto;
+  }
+
+  .career-detail__section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-paper);
+  }
+
+  .career-detail__description {
+    margin-top: 1.25rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(250, 250, 248, 0.78);
+  }
+
+  .career-detail__description :global(p + p) {
+    margin-top: 1rem;
+  }
+
+  .career-detail__description :global(h3) {
+    margin-top: 1.5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-paper);
+  }
+
+  .career-detail__description :global(ul),
+  .career-detail__description :global(ol) {
+    margin-top: 0.75rem;
+    padding-left: 1.25rem;
+  }
+
+  .career-detail__description :global(li + li) {
+    margin-top: 0.35rem;
+  }
+
+  .career-detail__apply-band {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .career-detail__apply-copy {
+    font-size: 0.9375rem;
+    color: rgba(250, 250, 248, 0.62);
+  }
+</style>

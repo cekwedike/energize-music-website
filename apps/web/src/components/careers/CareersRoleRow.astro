@@ -1,0 +1,160 @@
+---
+import type { CareerOpening } from '@energize/shared';
+import { slugifyEmploymentType } from '../../lib/careers/slugify';
+
+interface Props {
+  role: CareerOpening;
+}
+
+const { role } = Astro.props;
+const typeSlug = slugifyEmploymentType(role.type);
+---
+
+<a
+  href={`/careers/${role.slug}`}
+  class="careers-role-row"
+  data-careers-role
+  data-role-type={typeSlug}
+>
+  <div class="careers-role-row__main">
+    <p class="careers-role-row__title">{role.title}</p>
+    <p class="careers-role-row__type">{role.type}</p>
+  </div>
+
+  <p class="careers-role-row__location">{role.location}</p>
+
+  <div class="careers-role-row__meta">
+    <span class="careers-role-row__tag">{role.type}</span>
+    <span class="careers-role-row__chevron" aria-hidden="true">
+      <svg viewBox="0 0 20 20" fill="none">
+        <path
+          d="M7.5 5l5 5-5 5"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </span>
+  </div>
+</a>
+
+<style>
+  .careers-role-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    padding: 1.15rem 1.25rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .careers-role-row.is-filtered-out {
+    display: none;
+  }
+
+  .careers-role-row:hover,
+  .careers-role-row:focus-visible {
+    border-color: rgba(77, 168, 255, 0.35);
+    background: rgba(77, 168, 255, 0.04);
+    transform: translateY(-1px);
+  }
+
+  .careers-role-row__main {
+    min-width: 0;
+  }
+
+  .careers-role-row__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-paper);
+    line-height: 1.35;
+  }
+
+  .careers-role-row__type {
+    margin-top: 0.2rem;
+    font-size: 0.8125rem;
+    color: rgba(250, 250, 248, 0.52);
+  }
+
+  .careers-role-row__location {
+    font-size: 0.875rem;
+    color: rgba(250, 250, 248, 0.62);
+    line-height: 1.4;
+  }
+
+  .careers-role-row__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-self: end;
+  }
+
+  .careers-role-row__tag {
+    display: none;
+    border-radius: 9999px;
+    border: 1px solid rgba(77, 168, 255, 0.45);
+    padding: 0.3rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-glow);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 640px) {
+    .careers-role-row__tag {
+      display: inline-flex;
+    }
+
+    .careers-role-row__type {
+      display: none;
+    }
+  }
+
+  .careers-role-row__chevron {
+    display: inline-flex;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: rgba(250, 250, 248, 0.45);
+    transition: color 0.2s ease;
+  }
+
+  .careers-role-row__chevron svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .careers-role-row:hover .careers-role-row__chevron,
+  .careers-role-row:focus-visible .careers-role-row__chevron {
+    color: var(--color-glow);
+  }
+
+  @media (max-width: 639px) {
+    .careers-role-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'main meta'
+        'location meta';
+    }
+
+    .careers-role-row__main {
+      grid-area: main;
+    }
+
+    .careers-role-row__location {
+      grid-area: location;
+    }
+
+    .careers-role-row__meta {
+      grid-area: meta;
+      align-self: center;
+    }
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventDetailView from '../../components/events/EventDetailView.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import { sanityClient } from '../../lib/sanity/client';
+import { allEventSlugsQuery, eventBySlugQuery, type EventDetail } from '@energize/shared';
+import { getEventCoverUrl } from '../../lib/events/media';
+
+export async function getStaticPaths() {
+  let slugs: { slug: string }[] = [];
+  try {
+    slugs = await sanityClient.fetch<{ slug: string }[]>(allEventSlugsQuery);
+  } catch {
+    slugs = [];
+  }
+
+  return slugs
+    .filter((item) => Boolean(item.slug))
+    .map((item) => ({ params: { slug: item.slug } }));
+}
+
+const { slug } = Astro.params;
+
+let event: EventDetail | null = null;
+try {
+  event = await sanityClient.fetch<EventDetail | null>(eventBySlugQuery, { slug });
+} catch {
+  event = null;
+}
+
+if (!event) {
+  return Astro.redirect('/events');
+}
+
+const shareImage = getEventCoverUrl(event.shareImage, 1200, 630);
+const coverUrl = getEventCoverUrl(event.cover, 1200, 630);
+const ogImage = shareImage || coverUrl || undefined;
+const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://energize-music.com';
+const shareUrl = new URL(`/events/${event.slug}`, siteUrl).toString();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicEvent',
+  name: event.title,
+  startDate: event.startDate,
+  endDate: event.endDate,
+  image: ogImage ? [ogImage] : undefined,
+  url: shareUrl,
+  location: event.location
+    ? {
+        '@type': 'Place',
+        name: event.location,
+      }
+    : undefined,
+  description: event.summary ?? event.title,
+  organizer: {
+    '@type': 'Organization',
+    name: 'Energize Music',
+  },
+};
+---
+
+<BaseLayout
+  title={event.title}
+  description={event.summary ?? `${event.title} by Energize Music`}
+  ogImage={ogImage}
+  ambientVariant="editorial"
+  headerVariant="overlay"
+>
+  <JsonLd data={jsonLd} />
+  <EventDetailView event={event} shareUrl={shareUrl} />
+</BaseLayout>

@@ -19,7 +19,8 @@ const ROUTES = [
   '/blogs',
   '/contact',
   '/404',
-  '/energize-fest',
+  '/events',
+  '/events/energize-fest',
   '/energize-kids',
   '/next',
 ] as const;

@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CareersRoleDetail from '../../components/careers/CareersRoleDetail.astro';
+import { sanityClient } from '../../lib/sanity/client';
+import {
+  allCareerOpeningsQuery,
+  careerOpeningBySlugQuery,
+  type CareerOpening,
+  type PortableTextBlock,
+} from '@energize/shared';
+
+export async function getStaticPaths() {
+  const openings = await sanityClient.fetch<Pick<CareerOpening, 'slug'>[]>(allCareerOpeningsQuery);
+  return openings.map((opening) => ({ params: { slug: opening.slug } }));
+}
+
+const { slug } = Astro.params;
+const role = await sanityClient.fetch<
+  (CareerOpening & { description: PortableTextBlock[] }) | null
+>(careerOpeningBySlugQuery, { slug });
+
+if (!role) {
+  return Astro.redirect('/careers');
+}
+---
+
+<BaseLayout
+  title={role.title}
+  description={`${role.title} at Energize Music. ${role.location}. ${role.type}.`}
+  ambientVariant="editorial"
+>
+  <CareersRoleDetail role={role} />
+</BaseLayout>

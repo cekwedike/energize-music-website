@@ -24,6 +24,17 @@ export interface NewsPostSummary {
 export interface CareerOpening {
   _id: string;
   title: string;
+  slug: string;
+  location: string;
+  type: string;
+  description?: PortableTextBlock[];
+  applyUrl: string;
+}
+
+export interface CareerOpeningSummary {
+  _id: string;
+  title: string;
+  slug: string;
   location: string;
   type: string;
   applyUrl: string;
@@ -61,12 +72,24 @@ export interface TeamMember {
 }
 
 export interface VolunteerInfo {
+  eyebrow?: string;
   heading: string;
   intro: string;
+  roleOptionsLabel?: string;
   roleOptions?: string[];
+  platformsLabel?: string;
   platforms?: string[];
   signupUrl?: string;
   ctaLabel?: string;
+  fallbackCtaLabel?: string;
+  fallbackCtaUrl?: string;
+  secondaryLinkLabel?: string;
+  secondaryLinkUrl?: string;
+}
+
+export interface CareersPageData {
+  openings: CareerOpening[];
+  volunteer: VolunteerInfo | null;
 }
 
 export interface ReleasesPage {

@@ -8,6 +8,7 @@ export const primaryNav: NavLink[] = [
   { label: 'About Us', href: '/about' },
   { label: 'Artists', href: '/artists' },
   { label: 'Releases', href: '/releases' },
+  { label: 'Events', href: '/events' },
   { label: 'Blogs', href: '/blogs' },
   { label: 'Careers', href: '/careers' },
   { label: 'Contact', href: '/contact' },
@@ -16,7 +17,7 @@ export const primaryNav: NavLink[] = [
 export const secondaryNav: NavLink[] = [
   { label: 'Energize Kids', href: '/energize-kids' },
   { label: 'NEXT', href: '/next' },
-  { label: 'Energize Fest', href: '/energize-fest' },
+  { label: 'Energize Fest', href: '/events/energize-fest' },
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
 ];
@@ -43,7 +44,7 @@ export const initiativesNav: InitiativeItem[] = [
   },
   {
     label: 'Energize Fest',
-    href: '/energize-fest',
+    href: '/events/energize-fest',
     blurb:
       'An annual live showcase bringing the full Energize Music roster together on one stage. Afro-gospel and soul-fusion, built for the community.',
     image: '/initiatives/energize-fest.webp',
@@ -60,8 +61,9 @@ export const headerNav: HeaderNavEntry[] = [
   { type: 'link', label: 'About Us', href: '/about' },
   { type: 'link', label: 'Artists', href: '/artists' },
   { type: 'link', label: 'Releases', href: '/releases' },
-  { type: 'link', label: 'Blogs', href: '/blogs' },
   { type: 'dropdown', label: 'Initiatives', items: initiativesNav },
+  { type: 'link', label: 'Events', href: '/events' },
+  { type: 'link', label: 'Blogs', href: '/blogs' },
   { type: 'link', label: 'Careers', href: '/careers' },
   { type: 'link', label: 'Contact', href: '/contact' },
 ];

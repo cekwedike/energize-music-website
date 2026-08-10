@@ -1,0 +1,256 @@
+---
+import type { EventsPageSettings } from '@energize/shared';
+import Logo from '../ui/Logo.astro';
+import { getEventCoverUrl } from '../../lib/events/media';
+
+interface Props {
+  settings: EventsPageSettings;
+  spotlightAvailable?: boolean;
+}
+
+const { settings, spotlightAvailable = true } = Astro.props;
+const wordmarkImage = getEventCoverUrl(settings.heroWordmarkImage, 1400, 900);
+const wordmark = settings.heroWordmark || 'LIVE SHOWS';
+const badgeTitle = (settings.heroBadgeTitle || 'ENERGY').toUpperCase();
+const badgeSubtitle = settings.heroBadgeSubtitle || 'on Stage';
+const ctaHref = spotlightAvailable ? '#events-spotlight' : '#events-list';
+---
+
+<section class="events-hero" aria-labelledby="events-hero-title">
+  <div class="events-hero__mesh" aria-hidden="true"></div>
+  <div class="events-hero__mark" aria-hidden="true">
+    <Logo size="lg" animated={false} />
+  </div>
+
+  <div class="events-hero__inner">
+    <div class="events-hero__copy">
+      <h1 id="events-hero-title" class="events-hero__title font-display">
+        {settings.heroTitle}
+      </h1>
+      {
+        settings.heroLead && (
+          <p class="events-hero__lead">{settings.heroLead}</p>
+        )
+      }
+      <a href={ctaHref} class="events-hero__cta">
+        {settings.heroCtaLabel || 'Find an event'}
+      </a>
+    </div>
+
+    <div class="events-hero__stage" aria-hidden="true">
+      <div class="events-hero__wordmark">
+        <span
+          class:list={['events-hero__fill', !wordmarkImage && 'events-hero__fill--solid']}
+          style={wordmarkImage ? `--wordmark-image: url('${wordmarkImage}')` : undefined}
+        >
+          {wordmark}
+        </span>
+      </div>
+      <div class="events-hero__badge">
+        <span class="events-hero__badge-mark">{badgeTitle}</span>
+        <span class="events-hero__badge-text">{badgeSubtitle}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .events-hero {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .events-hero__mesh {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 55% 60% at 80% 40%, rgba(77, 168, 255, 0.16), transparent 60%),
+      radial-gradient(ellipse 40% 50% at 10% 90%, rgba(103, 232, 249, 0.08), transparent 55%),
+      linear-gradient(180deg, var(--color-ink) 0%, var(--color-ink-raised) 100%);
+    pointer-events: none;
+  }
+
+  .events-hero__mark {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    opacity: 0.07;
+  }
+
+  .events-hero__mark :global(.js-logo) {
+    width: min(72vw, 40rem);
+    transform: translate(18%, 8%);
+  }
+
+  .events-hero__inner {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    display: grid;
+    gap: 2.5rem;
+    padding: 7.5rem 1.25rem 3rem;
+  }
+
+  @media (min-width: 640px) {
+    .events-hero__inner {
+      padding: 8.5rem 1.5rem 3.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .events-hero__inner {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      align-items: end;
+      gap: 1.75rem;
+      padding-bottom: 4rem;
+    }
+
+    .events-hero__mark :global(.js-logo) {
+      transform: translate(22%, 4%);
+    }
+  }
+
+  .events-hero__title {
+    margin: 0;
+    max-width: 12ch;
+    font-size: clamp(2.6rem, 1.4rem + 4.5vw, 5.25rem);
+    font-weight: 600;
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    color: var(--color-paper);
+  }
+
+  .events-hero__lead {
+    margin: 1.25rem 0 0;
+    max-width: 28rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1.6;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.55);
+  }
+
+  .events-hero__cta {
+    display: inline-flex;
+    margin-top: 1.75rem;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.5rem;
+    background: var(--color-glow);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition: background 160ms ease, transform 160ms ease;
+  }
+
+  .events-hero__cta:hover,
+  .events-hero__cta:focus-visible {
+    background: var(--color-glow-deep);
+    transform: translateY(-1px);
+  }
+
+  .events-hero__stage {
+    position: relative;
+    min-height: 12rem;
+    padding-right: 2.25rem;
+    padding-top: 1.5rem;
+  }
+
+  .events-hero__wordmark {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #050507;
+  }
+
+  .events-hero__fill {
+    display: block;
+    padding: 0.85rem 0.4rem 0.55rem;
+    font-family: var(--font-display);
+    font-size: clamp(3.9rem, 1.6rem + 9.5vw, 9.75rem);
+    font-weight: 700;
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    text-transform: uppercase;
+    text-align: center;
+    color: transparent;
+    background-image:
+      linear-gradient(180deg, rgba(11, 11, 13, 0.15), rgba(11, 11, 13, 0.55)),
+      var(--wordmark-image);
+    background-size: cover;
+    background-position: center;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .events-hero__fill--solid {
+    color: rgba(250, 250, 248, 0.92);
+    background-image: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+  }
+
+  .events-hero__badge {
+    position: absolute;
+    z-index: 2;
+    top: 0.15rem;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    width: 6.6rem;
+    height: 6.6rem;
+    padding: 0.65rem 0.55rem;
+    border-radius: 50%;
+    border: 2px solid var(--color-glow);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    transform: rotate(6deg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  @media (min-width: 640px) {
+    .events-hero__badge {
+      width: 7.25rem;
+      height: 7.25rem;
+      top: 0;
+      right: 0.15rem;
+      gap: 0.22rem;
+    }
+  }
+
+  .events-hero__badge-mark {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .events-hero__badge-text {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    white-space: nowrap;
+  }
+</style>

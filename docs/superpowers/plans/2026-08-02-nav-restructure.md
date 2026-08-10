@@ -1012,7 +1012,7 @@ const volunteer = await sanityClient.fetch<VolunteerInfo | null>(volunteerInfoQu
     {
       openings.length === 0 ? (
         <p class="mt-10 text-paper/60">
-          No open roles right now. Reach out via <a href="/contact" class="underline hover:text-[var(--color-gold)]">Contact</a> to introduce yourself.
+          No open roles right now. Reach out via <a href="/contact" class="underline hover:text-[var(--color-gold)]">Contact</a> to Introduce Yourself.
         </p>
       ) : (
         <ul class="mt-10 divide-y divide-white/10 border-t border-white/10">

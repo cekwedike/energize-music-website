@@ -1,4 +1,6 @@
 ---
+import Logo from '../ui/Logo.astro';
+
 interface Props {
   totalCount: number;
 }
@@ -8,11 +10,12 @@ const { totalCount } = Astro.props;
 
 <section class="blogs-header" data-blogs-header aria-labelledby="blogs-page-title">
   <div class="blogs-header__mesh" aria-hidden="true"></div>
+  <div class="blogs-header__mark" aria-hidden="true">
+    <Logo size="lg" animated={false} />
+  </div>
   <div class="blogs-header__inner mx-auto max-w-3xl px-5 py-14 text-center sm:px-6 sm:py-16 lg:py-20">
-    <p class="blogs-header__eyebrow">Blog</p>
-
     <h1 id="blogs-page-title" class="blogs-header__title font-display">
-      Discover our latest news
+      Discover Our Latest News
     </h1>
 
     <p class="blogs-header__lead">
@@ -110,31 +113,36 @@ const { totalCount } = Astro.props;
     pointer-events: none;
   }
 
-  .blogs-header__inner {
-    position: relative;
+  .blogs-header__mark {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    z-index: 0;
+    width: min(92vw, 52rem);
+    transform: translate(-50%, -50%);
+    opacity: 0.055;
+    filter: blur(0.2px);
+    pointer-events: none;
+    user-select: none;
   }
 
-  .blogs-header__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.35rem 0.85rem;
-    border-radius: 999px;
-    border: 1px solid rgba(77, 168, 255, 0.28);
-    background: rgba(77, 168, 255, 0.08);
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-glow);
+  .blogs-header__mark :global(.js-logo) {
+    width: 100%;
+    filter: none;
+  }
+
+  .blogs-header__inner {
+    position: relative;
+    z-index: 1;
   }
 
   .blogs-header__title {
-    margin-top: 1.25rem;
+    margin-top: 0;
     font-size: clamp(2.25rem, 1.5rem + 3.5vw, 4.25rem);
     line-height: 0.95;
     letter-spacing: -0.02em;
     color: var(--color-paper);
+    text-shadow: 0 2px 28px rgba(11, 11, 13, 0.55);
   }
 
   .blogs-header__lead {
@@ -143,6 +151,7 @@ const { totalCount } = Astro.props;
     font-size: var(--text-lead);
     line-height: 1.65;
     color: rgba(250, 250, 248, 0.68);
+    text-shadow: 0 1px 18px rgba(11, 11, 13, 0.45);
   }
 
   .blogs-header__search {

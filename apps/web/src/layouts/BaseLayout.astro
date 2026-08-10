@@ -37,7 +37,13 @@ function resolveAmbientVariant(): AmbientVariant {
   if (pathname === '/') return 'home';
   if (pathname.startsWith('/about') || pathname.startsWith('/artists')) return 'editorial';
   if (pathname.startsWith('/next')) return 'pulse';
-  if (pathname.startsWith('/energize-kids') || pathname.startsWith('/energize-fest')) return 'warm';
+  if (
+    pathname.startsWith('/energize-kids') ||
+    pathname.startsWith('/energize-fest') ||
+    pathname.startsWith('/events')
+  ) {
+    return 'warm';
+  }
   return 'cosmic';
 }
 ---

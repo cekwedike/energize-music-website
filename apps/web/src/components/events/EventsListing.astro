@@ -1,0 +1,358 @@
+---
+import type { EventCard } from '@energize/shared';
+import { formatEventDate } from '../../lib/events/format';
+import { getEventCardCover } from '../../lib/events/media';
+
+interface Props {
+  upcoming: EventCard[];
+  archive: EventCard[];
+  upcomingPageSize: number;
+  archivePageSize: number;
+}
+
+const { upcoming, archive, upcomingPageSize, archivePageSize } = Astro.props;
+---
+
+<section class="events-board" id="events-list" aria-label="Event listings">
+  <div class="events-board__inner">
+    <div class="events-board__block" data-events-pager data-page-size={upcomingPageSize}>
+      <div class="events-board__head">
+        <h2>Upcoming</h2>
+        <span aria-hidden="true"></span>
+      </div>
+
+      {
+        upcoming.length === 0 ? (
+          <p class="events-board__empty">No upcoming dates yet. New nights land here first.</p>
+        ) : (
+          <>
+            <ul class="events-board__grid" data-events-list>
+              {upcoming.map((event, index) => {
+                const cover = getEventCardCover(event);
+                return (
+                  <li data-events-item hidden={index >= upcomingPageSize}>
+                    <a href={`/events/${event.slug}`} class="events-board__card">
+                      {cover ? (
+                        <img
+                          src={cover}
+                          alt={event.cover?.alt ?? event.title}
+                          class="events-board__image"
+                          width="900"
+                          height="1100"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span class="events-board__fallback" aria-hidden="true" />
+                      )}
+                      <span class="events-board__scrim" aria-hidden="true" />
+                      <span class="events-board__copy">
+                        <span class="events-board__date">{formatEventDate(event.startDate)}</span>
+                        <span class="events-board__name">{event.title}</span>
+                        {(event.subtitle || event.location) && (
+                          <span class="events-board__meta">{event.subtitle || event.location}</span>
+                        )}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+            <div class="events-board__pager" data-events-controls hidden={upcoming.length <= upcomingPageSize}>
+              <button type="button" data-events-prev disabled>Previous</button>
+              <p data-events-status></p>
+              <button type="button" data-events-next>Next</button>
+            </div>
+          </>
+        )
+      }
+    </div>
+
+    <div class="events-board__block events-board__block--archive" data-events-pager data-page-size={archivePageSize}>
+      <div class="events-board__head">
+        <h2>Archive</h2>
+        <span aria-hidden="true"></span>
+      </div>
+
+      {
+        archive.length === 0 ? (
+          <p class="events-board__empty">Past shows will archive here after the night wraps.</p>
+        ) : (
+          <>
+            <ul class="events-board__grid" data-events-list>
+              {archive.map((event, index) => {
+                const cover = getEventCardCover(event);
+                return (
+                  <li data-events-item hidden={index >= archivePageSize}>
+                    <a href={`/events/${event.slug}`} class="events-board__card events-board__card--archive">
+                      {cover ? (
+                        <img
+                          src={cover}
+                          alt={event.cover?.alt ?? event.title}
+                          class="events-board__image"
+                          width="900"
+                          height="1100"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span class="events-board__fallback" aria-hidden="true" />
+                      )}
+                      <span class="events-board__scrim" aria-hidden="true" />
+                      <span class="events-board__copy">
+                        <span class="events-board__date">{formatEventDate(event.startDate)}</span>
+                        <span class="events-board__name">{event.title}</span>
+                        {(event.subtitle || event.location) && (
+                          <span class="events-board__meta">{event.subtitle || event.location}</span>
+                        )}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+            <div class="events-board__pager" data-events-controls hidden={archive.length <= archivePageSize}>
+              <button type="button" data-events-prev disabled>Previous</button>
+              <p data-events-status></p>
+              <button type="button" data-events-next>Next</button>
+            </div>
+          </>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  function initEventsPagers() {
+    const pagers = document.querySelectorAll<HTMLElement>('[data-events-pager]');
+
+    pagers.forEach((pager) => {
+      const pageSize = Math.max(1, Number(pager.dataset.pageSize) || 6);
+      const items = Array.from(pager.querySelectorAll<HTMLElement>('[data-events-item]'));
+      const prev = pager.querySelector<HTMLButtonElement>('[data-events-prev]');
+      const next = pager.querySelector<HTMLButtonElement>('[data-events-next]');
+      const status = pager.querySelector<HTMLElement>('[data-events-status]');
+      const controls = pager.querySelector<HTMLElement>('[data-events-controls]');
+
+      if (items.length === 0 || !prev || !next || !status || !controls) return;
+
+      let page = 0;
+      const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+
+      const render = () => {
+        const start = page * pageSize;
+        const end = start + pageSize;
+
+        items.forEach((item, index) => {
+          item.hidden = index < start || index >= end;
+        });
+
+        prev.disabled = page <= 0;
+        next.disabled = page >= totalPages - 1;
+        status.textContent = `Page ${page + 1} of ${totalPages}`;
+        controls.hidden = totalPages <= 1;
+      };
+
+      prev.addEventListener('click', () => {
+        page = Math.max(0, page - 1);
+        render();
+      });
+
+      next.addEventListener('click', () => {
+        page = Math.min(totalPages - 1, page + 1);
+        render();
+      });
+
+      render();
+    });
+  }
+
+  initEventsPagers();
+</script>
+
+<style>
+  .events-board {
+    background: var(--color-ink);
+  }
+
+  .events-board__inner {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding: 2rem 1.25rem 4.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .events-board__inner {
+      padding: 2.25rem 1.5rem 5.5rem;
+    }
+  }
+
+  .events-board__block + .events-board__block {
+    margin-top: 3.5rem;
+    padding-top: 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .events-board__head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .events-board__head h2 {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .events-board__head span {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .events-board__empty {
+    margin: 0;
+    color: rgba(250, 250, 248, 0.55);
+  }
+
+  .events-board__grid {
+    display: grid;
+    gap: 1.1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 700px) {
+    .events-board__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .events-board__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .events-board__card {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    min-height: 22rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    transition:
+      border-color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .events-board__card--archive {
+    filter: saturate(0.85);
+  }
+
+  .events-board__card:hover,
+  .events-board__card:focus-visible {
+    border-color: rgba(77, 168, 255, 0.5);
+    transform: translateY(-3px);
+  }
+
+  .events-board__image,
+  .events-board__fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .events-board__fallback {
+    background:
+      radial-gradient(circle at 40% 20%, rgba(77, 168, 255, 0.28), transparent 45%),
+      #141417;
+  }
+
+  .events-board__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 11, 13, 0.05) 25%, rgba(11, 11, 13, 0.92) 100%);
+  }
+
+  .events-board__copy {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 0.45rem;
+    padding: 1.25rem;
+  }
+
+  .events-board__date {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--color-glow);
+  }
+
+  .events-board__name {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--color-paper);
+  }
+
+  .events-board__meta {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.62);
+  }
+
+  .events-board__pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.75rem;
+  }
+
+  .events-board__pager button {
+    min-height: 2.5rem;
+    padding: 0.55rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: transparent;
+    color: var(--color-paper);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .events-board__pager button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .events-board__pager button:not(:disabled):hover,
+  .events-board__pager button:not(:disabled):focus-visible {
+    border-color: var(--color-glow);
+    color: var(--color-glow);
+  }
+
+  .events-board__pager p {
+    margin: 0;
+    min-width: 7rem;
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.5);
+  }
+</style>

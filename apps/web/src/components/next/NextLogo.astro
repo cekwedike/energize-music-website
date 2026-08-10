@@ -1,0 +1,170 @@
+---
+interface Props {
+  animated?: boolean;
+  class?: string;
+}
+
+const { animated = true, class: className = '' } = Astro.props;
+---
+
+<div class:list={['next-logo', animated && 'next-logo--animated', className]}>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 3490.02 695.56"
+    class="next-logo__svg"
+    role="img"
+    aria-label="NEXT: New Era Xceptional Talent"
+  >
+    <g class="next-logo__mark">
+      <!-- N diagonal hatch bars -->
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 0" points="519.3,26.73 842.82,26.73 829.27,4.69 519.3,4.69" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 1" points="856.37,48.78 519.3,48.78 519.3,70.83 869.93,70.83" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 2" points="883.48,92.88 519.3,92.88 519.3,114.93 897.04,114.93" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 3" points="910.59,136.98 519.3,136.98 519.3,159.03 924.14,159.03" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 4" points="994.17,272.95 618.82,272.95 519.3,272.95 519.3,295 1007.72,295" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 5" points="1021.27,317.05 519.3,317.05 519.3,339.09 1034.82,339.09" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 6" points="1036.33,361.15 519.3,361.15 519.3,383.19 1022.77,383.19" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 7" points="1009.22,405.24 519.3,405.24 519.3,427.29 995.67,427.29" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 8" points="925.65,541.21 519.3,541.21 519.3,563.26 912.09,563.26" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 9" points="898.54,585.31 519.3,585.31 519.3,607.36 884.98,607.36" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 10" points="871.43,629.41 519.3,629.41 519.3,651.46 857.88,651.46" />
+      <polygon class="next-logo-el next-logo-el--bar" style="--i: 11" points="844.33,673.51 519.3,673.51 519.3,695.56 830.77,695.56" />
+
+      <!-- N uprights -->
+      <polygon class="next-logo-el next-logo-el--stroke" style="--i: 12" points="-0,135.68 342.76,693.32 448.33,693.32 448.33,550.45 109.98,0 -0,0" />
+      <polygon class="next-logo-el next-logo-el--stroke" style="--i: 13" points="245.48,693.32 1.91,275.22 3.94,691.06 3.94,693.32" />
+      <polygon class="next-logo-el next-logo-el--stroke" style="--i: 14" points="207.04,-0 450.7,405.07 452.07,2.3" />
+
+      <!-- X -->
+      <polygon class="next-logo-el next-logo-el--stroke" style="--i: 15" points="1189.27,4.68 1313.51,206.81 1328.63,231.41 1466.39,7.28 1466.39,4.68" />
+      <polygon class="next-logo-el next-logo-el--stroke" style="--i: 16" points="1189.27,695.56 1316.14,489.15 1331.57,464.04 1472.24,692.9 1472.24,695.56" />
+      <polygon class="next-logo-el next-logo-el--accent" style="--i: 17" points="919.74,4.69 1004.2,142.09 1105.86,307.49 1132.81,351.34 1105.86,395.19 921.24,695.56 1111.1,695.56 1200.8,549.63 1227.75,505.78 1322.68,351.34 1227.75,196.9 1200.8,153.05 1109.59,4.69 1004.2,4.69" />
+
+      <!-- T / E stem block -->
+      <polygon class="next-logo-el next-logo-el--stroke" style="--i: 18" points="1915.12,159.02 2148.1,159.02 2148.1,4.68 1520.39,4.68 1520.39,159.02 1753.37,159.02 1753.37,695.55 1915.12,695.55" />
+    </g>
+
+    <line
+      class="next-logo-el next-logo-el--rule"
+      style="--i: 19"
+      x1="2259.33"
+      y1="4.68"
+      x2="2259.33"
+      y2="695.55"
+    />
+
+    <text class="next-logo-el next-logo-el--copy" style="--i: 20" x="2381.53" y="207.91">New Era</text>
+    <text class="next-logo-el next-logo-el--copy" style="--i: 21" x="2381.53" y="417.8">Xceptional</text>
+    <text class="next-logo-el next-logo-el--copy" style="--i: 22" x="2381.53" y="627.69">Talent</text>
+  </svg>
+</div>
+
+<style>
+  .next-logo {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .next-logo__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .next-logo-el--bar,
+  .next-logo-el--stroke {
+    fill: #fff;
+  }
+
+  .next-logo-el--accent {
+    fill: gold;
+  }
+
+  .next-logo-el--rule {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 16.67;
+    stroke-miterlimit: 2.61313;
+  }
+
+  .next-logo-el--copy {
+    fill: #fff;
+    font-family: Poppins, Inter, system-ui, sans-serif;
+    font-size: 215.5px;
+    font-weight: 700;
+  }
+
+  .next-logo--animated .next-logo-el {
+    opacity: 0;
+    transition:
+      opacity 0.55s ease,
+      transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--i, 0) * 55ms);
+  }
+
+  .next-logo--animated .next-logo-el--bar {
+    transform: translateX(-28px);
+  }
+
+  .next-logo--animated .next-logo-el--stroke {
+    transform: translateY(22px);
+  }
+
+  .next-logo--animated .next-logo-el--accent {
+    transform: scale(0.88);
+    transform-origin: 1120px 350px;
+  }
+
+  .next-logo--animated .next-logo-el--rule {
+    transform: scaleY(0.2);
+    transform-origin: 2259px 350px;
+  }
+
+  .next-logo--animated .next-logo-el--copy {
+    transform: translateX(36px);
+  }
+
+  .next-logo--animated.is-visible .next-logo-el {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .next-logo--animated .next-logo-el {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  const logos = document.querySelectorAll('.next-logo--animated');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  logos.forEach((logo) => {
+    if (prefersReducedMotion) {
+      logo.classList.add('is-visible');
+      return;
+    }
+
+    const reveal = () => logo.classList.add('is-visible');
+    const hero = document.getElementById('next-hero');
+
+    if (hero && !hero.classList.contains('is-loaded')) {
+      const observer = new MutationObserver(() => {
+        if (hero.classList.contains('is-loaded')) {
+          observer.disconnect();
+          requestAnimationFrame(reveal);
+        }
+      });
+      observer.observe(hero, { attributes: true, attributeFilter: ['class'] });
+    } else {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(reveal);
+      });
+    }
+  });
+</script>

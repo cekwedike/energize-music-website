@@ -1,0 +1,197 @@
+---
+import type { ArtistCard } from '@energize/shared';
+import { urlForImage } from '../../lib/sanity/client';
+
+interface Props {
+  artists: ArtistCard[];
+}
+
+const { artists } = Astro.props;
+
+const roster = artists
+  .filter((artist) => artist.photo?.asset)
+  .slice(0, 8)
+  .map((artist) => ({
+    ...artist,
+    photoUrl: urlForImage(artist.photo).width(720).height(960).fit('crop').auto('format').url(),
+  }));
+---
+
+{
+  roster.length > 0 && (
+    <section class="home-artists" aria-labelledby="home-artists-title">
+      <div class="home-artists__head scroll-reveal">
+        <div>
+          <p class="home-kicker">The roster</p>
+          <h2 id="home-artists-title" class="home-artists__title">Voices carrying the Energy</h2>
+        </div>
+        <a href="/artists" class="home-link">
+          Full roster
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <div class="home-artists__strip scroll-reveal" style="--reveal-delay: 80ms">
+        <ul class="home-artists__track">
+          {roster.map((artist, index) => (
+            <li class="home-artists__item" style={`--i: ${index}`}>
+              <a href={`/artists/${artist.slug}`} class="home-artists__card">
+                <img
+                  src={artist.photoUrl}
+                  alt=""
+                  class="home-artists__img"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="home-artists__shade" aria-hidden="true"></div>
+                <div class="home-artists__meta">
+                  <p class="home-artists__name">{artist.name}</p>
+                  {artist.tagline && <p class="home-artists__tag">{artist.tagline}</p>}
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .home-artists {
+    position: relative;
+    padding: 4.5rem 0 3.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(77, 168, 255, 0.04), transparent 28%),
+      var(--color-ink);
+  }
+
+  .home-artists__head {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: min(100%, 80rem);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-artists__head {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .home-artists__title {
+    margin-top: 0.65rem;
+    max-width: 16ch;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.4rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .home-artists__strip {
+    margin-top: 2rem;
+    overflow: hidden;
+  }
+
+  .home-artists__track {
+    display: flex;
+    gap: 0.65rem;
+    padding: 0 1.25rem 0.5rem;
+    margin: 0;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(77, 168, 255, 0.45) transparent;
+  }
+
+  @media (min-width: 640px) {
+    .home-artists__track {
+      gap: 0.85rem;
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .home-artists__item {
+    flex: 0 0 auto;
+    width: min(68vw, 16.5rem);
+    scroll-snap-align: start;
+  }
+
+  @media (min-width: 900px) {
+    .home-artists__item {
+      width: clamp(14rem, 18vw, 17.5rem);
+    }
+  }
+
+  .home-artists__card {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    color: inherit;
+    text-decoration: none;
+    outline-offset: 3px;
+  }
+
+  .home-artists__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.04);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .home-artists__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 42%, rgba(5, 8, 12, 0.92) 100%);
+  }
+
+  .home-artists__meta {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 1rem 0.9rem 1.05rem;
+  }
+
+  .home-artists__name {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .home-artists__tag {
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    color: rgba(250, 250, 248, 0.62);
+  }
+
+  .home-artists__card:hover .home-artists__img,
+  .home-artists__card:focus-visible .home-artists__img {
+    transform: scale(1.1);
+  }
+
+  .home-artists__card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid transparent;
+    transition: border-color 0.25s ease;
+    pointer-events: none;
+  }
+
+  .home-artists__card:hover::after,
+  .home-artists__card:focus-visible::after {
+    border-color: rgba(77, 168, 255, 0.55);
+  }
+</style>

@@ -1,6 +1,11 @@
 ---
 import Logo from '../ui/Logo.astro';
-import { HERO_VIDEO_POSTER, HERO_VIDEO_SRC } from '../../lib/hero-video';
+import {
+  HERO_VIDEO_LOCAL,
+  HERO_VIDEO_POSTER,
+  HERO_VIDEO_SRC,
+  HERO_VIDEO_USES_CDN_FALLBACK,
+} from '../../lib/hero-video';
 
 const videoAttrs = {
   autoplay: true,
@@ -92,13 +97,31 @@ const videoAttrs = {
   }
 </script>
 
-<script>
-  const videoA = document.getElementById('hero-video-a') as HTMLVideoElement | null;
-  const videoB = document.getElementById('hero-video-b') as HTMLVideoElement | null;
+<script
+  define:vars={{
+    heroVideoLocal: HERO_VIDEO_LOCAL,
+    heroVideoUsesCdnFallback: HERO_VIDEO_USES_CDN_FALLBACK,
+  }}
+>
+  const videoA = document.getElementById('hero-video-a');
+  const videoB = document.getElementById('hero-video-b');
 
   if (videoA && videoB) {
-    const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
-    const lerp = (current: number, target: number, factor: number) => current + (target - current) * factor;
+    const applyLocalFallback = (video) => {
+      if (video.dataset.heroFallback === 'local') return;
+      video.dataset.heroFallback = 'local';
+      video.src = heroVideoLocal;
+      video.load();
+    };
+
+    if (heroVideoUsesCdnFallback) {
+      for (const video of [videoA, videoB]) {
+        video.addEventListener('error', () => applyLocalFallback(video), { once: true });
+      }
+    }
+
+    const clamp01 = (value) => Math.min(1, Math.max(0, value));
+    const lerp = (current, target, factor) => current + (target - current) * factor;
     const FADE_WINDOW = 0.8; // seconds of crossfade around each loop point
 
     let offsetApplied = false;
@@ -118,7 +141,7 @@ const videoAttrs = {
     let scale = startScale;
     let rafId = 0;
 
-    const applyTransform = (value: number) => {
+    const applyTransform = (value) => {
       const transform = `translateZ(0) scale(${value})`;
       videoA.style.transform = transform;
       videoB.style.transform = transform;

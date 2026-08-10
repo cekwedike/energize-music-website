@@ -1,0 +1,82 @@
+---
+---
+
+<section class="home-about" aria-labelledby="home-about-title">
+  <div class="home-about__glow" aria-hidden="true"></div>
+  <div class="home-about__inner scroll-reveal">
+    <p class="home-kicker">The belief</p>
+    <blockquote class="home-about__quote">
+      <p id="home-about-title">
+        Music can carry hope without losing its edge. From Lagos, we create Afro-gospel and
+        soul-fusion sound that is uplifting, family-friendly, and made to travel.
+      </p>
+    </blockquote>
+    <p class="home-about__by">Tochukwu Macfoy, Founder</p>
+    <a href="/about" class="home-btn home-btn--ghost home-about__cta">
+      More about us
+    </a>
+  </div>
+</section>
+
+<style>
+  .home-about {
+    position: relative;
+    overflow: hidden;
+    padding: 5rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      radial-gradient(ellipse 70% 80% at 50% 120%, rgba(77, 168, 255, 0.16), transparent 55%),
+      #070a0e;
+  }
+
+  @media (min-width: 640px) {
+    .home-about {
+      padding: 6.5rem 1.5rem;
+    }
+  }
+
+  .home-about__glow {
+    position: absolute;
+    inset: auto 20% -30% 20%;
+    height: 18rem;
+    background: rgba(77, 168, 255, 0.12);
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .home-about__inner {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 46rem);
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .home-about__quote {
+    margin: 1.25rem 0 0;
+  }
+
+  .home-about__quote p {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(1.65rem, 1.2rem + 2.2vw, 2.75rem);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.28;
+    letter-spacing: -0.015em;
+    color: #fff;
+    text-wrap: balance;
+  }
+
+  .home-about__by {
+    margin-top: 1.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(250, 250, 248, 0.48);
+  }
+
+  .home-about__cta {
+    margin-top: 1.75rem;
+  }
+</style>
