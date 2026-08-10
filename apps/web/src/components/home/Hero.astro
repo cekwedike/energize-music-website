@@ -11,16 +11,16 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
 ---
 
 <section class="hero" data-hero style={`--hero-poster: url('${HERO_VIDEO_POSTER}')`}>
-  {/* src is set after first paint so the poster can be LCP without competing with the video. */}
   <video
     id="hero-video"
     class="hero-video"
-    style="transform-origin: 50% 100%; backface-visibility: hidden;"
-    data-src={HERO_VIDEO_SRC}
+    src={HERO_VIDEO_SRC}
+    data-local-src={HERO_VIDEO_LOCAL}
     muted
     loop
     playsinline
-    preload="none"
+    autoplay
+    preload="auto"
     poster={HERO_VIDEO_POSTER}
     aria-hidden="true"
   />
@@ -29,7 +29,7 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
   <div class="hero-glow" data-hero-glow aria-hidden="true"></div>
   <div class="hero-noise" aria-hidden="true"></div>
 
-  <p class="hero-watermark" data-hero-parallax data-parallax-depth="18" aria-hidden="true">ENERGY</p>
+  <p class="hero-watermark" aria-hidden="true">ENERGY</p>
 
   <div class="hero-rail hero-rail--left" aria-hidden="true">
     <span>Lagos</span>
@@ -53,7 +53,7 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     <span class="hero-frame__corner hero-frame__corner--br"></span>
   </div>
 
-  <div id="hero-content" class="hero-content" data-hero-parallax data-parallax-depth="8">
+  <div id="hero-content" class="hero-content">
     <Logo />
     <p class="hero-text-el font-inter mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-white sm:mt-6 sm:text-xs">
       The Energy Different
@@ -119,6 +119,7 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transform: none;
     background-color: #04080c;
     background-image: var(--hero-poster);
     background-size: cover;
@@ -242,8 +243,8 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     border-color: rgba(77, 168, 255, 0.55);
     border-style: solid;
     opacity: 0;
-    animation: hero-corner-in 0.9s ease forwards;
-    animation-delay: 2.6s;
+    animation: hero-corner-in 0.75s ease forwards;
+    animation-delay: 0.35s;
   }
 
   .hero-frame__corner--tl {
@@ -297,21 +298,21 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     opacity: 0;
     transform: translateY(18px);
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-    transition-delay: 2.9s;
+      opacity 0.65s ease,
+      transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: 0.08s;
   }
 
   .hero-text-el-heading {
-    transition-delay: 3.05s;
+    transition-delay: 0.18s;
   }
 
   .hero-text-el-sub {
-    transition-delay: 3.2s;
+    transition-delay: 0.3s;
   }
 
   .hero-text-el-actions {
-    transition-delay: 3.35s;
+    transition-delay: 0.42s;
   }
 
   #hero-content.is-visible .hero-text-el {
@@ -348,8 +349,8 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     width: min(16rem, 70vw);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.8s ease;
-    transition-delay: 3.4s;
+    transition: opacity 0.7s ease;
+    transition-delay: 0.55s;
   }
 
   #hero-content.is-visible ~ .hero-signal {
@@ -392,10 +393,10 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
     opacity: 0;
     transform: translateY(10px);
     transition:
-      opacity 0.7s ease,
-      transform 0.7s ease,
+      opacity 0.65s ease,
+      transform 0.65s ease,
       color 0.2s ease;
-    transition-delay: 3.55s;
+    transition-delay: 0.65s;
   }
 
   #hero-content.is-visible ~ .hero-scroll {
@@ -495,158 +496,67 @@ const freqBars = Array.from({ length: 18 }, (_, i) => i);
   }
 </style>
 
-<script>
-  const heroContent = document.getElementById('hero-content');
-  const hero = document.querySelector('[data-hero]');
-  const prefersReducedMotionText = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (heroContent) {
-    if (prefersReducedMotionText) {
-      heroContent.classList.add('is-visible');
-    } else {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          heroContent.classList.add('is-visible');
-        });
-      });
-    }
-  }
-
-  if (hero instanceof HTMLElement && !prefersReducedMotionText && window.matchMedia('(pointer: fine)').matches) {
-    const layers = Array.from(hero.querySelectorAll('[data-hero-parallax]')).filter(
-      (node): node is HTMLElement => node instanceof HTMLElement,
-    );
-    let raf = 0;
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let active = false;
-
-    const tickParallax = () => {
-      currentX += (targetX - currentX) * 0.08;
-      currentY += (targetY - currentY) * 0.08;
-      for (const layer of layers) {
-        const depth = Number(layer.dataset.parallaxDepth || 6);
-        layer.style.transform = `translate3d(${currentX * depth}px, ${currentY * depth}px, 0)`;
-      }
-      const settled = Math.abs(targetX - currentX) < 0.001 && Math.abs(targetY - currentY) < 0.001;
-      if (settled && !active) {
-        raf = 0;
-        return;
-      }
-      raf = requestAnimationFrame(tickParallax);
-    };
-
-    const ensureTick = () => {
-      if (!raf) raf = requestAnimationFrame(tickParallax);
-    };
-
-    const onPointerMove = (event: Event) => {
-      if (!(event instanceof PointerEvent)) return;
-      const rect = hero.getBoundingClientRect();
-      targetX = (event.clientX - rect.left) / rect.width - 0.5;
-      targetY = (event.clientY - rect.top) / rect.height - 0.5;
-      active = true;
-      ensureTick();
-    };
-
-    hero.addEventListener('pointermove', onPointerMove);
-    hero.addEventListener('pointerleave', () => {
-      targetX = 0;
-      targetY = 0;
-      active = false;
-      ensureTick();
-    });
-
-    window.addEventListener('pagehide', () => {
-      if (raf) cancelAnimationFrame(raf);
-    });
-  }
-</script>
-
 <script
   define:vars={{
-    heroVideoLocal: HERO_VIDEO_LOCAL,
     heroVideoUsesCdnFallback: HERO_VIDEO_USES_CDN_FALLBACK,
   }}
 >
+  const heroContent = document.getElementById('hero-content');
+  const homePage = document.querySelector('[data-home-page]');
   const video = document.getElementById('hero-video');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const READY_EVENT = 'energize:hero-ready';
+  const MAX_WAIT_MS = 3500;
+
+  const revealHeroCopy = () => {
+    heroContent?.classList.add('is-visible');
+  };
+
+  const markHeroReady = () => {
+    if (homePage instanceof HTMLElement && homePage.dataset.heroReady === 'true') return;
+    if (homePage instanceof HTMLElement) homePage.dataset.heroReady = 'true';
+    document.documentElement.dataset.heroReady = 'true';
+    revealHeroCopy();
+    window.dispatchEvent(new CustomEvent(READY_EVENT));
+  };
+
+  if (prefersReducedMotion) {
+    markHeroReady();
+  }
 
   if (video instanceof HTMLVideoElement) {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const saveData = navigator.connection?.saveData === true;
-    const slowNet = ['slow-2g', '2g'].includes(navigator.connection?.effectiveType || '');
-
     if (heroVideoUsesCdnFallback) {
       video.addEventListener(
         'error',
         () => {
           if (video.dataset.heroFallback === 'local') return;
+          const localSrc = video.dataset.localSrc;
+          if (!localSrc) return;
           video.dataset.heroFallback = 'local';
-          video.src = heroVideoLocal;
+          video.src = localSrc;
           video.load();
+          video.play().catch(() => {});
         },
         { once: true },
       );
     }
 
-    const startPlayback = () => {
-      if (video.dataset.heroStarted === '1') return;
-      const src = video.dataset.src;
-      if (!src) return;
-      video.dataset.heroStarted = '1';
-      video.src = src;
-      video.preload = 'metadata';
-      video.load();
-      video.play().catch(() => {});
-    };
-
-    // Skip video on reduced motion / constrained networks; poster stays as background.
-    if (!prefersReducedMotion && !saveData && !slowNet) {
-      const schedule = () => {
-        if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(startPlayback, { timeout: 2800 });
-        } else {
-          window.setTimeout(startPlayback, 1200);
-        }
-      };
-      if (document.readyState === 'complete') schedule();
-      else window.addEventListener('load', schedule, { once: true });
-    }
-
-    const clamp01 = (value) => Math.min(1, Math.max(0, value));
-    const startScale = 1.001;
-    const endScale = 1.12;
-    let rafId = 0;
-
-    const applyScrollScale = () => {
-      rafId = 0;
-      const scrollRange = window.innerHeight * 1.4;
-      const progress = clamp01(window.scrollY / scrollRange);
-      const scale = startScale + (endScale - startScale) * progress;
-      video.style.transform = `translateZ(0) scale(${scale})`;
-    };
-
-    const onScroll = () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(applyScrollScale);
-    };
-
-    if (!prefersReducedMotion) {
-      applyScrollScale();
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('pagehide', () => {
-        window.removeEventListener('scroll', onScroll);
-        if (rafId) cancelAnimationFrame(rafId);
-      });
-    }
+    // Prefer actual playback so decode has started before the rest of the page competes.
+    const onReady = () => markHeroReady();
+    video.addEventListener('playing', onReady, { once: true });
+    // canplaythrough = enough buffered to play through; stronger signal than canplay.
+    video.addEventListener('canplaythrough', onReady, { once: true });
+    if (video.readyState >= 3) markHeroReady();
+    video.play().catch(() => markHeroReady());
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) video.pause();
-      else if (video.dataset.heroStarted === '1' && !prefersReducedMotion) {
-        video.play().catch(() => {});
-      }
+      else if (!prefersReducedMotion) video.play().catch(() => {});
     });
+  } else {
+    markHeroReady();
   }
+
+  // Never block the rest of the site forever if the video stalls.
+  window.setTimeout(markHeroReady, MAX_WAIT_MS);
 </script>

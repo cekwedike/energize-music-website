@@ -18,6 +18,7 @@ import {
   type EventCard,
   type Release,
 } from '@energize/shared';
+import { HERO_VIDEO_POSTER, HERO_VIDEO_SRC } from '../lib/hero-video';
 import '../styles/home.css';
 
 let artists: ArtistCard[] = [];
@@ -58,46 +59,51 @@ const homeEvents = featuredEvents.filter(isValidEventCard);
   hideAmbient
   showTopMarquee
 >
-  <link slot="head" rel="preload" as="image" href="/video/hero-bg-poster.webp" type="image/webp" />
-  <div data-home-page>
+  <link slot="head" rel="preload" as="image" href={HERO_VIDEO_POSTER} type="image/webp" />
+  <link slot="head" rel="preload" as="video" href={HERO_VIDEO_SRC} type="video/webm" />
+  <div data-home-page data-hero-ready="false">
     <Hero />
-    <HomeReleases releases={releases} />
-    <HomeInitiatives />
-    <HomeEvents events={homeEvents} />
-    <HomeArtists artists={artists} />
-    <HomeAbout />
-    <HomeNewsletter />
+    <div data-home-below class="home-below">
+      <HomeReleases releases={releases} />
+      <HomeInitiatives />
+      <HomeEvents events={homeEvents} />
+      <HomeArtists artists={artists} />
+      <HomeAbout />
+      <HomeNewsletter />
+    </div>
   </div>
 </BaseLayout>
 
 <script>
   let homeMotionModule: Promise<typeof import('../lib/motion/home/initHome')> | null = null;
-  let homeMotionIdleId: number | null = null;
-  let homeMotionTimer: number | null = null;
+  let homeMotionBooted = false;
 
-  const runHomeMotion = () => {
+  const bootHomeMotion = () => {
+    if (homeMotionBooted) return;
+    homeMotionBooted = true;
     homeMotionModule ??= import('../lib/motion/home/initHome');
     void homeMotionModule.then(({ initHomePage }) => initHomePage());
   };
 
-  // Boot soon after first paint so pin distances are measured before the user reaches
-  // the horizontal sections (late idle boot was leaving blank pin-spacers).
-  const scheduleHomeMotion = () => {
-    if (homeMotionIdleId != null && typeof window.cancelIdleCallback === 'function') {
-      window.cancelIdleCallback(homeMotionIdleId);
-      homeMotionIdleId = null;
-    }
-    if (homeMotionTimer != null) {
-      window.clearTimeout(homeMotionTimer);
-      homeMotionTimer = null;
-    }
-    if (typeof window.requestIdleCallback === 'function') {
-      homeMotionIdleId = window.requestIdleCallback(runHomeMotion, { timeout: 600 });
-    } else {
-      homeMotionTimer = window.setTimeout(runHomeMotion, 80);
-    }
+  const onHeroReady = () => {
+    const root = document.querySelector<HTMLElement>('[data-home-page]');
+    if (root) root.dataset.heroReady = 'true';
+    // Let hero copy start painting, then mount below-fold + GSAP so they do not steal bandwidth/CPU mid-decode.
+    window.requestAnimationFrame(() => {
+      window.setTimeout(bootHomeMotion, 420);
+    });
   };
 
-  scheduleHomeMotion();
-  document.addEventListener('astro:page-load', scheduleHomeMotion);
+  if (document.documentElement.dataset.heroReady === 'true') {
+    onHeroReady();
+  } else {
+    window.addEventListener('energize:hero-ready', onHeroReady, { once: true });
+    // Safety net if the hero script never fires.
+    window.setTimeout(onHeroReady, 4000);
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    homeMotionBooted = false;
+    if (document.documentElement.dataset.heroReady === 'true') onHeroReady();
+  });
 </script>

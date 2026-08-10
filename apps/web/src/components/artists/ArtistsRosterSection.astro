@@ -77,47 +77,28 @@ const isReversed = index % 2 === 1;
     </div>
 
     <div class="roster-card__info">
-      <div class="roster-card__info-panel" data-roster-info-panel data-collapsed="true">
-        <p class="roster-card__eyebrow roster-card__eyebrow--desktop" data-motion="reveal">Profile</p>
+      <div class="roster-card__info-panel">
+        <p class="roster-card__eyebrow" data-motion="reveal">Profile</p>
 
-        <button
-          type="button"
-          class="roster-card__info-toggle"
-          data-roster-info-toggle
-          aria-expanded="false"
-          aria-controls={`roster-info-${artist.slug}`}
-        >
-          <span class="roster-card__eyebrow">Profile</span>
-          <span class="roster-card__toggle-label">Show bio</span>
-          <svg
-            class="roster-card__toggle-chevron"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            aria-hidden="true"
-          >
-            <path d="M6 9l6 6 6-6"></path>
-          </svg>
-        </button>
+        <div class="roster-card__content">
+          {
+            bio ? (
+              <p class="roster-card__bio" data-motion="reveal">
+                {bio}
+              </p>
+            ) : (
+              <p class="roster-card__bio" data-motion="reveal">
+                Explore {artist.name} on the Energize Music roster.
+              </p>
+            )
+          }
 
-        <div id={`roster-info-${artist.slug}`} class="roster-card__info-body" data-roster-info-body hidden>
-          <div class="roster-card__content">
-            {
-              bio && (
-                <p class="roster-card__bio" data-motion="reveal">
-                  {bio}
-                </p>
-              )
-            }
-
-            <a href={`/artists/${artist.slug}`} class="roster-card__cta" data-motion="reveal">
-              View full profile
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M5 12h14M13 6l6 6-6 6"></path>
-              </svg>
-            </a>
-          </div>
+          <a href={`/artists/${artist.slug}`} class="roster-card__cta" data-motion="reveal">
+            View profile
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6"></path>
+            </svg>
+          </a>
         </div>
       </div>
     </div>
@@ -205,69 +186,12 @@ const isReversed = index % 2 === 1;
     display: flex;
     flex: 1;
     flex-direction: column;
-    padding: clamp(1rem, 3vh, 1.35rem) clamp(1.25rem, 4vw, 2.5rem);
+    justify-content: flex-end;
+    padding: clamp(1.35rem, 3.5vh, 2rem) clamp(1.25rem, 4vw, 2.5rem);
     color: var(--color-paper);
-    background: rgba(11, 11, 13, 0.26);
+    background: rgba(11, 11, 13, 0.42);
     backdrop-filter: blur(8px) saturate(1.08);
     -webkit-backdrop-filter: blur(8px) saturate(1.08);
-    transition:
-      background 0.3s ease,
-      padding 0.3s ease;
-  }
-
-  .roster-card__info-panel[data-collapsed='false'] {
-    padding-block: clamp(1.75rem, 4vh, 2.5rem) clamp(2rem, 5vh, 2.75rem);
-  }
-
-  .roster-card__info-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    width: 100%;
-    min-height: 2.75rem;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    text-align: left;
-    font: inherit;
-    touch-action: manipulation;
-  }
-
-  .roster-card__info-toggle:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--roster-accent) 55%, white 10%);
-    outline-offset: 3px;
-    border-radius: 0.25rem;
-  }
-
-  .roster-card__toggle-label {
-    margin-left: auto;
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-paper);
-  }
-
-  .roster-card__toggle-chevron {
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
-    color: var(--color-paper);
-    transition: transform 0.25s ease;
-  }
-
-  .roster-card__info-panel[data-collapsed='false'] .roster-card__toggle-chevron {
-    transform: rotate(180deg);
-  }
-
-  .roster-card__info-body {
-    overflow: hidden;
-  }
-
-  .roster-card__info-body[hidden] {
-    display: none;
   }
 
   .roster-card__marker {
@@ -344,14 +268,10 @@ const isReversed = index % 2 === 1;
     color: var(--color-paper);
   }
 
-  .roster-card__eyebrow--desktop {
-    display: none;
-  }
-
   .roster-card__content {
     display: grid;
     gap: 1.25rem;
-    margin-top: clamp(1.5rem, 4vh, 2.5rem);
+    margin-top: 0.85rem;
     max-width: 34rem;
   }
 
@@ -454,37 +374,22 @@ const isReversed = index % 2 === 1;
       min-height: min(48svh, 480px);
     }
 
-    .roster-card__info-toggle {
-      display: none;
-    }
-
-    .roster-card__eyebrow--desktop {
-      display: block;
-      text-shadow: 0 1px 10px rgba(11, 11, 13, 0.55);
-    }
-
-    .roster-card__info-body {
-      display: block !important;
-    }
-
-    .roster-card__info-body[hidden] {
-      display: block !important;
-    }
-
-    .roster-card__info-panel[data-collapsed='true'],
-    .roster-card__info-panel[data-collapsed='false'] {
-      padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
-    }
-
     .roster-card__info-panel {
-      background: rgba(11, 11, 13, 0.12);
+      justify-content: center;
+      padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
+      background: rgba(11, 11, 13, 0.28);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
+    }
+
+    .roster-card__eyebrow {
+      text-shadow: 0 1px 10px rgba(11, 11, 13, 0.55);
     }
 
     .roster-card__content {
       position: relative;
       isolation: isolate;
+      margin-top: 1.25rem;
     }
 
     .roster-card__content::before {
@@ -580,12 +485,5 @@ const isReversed = index % 2 === 1;
       transform: none;
     }
 
-    .roster-card__toggle-chevron {
-      transition: none;
-    }
-
-    .roster-card__info-panel {
-      transition: none;
-    }
   }
 </style>
