@@ -2,14 +2,8 @@
    Avoid content-visibility here: it invents placeholder height and breaks GSAP pin spacers
    (long blank voids mid horizontal-scroll sections). */
 
-/* Hold below-the-fold homepage sections until the hero video is ready (or times out).
-   Avoid content-visibility here: it breaks GSAP pin spacer measurements. */
-[data-home-page][data-hero-ready='false'] .home-below {
-  display: none;
-}
-
+/* Below-fold homepage sections paint immediately; images stay lazy-loaded. */
 [data-home-page][data-hero-ready='true'] .home-below {
-  display: block;
   animation: home-below-in 0.5s ease both;
 }
 
@@ -22,11 +16,6 @@
     opacity: 1;
     transform: none;
   }
-}
-
-/* Keep the first paint focused on the hero while video boots. */
-html:has([data-home-page][data-hero-ready='false']) {
-  overflow: hidden;
 }
 
 .home-kicker {
@@ -127,17 +116,18 @@ html:has([data-home-page][data-hero-ready='false']) {
 }
 
 .home-marquee__track {
-  display: flex;
-  width: max-content;
-  gap: 2.5rem;
-  padding: 0.85rem 0;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: #ffffff;
-  animation: home-marquee-x var(--home-marquee-duration, 26s) linear infinite;
-}
+    display: flex;
+    width: max-content;
+    gap: 2.5rem;
+    padding: 0.85rem 0;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #ffffff;
+    transform: translate3d(0, 0, 0);
+    animation: home-marquee-x var(--home-marquee-duration, 26s) linear infinite;
+  }
 
 .home-marquee__track span:nth-child(odd) {
   color: rgba(77, 168, 255, 0.7);
@@ -145,10 +135,10 @@ html:has([data-home-page][data-hero-ready='false']) {
 
 @keyframes home-marquee-x {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 

@@ -1,7 +1,26 @@
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import type GSAP from 'gsap';
+import type { ScrollTrigger as ScrollTriggerType } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+type GsapBundle = {
+  gsap: typeof GSAP;
+  ScrollTrigger: typeof ScrollTriggerType;
+};
+
+let gsapBundle: Promise<GsapBundle> | null = null;
+let gsap!: typeof GSAP;
+let ScrollTrigger!: typeof ScrollTriggerType;
+
+function loadGsap(): Promise<GsapBundle> {
+  gsapBundle ??= Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(
+    ([{ default: gsapMod }, { ScrollTrigger: ScrollTriggerMod }]) => {
+      gsapMod.registerPlugin(ScrollTriggerMod);
+      gsap = gsapMod;
+      ScrollTrigger = ScrollTriggerMod;
+      return { gsap: gsapMod, ScrollTrigger: ScrollTriggerMod };
+    },
+  );
+  return gsapBundle;
+}
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -53,7 +72,7 @@ function pinHorizontalTrack(options: {
   const overflow = () => trackOverflow(track);
   if (overflow() < 48) return;
 
-  gsap.set(track, { x: 0, force3d: true });
+  gsap.set(track, { x: 0, force3D: true });
 
   gsap.to(track, {
     x: () => -overflow(),
@@ -61,7 +80,6 @@ function pinHorizontalTrack(options: {
     scrollTrigger: {
       trigger: section,
       start: `top top+=${headerOffset}`,
-      // 1px vertical scroll ≈ 1px horizontal travel. Extra padding caused the blank void.
       end: () => `+=${overflow()}`,
       pin: true,
       pinSpacing: true,
@@ -158,8 +176,6 @@ function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
   const panels = track?.querySelectorAll<HTMLElement>('[data-home-initiative]');
   if (!section || !track || !panels?.length) return;
 
-  // Keep panels visible by default; only enhance with a light rise (no autoAlpha:0),
-  // so a late/broken trigger cannot leave the strip blank mid-pin.
   gsap.fromTo(
     panels,
     { y: 28 },
@@ -176,18 +192,17 @@ function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
   pinHorizontalTrack({ section, track, headerOffset: 64, scrub: 0.75 });
 }
 
-function initAbout(root: ParentNode, reduced: boolean) {
+function initAbout(root: ParentNode) {
   const section = root.querySelector<HTMLElement>('[data-home-about]');
   const words = section?.querySelectorAll<HTMLElement>('[data-home-word]');
   if (!section || !words?.length) return;
 
   gsap.fromTo(
     words,
-    { autoAlpha: 0, y: reduced ? 0 : 28, filter: reduced ? 'none' : 'blur(6px)' },
+    { autoAlpha: 0, y: 28 },
     {
       autoAlpha: 1,
       y: 0,
-      filter: 'blur(0px)',
       duration: 0.55,
       stagger: 0.04,
       ease: 'power2.out',
@@ -242,7 +257,7 @@ function syncHScrollThumb(stage: HTMLElement, thumb: HTMLElement) {
   const max = stage.scrollWidth - stage.clientWidth;
   if (max <= 1) {
     thumb.style.width = '100%';
-    thumb.style.transform = 'translateX(0)';
+    thumb.style.transform = 'translate3d(0, 0, 0)';
     return;
   }
 
@@ -253,11 +268,15 @@ function syncHScrollThumb(stage: HTMLElement, thumb: HTMLElement) {
   const thumbWidthPx = (thumbWidthPct / 100) * track.clientWidth;
   const travel = Math.max(track.clientWidth - thumbWidthPx, 0);
   const progress = stage.scrollLeft / max;
-  thumb.style.transform = `translateX(${progress * travel}px)`;
+  thumb.style.transform = `translate3d(${progress * travel}px, 0, 0)`;
 }
 
 let hScrollMetersAbort: AbortController | null = null;
-let homeMotionCtx: gsap.Context | null = null;
+interface HomeMotionContext {
+  revert: () => void;
+}
+
+let homeMotionCtx: HomeMotionContext | null = null;
 let refreshAbort: AbortController | null = null;
 
 function disposeHScrollMeters() {
@@ -319,14 +338,13 @@ function schedulePinRefresh(root: HTMLElement) {
   window.setTimeout(refresh, 400);
 }
 
-export function initHomePage(): void {
+export async function initHomePage(): Promise<void> {
   const root = document.querySelector<HTMLElement>('[data-home-page]');
   if (!root) {
     disposeHomeMotion();
     return;
   }
 
-  // Tear down prior pins/tweens so re-entry cannot stack pin-spacers.
   disposeHomeMotion();
 
   const reduced = prefersReducedMotion();
@@ -337,12 +355,14 @@ export function initHomePage(): void {
 
   if (reduced) return;
 
+  await loadGsap();
+
   homeMotionCtx = gsap.context(() => {
     revealBasics(root);
     initArtistRunway(root, reduced, mobile);
     initReleaseStage(root, reduced);
     initInitiatives(root, reduced, mobile);
-    initAbout(root, reduced);
+    initAbout(root);
     initNewsletter(root, reduced);
   }, root);
 

@@ -34,5 +34,16 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/gsap')) return 'gsap';
+            if (id.includes('node_modules/react-dom')) return 'react';
+            if (id.includes('node_modules/react/')) return 'react';
+          },
+        },
+      },
+    },
   },
 });

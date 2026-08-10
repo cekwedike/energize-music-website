@@ -13,7 +13,7 @@ const roster = artists
   .slice(0, 8)
   .map((artist) => ({
     ...artist,
-    photoUrl: urlForImage(artist.photo).width(480).height(640).fit('crop').auto('format').url(),
+    photoUrl: urlForImage(artist.photo).width(360).height(480).fit('crop').auto('format').url(),
   }));
 
 const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)];
@@ -56,8 +56,8 @@ const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)
                   <img
                     src={artist.photoUrl}
                     alt=""
-                    width="480"
-                    height="640"
+                    width="360"
+                    height="480"
                     loading="lazy"
                     decoding="async"
                     sizes="(max-width: 640px) 70vw, 280px"

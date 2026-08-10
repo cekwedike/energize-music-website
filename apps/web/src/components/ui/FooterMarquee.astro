@@ -79,6 +79,7 @@ const loopItems = Array.from({ length: 12 }, () => phrase);
     width: max-content;
     align-items: center;
     gap: 0;
+    transform: translate3d(0, 0, 0);
     animation: footer-marquee-scroll 52s linear infinite;
   }
 
@@ -120,7 +121,7 @@ const loopItems = Array.from({ length: 12 }, () => phrase);
 
   @media (prefers-reduced-motion: reduce) {
     .footer-marquee__track {
-      animation-duration: 140s;
+      animation: none;
     }
   }
 </style>

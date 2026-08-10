@@ -23,7 +23,16 @@ const items = initiativesNav;
         {
           items.map((item) => (
             <a href={item.href} class="home-initiatives__panel" data-home-initiative>
-              <img src={item.image} alt="" class="home-initiatives__img" loading="lazy" decoding="async" />
+              <img
+                src={item.image}
+                alt=""
+                width="640"
+                height="400"
+                class="home-initiatives__img"
+                loading="lazy"
+                decoding="async"
+                sizes="(max-width: 640px) 85vw, 420px"
+              />
               <div class="home-initiatives__veil" aria-hidden="true"></div>
               <div class="home-initiatives__content">
                 <h3 class="home-initiatives__name">{item.label}</h3>

@@ -58,8 +58,8 @@ const words = quote.split(' ');
     translate: -50% 0;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(77, 168, 255, 0.28), transparent 68%);
-    filter: blur(10px);
     pointer-events: none;
+    transform: translateZ(0);
     animation: home-about-pulse 5.5s ease-in-out infinite;
   }
 
@@ -67,11 +67,11 @@ const words = quote.split(' ');
     0%,
     100% {
       opacity: 0.55;
-      transform: scale(0.92);
+      transform: scale(0.92) translateZ(0);
     }
     50% {
       opacity: 1;
-      transform: scale(1.08);
+      transform: scale(1.08) translateZ(0);
     }
   }
 
