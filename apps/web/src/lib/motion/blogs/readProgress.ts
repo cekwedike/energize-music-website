@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import type { MotionPrefs } from '../artists/prefs';
+import type { MotionPrefs } from '../prefs';
 
 gsap.registerPlugin(ScrollTrigger);
 

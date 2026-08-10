@@ -12,9 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # version comes from package.json "packageManager" (pnpm@10.30.3)
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:
@@ -29,7 +28,7 @@ jobs:
 
       - name: Audit dependencies
         # apps/studio's Sanity CLI deploy toolchain carries advisories with no upstream fix
-        # yet (dev-only, not shipped in dist/) — waived and tracked in docs/SECURITY.md.
+        # yet (dev-only, not shipped in dist/). Waived and tracked in docs/SECURITY.md.
         run: pnpm audit --audit-level=high
         continue-on-error: true
 

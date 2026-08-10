@@ -1,5 +1,5 @@
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { getMotionPrefs } from '../artists/prefs';
+import { getMotionPrefs } from '../prefs';
 import { initReadProgress } from './readProgress';
 
 export function initBlogPost(): () => void {

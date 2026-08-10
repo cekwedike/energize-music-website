@@ -62,7 +62,13 @@ export default defineType({
             const maxReleasesPerArtist = 20;
 
             for (const ref of artistRefs) {
-              const artistId = ref?._ref;
+              const artistId =
+                typeof ref === 'object' &&
+                ref !== null &&
+                '_ref' in ref &&
+                typeof (ref as { _ref?: unknown })._ref === 'string'
+                  ? (ref as { _ref: string })._ref
+                  : undefined;
               if (!artistId) continue;
 
               const count = await client.fetch<number>(
@@ -109,11 +115,11 @@ export default defineType({
 
     defineField({
       name: 'featured',
-      title: 'Homepage hero (coming soon)',
+      title: 'Feature on homepage',
       type: 'boolean',
       initialValue: false,
       description:
-        'Reserved for a future homepage hero. To feature releases on /releases, use Spotlight A Release in the sidebar.',
+        'Shows this release in the homepage Now Spinning section. To spotlight a release on /releases, use Spotlight A Release in the sidebar.',
     }),
   ],
   preview: {

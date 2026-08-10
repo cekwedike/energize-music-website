@@ -104,12 +104,7 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
   .artist-stage__backdrop {
     position: absolute;
     z-index: 0;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 100vw;
-    max-width: none;
-    margin-left: -50vw;
+    inset: 0;
     background:
       linear-gradient(180deg, var(--stage-tint) 0%, transparent 100%),
       linear-gradient(90deg, rgba(11, 11, 13, 0.92) 0%, rgba(11, 11, 13, 0.78) 100%);

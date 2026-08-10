@@ -129,12 +129,9 @@ const jsonLd = {
   .artist-profile-body__scrim {
     position: absolute;
     z-index: 0;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 100vw;
+    inset: 0;
+    width: 100%;
     max-width: none;
-    margin-left: -50vw;
     pointer-events: none;
     background:
       linear-gradient(
@@ -174,8 +171,3 @@ const jsonLd = {
   }
 </style>
 
-<script>
-  import { initArtistProfile } from '../../lib/motion/artists/initProfile';
-
-  initArtistProfile();
-</script>
