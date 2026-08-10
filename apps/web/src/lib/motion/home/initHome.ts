@@ -59,16 +59,19 @@ function initArtistRunway(root: ParentNode, reduced: boolean, mobile: boolean) {
 
   if (reduced || mobile || cards.length < 3) return;
 
-  const getDistance = () =>
-    Math.max(track.scrollWidth - window.innerWidth + 120, window.innerHeight * 0.8);
+  const overflow = () => track.scrollWidth - window.innerWidth;
+  // Only pin when the roster actually extends past the viewport.
+  if (overflow() < 48) return;
+
+  gsap.set(track, { x: 0 });
 
   gsap.to(track, {
-    x: () => -(track.scrollWidth - window.innerWidth + 80),
+    x: () => -Math.max(overflow() + 80, 0),
     ease: 'none',
     scrollTrigger: {
       trigger: section,
       start: 'top top+=68',
-      end: () => `+=${getDistance()}`,
+      end: () => `+=${Math.max(overflow() + 120, window.innerHeight * 0.55)}`,
       pin: true,
       scrub: 0.65,
       anticipatePin: 1,
@@ -148,15 +151,18 @@ function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
 
   if (reduced || mobile) return;
 
-  const getDistance = () => Math.max(track.scrollWidth - window.innerWidth, window.innerHeight * 1.1);
+  const overflow = () => track.scrollWidth - window.innerWidth;
+  if (overflow() < 48) return;
+
+  gsap.set(track, { x: 0 });
 
   gsap.to(track, {
-    x: () => -(track.scrollWidth - window.innerWidth),
+    x: () => -Math.max(overflow(), 0),
     ease: 'none',
     scrollTrigger: {
       trigger: section,
       start: 'top top+=64',
-      end: () => `+=${getDistance()}`,
+      end: () => `+=${Math.max(overflow(), window.innerHeight * 0.75)}`,
       pin: true,
       scrub: 0.75,
       anticipatePin: 1,
@@ -224,14 +230,75 @@ function initMarquee(root: ParentNode, reduced: boolean) {
   });
 }
 
+function syncHScrollThumb(stage: HTMLElement, thumb: HTMLElement) {
+  const track = thumb.parentElement;
+  if (!track) return;
+
+  const max = stage.scrollWidth - stage.clientWidth;
+  if (max <= 1) {
+    thumb.style.width = '100%';
+    thumb.style.transform = 'translateX(0)';
+    return;
+  }
+
+  const ratio = stage.clientWidth / stage.scrollWidth;
+  const thumbWidthPct = Math.max(ratio * 100, 18);
+  thumb.style.width = `${thumbWidthPct}%`;
+
+  const thumbWidthPx = (thumbWidthPct / 100) * track.clientWidth;
+  const travel = Math.max(track.clientWidth - thumbWidthPx, 0);
+  const progress = stage.scrollLeft / max;
+  thumb.style.transform = `translateX(${progress * travel}px)`;
+}
+
+let hScrollMetersAbort: AbortController | null = null;
+let homeMotionCtx: gsap.Context | null = null;
+
+function disposeHScrollMeters() {
+  hScrollMetersAbort?.abort();
+  hScrollMetersAbort = null;
+}
+
+function disposeHomeMotion() {
+  homeMotionCtx?.revert();
+  homeMotionCtx = null;
+  disposeHScrollMeters();
+}
+
+function initHScrollMeters(root: ParentNode) {
+  disposeHScrollMeters();
+  const abort = new AbortController();
+  hScrollMetersAbort = abort;
+  const { signal } = abort;
+
+  root.querySelectorAll<HTMLElement>('[data-home-h-scroll]').forEach((stage) => {
+    const wrap = stage.closest('.home-h-scroll');
+    const thumb = wrap?.querySelector<HTMLElement>('[data-home-h-scroll-thumb]');
+    if (!thumb) return;
+
+    const update = () => syncHScrollThumb(stage, thumb);
+    update();
+    stage.addEventListener('scroll', update, { passive: true, signal });
+    window.addEventListener('resize', update, { passive: true, signal });
+  });
+}
+
 export function initHomePage(): void {
-  const root = document.querySelector('[data-home-page]');
-  if (!root) return;
+  const root = document.querySelector<HTMLElement>('[data-home-page]');
+  if (!root) {
+    disposeHomeMotion();
+    return;
+  }
+
+  // Tear down prior pins/tweens so re-entry (page-load, HMR, double boot) cannot
+  // stack ScrollTrigger pin-spacers and blow out page height.
+  disposeHomeMotion();
 
   const reduced = prefersReducedMotion();
   const mobile = isMobile();
 
   initMarquee(root, reduced);
+  initHScrollMeters(root);
 
   if (reduced) {
     root
@@ -247,12 +314,14 @@ export function initHomePage(): void {
     return;
   }
 
-  revealBasics(root);
-  initArtistRunway(root, reduced, mobile);
-  initReleaseStage(root, reduced);
-  initInitiatives(root, reduced, mobile);
-  initAbout(root, reduced);
-  initNewsletter(root, reduced);
+  homeMotionCtx = gsap.context(() => {
+    revealBasics(root);
+    initArtistRunway(root, reduced, mobile);
+    initReleaseStage(root, reduced);
+    initInitiatives(root, reduced, mobile);
+    initAbout(root, reduced);
+    initNewsletter(root, reduced);
+  }, root);
 
   requestAnimationFrame(() => ScrollTrigger.refresh());
 }

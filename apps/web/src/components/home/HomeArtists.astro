@@ -26,7 +26,7 @@ const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)
         <div data-home-reveal>
           <p class="home-kicker">The roster</p>
           <h2 id="home-artists-title" class="home-title">
-            Faces of the<br />Energy Different
+            Faces of the<br />Energy
           </h2>
         </div>
         <a href="/artists" class="home-link" data-home-reveal data-home-reveal-delay="80">
@@ -43,23 +43,31 @@ const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)
         </div>
       </div>
 
-      <div class="home-artists__stage">
-        <div class="home-artists__track" data-home-artists-track>
-          {roster.map((artist) => (
-            <a
-              href={`/artists/${artist.slug}`}
-              class="home-artists__card"
-              data-home-artist
-            >
-              <div class="home-artists__media" data-home-artist-media>
-                <img src={artist.photoUrl} alt="" loading="lazy" decoding="async" />
-              </div>
-              <div class="home-artists__meta">
-                <p class="home-artists__name">{artist.name}</p>
-                {artist.tagline && <p class="home-artists__tag">{artist.tagline}</p>}
-              </div>
-            </a>
-          ))}
+      <div class="home-h-scroll home-artists__scroll">
+        <div class="home-artists__stage home-h-scroll__stage" data-home-h-scroll>
+          <div class="home-artists__track" data-home-artists-track>
+            {roster.map((artist) => (
+              <a
+                href={`/artists/${artist.slug}`}
+                class="home-artists__card"
+                data-home-artist
+              >
+                <div class="home-artists__media" data-home-artist-media>
+                  <img src={artist.photoUrl} alt="" loading="lazy" decoding="async" />
+                </div>
+                <div class="home-artists__meta">
+                  <p class="home-artists__name">{artist.name}</p>
+                  {artist.tagline && <p class="home-artists__tag">{artist.tagline}</p>}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+        <div class="home-h-scroll__meter" aria-hidden="true">
+          <div class="home-h-scroll__track">
+            <div class="home-h-scroll__thumb" data-home-h-scroll-thumb></div>
+          </div>
+          <span class="home-h-scroll__label">Swipe</span>
         </div>
       </div>
 
@@ -77,7 +85,8 @@ const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)
     background:
       radial-gradient(ellipse 60% 50% at 0% 0%, rgba(77, 168, 255, 0.12), transparent 55%),
       #080b10;
-    overflow: clip;
+    /* visible so ScrollTrigger pin spacers are not clipped into a blank void */
+    overflow: visible;
   }
 
   .home-artists__head {
@@ -209,10 +218,8 @@ const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)
   }
 
   @media (max-width: 899px) {
-    .home-artists__stage {
+    .home-artists__stage.home-h-scroll__stage {
       overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: thin;
     }
 
     .home-artists__card {

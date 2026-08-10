@@ -73,10 +73,12 @@ export interface SocialLink {
   href: string;
 }
 
-// Placeholder handles. Wire to siteSettings.socials once Sanity content is seeded.
 export const socialLinks: SocialLink[] = [
-  { label: 'Instagram', href: 'https://instagram.com/energizemusic' },
-  { label: 'YouTube', href: 'https://youtube.com/@energizemusic' },
-  { label: 'Spotify', href: 'https://open.spotify.com/artist/5dAPl80cZ4v2sTePGMbP2E' },
-  { label: 'TikTok', href: 'https://tiktok.com/@energizemusic' },
+  {
+    label: 'Spotify',
+    href: 'https://open.spotify.com/artist/5dAPl80cZ4v2sTePGMbP2E?si=5FXGMXScQCmWhfsDNfj8kw',
+  },
+  { label: 'YouTube', href: 'https://www.youtube.com/@Energize_HQ?sub_confirmation=1' },
+  { label: 'Instagram', href: 'https://www.instagram.com/energize_music/' },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@energizecentral' },
 ];

@@ -52,9 +52,13 @@ export default defineType({
             if (!Array.isArray(artistRefs) || artistRefs.length === 0) return true;
 
             const client = context.getClient({ apiVersion: '2024-01-01' });
-            const docId = context.document?._id ?? '';
+            const docId =
+              typeof context.document?._id === 'string' ? context.document._id : '';
             const publishedId = docId.replace(/^drafts\./, '');
-            const draftId = publishedId ? `drafts.${publishedId}` : '';
+            // Only exclude once the doc has a real id. Empty strings would match nothing
+            // useful and can mis-count when a new draft is already in the dataset.
+            const excludeIds =
+              publishedId.length > 0 ? [publishedId, `drafts.${publishedId}`] : [];
             const maxReleasesPerArtist = 20;
 
             for (const ref of artistRefs) {
@@ -62,12 +66,15 @@ export default defineType({
               if (!artistId) continue;
 
               const count = await client.fetch<number>(
-                `count(*[
+                `count(array::unique(*[
                   _type == "release"
                   && $artistId in artists[]._ref
-                  && !(_id in [$publishedId, $draftId])
-                ])`,
-                { artistId, publishedId, draftId },
+                  && !(_id in $excludeIds)
+                ].select(
+                  _id in path("drafts.**") => string::split(_id, "drafts.")[1],
+                  _id
+                )))`,
+                { artistId, excludeIds },
               );
 
               if (count >= maxReleasesPerArtist) {
@@ -90,6 +97,13 @@ export default defineType({
         defineField({ name: 'spotify', type: 'url', title: 'Spotify' }),
         defineField({ name: 'appleMusic', type: 'url', title: 'Apple Music' }),
         defineField({ name: 'youtube', type: 'url', title: 'YouTube' }),
+        defineField({
+          name: 'smartLink',
+          type: 'url',
+          title: 'Feature.fm / Pre-save / Smart link',
+          description:
+            'Optional aggregator link (Feature.fm, Linkfire, ToneDen, etc.) that houses all platform listen/pre-save options.',
+        }),
       ],
     }),
 

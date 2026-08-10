@@ -17,6 +17,7 @@ const platforms: {
   { key: 'spotify', label: 'Spotify', accent: '#1DB954' },
   { key: 'appleMusic', label: 'Apple Music', accent: '#FA2D48' },
   { key: 'youtube', label: 'YouTube', accent: '#FF0000' },
+  { key: 'smartLink', label: 'All platforms', accent: '#4DA8FF' },
   { key: 'instagram', label: 'Instagram', accent: '#E4405F' },
 ];
 
@@ -82,6 +83,23 @@ const cornerClass = (index: number): string => {
             {key === 'youtube' && (
               <svg class="streaming-grid__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+            )}
+            {key === 'smartLink' && (
+              <svg class="streaming-grid__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.75" />
+                <path
+                  d="M8.5 12h7M12 8.5v7"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M9.2 9.2c2.8 1.1 4.7 3 5.6 5.6M14.8 14.8c-2.8-1.1-4.7-3-5.6-5.6"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                />
               </svg>
             )}
             {key === 'instagram' && (
@@ -265,6 +283,13 @@ const cornerClass = (index: number): string => {
     background: rgba(255, 0, 0, 0.18);
     border-color: rgba(255, 0, 0, 0.55);
     color: #ff0000;
+  }
+
+  .streaming-grid__link[data-platform='smartLink']:hover,
+  .streaming-grid__link[data-platform='smartLink']:focus-visible {
+    background: rgba(77, 168, 255, 0.18);
+    border-color: rgba(77, 168, 255, 0.55);
+    color: #4da8ff;
   }
 
   .streaming-grid__link[data-platform='instagram']:hover,

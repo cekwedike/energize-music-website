@@ -7,6 +7,8 @@ export interface ReleaseLinks {
   spotify?: string;
   appleMusic?: string;
   youtube?: string;
+  /** Feature.fm, Linkfire, or similar all-platforms / pre-save URL. */
+  smartLink?: string;
 }
 
 export interface Release {

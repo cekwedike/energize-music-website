@@ -153,3 +153,68 @@
     animation: none;
   }
 }
+
+/* Custom mobile horizontal scroller (hides native scrollbar) */
+.home-h-scroll {
+  position: relative;
+}
+
+.home-h-scroll__stage {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.home-h-scroll__stage::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+@media (max-width: 899px) {
+  .home-h-scroll__stage {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+}
+
+.home-h-scroll__meter {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(100%, 80rem);
+  margin: 0.85rem auto 0;
+  padding-inline: 1.25rem;
+}
+
+@media (max-width: 899px) {
+  .home-h-scroll__meter {
+    display: flex;
+  }
+}
+
+.home-h-scroll__track {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.home-h-scroll__thumb {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 34%;
+  background: linear-gradient(90deg, var(--color-glow), color-mix(in srgb, var(--color-glow) 55%, white));
+  box-shadow: 0 0 12px rgba(77, 168, 255, 0.55);
+  transform: translateX(0);
+  will-change: transform, width;
+}
+
+.home-h-scroll__label {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(250, 250, 248, 0.4);
+}

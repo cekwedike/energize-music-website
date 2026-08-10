@@ -2,7 +2,7 @@ import type { EnrichedRelease, Release } from '@energize/shared';
 import { sanityImageUrl } from '../sanity/client';
 import { fetchLinkMeta, type LinkMeta } from './fetchLinkMeta';
 
-/** Prefer primary sourceUrl, then Spotify → Apple Music → YouTube (for listen CTA). */
+/** Prefer primary sourceUrl, then Spotify → Apple Music → YouTube, then smart link (for listen CTA). */
 export function collectStreamingUrls(release: Release): string[] {
   const urls: string[] = [];
   const push = (value?: string) => {
@@ -15,6 +15,7 @@ export function collectStreamingUrls(release: Release): string[] {
   push(release.links?.spotify);
   push(release.links?.appleMusic);
   push(release.links?.youtube);
+  push(release.links?.smartLink);
   return urls;
 }
 

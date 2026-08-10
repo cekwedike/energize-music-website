@@ -78,13 +78,7 @@ const homeEvents = featuredEvents.filter(isValidEventCard);
 <script>
   import { initHomePage } from '../lib/motion/home/initHome';
 
-  const boot = () => initHomePage();
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot, { once: true });
-  } else {
-    boot();
-  }
-
-  document.addEventListener('astro:page-load', boot);
+  // initHomePage tears down prior ScrollTriggers, so a second call is safe.
+  document.addEventListener('astro:page-load', () => initHomePage());
+  initHomePage();
 </script>

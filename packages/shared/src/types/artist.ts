@@ -7,6 +7,8 @@ export interface StreamingLinks {
   appleMusic?: string;
   youtube?: string;
   instagram?: string;
+  /** Feature.fm / pre-save / smart link. Used on releases; optional elsewhere. */
+  smartLink?: string;
 }
 
 /** Card/list shape from GROQ (bio optional on cards). */

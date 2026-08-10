@@ -34,8 +34,11 @@ const streaming: StreamingLinks = {
   spotify: release.links?.spotify,
   appleMusic: release.links?.appleMusic,
   youtube: release.links?.youtube,
+  smartLink: release.links?.smartLink,
 };
-const hasStreaming = Boolean(streaming.spotify || streaming.appleMusic || streaming.youtube);
+const hasStreaming = Boolean(
+  streaming.spotify || streaming.appleMusic || streaming.youtube || streaming.smartLink,
+);
 const primaryListenUrl = release.externalUrl;
 ---
 
