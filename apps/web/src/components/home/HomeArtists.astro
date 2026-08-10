@@ -13,7 +13,7 @@ const roster = artists
   .slice(0, 8)
   .map((artist) => ({
     ...artist,
-    photoUrl: urlForImage(artist.photo).width(900).height(1200).fit('crop').auto('format').url(),
+    photoUrl: urlForImage(artist.photo).width(480).height(640).fit('crop').auto('format').url(),
   }));
 
 const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)];
@@ -53,7 +53,15 @@ const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)
                 data-home-artist
               >
                 <div class="home-artists__media" data-home-artist-media>
-                  <img src={artist.photoUrl} alt="" loading="lazy" decoding="async" />
+                  <img
+                    src={artist.photoUrl}
+                    alt=""
+                    width="480"
+                    height="640"
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(max-width: 640px) 70vw, 280px"
+                  />
                 </div>
                 <div class="home-artists__meta">
                   <p class="home-artists__name">{artist.name}</p>

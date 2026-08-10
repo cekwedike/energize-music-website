@@ -23,6 +23,8 @@ interface Props {
   hideFooter?: boolean;
   showTopMarquee?: boolean;
   ambientVariant?: AmbientVariant;
+  /** Skip decorative ambient layers (e.g. homepage hero already fills the viewport). */
+  hideAmbient?: boolean;
   headerVariant?: HeaderVariant;
   pageTheme?: 'dark' | 'light';
 }
@@ -41,6 +43,7 @@ const {
   hideFooter = false,
   showTopMarquee = false,
   ambientVariant,
+  hideAmbient = false,
   headerVariant = 'default',
   pageTheme = 'dark',
 } = Astro.props;
@@ -99,9 +102,14 @@ function resolveAmbientVariant(): AmbientVariant {
     />
     <JsonLd data={siteGraph} />
     {breadcrumbGraph && <JsonLd data={breadcrumbGraph} />}
+    <slot name="head" />
   </head>
   <body class:list={['site-body', pageTheme === 'light' && 'site-body--light']}>
-    {pageTheme === 'light' ? null : <AmbientBackground variant={resolveAmbientVariant()} />}
+    {
+      pageTheme === 'light' || hideAmbient ? null : (
+        <AmbientBackground variant={resolveAmbientVariant()} />
+      )
+    }
     <a href="#main-content" class="skip-link">Skip to content</a>
     {!hideHeader && <SiteHeader variant={headerVariant} />}
     {showTopMarquee && <FooterMarquee placement="top" />}

@@ -20,7 +20,20 @@ function formatDate(value: string): string {
   lead && (
     <section class="home-releases" id="now-spinning" data-home-releases aria-labelledby="home-releases-title">
       <div class="home-releases__atmosphere" aria-hidden="true">
-        {lead.coverUrl && <img src={lead.coverUrl} alt="" referrerpolicy="no-referrer" />}
+        {
+          lead.coverUrl && (
+            <img
+              src={lead.coverUrl}
+              alt=""
+              width="640"
+              height="640"
+              loading="lazy"
+              decoding="async"
+              fetchpriority="low"
+              referrerpolicy="no-referrer"
+            />
+          )
+        }
       </div>
 
       <div class="home-releases__inner">
@@ -35,9 +48,13 @@ function formatDate(value: string): string {
               <img
                 src={lead.coverUrl}
                 alt=""
+                width="640"
+                height="640"
                 loading="lazy"
                 decoding="async"
+                fetchpriority="low"
                 referrerpolicy="no-referrer"
+                sizes="(max-width: 768px) 80vw, 420px"
               />
             ) : (
               <div class="home-releases__cover-fallback" aria-hidden="true"></div>
@@ -89,8 +106,11 @@ function formatDate(value: string): string {
                       <img
                         src={release.coverUrl}
                         alt=""
+                        width="96"
+                        height="96"
                         loading="lazy"
                         decoding="async"
+                        fetchpriority="low"
                         referrerpolicy="no-referrer"
                       />
                     ) : null}

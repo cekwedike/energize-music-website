@@ -30,6 +30,9 @@ export const allReleasesQuery = /* groq */ `*[_type == "release"] | order(releas
 
 export const featuredReleasesQuery = /* groq */ `*[_type == "release" && featured == true] | order(releaseDate desc) ${releaseCardFragment}`;
 
+/** Homepage Now Spinning: featured first, then newest, capped. */
+export const homeReleasesQuery = /* groq */ `*[_type == "release"] | order(featured desc, releaseDate desc) [0...4] ${releaseCardFragment}`;
+
 export const releaseBySlugQuery = /* groq */ `*[_type == "release" && slug.current == $slug][0] ${releaseDetailFragment}`;
 
 /** Max 10 releases per artist profile (newest first). */

@@ -1,29 +1,6 @@
-/* Shared homepage utilities: sharp geometry, no pills */
-
-[data-home-page] [data-home-reveal],
-[data-home-page] [data-home-artist],
-[data-home-page] [data-home-initiative],
-[data-home-page] [data-home-release-cover],
-[data-home-page] [data-home-release-copy] > *,
-[data-home-page] [data-home-release-rail],
-[data-home-page] [data-home-word],
-[data-home-page] [data-home-newsletter-form] {
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-home-page] [data-home-reveal],
-  [data-home-page] [data-home-artist],
-  [data-home-page] [data-home-initiative],
-  [data-home-page] [data-home-release-cover],
-  [data-home-page] [data-home-release-copy] > *,
-  [data-home-page] [data-home-release-rail],
-  [data-home-page] [data-home-word],
-  [data-home-page] [data-home-newsletter-form] {
-    opacity: 1 !important;
-  }
-}
-
+/* Shared homepage utilities: sharp geometry, no pills.
+   Avoid content-visibility here: it invents placeholder height and breaks GSAP pin spacers
+   (long blank voids mid horizontal-scroll sections). */
 
 .home-kicker {
   display: inline-flex;

@@ -11,49 +11,33 @@ import { sanityClient } from '../lib/sanity/client';
 import { enrichRelease } from '../lib/metadata/enrichReleases';
 import { isValidEventCard } from '../lib/events/format';
 import {
-  allArtistsQuery,
-  allReleasesQuery,
-  featuredArtistsQuery,
   featuredEventsQuery,
-  featuredReleasesQuery,
+  homeArtistsQuery,
+  homeReleasesQuery,
   type ArtistCard,
   type EventCard,
   type Release,
 } from '@energize/shared';
 import '../styles/home.css';
 
-let featuredArtists: ArtistCard[] = [];
-let rosterFallback: ArtistCard[] = [];
-let featuredReleases: Release[] = [];
-let latestReleases: Release[] = [];
+let artists: ArtistCard[] = [];
+let homeReleases: Release[] = [];
 let featuredEvents: EventCard[] = [];
 
 try {
-  [featuredArtists, rosterFallback, featuredReleases, latestReleases, featuredEvents] =
-    await Promise.all([
-      sanityClient.fetch<ArtistCard[]>(featuredArtistsQuery),
-      sanityClient.fetch<ArtistCard[]>(allArtistsQuery),
-      sanityClient.fetch<Release[]>(featuredReleasesQuery),
-      sanityClient.fetch<Release[]>(allReleasesQuery),
-      sanityClient.fetch<EventCard[]>(featuredEventsQuery),
-    ]);
+  [artists, homeReleases, featuredEvents] = await Promise.all([
+    sanityClient.fetch<ArtistCard[]>(homeArtistsQuery),
+    sanityClient.fetch<Release[]>(homeReleasesQuery),
+    sanityClient.fetch<EventCard[]>(featuredEventsQuery),
+  ]);
 } catch {
-  featuredArtists = [];
-  rosterFallback = [];
-  featuredReleases = [];
-  latestReleases = [];
+  artists = [];
+  homeReleases = [];
   featuredEvents = [];
 }
 
-const artists =
-  featuredArtists.length > 0
-    ? featuredArtists
-    : rosterFallback.filter((artist) => artist.photo?.asset).slice(0, 8);
-
-const releaseSource =
-  featuredReleases.length > 0 ? featuredReleases.slice(0, 4) : latestReleases.slice(0, 4);
 const releases = await Promise.all(
-  releaseSource.map((release) => enrichRelease(release, { coverSize: 900 })),
+  homeReleases.map((release) => enrichRelease(release, { coverSize: 640 })),
 );
 
 const homeEvents = featuredEvents.filter(isValidEventCard);
@@ -71,8 +55,10 @@ const homeEvents = featuredEvents.filter(isValidEventCard);
     'NEXT Afrogospel',
     'Energize Fest',
   ]}
+  hideAmbient
   showTopMarquee
 >
+  <link slot="head" rel="preload" as="image" href="/video/hero-bg-poster.webp" type="image/webp" />
   <div data-home-page>
     <Hero />
     <HomeReleases releases={releases} />
@@ -85,9 +71,33 @@ const homeEvents = featuredEvents.filter(isValidEventCard);
 </BaseLayout>
 
 <script>
-  import { initHomePage } from '../lib/motion/home/initHome';
+  let homeMotionModule: Promise<typeof import('../lib/motion/home/initHome')> | null = null;
+  let homeMotionIdleId: number | null = null;
+  let homeMotionTimer: number | null = null;
 
-  // initHomePage tears down prior ScrollTriggers, so a second call is safe.
-  document.addEventListener('astro:page-load', () => initHomePage());
-  initHomePage();
+  const runHomeMotion = () => {
+    homeMotionModule ??= import('../lib/motion/home/initHome');
+    void homeMotionModule.then(({ initHomePage }) => initHomePage());
+  };
+
+  // Boot soon after first paint so pin distances are measured before the user reaches
+  // the horizontal sections (late idle boot was leaving blank pin-spacers).
+  const scheduleHomeMotion = () => {
+    if (homeMotionIdleId != null && typeof window.cancelIdleCallback === 'function') {
+      window.cancelIdleCallback(homeMotionIdleId);
+      homeMotionIdleId = null;
+    }
+    if (homeMotionTimer != null) {
+      window.clearTimeout(homeMotionTimer);
+      homeMotionTimer = null;
+    }
+    if (typeof window.requestIdleCallback === 'function') {
+      homeMotionIdleId = window.requestIdleCallback(runHomeMotion, { timeout: 600 });
+    } else {
+      homeMotionTimer = window.setTimeout(runHomeMotion, 80);
+    }
+  };
+
+  scheduleHomeMotion();
+  document.addEventListener('astro:page-load', scheduleHomeMotion);
 </script>

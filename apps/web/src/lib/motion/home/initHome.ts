@@ -33,6 +33,47 @@ function revealBasics(root: ParentNode) {
   });
 }
 
+/** Horizontal travel needed to reveal the full track inside the viewport. */
+function trackOverflow(track: HTMLElement): number {
+  return Math.max(track.scrollWidth - window.innerWidth, 0);
+}
+
+/**
+ * Pin a section and scrub its track sideways. End distance matches overflow 1:1
+ * so we do not leave a long blank pin-spacer after the cards finish moving.
+ */
+function pinHorizontalTrack(options: {
+  section: HTMLElement;
+  track: HTMLElement;
+  headerOffset: number;
+  scrub: number;
+}): void {
+  const { section, track, headerOffset, scrub } = options;
+
+  const overflow = () => trackOverflow(track);
+  if (overflow() < 48) return;
+
+  gsap.set(track, { x: 0, force3d: true });
+
+  gsap.to(track, {
+    x: () => -overflow(),
+    ease: 'none',
+    scrollTrigger: {
+      trigger: section,
+      start: `top top+=${headerOffset}`,
+      // 1px vertical scroll ≈ 1px horizontal travel. Extra padding caused the blank void.
+      end: () => `+=${overflow()}`,
+      pin: true,
+      pinSpacing: true,
+      pinType: 'fixed',
+      scrub,
+      invalidateOnRefresh: true,
+      anticipatePin: 0,
+      fastScrollEnd: true,
+    },
+  });
+}
+
 function initArtistRunway(root: ParentNode, reduced: boolean, mobile: boolean) {
   const section = root.querySelector<HTMLElement>('[data-home-artists]');
   const track = section?.querySelector<HTMLElement>('[data-home-artists-track]');
@@ -58,26 +99,7 @@ function initArtistRunway(root: ParentNode, reduced: boolean, mobile: boolean) {
   );
 
   if (reduced || mobile || cards.length < 3) return;
-
-  const overflow = () => track.scrollWidth - window.innerWidth;
-  // Only pin when the roster actually extends past the viewport.
-  if (overflow() < 48) return;
-
-  gsap.set(track, { x: 0 });
-
-  gsap.to(track, {
-    x: () => -Math.max(overflow() + 80, 0),
-    ease: 'none',
-    scrollTrigger: {
-      trigger: section,
-      start: 'top top+=68',
-      end: () => `+=${Math.max(overflow() + 120, window.innerHeight * 0.55)}`,
-      pin: true,
-      scrub: 0.65,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-    },
-  });
+  pinHorizontalTrack({ section, track, headerOffset: 68, scrub: 0.65 });
 }
 
 function initReleaseStage(root: ParentNode, reduced: boolean) {
@@ -136,12 +158,13 @@ function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
   const panels = track?.querySelectorAll<HTMLElement>('[data-home-initiative]');
   if (!section || !track || !panels?.length) return;
 
+  // Keep panels visible by default; only enhance with a light rise (no autoAlpha:0),
+  // so a late/broken trigger cannot leave the strip blank mid-pin.
   gsap.fromTo(
     panels,
-    { autoAlpha: 0, scale: 0.96 },
+    { y: 28 },
     {
-      autoAlpha: 1,
-      scale: 1,
+      y: 0,
       duration: 0.85,
       stagger: 0.12,
       ease: 'power3.out',
@@ -150,25 +173,7 @@ function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
   );
 
   if (reduced || mobile) return;
-
-  const overflow = () => track.scrollWidth - window.innerWidth;
-  if (overflow() < 48) return;
-
-  gsap.set(track, { x: 0 });
-
-  gsap.to(track, {
-    x: () => -Math.max(overflow(), 0),
-    ease: 'none',
-    scrollTrigger: {
-      trigger: section,
-      start: 'top top+=64',
-      end: () => `+=${Math.max(overflow(), window.innerHeight * 0.75)}`,
-      pin: true,
-      scrub: 0.75,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-    },
-  });
+  pinHorizontalTrack({ section, track, headerOffset: 64, scrub: 0.75 });
 }
 
 function initAbout(root: ParentNode, reduced: boolean) {
@@ -253,6 +258,7 @@ function syncHScrollThumb(stage: HTMLElement, thumb: HTMLElement) {
 
 let hScrollMetersAbort: AbortController | null = null;
 let homeMotionCtx: gsap.Context | null = null;
+let refreshAbort: AbortController | null = null;
 
 function disposeHScrollMeters() {
   hScrollMetersAbort?.abort();
@@ -260,6 +266,8 @@ function disposeHScrollMeters() {
 }
 
 function disposeHomeMotion() {
+  refreshAbort?.abort();
+  refreshAbort = null;
   homeMotionCtx?.revert();
   homeMotionCtx = null;
   disposeHScrollMeters();
@@ -283,6 +291,34 @@ function initHScrollMeters(root: ParentNode) {
   });
 }
 
+/** Re-measure pin distances after images/fonts settle so spacers match the track. */
+function schedulePinRefresh(root: HTMLElement) {
+  refreshAbort?.abort();
+  const abort = new AbortController();
+  refreshAbort = abort;
+  const { signal } = abort;
+
+  const refresh = () => {
+    if (signal.aborted) return;
+    ScrollTrigger.refresh();
+  };
+
+  requestAnimationFrame(refresh);
+  window.addEventListener('load', refresh, { once: true, signal });
+
+  root
+    .querySelectorAll<HTMLImageElement>(
+      '[data-home-initiatives] img, [data-home-artists] img',
+    )
+    .forEach((img) => {
+      if (img.complete) return;
+      img.addEventListener('load', refresh, { once: true, signal });
+      img.addEventListener('error', refresh, { once: true, signal });
+    });
+
+  window.setTimeout(refresh, 400);
+}
+
 export function initHomePage(): void {
   const root = document.querySelector<HTMLElement>('[data-home-page]');
   if (!root) {
@@ -290,8 +326,7 @@ export function initHomePage(): void {
     return;
   }
 
-  // Tear down prior pins/tweens so re-entry (page-load, HMR, double boot) cannot
-  // stack ScrollTrigger pin-spacers and blow out page height.
+  // Tear down prior pins/tweens so re-entry cannot stack pin-spacers.
   disposeHomeMotion();
 
   const reduced = prefersReducedMotion();
@@ -300,19 +335,7 @@ export function initHomePage(): void {
   initMarquee(root, reduced);
   initHScrollMeters(root);
 
-  if (reduced) {
-    root
-      .querySelectorAll<HTMLElement>(
-        '[data-home-reveal], [data-home-artist], [data-home-initiative], [data-home-release-cover], [data-home-release-copy] > *, [data-home-release-rail], [data-home-word], [data-home-newsletter-form]',
-      )
-      .forEach((el) => {
-        el.style.opacity = '1';
-        el.style.transform = 'none';
-        el.style.filter = 'none';
-        el.style.visibility = 'visible';
-      });
-    return;
-  }
+  if (reduced) return;
 
   homeMotionCtx = gsap.context(() => {
     revealBasics(root);
@@ -323,5 +346,5 @@ export function initHomePage(): void {
     initNewsletter(root, reduced);
   }, root);
 
-  requestAnimationFrame(() => ScrollTrigger.refresh());
+  schedulePinRefresh(root);
 }
