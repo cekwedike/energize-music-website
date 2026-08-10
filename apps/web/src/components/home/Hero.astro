@@ -209,14 +209,14 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   }
 
   .hero-rail--left {
-    left: 1.25rem;
-    rotate: -90deg;
+    left: max(1.25rem, env(safe-area-inset-left, 0px));
+    transform: translateY(-50%) rotate(-90deg);
     transform-origin: left center;
   }
 
   .hero-rail--right {
-    right: 1.25rem;
-    rotate: 90deg;
+    right: max(1.25rem, env(safe-area-inset-right, 0px));
+    transform: translateY(-50%) rotate(90deg);
     transform-origin: right center;
   }
 
@@ -356,11 +356,12 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
 
   .hero-signal {
     position: absolute;
+    right: 0;
     bottom: 4.75rem;
-    left: 50%;
+    left: 0;
     z-index: 4;
-    translate: -50% 0;
     width: min(14rem, 60vw);
+    margin-inline: auto;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.6s ease;
@@ -396,11 +397,13 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
 
   .hero-scroll {
     position: absolute;
-    bottom: 1.15rem;
-    left: 50%;
+    right: 0;
+    bottom: max(1.15rem, env(safe-area-inset-bottom, 0px));
+    left: 0;
     z-index: 5;
     display: flex;
-    translate: -50% 0;
+    width: fit-content;
+    margin-inline: auto;
     flex-direction: column;
     align-items: center;
     gap: 0.4rem;
@@ -422,6 +425,10 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   #hero-content.is-visible ~ .hero-scroll {
     opacity: 1;
     transform: translate3d(0, 0, 0);
+  }
+
+  .hero-scroll > span:first-child {
+    padding-left: 0.28em;
   }
 
   .hero-scroll:hover {
