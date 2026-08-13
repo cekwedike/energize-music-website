@@ -122,7 +122,7 @@ export default defineType({
       type: 'boolean',
       initialValue: false,
       description:
-        'Shows this release in the homepage Now Spinning section. To spotlight a release on /releases, use Spotlight A Release in the sidebar.',
+        'Shows this release as the homepage Now Spinning pick (newest featured wins). Toggle off and rebuild the site to remove it. To spotlight a release on /releases, use Spotlight A Release in the sidebar.',
     }),
   ],
   preview: {

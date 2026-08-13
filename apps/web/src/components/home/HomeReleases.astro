@@ -6,8 +6,8 @@ interface Props {
 }
 
 const { releases } = Astro.props;
-const [lead, ...rest] = releases.slice(0, 4);
-const side = rest.slice(0, 3);
+// Now Spinning shows only the newest featured release (no filler rail).
+const lead = releases[0];
 
 function formatDate(value: string): string {
   const date = new Date(value);
@@ -80,38 +80,6 @@ function formatDate(value: string): string {
             </div>
           </div>
         </div>
-
-        {side.length > 0 && (
-          <ul class="home-releases__rail">
-            {side.map((release) => (
-              <li data-home-release-rail>
-                <a href={`/releases/${release.slug}`} class="home-releases__rail-item">
-                  <span class="home-releases__rail-art">
-                    {release.coverUrl ? (
-                      <img
-                        src={release.coverUrl}
-                        alt=""
-                        width="96"
-                        height="96"
-                        loading="lazy"
-                        decoding="async"
-                        fetchpriority="low"
-                        referrerpolicy="no-referrer"
-                      />
-                    ) : null}
-                  </span>
-                  <span class="home-releases__rail-meta">
-                    <span class="home-releases__rail-title">{release.displayTitle || release.title}</span>
-                    <span class="home-releases__rail-artists">
-                      {release.artistNames.join(', ') || 'Energize Music'}
-                    </span>
-                  </span>
-                  <span class="home-releases__rail-arrow" aria-hidden="true">→</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
     </section>
   )
@@ -263,77 +231,6 @@ function formatDate(value: string): string {
     flex-wrap: wrap;
     gap: 0.75rem;
     margin-top: 1.85rem;
-  }
-
-  .home-releases__rail {
-    display: grid;
-    gap: 0.65rem;
-    margin: 2.75rem 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  @media (min-width: 800px) {
-    .home-releases__rail {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .home-releases__rail-item {
-    display: grid;
-    grid-template-columns: 4.75rem 1fr auto;
-    gap: 0.9rem;
-    align-items: center;
-    min-height: 5.5rem;
-    padding: 0.65rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(8, 12, 18, 0.65);
-    color: inherit;
-    text-decoration: none;
-    transition:
-      border-color 0.25s ease,
-      background 0.25s ease,
-      transform 0.25s ease;
-  }
-
-  .home-releases__rail-item:hover {
-    border-color: rgba(77, 168, 255, 0.5);
-    background: rgba(77, 168, 255, 0.08);
-    transform: translateY(-2px);
-  }
-
-  .home-releases__rail-art {
-    aspect-ratio: 1;
-    overflow: hidden;
-    background: #151a22;
-  }
-
-  .home-releases__rail-art img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .home-releases__rail-title {
-    display: block;
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    font-weight: 500;
-    line-height: 1.15;
-  }
-
-  .home-releases__rail-artists {
-    display: block;
-    margin-top: 0.3rem;
-    font-size: 0.8rem;
-    color: var(--color-paper);
-  }
-
-  .home-releases__rail-arrow {
-    color: var(--color-glow);
-    font-size: 1.1rem;
-    opacity: 0.7;
   }
 
   @media (prefers-reduced-motion: reduce) {

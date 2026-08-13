@@ -83,7 +83,9 @@ function pinHorizontalTrack(options: {
       end: () => `+=${overflow()}`,
       pin: true,
       pinSpacing: true,
-      pinType: 'fixed',
+      // transform pin survives body overflow-x:clip and ancestor compositing;
+      // fixed pins were leaving a blank void while the track scrubbed.
+      pinType: 'transform',
       scrub,
       invalidateOnRefresh: true,
       anticipatePin: 0,
@@ -124,7 +126,6 @@ function initReleaseStage(root: ParentNode, reduced: boolean) {
   const section = root.querySelector<HTMLElement>('[data-home-releases]');
   const cover = section?.querySelector<HTMLElement>('[data-home-release-cover]');
   const copy = section?.querySelector<HTMLElement>('[data-home-release-copy]');
-  const rails = section?.querySelectorAll<HTMLElement>('[data-home-release-rail]');
   if (!section || !cover) return;
 
   const tl = gsap.timeline({
@@ -143,15 +144,6 @@ function initReleaseStage(root: ParentNode, reduced: boolean) {
       { autoAlpha: 0, y: 32 },
       { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' },
       '-=0.65',
-    );
-  }
-
-  if (rails?.length) {
-    tl.fromTo(
-      rails,
-      { autoAlpha: 0, y: 24 },
-      { autoAlpha: 1, y: 0, duration: 0.65, stagger: 0.08, ease: 'power2.out' },
-      '-=0.4',
     );
   }
 

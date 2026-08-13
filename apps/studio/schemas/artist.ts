@@ -29,7 +29,14 @@ export default defineType({
         'Internal CMS label only. The public website does not display artist tiers or categorization.',
       validation: (r) => r.required(),
     }),
-    defineField({ name: 'featured', title: 'Featured on homepage', type: 'boolean', initialValue: false }),
+    defineField({
+      name: 'featured',
+      title: 'Featured on homepage',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'Shows this artist in the homepage roster strip. Toggle off and rebuild the site to remove them.',
+    }),
     defineField({
       name: 'displayOrder',
       title: 'Display order',
