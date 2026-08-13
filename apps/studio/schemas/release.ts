@@ -71,15 +71,18 @@ export default defineType({
                   : undefined;
               if (!artistId) continue;
 
+              // Deduplicate draft + published pairs so one release counts once.
               const count = await client.fetch<number>(
                 `count(array::unique(*[
                   _type == "release"
                   && $artistId in artists[]._ref
                   && !(_id in $excludeIds)
-                ].select(
-                  _id in path("drafts.**") => string::split(_id, "drafts.")[1],
-                  _id
-                )))`,
+                ]{
+                  "id": select(
+                    _id in path("drafts.**") => string::split(_id, "drafts.")[1],
+                    _id
+                  )
+                }.id))`,
                 { artistId, excludeIds },
               );
 
