@@ -43,6 +43,15 @@ export function buildOrganizationSchema(): JsonLd {
       '@type': 'Place',
       name: 'Lagos, Nigeria',
     },
+    founder: {
+      '@type': 'Person',
+      name: 'Tochukwu "Dr. Foy" Macfoy',
+      jobTitle: 'Founder',
+    },
+    parentOrganization: {
+      '@type': 'Organization',
+      name: 'Same Energy Global',
+    },
     areaServed: 'Worldwide',
     knowsAbout: [...SITE_GENRES, 'Record label', 'Artist development', 'Live events'],
     sameAs: getOrganizationSameAs(),

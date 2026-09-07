@@ -5,7 +5,8 @@ export const nextPageDefaults: NextPageSettings = {
   submitUrl: 'https://tally.so/r/ob7Px1',
   submitLabel: 'Submit Your Music',
   closedLabel: 'Submissions Closed',
-  closedMessage: 'Registration for this season has ended. Follow Energize Music for the next drop.',
+  closedMessage:
+    'Registration for this season has ended. Follow Energize Music for the next open window.',
 };
 
 export function mergeNextPageSettings(

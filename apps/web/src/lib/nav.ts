@@ -32,21 +32,21 @@ export const initiativesNav: InitiativeItem[] = [
     label: 'Energize Kids',
     href: '/energize-kids',
     blurb:
-      'Clean entertainment for kids: music, movement, learning, and joy. Explore activities and events at energize-kids.com.',
+      'Clean kids entertainment with music, Play Zone challenges, and artist Xade. Register a child at energize-kids.com.',
     image: '/initiatives/energize-kids.webp',
   },
   {
     label: 'NEXT',
     href: '/next',
     blurb:
-      'Pan-African Afrogospel talent competition. Submit, get voted in, and launch on the ENERGIZE Afrogospel Album.',
+      'Pan-African Afrogospel competition. Ten finalists earn a spot on the ENERGIZE Afrogospel Album and the launch stage.',
     image: '/initiatives/next.jpg',
   },
   {
     label: 'Energize Fest',
     href: '/events/energize-fest',
     blurb:
-      'An annual live showcase bringing the full Energize Music roster together on one stage. Afro-gospel and soul-fusion, built for the community.',
+      'Annual live showcase for the full Energize Music roster. Next date: 1 December 2026. Venue TBA.',
     image: '/initiatives/energize-fest.webp',
   },
 ];
