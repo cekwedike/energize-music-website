@@ -7,6 +7,12 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: 'development'
+    ignore:
+      # TypeScript 7 (native Go compiler) does not expose the programmatic
+      # Language Service API that `astro check` / @astrojs/language-server need.
+      # Track: https://github.com/withastro/roadmap/discussions/1321
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
