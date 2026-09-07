@@ -40,7 +40,7 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
     <div class="profile-hero__main">
       <img
         src={avatarUrl}
-        alt={artist.photo.alt ?? artist.name}
+        alt={artist.photo.alt ?? `${artist.name} portrait`}
         class="profile-hero__avatar"
         loading="eager"
         decoding="async"
@@ -49,6 +49,9 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
       <div class="profile-hero__meta min-w-0">
         <h1 class="font-display text-[clamp(2rem,1.2rem+4vw,3.75rem)] leading-none tracking-tight text-paper">
           {artist.name}
+          <span class="mt-2 block text-[clamp(1rem,0.85rem+1vw,1.35rem)] font-sans font-medium tracking-normal text-paper/80">
+            {(artist.genres?.[0] ?? 'Afro-Gospel')} Artist
+          </span>
         </h1>
         {artist.tagline && <p class="mt-3 max-w-xl text-base text-paper sm:text-lg">{artist.tagline}</p>}
 

@@ -10,6 +10,7 @@ import { sanityClient, urlForImage } from '../../lib/sanity/client';
 import { enrichReleases } from '../../lib/metadata/enrichReleases';
 import { crumbs, organizationId } from '../../lib/seo/schema';
 import { absoluteUrl } from '../../lib/seo/site';
+import { excerptCompleteSentences } from '../../lib/artists/rosterUtils';
 import {
   artistSlugsQuery,
   artistBySlugQuery,
@@ -48,10 +49,14 @@ const profileBgUrl = urlForImage(artist.photo).width(2400).height(1350).fit('cro
 const pageUrl = absoluteUrl(`/artists/${artist.slug}`);
 const pageId = `${pageUrl}#artist`;
 
-const description =
-  artist.tagline && artist.bio
-    ? `${artist.tagline} ${artist.bio}`.slice(0, 160)
-    : artist.bio.slice(0, 160);
+const genreLabel = artist.genres?.[0] ?? 'Afro-Gospel';
+const pageTitle = `${artist.name} | Afro-Gospel Artist | Energize Music`;
+const description = excerptCompleteSentences(
+  artist.tagline?.trim()
+    ? `${artist.name} is an Energize Music artist (${genreLabel}). ${artist.tagline}. ${artist.bio}`
+    : `${artist.name} is an Energize Music artist known for ${genreLabel}. ${artist.bio}`,
+  155,
+);
 
 const sameAs = Object.values(artist.streaming ?? {}).filter(
   (value): value is string => typeof value === 'string' && value.length > 0,
@@ -73,7 +78,7 @@ const jsonLd = {
 ---
 
 <BaseLayout
-  title={artist.name}
+  title={pageTitle}
   description={description}
   ogImage={photoUrl}
   ogType="profile"
