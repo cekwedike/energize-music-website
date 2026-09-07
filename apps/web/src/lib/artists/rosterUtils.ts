@@ -59,6 +59,32 @@ export function truncateBio(text: string, maxLength = 220): string {
   return `${base.trimEnd()}…`;
 }
 
+/** Prefer ending on a full sentence. Only use ellipsis when no sentence boundary fits. */
+export function excerptCompleteSentences(text: string, maxLength = 220): string {
+  const trimmed = text.trim();
+  if (trimmed.length <= maxLength) return trimmed;
+
+  const window = trimmed.slice(0, maxLength + 1);
+  const sentenceEnds: number[] = [];
+  for (let i = 0; i < window.length; i++) {
+    const ch = window[i];
+    if (
+      (ch === '.' || ch === '!' || ch === '?') &&
+      (i === window.length - 1 || /\s/.test(window[i + 1] ?? ''))
+    ) {
+      sentenceEnds.push(i + 1);
+    }
+  }
+
+  const minKeep = Math.floor(maxLength * 0.45);
+  const viable = sentenceEnds.filter((end) => end >= minKeep && end <= maxLength);
+  if (viable.length > 0) {
+    return trimmed.slice(0, viable[viable.length - 1]!).trimEnd();
+  }
+
+  return truncateBio(trimmed, maxLength);
+}
+
 export function truncateQuote(text: string, maxLength = 72): string {
   const trimmed = text.trim();
   if (trimmed.length <= maxLength) return trimmed;
@@ -69,7 +95,7 @@ export function truncateQuote(text: string, maxLength = 72): string {
 }
 
 export function bioSnippet(artist: ArtistCard): string | undefined {
-  if (artist.bio?.trim()) return truncateBio(artist.bio);
+  if (artist.bio?.trim()) return excerptCompleteSentences(artist.bio);
   if (artist.tagline?.trim()) return artist.tagline.trim();
   return undefined;
 }
