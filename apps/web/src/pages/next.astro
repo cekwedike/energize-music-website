@@ -23,7 +23,7 @@ const submitLabel = settings.submitLabel || 'Submit Your Music';
 const closedLabel = settings.closedLabel || 'Submissions Closed';
 const closedMessage =
   settings.closedMessage ||
-  'Registration for this season has ended. Follow Energize Music for the next drop.';
+  'Registration for this season has ended. Follow Energize Music for the next open window.';
 
 const heroImages = [
   '/next/takit.webp',
@@ -78,10 +78,10 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
 ---
 
 <BaseLayout
-  title="NEXT: New Era Xceptional Talent"
-  description="Africa's boldest Afrogospel talent competition and music incubator by Energize Music."
+  title="NEXT: Afrogospel Talent Competition | Energize Music"
+  description="NEXT is Energize Music's pan-African Afrogospel competition. Ten finalists win a spot on an album and a stage at the launch concert."
   ogImage="/next/takit.webp"
-  keywords={['NEXT', 'New Era Xceptional Talent', 'Afrogospel', 'talent competition', 'Energize Music']}
+  keywords={['Afrogospel talent competition', 'Christian music competition Africa', 'NEXT Energize Music']}
   breadcrumbs={crumbs({ name: 'NEXT', path: '/next' })}
   headerVariant="overlay"
 >
@@ -113,7 +113,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
       </h1>
 
       <p class="next-reveal next-hero__lead" style="--reveal-delay: 260ms">
-        Africa's boldest Afrogospel talent competition. Rise from community votes onto the ENERGIZE Afrogospel Album.
+        Ten finalists earn a place on the ENERGIZE Afrogospel Album and a set at the pan-African launch concert. Season path runs from submissions in May through the October launch.
       </p>
 
       {
