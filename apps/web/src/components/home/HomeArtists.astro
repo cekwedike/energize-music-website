@@ -26,7 +26,7 @@ const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)
         <div data-home-reveal>
           <p class="home-kicker">The roster</p>
           <h2 id="home-artists-title" class="home-title">
-            Faces of the<br />Energy
+            Greatman Takit,<br />TY Bello, Ellie Scotte
           </h2>
         </div>
         <a href="/artists" class="home-link" data-home-reveal data-home-reveal-delay="80">
@@ -55,7 +55,7 @@ const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)
                 <div class="home-artists__media" data-home-artist-media>
                   <img
                     src={artist.photoUrl}
-                    alt=""
+                    alt={`${artist.name}, Energize Music artist`}
                     width="360"
                     height="480"
                     loading="lazy"
