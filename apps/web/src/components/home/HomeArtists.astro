@@ -9,14 +9,17 @@ interface Props {
 const { artists } = Astro.props;
 
 const roster = artists
-  .filter((artist) => artist.photo?.asset)
+  .filter((artist: ArtistCard) => artist.photo?.asset)
   .slice(0, 8)
-  .map((artist) => ({
+  .map((artist: ArtistCard) => ({
     ...artist,
     photoUrl: urlForImage(artist.photo).width(360).height(480).fit('crop').auto('format').url(),
   }));
 
-const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)];
+const marqueeNames = [
+  ...roster.map((a: (typeof roster)[number]) => a.name),
+  ...roster.map((a: (typeof roster)[number]) => a.name),
+];
 ---
 
 {
@@ -46,7 +49,7 @@ const marqueeNames = [...roster.map((a) => a.name), ...roster.map((a) => a.name)
       <div class="home-h-scroll home-artists__scroll">
         <div class="home-artists__stage home-h-scroll__stage" data-home-h-scroll>
           <div class="home-artists__track" data-home-artists-track>
-            {roster.map((artist) => (
+            {roster.map((artist: (typeof roster)[number]) => (
               <a
                 href={`/artists/${artist.slug}`}
                 class="home-artists__card"
