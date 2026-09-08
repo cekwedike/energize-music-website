@@ -24,7 +24,7 @@ const configuredSpotlights = releasesPage?.releaseSpotlights?.filter(Boolean) ??
 const spotlightReleases =
   configuredSpotlights.length > 0
     ? await Promise.all(
-        configuredSpotlights.map((release) => enrichRelease(release, { coverSize: 800 })),
+        configuredSpotlights.map((release: Release) => enrichRelease(release, { coverSize: 800 })),
       )
     : [];
 
@@ -34,7 +34,7 @@ const itemList =
         '@context': 'https://schema.org',
         '@type': 'ItemList',
         name: 'Energize Music Releases',
-        itemListElement: releases.slice(0, 50).map((release, index) => ({
+        itemListElement: releases.slice(0, 50).map((release: (typeof releases)[number], index: number) => ({
           '@type': 'ListItem',
           position: index + 1,
           url: absoluteUrl(`/releases/${release.slug}`),

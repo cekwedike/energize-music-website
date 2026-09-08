@@ -15,7 +15,7 @@ const itemList =
         '@context': 'https://schema.org',
         '@type': 'ItemList',
         name: 'Energize Music Artists',
-        itemListElement: artists.slice(0, 50).map((artist, index) => ({
+        itemListElement: artists.slice(0, 50).map((artist: ArtistCardType, index: number) => ({
           '@type': 'ListItem',
           position: index + 1,
           url: absoluteUrl(`/artists/${artist.slug}`),
