@@ -3,13 +3,14 @@
 /// <reference path="../.astro/types.d.ts" />
 
 /**
- * Bridge Astro's JSX types into the global JSX namespace.
- * IntrinsicElements must be an interface (not a type alias) or the editor
- * reports TS7026 on every HTML tag in .astro files.
+ * The workspace TypeScript server typechecks .astro files as JSX.
+ * Provide IntrinsicElements so every HTML tag is typed (avoids TS7026).
+ * Astro's own language tools still use astroHTML.JSX for richer checking.
  */
 declare namespace JSX {
-  type Element = astroHTML.JSX.Element;
-  interface IntrinsicElements extends astroHTML.JSX.IntrinsicElements {}
+  interface IntrinsicElements {
+    [elemName: string]: any;
+  }
 }
 
 /** HTML `fetchpriority` is valid; older DOM/Astro attribute typings omit it. */

@@ -14,11 +14,12 @@
     "skipLibCheck": true,
     "allowJs": true,
     "jsx": "preserve",
-    "jsxImportSource": "astro",
     "strict": true,
     "paths": {
       "@energize/shared": ["../../packages/shared/src/index.ts"],
-      "@energize/shared/*": ["../../packages/shared/src/*"]
+      "@energize/shared/*": ["../../packages/shared/src/*"],
+      "astro": ["./node_modules/astro"],
+      "astro/*": ["./node_modules/astro/*"]
     }
   },
   "include": [".astro/types.d.ts", "src/**/*", "tests/**/*"],
