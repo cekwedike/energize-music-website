@@ -11,6 +11,17 @@ declare namespace JSX {
   type IntrinsicElements = astroHTML.JSX.IntrinsicElements;
 }
 
+/** HTML `fetchpriority` is valid; older DOM/Astro attribute typings omit it. */
+declare namespace astroHTML.JSX {
+  interface ImgHTMLAttributes {
+    fetchpriority?: 'high' | 'low' | 'auto';
+  }
+
+  interface LinkHTMLAttributes {
+    fetchpriority?: 'high' | 'low' | 'auto';
+  }
+}
+
 declare module '*.css' {}
 
 interface ImportMetaEnv {
