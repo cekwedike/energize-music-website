@@ -76,21 +76,6 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     <p class="hero-text-el hero-text-el-sub font-inter mt-4 max-w-xl text-sm text-white sm:mt-5 md:mt-7 md:text-base">
       Energize Music is a Lagos record label for Afro-gospel and soul-fusion listeners who want faith-filled music with real craft.
     </p>
-
-    <div class="hero-text-el hero-text-el-actions mt-7 flex flex-col items-stretch gap-3 sm:mt-9 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
-      <a
-        href="/artists"
-        class="hero-cta hero-cta--primary inline-flex min-h-12 items-center justify-center px-6 text-sm font-semibold text-[#041018] transition"
-      >
-        Meet The Roster
-      </a>
-      <a
-        href="/releases"
-        class="hero-cta hero-cta--ghost inline-flex min-h-12 items-center justify-center border border-white/40 px-6 text-sm font-semibold text-white transition"
-      >
-        Listen Now
-      </a>
-    </div>
   </div>
 
   <div class="hero-signal" aria-hidden="true">
@@ -326,32 +311,9 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     transition-delay: 0.3s;
   }
 
-  .hero-text-el-actions {
-    transition-delay: 0.4s;
-  }
-
   #hero-content.is-visible .hero-text-el {
     opacity: 1;
     transform: translate3d(0, 0, 0);
-  }
-
-  .hero-cta--primary {
-    background: var(--color-glow);
-    box-shadow: 0 12px 36px rgba(77, 168, 255, 0.35);
-  }
-
-  .hero-cta--primary:hover {
-    background: color-mix(in srgb, var(--color-glow) 88%, white);
-    transform: translateY(-1px);
-  }
-
-  .hero-cta--ghost {
-    background: rgba(0, 0, 0, 0.35);
-  }
-
-  .hero-cta--ghost:hover {
-    border-color: rgba(255, 255, 255, 0.75);
-    background: rgba(255, 255, 255, 0.08);
   }
 
   .hero-signal {

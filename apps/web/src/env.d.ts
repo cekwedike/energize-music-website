@@ -3,24 +3,43 @@
 /// <reference path="../.astro/types.d.ts" />
 
 /**
- * The workspace TypeScript server typechecks .astro files as JSX.
- * Provide IntrinsicElements so every HTML tag is typed (avoids TS7026).
- * Astro's own language tools still use astroHTML.JSX for richer checking.
+ * Satisfy editor TS2875 when jsxImportSource is "astro" but package
+ * export resolution is incomplete under the workspace TypeScript server.
  */
-declare namespace JSX {
+declare module 'astro/jsx-runtime' {
+  export namespace JSX {
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+    type Element = any;
+  }
+  export function Fragment(props: any, ...children: any[]): any;
+  export function jsx(type: any, props: any, key?: any): any;
+  export function jsxs(type: any, props: any, key?: any): any;
+  export function jsxDEV(type: any, props: any, key?: any): any;
+}
+
+declare module 'astro/jsx-dev-runtime' {
+  export * from 'astro/jsx-runtime';
+}
+
+declare namespace astroHTML.JSX {
   interface IntrinsicElements {
     [elemName: string]: any;
   }
-}
 
-/** HTML `fetchpriority` is valid; older DOM/Astro attribute typings omit it. */
-declare namespace astroHTML.JSX {
   interface ImgHTMLAttributes {
     fetchpriority?: 'high' | 'low' | 'auto';
   }
 
   interface LinkHTMLAttributes {
     fetchpriority?: 'high' | 'low' | 'auto';
+  }
+}
+
+declare namespace JSX {
+  interface IntrinsicElements {
+    [elemName: string]: any;
   }
 }
 
