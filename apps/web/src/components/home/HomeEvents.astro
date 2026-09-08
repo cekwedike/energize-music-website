@@ -66,7 +66,7 @@ const rest = spotlight.slice(1);
 
           {rest.length > 0 && (
             <ul class="home-events__rail">
-              {rest.map((event, index) => {
+              {rest.map((event: EventCard, index: number) => {
                 const cover = getEventCardCover(event, 640, 640);
                 return (
                   <li data-home-reveal data-home-reveal-delay={String(120 + index * 60)}>

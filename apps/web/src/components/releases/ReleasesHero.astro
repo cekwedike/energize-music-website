@@ -9,7 +9,7 @@ interface Props {
 const { releases } = Astro.props;
 
 const collageReleases = releases
-  .filter((release) => release.coverUrl)
+  .filter((release: EnrichedRelease) => release.coverUrl)
   .slice(0, 10);
 ---
 
@@ -24,7 +24,7 @@ const collageReleases = releases
     collageReleases.length > 0 && (
       <div class="releases-hero__collage" aria-hidden="true">
         {
-          collageReleases.map((release, index) => (
+          collageReleases.map((release: EnrichedRelease, index: number) => (
             <div
               class="releases-hero__collage-item"
               style={`--collage-index: ${index}; --collage-rotate: ${(index % 5) - 2}deg;`}

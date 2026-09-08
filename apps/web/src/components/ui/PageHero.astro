@@ -87,7 +87,7 @@ const isCenter = align === 'center';
             ]}
           >
             {
-              ctas.map((cta) => (
+              ctas.map((cta: PageHeroCta) => (
                 <a
                   href={cta.href}
                   target={cta.external ? '_blank' : undefined}
