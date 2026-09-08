@@ -9,9 +9,13 @@ interface Props {
 
 const { openings } = Astro.props;
 
-const categories = [...new Set(openings.map((role) => role.type).filter(Boolean))].sort((a, b) =>
-  a.localeCompare(b),
-);
+const categories = [
+  ...new Set(
+    openings
+      .map((role: CareerOpening) => role.type)
+      .filter((type): type is string => Boolean(type)),
+  ),
+].sort((a: string, b: string) => a.localeCompare(b));
 ---
 
 <section id="open-roles" class="careers-roles scroll-mt-24" aria-labelledby="careers-roles-title">
@@ -79,7 +83,7 @@ const categories = [...new Set(openings.map((role) => role.type).filter(Boolean)
 
           <div class="careers-roles__list">
             {
-              openings.map((role) => (
+              openings.map((role: CareerOpening) => (
                 <CareersRoleRow role={role} />
               ))
             }
