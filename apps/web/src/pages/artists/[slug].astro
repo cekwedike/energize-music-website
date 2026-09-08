@@ -27,8 +27,8 @@ export const dynamicParams = true;
 export async function getStaticPaths() {
   const slugs = await sanityClient.fetch<{ slug: string }[]>(artistSlugsQuery);
   return slugs
-    .filter((entry) => Boolean(entry.slug))
-    .map((entry) => ({ params: { slug: entry.slug } }));
+    .filter((entry: { slug: string }) => Boolean(entry.slug))
+    .map((entry: { slug: string }) => ({ params: { slug: entry.slug } }));
 }
 
 const { slug } = Astro.params;
