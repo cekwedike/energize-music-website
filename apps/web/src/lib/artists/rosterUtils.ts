@@ -8,31 +8,14 @@ export interface RosterAccent {
   duotone: string;
 }
 
-/** Brand-token accent rotation: glow blue, neutral mono, glow-cyan. */
+/** One accent for every card: brand red, white text over a flat dark photo tint. */
 export const ROSTER_ACCENTS: RosterAccent[] = [
   {
-    color: 'var(--color-glow)',
-    glow: 'rgba(77, 168, 255, 0.22)',
-    muted: 'rgba(77, 168, 255, 0.55)',
-    panelInk: '#fafaf8',
-    duotone:
-      'linear-gradient(160deg, rgba(11, 11, 13, 0.35) 0%, rgba(77, 168, 255, 0.38) 38%, rgba(11, 11, 13, 0.88) 100%)',
-  },
-  {
-    color: '#a3a3a3',
-    glow: 'rgba(163, 163, 163, 0.18)',
-    muted: 'rgba(163, 163, 163, 0.55)',
-    panelInk: '#fafaf8',
-    duotone:
-      'linear-gradient(160deg, rgba(11, 11, 13, 0.35) 0%, rgba(163, 163, 163, 0.32) 38%, rgba(11, 11, 13, 0.9) 100%)',
-  },
-  {
-    color: 'var(--color-glow-cyan)',
-    glow: 'rgba(103, 232, 249, 0.2)',
-    muted: 'rgba(103, 232, 249, 0.55)',
-    panelInk: '#fafaf8',
-    duotone:
-      'linear-gradient(160deg, rgba(11, 11, 13, 0.35) 0%, rgba(103, 232, 249, 0.34) 38%, rgba(11, 11, 13, 0.88) 100%)',
+    color: 'var(--color-accent)',
+    glow: 'transparent',
+    muted: 'var(--color-faint)',
+    panelInk: '#ffffff',
+    duotone: 'rgba(10, 10, 10, 0.3)',
   },
 ];
 

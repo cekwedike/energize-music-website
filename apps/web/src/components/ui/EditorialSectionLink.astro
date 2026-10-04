@@ -37,17 +37,15 @@ const isBack = variant === 'back';
     min-height: 2.5rem;
     padding: 0.45rem 1rem;
     border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    border: 1px solid var(--color-line);
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%),
-      rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(10px);
+      var(--color-surface);
     font-size: 0.625rem;
     font-weight: 700;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     text-decoration: none;
-    color: var(--color-paper);
+    color: var(--color-ink);
     transition:
       border-color 0.2s ease,
       color 0.2s ease,
@@ -58,12 +56,10 @@ const isBack = variant === 'back';
 
   .editorial-link:hover,
   .editorial-link:focus-visible {
-    border-color: rgba(77, 168, 255, 0.45);
-    color: var(--color-glow);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
     background:
-      linear-gradient(135deg, rgba(77, 168, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%),
-      rgba(77, 168, 255, 0.04);
-    box-shadow: 0 0 28px rgba(77, 168, 255, 0.1);
+      var(--color-surface);
     transform: translateY(-1px);
   }
 

@@ -3,7 +3,8 @@ import '../../styles/site-header.css';
 import { hqLink, primaryNav } from '../../lib/nav';
 import Logo from './Logo.astro';
 
-export type HeaderVariant = 'default' | 'ambient' | 'overlay' | 'light';
+// Overlay sits transparent over a dark photo until the page scrolls.
+export type HeaderVariant = 'default' | 'overlay';
 
 interface Props {
   variant?: HeaderVariant;
@@ -23,9 +24,7 @@ function isActive(href: string) {
   id="site-header"
   class:list={[
     'site-header sticky top-0 z-40',
-    variant === 'ambient' && 'site-header--ambient',
     variant === 'overlay' && 'site-header--overlay',
-    variant === 'light' && 'site-header--light',
   ]}
 >
   <div class="site-header__bar mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3.5 sm:gap-6 sm:px-6 sm:py-4 lg:py-[1.125rem]">

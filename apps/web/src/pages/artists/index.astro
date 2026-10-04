@@ -30,15 +30,14 @@ const itemList =
   description="Meet the Energize Music roster. Afro-gospel and soul-fusion artists from Lagos making family-friendly music for a global audience."
   keywords={['Afro-gospel artists', 'Greatman Takit', 'TY Bello', 'Ellie Scotte', 'Energize Music']}
   breadcrumbs={crumbs({ name: 'Artists', path: '/artists' })}
-  ambientVariant="editorial"
 >
   {itemList && <JsonLd data={itemList} />}
   {
     artists.length === 0 ? (
       <section class="mx-auto max-w-6xl px-5 py-20 sm:px-6">
-        <p class="text-center text-paper">
+        <p class="text-center text-ink">
           Artists will appear here once you add them in Sanity Studio. Each published artist automatically gets a page
-          at <code class="text-[var(--color-glow)]">/artists/their-slug</code> on the next site build.
+          at <code class="text-accent">/artists/their-slug</code> on the next site build.
         </p>
       </section>
     ) : (

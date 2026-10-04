@@ -25,7 +25,6 @@ const updated = new Date().toLocaleDateString('en-US', {
   title={title}
   description={description}
   breadcrumbs={breadcrumbs}
-  ambientVariant="editorial"
 >
   <PageHero size="slim" eyebrow={eyebrow} title={title} description={description} />
 
@@ -80,7 +79,7 @@ const updated = new Date().toLocaleDateString('en-US', {
     .legal-page__rail {
       display: block;
       padding-top: 0.35rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 1px solid var(--color-line);
     }
   }
 
@@ -98,7 +97,7 @@ const updated = new Date().toLocaleDateString('en-US', {
     font-family: var(--font-display, Georgia, serif);
     font-size: 1.35rem;
     line-height: 1.15;
-    color: var(--color-glow);
+    color: var(--color-accent);
   }
 
   .legal-page__article {
@@ -120,7 +119,7 @@ const updated = new Date().toLocaleDateString('en-US', {
     font-size: clamp(1.5rem, 1.25rem + 0.8vw, 2rem);
     line-height: 1.15;
     letter-spacing: -0.02em;
-    color: var(--color-paper, #f5f2ea);
+    color: var(--color-ink);
   }
 
   .legal-page__prose :global(h2:first-child) {
@@ -133,7 +132,7 @@ const updated = new Date().toLocaleDateString('en-US', {
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-glow);
+    color: var(--color-accent);
   }
 
   .legal-page__prose :global(p) {
@@ -162,13 +161,13 @@ const updated = new Date().toLocaleDateString('en-US', {
   .legal-page__prose :global(blockquote) {
     margin: 1.5rem 0 0;
     padding: 0.85rem 0 0.85rem 1.1rem;
-    border-left: 2px solid var(--color-glow);
+    border-left: 2px solid var(--color-accent);
     color: rgba(245, 242, 234, 0.7);
     font-style: italic;
   }
 
   .legal-page__prose :global(a) {
-    color: var(--color-paper, #f5f2ea);
+    color: var(--color-ink);
     text-decoration: underline;
     text-decoration-color: var(--color-accent);
     text-underline-offset: 0.18em;
@@ -181,14 +180,14 @@ const updated = new Date().toLocaleDateString('en-US', {
   .legal-page__footer {
     margin-top: 3rem;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--color-line);
     font-size: 0.95rem;
     line-height: 1.6;
     color: rgba(245, 242, 234, 0.55);
   }
 
   .legal-page__footer a {
-    color: var(--color-paper, #f5f2ea);
+    color: var(--color-ink);
     text-decoration: underline;
     text-decoration-color: var(--color-accent);
     text-underline-offset: 0.18em;

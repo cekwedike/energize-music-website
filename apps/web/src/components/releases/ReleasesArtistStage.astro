@@ -29,7 +29,7 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
   data-index={index}
   data-filtered="visible"
   data-tint={tintVariant}
-  style="--stage-accent: var(--color-glow);"
+  style="--stage-accent: var(--color-accent);"
   aria-labelledby={`releases-artist-${group.slug}`}
 >
   <div class="artist-stage__backdrop" aria-hidden="true"></div>
@@ -87,27 +87,16 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
 
 <style>
   .artist-stage {
-    --stage-tint: rgba(77, 168, 255, 0.05);
     position: relative;
     scroll-margin-top: 5rem;
     padding: clamp(1.75rem, 4vw, 2.75rem) 0;
-  }
-
-  .artist-stage[data-tint='navy'] {
-    --stage-tint: rgba(37, 99, 235, 0.045);
-  }
-
-  .artist-stage[data-tint='blue'] {
-    --stage-tint: rgba(77, 168, 255, 0.055);
   }
 
   .artist-stage__backdrop {
     position: absolute;
     z-index: 0;
     inset: 0;
-    background:
-      linear-gradient(180deg, var(--stage-tint) 0%, transparent 100%),
-      linear-gradient(90deg, rgba(11, 11, 13, 0.92) 0%, rgba(11, 11, 13, 0.78) 100%);
+    background: var(--color-surface);
     pointer-events: none;
   }
 
@@ -140,7 +129,6 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
     border-radius: 1rem;
     min-height: clamp(200px, 42vw, 300px);
     max-height: 320px;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
   }
 
   @media (min-width: 1024px) {
@@ -162,15 +150,13 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
   .artist-stage__portrait--placeholder {
     display: block;
     min-height: inherit;
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--color-surface);
   }
 
   .artist-stage__portrait-wash {
     position: absolute;
     inset: 0;
-    background:
-      linear-gradient(180deg, transparent 45%, rgba(11, 11, 13, 0.55) 100%),
-      linear-gradient(135deg, rgba(77, 168, 255, 0.12) 0%, transparent 55%);
+    background: none;
     pointer-events: none;
   }
 
@@ -195,7 +181,7 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
     font-weight: 600;
     line-height: 0.95;
     letter-spacing: -0.02em;
-    color: var(--color-paper);
+    color: var(--color-ink);
   }
 
   .artist-stage__name-link {
@@ -214,7 +200,7 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
     max-width: 28rem;
     font-size: clamp(1rem, 0.95rem + 0.35vw, 1.25rem);
     line-height: 1.55;
-    color: var(--color-paper);
+    color: var(--color-ink);
   }
 
   .artist-stage__count {
@@ -224,7 +210,7 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-paper);
+    color: var(--color-ink);
   }
 
   .artist-stage__catalog {

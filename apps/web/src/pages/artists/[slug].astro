@@ -45,7 +45,6 @@ if (!artist) {
 const enrichedDiscography = await enrichReleases(discography);
 
 const photoUrl = urlForImage(artist.photo).width(1200).height(630).fit('crop').auto('format').url();
-const profileBgUrl = urlForImage(artist.photo).width(2400).height(1350).fit('crop').auto('format').url();
 const pageUrl = absoluteUrl(`/artists/${artist.slug}`);
 const pageId = `${pageUrl}#artist`;
 
@@ -84,23 +83,12 @@ const jsonLd = {
   ogType="profile"
   keywords={[artist.name, 'Energize Music', 'Afro-gospel', ...(artist.genres ?? [])]}
   breadcrumbs={crumbs({ name: 'Artists', path: '/artists' }, { name: artist.name, path: `/artists/${artist.slug}` })}
-  ambientVariant="pulse"
   headerVariant="overlay"
 >
   <JsonLd data={jsonLd} />
   <div class="artist-profile-page">
     <ArtistProfileHero artist={artist} />
-    <div class="artist-profile-body__backdrop" aria-hidden="true">
-      <img
-        src={profileBgUrl}
-        alt=""
-        class="artist-profile-body__backdrop-image"
-        loading="lazy"
-        decoding="async"
-      />
-    </div>
     <div class="artist-profile-body">
-      <div class="artist-profile-body__scrim" aria-hidden="true"></div>
       <ArtistBio bio={artist.bio} name={artist.name} />
       {artist.quote && <ArtistQuote quote={artist.quote} name={artist.name} />}
       <ArtistDiscography releases={enrichedDiscography} artistName={artist.name} />
@@ -110,81 +98,10 @@ const jsonLd = {
 </BaseLayout>
 
 <style>
-  .artist-profile-page {
-    position: relative;
-  }
-
   .artist-profile-page :global(.profile-hero) {
     position: relative;
     z-index: 2;
-    background: var(--color-ink);
-  }
-
-  .artist-profile-body__backdrop {
-    position: fixed;
-    z-index: 0;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .artist-profile-body__backdrop-image {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 22%;
-    opacity: 0.22;
-  }
-
-  .artist-profile-body {
-    position: relative;
-    z-index: 1;
-    isolation: isolate;
-  }
-
-  .artist-profile-body__scrim {
-    position: absolute;
-    z-index: 0;
-    inset: 0;
-    width: 100%;
-    max-width: none;
-    pointer-events: none;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(11, 11, 13, 0.52) 0%,
-        rgba(11, 11, 13, 0.68) 18%,
-        rgba(11, 11, 13, 0.84) 52%,
-        var(--color-ink) 100%
-      ),
-      radial-gradient(ellipse 130% 90% at 50% 0%, rgba(11, 11, 13, 0.55), transparent 62%);
-  }
-
-  .artist-profile-body > :global(*:not(.artist-profile-body__scrim)) {
-    position: relative;
-    z-index: 1;
-  }
-
-  @media (min-width: 1280px) {
-    .artist-profile-body__backdrop-image {
-      object-position: center 20%;
-    }
-  }
-
-  @media (min-width: 1920px) {
-    .artist-profile-body__backdrop-image {
-      object-position: center 18%;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .artist-profile-body__backdrop {
-      position: absolute;
-      inset: 0;
-      width: auto;
-      height: auto;
-    }
+    background: var(--color-bg);
   }
 </style>
 

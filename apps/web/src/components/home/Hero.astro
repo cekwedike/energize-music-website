@@ -39,7 +39,6 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   </video>
 
   <div class="hero-veil" aria-hidden="true"></div>
-  <div class="hero-glow" aria-hidden="true"></div>
 
   <p class="hero-watermark" aria-hidden="true">ENERGY</p>
 
@@ -66,14 +65,14 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   </div>
 
   <div id="hero-content" class="hero-content">
-    <Logo />
-    <p class="hero-text-el font-inter mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-white sm:mt-6 sm:text-xs">
+    <Logo tone="light" />
+    <p class="hero-text-el font-body mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-white sm:mt-6 sm:text-xs">
       The Energy Different
     </p>
-    <h1 class="hero-text-el hero-text-el-heading font-instrument mt-5 max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-white sm:mt-8 sm:max-w-2xl md:mt-9 md:max-w-4xl">
+    <h1 class="hero-text-el hero-text-el-heading font-display mt-5 max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-white sm:mt-8 sm:max-w-2xl md:mt-9 md:max-w-4xl">
       The Afro-Gospel Label Behind Africa's Biggest Christian Voices
     </h1>
-    <p class="hero-text-el hero-text-el-sub font-inter mt-4 max-w-xl text-sm text-white sm:mt-5 md:mt-7 md:text-base">
+    <p class="hero-text-el hero-text-el-sub font-body mt-4 max-w-xl text-sm text-white sm:mt-5 md:mt-7 md:text-base">
       Energize Music is a Lagos record label for Afro-gospel and soul-fusion listeners who want faith-filled music with real craft.
     </p>
   </div>
@@ -107,7 +106,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     width: 100%;
     overflow: hidden;
     isolation: isolate;
-    background: #04080c;
+    background: #0a0a0a;
   }
 
   .hero-video {
@@ -122,7 +121,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     will-change: opacity;
     opacity: 0;
     transition: opacity 0.55s ease;
-    background-color: #04080c;
+    background-color: #0a0a0a;
     background-image: var(--hero-poster);
     background-size: cover;
     background-position: center bottom;
@@ -136,24 +135,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     position: absolute;
     inset: 0;
     z-index: 1;
-    background:
-      radial-gradient(ellipse 70% 55% at 50% 28%, rgba(77, 168, 255, 0.14), transparent 60%),
-      linear-gradient(180deg, rgba(4, 8, 12, 0.35) 0%, rgba(4, 8, 12, 0.12) 42%, rgba(4, 8, 12, 0.55) 100%);
-    pointer-events: none;
-  }
-
-  /* Soft glow without filter:blur (blur over video is a major jank source). */
-  .hero-glow {
-    position: absolute;
-    top: 14%;
-    left: 50%;
-    z-index: 1;
-    width: min(72vw, 30rem);
-    height: min(72vw, 30rem);
-    translate: -50% 0;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(77, 168, 255, 0.22) 0%, rgba(77, 168, 255, 0.06) 42%, transparent 70%);
-    opacity: 0.7;
+    background: rgba(10, 10, 10, 0.45);
     pointer-events: none;
   }
 
@@ -208,8 +190,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   .hero-rail__dot {
     width: 0.28rem;
     height: 0.28rem;
-    background: var(--color-glow);
-    box-shadow: 0 0 10px rgba(77, 168, 255, 0.8);
+    background: var(--color-accent);
   }
 
   @media (min-width: 1100px) {
@@ -235,7 +216,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     position: absolute;
     width: 1.75rem;
     height: 1.75rem;
-    border-color: rgba(77, 168, 255, 0.55);
+    border-color: var(--color-accent);
     border-style: solid;
     opacity: 0;
     transition: opacity 0.6s ease;
@@ -304,7 +285,6 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
 
   .hero-text-el-heading {
     transition-delay: 0.2s;
-    text-shadow: 0 0 40px rgba(255, 255, 255, 0.28);
   }
 
   .hero-text-el-sub {
@@ -345,7 +325,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   .hero-signal__bar {
     width: 0.18rem;
     height: 100%;
-    background: linear-gradient(180deg, var(--color-glow), rgba(255, 255, 255, 0.35));
+    background: var(--color-accent);
     transform: scaleY(0.25) translateZ(0);
     transform-origin: bottom center;
     opacity: 0.55;
@@ -401,7 +381,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     display: block;
     width: 1px;
     height: 1.6rem;
-    background: linear-gradient(180deg, var(--color-glow), transparent);
+    background: var(--color-accent);
     transform: scaleY(0.55) translateZ(0);
     transform-origin: top center;
   }

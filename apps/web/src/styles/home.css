@@ -8,7 +8,7 @@
 }
 
 /* Opacity only: a transform on .home-below breaks GSAP position:fixed pins
-   and produces blank voids in the initiatives horizontal scroll. */
+   and produces blank voids in pinned horizontal scroll sections. */
 @keyframes home-below-in {
   from {
     opacity: 0;
@@ -26,7 +26,8 @@
   font-weight: 800;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--color-glow);
+  font-family: var(--font-mono);
+  color: var(--color-accent);
 }
 
 .home-kicker::before {
@@ -40,8 +41,9 @@
   margin-top: 0.85rem;
   font-family: var(--font-display);
   font-size: clamp(2.35rem, 1.5rem + 3.2vw, 4.5rem);
-  font-weight: 500;
-  letter-spacing: -0.035em;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--color-accent);
   line-height: 0.98;
 }
 
@@ -53,14 +55,14 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--color-ink);
   text-decoration: none;
 }
 
 .home-link__line {
   width: 2rem;
   height: 1px;
-  background: var(--color-glow);
+  background: var(--color-accent);
   transition: width 0.3s ease;
 }
 
@@ -82,37 +84,33 @@
   transition:
     transform 0.2s ease,
     background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color 0.2s ease;
 }
 
 .home-btn--solid {
-  background: var(--color-glow);
-  color: #041018;
-  box-shadow: 0 14px 40px rgba(77, 168, 255, 0.32);
+  background: var(--color-accent);
+  color: #ffffff;
 }
 
 .home-btn--solid:hover {
   transform: translateY(-2px);
-  background: color-mix(in srgb, var(--color-glow) 88%, white);
+  background: var(--color-ink);
 }
 
 .home-btn--ghost {
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #fff;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-ink);
+  color: var(--color-ink);
+  background: transparent;
 }
 
 .home-btn--ghost:hover {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--color-ink);
+  color: var(--color-bg);
 }
 
 .home-marquee {
   overflow: hidden;
-  border-block: 1px solid rgba(255, 255, 255, 0.08);
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  border-block: 1px solid var(--color-line);
 }
 
 .home-marquee__track {
@@ -124,13 +122,14 @@
     font-weight: 800;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: #ffffff;
+    font-family: var(--font-mono);
+    color: var(--color-ink);
     transform: translate3d(0, 0, 0);
     animation: home-marquee-x var(--home-marquee-duration, 26s) linear infinite;
   }
 
 .home-marquee__track span:nth-child(odd) {
-  color: rgba(77, 168, 255, 0.7);
+  color: var(--color-accent);
 }
 
 @keyframes home-marquee-x {
@@ -191,15 +190,14 @@
   flex: 1;
   height: 2px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--color-line);
 }
 
 .home-h-scroll__thumb {
   position: absolute;
   inset: 0 auto 0 0;
   width: 34%;
-  background: linear-gradient(90deg, var(--color-glow), color-mix(in srgb, var(--color-glow) 55%, white));
-  box-shadow: 0 0 12px rgba(77, 168, 255, 0.55);
+  background: var(--color-accent);
   transform: translateX(0);
   will-change: transform, width;
 }
@@ -210,5 +208,6 @@
   font-weight: 800;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--color-paper);
+  font-family: var(--font-mono);
+  color: var(--color-muted);
 }

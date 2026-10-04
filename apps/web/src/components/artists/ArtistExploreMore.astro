@@ -16,7 +16,7 @@ if (others.length === 0) return null;
 
 <section class="explore-more mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20" aria-labelledby="explore-more-heading">
   <div class="flex items-end justify-between gap-4">
-    <h2 id="explore-more-heading" class="font-display text-2xl text-paper sm:text-3xl">
+    <h2 id="explore-more-heading" class="font-display text-2xl text-ink sm:text-3xl">
       More Artists
     </h2>
     <EditorialSectionLink href="/artists" label="View All" />
@@ -83,7 +83,7 @@ if (others.length === 0) return null;
     aspect-ratio: 1;
     overflow: hidden;
     border-radius: 0.75rem;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--color-surface);
     transition: transform 0.2s ease;
   }
 
@@ -101,7 +101,7 @@ if (others.length === 0) return null;
     margin-top: 0.6rem;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--color-paper);
+    color: var(--color-ink);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

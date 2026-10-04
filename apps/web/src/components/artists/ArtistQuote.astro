@@ -34,7 +34,7 @@ const words = quote.split(/\s+/);
     position: relative;
     overflow: hidden;
     padding: clamp(4rem, 3rem + 6vw, 10rem) 1.25rem;
-    border-block: 1px solid rgba(255, 255, 255, 0.08);
+    border-block: 1px solid var(--color-line);
     background: transparent;
   }
 
@@ -48,7 +48,7 @@ const words = quote.split(/\s+/);
     font-weight: 700;
     font-style: italic;
     line-height: 1;
-    color: rgba(77, 168, 255, 0.04);
+    color: var(--color-accent);
     white-space: nowrap;
     pointer-events: none;
     user-select: none;
@@ -84,13 +84,13 @@ const words = quote.split(/\s+/);
 
   .monument-quote__word:first-child::before {
     opacity: 1;
-    color: var(--color-glow);
+    color: var(--color-accent);
     margin-right: 0.05em;
   }
 
   .monument-quote__word:last-child::after {
     content: '\201D';
-    color: var(--color-glow);
+    color: var(--color-accent);
     margin-left: 0.05em;
   }
 
@@ -104,6 +104,6 @@ const words = quote.split(/\s+/);
     font-style: normal;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: rgba(77, 168, 255, 0.65);
+    color: var(--color-accent);
   }
 </style>

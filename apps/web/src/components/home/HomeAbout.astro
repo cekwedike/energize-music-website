@@ -36,8 +36,8 @@ const words = quote.split(' ');
     position: relative;
     overflow: hidden;
     padding: 6rem 1.25rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    background: #070a0f;
+    border-top: 1px solid var(--color-line);
+    background: var(--color-surface);
   }
 
   @media (min-width: 640px) {
@@ -54,7 +54,7 @@ const words = quote.split(' ');
     height: min(70vw, 34rem);
     translate: -50% 0;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(77, 168, 255, 0.28), transparent 68%);
+    background: none;
     pointer-events: none;
     transform: translateZ(0);
     animation: home-about-pulse 5.5s ease-in-out infinite;
@@ -89,13 +89,12 @@ const words = quote.split(' ');
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.35rem 0.55rem;
-    font-family: 'Instrument Serif', Georgia, serif;
+    font-family: var(--font-display);
     font-size: clamp(1.7rem, 1.2rem + 2.4vw, 2.9rem);
     font-weight: 400;
-    font-style: italic;
     line-height: 1.3;
     letter-spacing: -0.015em;
-    color: #fff;
+    color: var(--color-ink);
   }
 
   .home-about__word {

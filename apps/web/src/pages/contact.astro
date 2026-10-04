@@ -37,33 +37,33 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
       data-endpoint-configured={formEndpoint ? 'true' : 'false'}
     >
       <div>
-        <label for="name" class="block text-sm font-medium text-paper">Name</label>
+        <label for="name" class="block text-sm font-medium text-ink">Name</label>
         <input
           id="name"
           name="name"
           type="text"
           required
-          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-3 text-base text-paper focus-visible:border-[var(--color-glow)] sm:py-2.5 sm:text-sm"
+          class="mt-1.5 w-full rounded-lg border border-line bg-transparent px-4 py-3 text-base text-ink focus-visible:border-accent sm:py-2.5 sm:text-sm"
         />
       </div>
 
       <div>
-        <label for="email" class="block text-sm font-medium text-paper">Email</label>
+        <label for="email" class="block text-sm font-medium text-ink">Email</label>
         <input
           id="email"
           name="email"
           type="email"
           required
-          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-3 text-base text-paper focus-visible:border-[var(--color-glow)] sm:py-2.5 sm:text-sm"
+          class="mt-1.5 w-full rounded-lg border border-line bg-transparent px-4 py-3 text-base text-ink focus-visible:border-accent sm:py-2.5 sm:text-sm"
         />
       </div>
 
       <div>
-        <label for="intent" class="block text-sm font-medium text-paper">I'm reaching out about</label>
+        <label for="intent" class="block text-sm font-medium text-ink">I'm reaching out about</label>
         <select
           id="intent"
           name="intent"
-          class="mt-1.5 w-full rounded-lg border border-white/20 bg-[var(--color-ink)] px-4 py-3 text-base text-paper focus-visible:border-[var(--color-glow)] sm:py-2.5 sm:text-sm"
+          class="mt-1.5 w-full rounded-lg border border-line bg-bg px-4 py-3 text-base text-ink focus-visible:border-accent sm:py-2.5 sm:text-sm"
         >
           {contactIntents.map((intent) => (
             <option value={intent}>{intentLabels[intent]}</option>
@@ -72,13 +72,13 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
       </div>
 
       <div>
-        <label for="message" class="block text-sm font-medium text-paper">Message</label>
+        <label for="message" class="block text-sm font-medium text-ink">Message</label>
         <textarea
           id="message"
           name="message"
           rows={5}
           required
-          class="mt-1.5 w-full rounded-lg border border-white/20 bg-transparent px-4 py-3 text-base text-paper focus-visible:border-[var(--color-glow)] sm:py-2.5 sm:text-sm"
+          class="mt-1.5 w-full rounded-lg border border-line bg-transparent px-4 py-3 text-base text-ink focus-visible:border-accent sm:py-2.5 sm:text-sm"
         />
       </div>
 
@@ -90,15 +90,15 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
 
       <button
         type="submit"
-        class="inline-flex min-h-11 items-center rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
+        class="inline-flex min-h-11 items-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent/90"
       >
         Send message
       </button>
 
-      <p id="contact-form-status" class="text-sm text-paper" role="status"></p>
+      <p id="contact-form-status" class="text-sm text-ink" role="status"></p>
     </form>
 
-    <p class="mt-10 text-sm text-paper">
+    <p class="mt-10 text-sm text-ink">
       Want to work with us? <a href={workWithUsHref} class="font-semibold underline underline-offset-4">Email us.</a>
     </p>
   </section>

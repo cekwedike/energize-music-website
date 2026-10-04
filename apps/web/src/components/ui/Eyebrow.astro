@@ -1,0 +1,36 @@
+---
+interface Props {
+  as?: 'p' | 'span' | 'div';
+  tone?: 'accent' | 'muted' | 'light';
+  class?: string;
+}
+
+const { as: Tag = 'p', tone = 'accent', class: className } = Astro.props;
+---
+
+<Tag class:list={['eyebrow', `eyebrow--${tone}`, className]}><slot /></Tag>
+
+<style>
+  .eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow--accent {
+    color: var(--color-accent);
+  }
+
+  .eyebrow--muted {
+    color: var(--color-muted);
+  }
+
+  /* Only on top of dark photos or video. */
+  .eyebrow--light {
+    color: #ffffff;
+  }
+</style>

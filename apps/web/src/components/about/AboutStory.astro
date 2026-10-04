@@ -13,29 +13,29 @@ const hasIntro = aboutPage?.intro && aboutPage.intro.length > 0;
 const hasLegacy = legacyPage && legacyPage.blocks.length > 0;
 ---
 
-<section id="story" class="scroll-mt-24 border-b border-white/10">
+<section id="story" class="scroll-mt-24 border-b border-line">
   <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
     <div class="grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
       <div class="about-scroll-reveal lg:sticky lg:top-28 lg:self-start">
-        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">Our story</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-accent">Our story</p>
         <h2 class="text-h2 mt-4">How the label works</h2>
-        <p class="mt-5 text-paper">
+        <p class="mt-5 text-ink">
           Same Energy Global is the parent company. From Lagos, the team signs artists, ships releases, and runs NEXT, Energize Kids, and Energize Fest.
         </p>
 
-        <div class="about-story-visual mt-10 overflow-hidden rounded-2xl border border-white/10">
+        <div class="about-story-visual mt-10 overflow-hidden rounded-2xl border border-line">
           <img
             src="/brand/logo.webp"
             alt="Energize Music logo"
-            class="h-auto w-full bg-[var(--color-ink-raised)] p-8 object-contain"
+            class="h-auto w-full bg-surface p-8 object-contain"
             loading="lazy"
           />
         </div>
 
-        <div class="mt-8 hidden h-24 w-px bg-gradient-to-b from-[var(--color-glow)]/60 to-transparent lg:block" aria-hidden="true"></div>
+        <div class="mt-8 hidden h-24 w-px bg-line lg:block" aria-hidden="true"></div>
       </div>
 
-      <div id="about-story-content" class="about-scroll-reveal about-story-content space-y-6 text-paper" style="--reveal-delay: 120ms">
+      <div id="about-story-content" class="about-scroll-reveal about-story-content space-y-6 text-ink" style="--reveal-delay: 120ms">
         {
           hasIntro ? (
             <PortableText value={aboutPage!.intro!} />
@@ -43,7 +43,7 @@ const hasLegacy = legacyPage && legacyPage.blocks.length > 0;
             <PortableText value={legacyPage!.blocks} />
           ) : (
             <>
-              <p class="text-lead text-paper">
+              <p class="text-lead text-ink">
                 Tochukwu "Dr. Foy" Macfoy built Energize Music after years in media and brand storytelling, including Content Director work at Dentsu Nigeria.
               </p>
               <p>
@@ -61,15 +61,12 @@ const hasLegacy = legacyPage && legacyPage.blocks.length > 0;
 </section>
 
 <style>
-  .about-story-visual {
-    box-shadow: 0 16px 48px rgba(77, 168, 255, 0.06);
-  }
 
   .about-story-content :global(h2) {
     font-family: var(--font-display);
     font-size: var(--text-h3);
     margin-top: 2rem;
-    color: var(--color-paper);
+    color: var(--color-ink);
   }
 
   .about-story-content :global(h2:first-child) {

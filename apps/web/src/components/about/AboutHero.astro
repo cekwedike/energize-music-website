@@ -21,45 +21,42 @@ const { title, eyebrow = 'About Us' } = Astro.props;
         <div class="about-reveal about-reveal-1 mb-10 max-w-[280px] sm:max-w-[320px]">
           <Logo size="sm" />
         </div>
-        <p class="about-reveal about-reveal-2 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">
+        <p class="about-reveal about-reveal-2 text-xs font-semibold uppercase tracking-[0.35em] text-accent">
           {eyebrow}
         </p>
-        <div class="about-reveal about-reveal-3 mt-4 h-px w-12 bg-[var(--color-glow)]" aria-hidden="true"></div>
+        <div class="about-reveal about-reveal-3 mt-4 h-px w-12 bg-accent" aria-hidden="true"></div>
         <h1 class="about-reveal about-reveal-4 text-display mt-8 max-w-3xl font-display leading-[0.95] tracking-tight">
           {title}
         </h1>
-        <p class="about-reveal about-reveal-5 text-lead mt-8 max-w-xl text-paper">
+        <p class="about-reveal about-reveal-5 text-lead mt-8 max-w-xl text-ink">
           Afro-gospel and soul-fusion: uplifting music built on the belief that sound can connect people and speak to audiences everywhere.
         </p>
 
         <div class="about-reveal about-reveal-6 mt-12 flex flex-wrap gap-3">
-          <a href="#story" class="rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90">
+          <a href="#story" class="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent/90">
             Our story
           </a>
-          <a href="#team" class="rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-paper transition hover:border-white/45 hover:bg-white/5">
+          <a href="#team" class="rounded-full border border-line px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink hover:bg-surface">
             Meet the team
           </a>
         </div>
       </div>
 
       <div class="about-reveal about-reveal-7 relative hidden lg:block">
-        <div class="about-hero__visual relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10">
+        <div class="about-hero__visual relative aspect-[4/5] overflow-hidden rounded-2xl border border-line">
           <img
             src="/initiatives/energize-fest.webp"
             alt="Energize Fest gathering with a global audience"
             class="h-full w-full object-cover object-center"
             loading="eager"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)] via-[var(--color-ink)]/25 to-transparent"></div>
-          <div class="absolute inset-x-0 bottom-0 p-6">
-            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-glow)]">From Lagos to the world</p>
-            <p class="mt-2 max-w-xs text-sm text-paper">
+          <div class="absolute inset-x-0 bottom-0 bg-bg p-6">
+            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">From Lagos to the world</p>
+            <p class="mt-2 max-w-xs text-sm text-ink">
               Faith, culture, and excellence woven into every release, experience, and initiative.
             </p>
           </div>
         </div>
-        <div class="about-hero__visual-accent absolute -bottom-6 -left-6 -z-10 h-32 w-32 rounded-full bg-[var(--color-glow)]/15 blur-3xl" aria-hidden="true"></div>
-        <div class="about-hero__visual-accent absolute -right-4 -top-4 -z-10 h-24 w-24 rounded-full bg-cyan-400/10 blur-2xl" aria-hidden="true"></div>
       </div>
     </div>
   </div>
@@ -68,7 +65,7 @@ const { title, eyebrow = 'About Us' } = Astro.props;
 <style>
   .about-hero {
     min-height: min(72vh, 900px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--color-line);
   }
 
   @media (min-width: 640px) {
@@ -81,9 +78,7 @@ const { title, eyebrow = 'About Us' } = Astro.props;
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(77, 168, 255, 0.14), transparent 55%),
-      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(103, 232, 249, 0.08), transparent 50%),
-      linear-gradient(165deg, var(--color-ink) 0%, #0f0f12 45%, var(--color-ink-raised) 100%);
+      none;
   }
 
   .about-hero__grain {
@@ -91,14 +86,12 @@ const { title, eyebrow = 'About Us' } = Astro.props;
     inset: 0;
     opacity: 0.35;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-    mix-blend-mode: overlay;
     pointer-events: none;
   }
 
   .about-hero__glow {
     position: absolute;
     border-radius: 50%;
-    filter: blur(80px);
     pointer-events: none;
   }
 
@@ -107,7 +100,7 @@ const { title, eyebrow = 'About Us' } = Astro.props;
     left: -8%;
     width: 320px;
     height: 320px;
-    background: rgba(77, 168, 255, 0.12);
+    background: transparent;
   }
 
   .about-hero__glow--right {
@@ -115,11 +108,7 @@ const { title, eyebrow = 'About Us' } = Astro.props;
     right: -5%;
     width: 280px;
     height: 280px;
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .about-hero__visual {
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    background: var(--color-surface);
   }
 
   .about-reveal {

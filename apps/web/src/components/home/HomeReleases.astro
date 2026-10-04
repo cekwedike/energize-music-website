@@ -93,7 +93,7 @@ function formatDate(value: string): string {
     margin-top: -1px;
     padding: 3.25rem 0 5.5rem;
     overflow: hidden;
-    background: #06090d;
+    background: var(--color-surface);
   }
 
   @media (min-width: 640px) {
@@ -109,8 +109,7 @@ function formatDate(value: string): string {
     opacity: 0.35;
     pointer-events: none;
     background:
-      radial-gradient(ellipse 70% 55% at 22% 18%, rgba(77, 168, 255, 0.22), transparent 62%),
-      radial-gradient(ellipse 55% 45% at 78% 82%, rgba(77, 168, 255, 0.12), transparent 58%);
+      none;
   }
 
   .home-releases__inner {
@@ -148,10 +147,7 @@ function formatDate(value: string): string {
     max-width: 34rem;
     margin-inline: auto;
     overflow: hidden;
-    background: #10141b;
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.1),
-      0 40px 100px rgba(0, 0, 0, 0.55);
+    background: var(--color-surface);
   }
 
   .home-releases__cover img,
@@ -164,17 +160,15 @@ function formatDate(value: string): string {
 
   .home-releases__cover-fallback {
     background:
-      radial-gradient(circle at 30% 20%, rgba(77, 168, 255, 0.4), transparent 55%),
-      #151a22;
+      var(--color-bg);
   }
 
   .home-releases__ring {
     position: absolute;
     inset: 8%;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--color-line);
     border-radius: 50%;
     pointer-events: none;
-    mix-blend-mode: screen;
     transform: translateZ(0);
     animation: home-release-spin 18s linear infinite;
   }
@@ -183,7 +177,7 @@ function formatDate(value: string): string {
     content: '';
     position: absolute;
     inset: 18%;
-    border: 1px dashed rgba(77, 168, 255, 0.35);
+    border: 1px dashed var(--color-accent);
     border-radius: 50%;
   }
 
@@ -198,15 +192,14 @@ function formatDate(value: string): string {
     font-weight: 800;
     letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: var(--color-glow);
+    color: var(--color-accent);
   }
 
   .home-releases__name {
     margin-top: 0.9rem;
-    font-family: 'Instrument Serif', Georgia, serif;
+    font-family: var(--font-display);
     font-size: clamp(2.4rem, 1.6rem + 3.2vw, 4.25rem);
     font-weight: 400;
-    font-style: italic;
     line-height: 1;
     letter-spacing: -0.02em;
   }
@@ -217,13 +210,13 @@ function formatDate(value: string): string {
   }
 
   .home-releases__name a:hover {
-    color: color-mix(in srgb, var(--color-glow) 65%, white);
+    color: color-mix(in srgb, var(--color-accent) 65%, var(--color-ink));
   }
 
   .home-releases__artists {
     margin-top: 1rem;
     font-size: 1.05rem;
-    color: var(--color-paper);
+    color: var(--color-ink);
   }
 
   .home-releases__actions {
