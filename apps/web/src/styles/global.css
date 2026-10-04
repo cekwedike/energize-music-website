@@ -1,13 +1,20 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-ink: #0b0b0d;
-  --color-ink-raised: #141417;
-  --color-paper: #fafaf8;
-  --color-accent: #fafaf8;
-  --color-glow: #4da8ff;
-  --color-glow-deep: #2563eb;
-  --color-glow-cyan: #67e8f9;
+  /* Light theme. Every colour on the site comes from these tokens. */
+  --color-bg: #fafaf8;
+  --color-surface: #ffffff;
+  --color-fg: #0b0b0d;
+  --color-muted: #5c5c63;
+  --color-line: #e7e5e0;
+  --color-accent: #2563eb;
+  --color-accent-strong: #1d4ed8;
+  --color-accent-soft: #eef3fd;
+  --color-on-accent: #ffffff;
+  /* Fixed colours for content sitting on photos, video or other dark media. */
+  --color-on-dark: #fafaf8;
+  --color-scrim: #0b0b0d;
+  --color-shadow: #0b0b0d;
   --font-display: 'Fraunces', 'Georgia', serif;
   --font-body: 'Inter', system-ui, sans-serif;
 
@@ -20,9 +27,25 @@
   --text-body-lg: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
 }
 
+/* Dark islands (hero, image overlays) reset the tokens to the original dark palette.
+   The overlay header joins them while it sits on top of a dark hero. */
+.theme-dark,
+.site-header--overlay:not(.is-scrolled):not(.is-menu-open) {
+  --color-bg: #0b0b0d;
+  --color-surface: #141417;
+  --color-fg: #fafaf8;
+  --color-muted: rgba(250, 250, 248, 0.72);
+  --color-line: rgba(250, 250, 248, 0.14);
+  --color-accent: #4da8ff;
+  --color-accent-strong: #2563eb;
+  --color-accent-soft: rgba(77, 168, 255, 0.12);
+  color-scheme: dark;
+  color: var(--color-fg);
+}
+
 @layer base {
   html {
-    color-scheme: dark;
+    color-scheme: light;
     overflow-x: clip;
     max-width: 100%;
     height: 100%;
@@ -37,8 +60,8 @@
   }
 
   body {
-    background-color: var(--color-ink);
-    color: var(--color-paper);
+    background-color: var(--color-bg);
+    color: var(--color-fg);
     font-family: var(--font-body);
     font-size: var(--text-body-lg);
     line-height: 1.6;
@@ -48,12 +71,6 @@
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-  }
-
-  body.site-body--light {
-    color-scheme: light;
-    background-color: #ffffff;
-    color: #111111;
   }
 
   /* Keep the site footer pinned to the bottom of short pages. */
@@ -90,7 +107,7 @@
     top: 0;
     z-index: 100;
     background: var(--color-accent);
-    color: var(--color-ink);
+    color: var(--color-bg);
     padding: 0.75rem 1.25rem;
   }
 
@@ -150,12 +167,12 @@
 }
 
 .liquid-glass {
-  background: rgba(255, 255, 255, 0.01);
+  background: color-mix(in srgb, var(--color-fg) 1%, transparent);
   background-blend-mode: luminosity;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border: none;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 1px color-mix(in srgb, var(--color-fg) 10%, transparent);
 }
 
 .liquid-glass::before {
@@ -166,12 +183,12 @@
   padding: 1.4px;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.45) 0%,
-    rgba(255, 255, 255, 0.15) 20%,
-    rgba(255, 255, 255, 0) 40%,
-    rgba(255, 255, 255, 0) 60%,
-    rgba(255, 255, 255, 0.15) 80%,
-    rgba(255, 255, 255, 0.45) 100%
+    color-mix(in srgb, var(--color-fg) 45%, transparent) 0%,
+    color-mix(in srgb, var(--color-fg) 15%, transparent) 20%,
+    transparent 40%,
+    transparent 60%,
+    color-mix(in srgb, var(--color-fg) 15%, transparent) 80%,
+    color-mix(in srgb, var(--color-fg) 45%, transparent) 100%
   );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
@@ -183,9 +200,9 @@
 
 .text-glow {
   text-shadow:
-    0 0 40px rgba(255, 255, 255, 0.4),
-    0 0 80px rgba(255, 255, 255, 0.2),
-    0 0 120px rgba(255, 255, 255, 0.1);
+    0 0 40px color-mix(in srgb, var(--color-fg) 40%, transparent),
+    0 0 80px color-mix(in srgb, var(--color-fg) 20%, transparent),
+    0 0 120px color-mix(in srgb, var(--color-fg) 10%, transparent);
 }
 
 .text-glow-pulse {
@@ -196,15 +213,15 @@
   0%,
   100% {
     text-shadow:
-      0 0 40px rgba(255, 255, 255, 0.4),
-      0 0 80px rgba(255, 255, 255, 0.2),
-      0 0 120px rgba(255, 255, 255, 0.1);
+      0 0 40px color-mix(in srgb, var(--color-fg) 40%, transparent),
+      0 0 80px color-mix(in srgb, var(--color-fg) 20%, transparent),
+      0 0 120px color-mix(in srgb, var(--color-fg) 10%, transparent);
   }
   50% {
     text-shadow:
-      0 0 56px rgba(255, 255, 255, 0.6),
-      0 0 104px rgba(255, 255, 255, 0.35),
-      0 0 150px rgba(255, 255, 255, 0.18);
+      0 0 56px color-mix(in srgb, var(--color-fg) 60%, transparent),
+      0 0 104px color-mix(in srgb, var(--color-fg) 35%, transparent),
+      0 0 150px color-mix(in srgb, var(--color-fg) 18%, transparent);
   }
 }
 
@@ -216,8 +233,8 @@
 
 .button-glow {
   box-shadow:
-    0 0 20px rgba(255, 255, 255, 0.3),
-    0 0 40px rgba(255, 255, 255, 0.1);
+    0 6px 20px color-mix(in srgb, var(--color-accent) 18%, transparent),
+    0 2px 6px color-mix(in srgb, var(--color-shadow) 3.2%, transparent);
 }
 
 /* ── Ambient page background ─────────────────────────────────────────────── */
@@ -237,7 +254,7 @@
 .ambient-bg__base {
   position: absolute;
   inset: 0;
-  background: var(--color-ink);
+  background: var(--color-bg);
 }
 
 .ambient-bg__mesh {
@@ -245,9 +262,9 @@
   inset: -20%;
   opacity: 0.55;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(77, 168, 255, 0.14) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 50% at 85% 25%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 45% at 50% 90%, rgba(103, 232, 249, 0.07) 0%, transparent 45%);
+    radial-gradient(ellipse 80% 60% at 20% 10%, color-mix(in srgb, var(--color-accent) 8.4%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 25%, color-mix(in srgb, var(--color-accent-strong) 6%, transparent) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 45% at 50% 90%, color-mix(in srgb, var(--color-accent) 3.5%, transparent) 0%, transparent 45%);
   animation: ambient-mesh-shift 42s ease-in-out infinite alternate;
 }
 
@@ -255,7 +272,7 @@
   position: absolute;
   border-radius: 50%;
   filter: blur(90px);
-  mix-blend-mode: screen;
+  opacity: 0.5;
 }
 
 .ambient-bg__glow--primary {
@@ -263,7 +280,7 @@
   left: -8%;
   width: min(72vmax, 900px);
   height: min(72vmax, 900px);
-  background: radial-gradient(circle, rgba(77, 168, 255, 0.22) 0%, transparent 68%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 13.2%, transparent) 0%, transparent 68%);
   animation: ambient-drift-a 36s ease-in-out infinite;
 }
 
@@ -272,7 +289,7 @@
   right: -10%;
   width: min(64vmax, 780px);
   height: min(64vmax, 780px);
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.16) 0%, transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent-strong) 9.6%, transparent) 0%, transparent 70%);
   animation: ambient-drift-b 48s ease-in-out infinite;
 }
 
@@ -281,14 +298,14 @@
   left: 42%;
   width: min(42vmax, 520px);
   height: min(42vmax, 520px);
-  background: radial-gradient(circle, rgba(103, 232, 249, 0.1) 0%, transparent 72%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 5%, transparent) 0%, transparent 72%);
   animation: ambient-pulse 14s ease-in-out infinite;
 }
 
 .ambient-bg__grain {
   position: absolute;
   inset: 0;
-  opacity: 0.045;
+  opacity: 0.018;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 180px 180px;
   mix-blend-mode: overlay;
@@ -297,7 +314,7 @@
 .ambient-bg__vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 120% 80% at 50% 50%, transparent 35%, rgba(11, 11, 13, 0.55) 100%);
+  background: radial-gradient(ellipse 120% 80% at 50% 50%, transparent 35%, color-mix(in srgb, var(--color-bg) 55%, transparent) 100%);
 }
 
 /* Variant: home. Video hero dominates; keep atmosphere minimal */
@@ -321,7 +338,7 @@
 
 .ambient-bg--editorial .ambient-bg__glow--primary {
   animation-duration: 52s;
-  background: radial-gradient(circle, rgba(77, 168, 255, 0.18) 0%, transparent 68%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 10.8%, transparent) 0%, transparent 68%);
 }
 
 .ambient-bg--editorial .ambient-bg__glow--accent {
@@ -330,12 +347,12 @@
 
 /* Variant: pulse. Slightly more energy for campaign pages */
 .ambient-bg--pulse .ambient-bg__glow--primary {
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.14) 0%, rgba(77, 168, 255, 0.12) 45%, transparent 72%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent-strong) 8.4%, transparent) 0%, color-mix(in srgb, var(--color-accent) 7.2%, transparent) 45%, transparent 72%);
   animation-duration: 24s;
 }
 
 .ambient-bg--pulse .ambient-bg__glow--secondary {
-  background: radial-gradient(circle, rgba(77, 168, 255, 0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 10.8%, transparent) 0%, transparent 70%);
   animation-duration: 30s;
 }
 
@@ -345,18 +362,18 @@
 
 .ambient-bg--pulse .ambient-bg__mesh {
   background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 50% at 85% 25%, rgba(77, 168, 255, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 45% at 50% 90%, rgba(37, 99, 235, 0.08) 0%, transparent 45%);
+    radial-gradient(ellipse 80% 60% at 20% 10%, color-mix(in srgb, var(--color-accent-strong) 4.8%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 25%, color-mix(in srgb, var(--color-accent) 7.2%, transparent) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 45% at 50% 90%, color-mix(in srgb, var(--color-accent-strong) 4.8%, transparent) 0%, transparent 45%);
 }
 
 /* Variant: warm. Playful undertone for kids/initiatives */
 .ambient-bg--warm .ambient-bg__glow--primary {
-  background: radial-gradient(circle, rgba(255, 180, 100, 0.1) 0%, rgba(77, 168, 255, 0.1) 50%, transparent 72%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 5%, transparent) 0%, color-mix(in srgb, var(--color-accent) 6%, transparent) 50%, transparent 72%);
 }
 
 .ambient-bg--warm .ambient-bg__glow--secondary {
-  background: radial-gradient(circle, rgba(103, 232, 249, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 6%, transparent) 0%, transparent 70%);
 }
 
 @keyframes ambient-mesh-shift {
@@ -423,7 +440,7 @@
   }
 
   .ambient-bg__grain {
-    opacity: 0.03;
+    opacity: 0.012;
   }
 }
 

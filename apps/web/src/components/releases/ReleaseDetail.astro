@@ -83,11 +83,11 @@ const primaryListenUrl = release.externalUrl;
       </figure>
 
       <div class="release-detail__copy min-w-0 lg:pt-4">
-        <p class="release-reveal release-reveal-3 text-xs font-bold uppercase tracking-[0.28em] text-[var(--color-glow)]">
+        <p class="release-reveal release-reveal-3 text-xs font-bold uppercase tracking-[0.28em] text-[var(--color-accent)]">
           {releaseTypeLabel} &middot; {releaseDate}
         </p>
 
-        <h1 class="release-reveal release-reveal-4 mt-4 font-display text-[clamp(2.25rem,1.4rem+3.2vw,4.25rem)] leading-[0.95] tracking-tight text-paper">
+        <h1 class="release-reveal release-reveal-4 mt-4 font-display text-[clamp(2.25rem,1.4rem+3.2vw,4.25rem)] leading-[0.95] tracking-tight text-fg">
           {release.displayTitle}
         </h1>
 
@@ -95,19 +95,19 @@ const primaryListenUrl = release.externalUrl;
           artists.length > 0 ? (
             <ul class="release-reveal release-reveal-5 mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1" aria-label="Artists">
               {artists.map((artist, index) => (
-                <li class="inline-flex items-baseline text-lg text-paper sm:text-xl">
+                <li class="inline-flex items-baseline text-lg text-fg sm:text-xl">
                   <a
                     href={`/artists/${artist.slug}`}
-                    class="release-detail__artist-link font-display italic underline decoration-[var(--color-glow)]/50 underline-offset-[0.22em] transition hover:text-[var(--color-glow)] hover:decoration-[var(--color-glow)]"
+                    class="release-detail__artist-link font-display italic underline decoration-[var(--color-accent)]/50 underline-offset-[0.22em] transition hover:text-[var(--color-accent)] hover:decoration-[var(--color-accent)]"
                   >
                     {artist.name}
                   </a>
-                  {index < artists.length - 1 && <span class="ml-2 text-paper" aria-hidden="true">/</span>}
+                  {index < artists.length - 1 && <span class="ml-2 text-fg" aria-hidden="true">/</span>}
                 </li>
               ))}
             </ul>
           ) : release.artistNames.length > 0 ? (
-            <p class="release-reveal release-reveal-5 mt-6 font-display text-lg italic text-paper sm:text-xl">
+            <p class="release-reveal release-reveal-5 mt-6 font-display text-lg italic text-fg sm:text-xl">
               {release.artistNames.join(' / ')}
             </p>
           ) : null
@@ -116,7 +116,7 @@ const primaryListenUrl = release.externalUrl;
         {
           hasStreaming && (
             <div class="release-reveal release-reveal-6 mt-10 max-w-md">
-              <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-paper">Listen</p>
+              <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-fg">Listen</p>
               <div class="mt-4">
                 <ArtistStreamingLinks
                   streaming={streaming}
@@ -135,7 +135,7 @@ const primaryListenUrl = release.externalUrl;
                 href={primaryListenUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center justify-center rounded-full bg-paper px-7 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-paper/90"
+                class="inline-flex items-center justify-center rounded-full bg-fg px-7 py-3.5 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90"
               >
                 Listen Now
               </a>
@@ -182,8 +182,8 @@ const primaryListenUrl = release.externalUrl;
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 70% 55% at 20% 30%, rgba(77, 168, 255, 0.12), transparent 55%),
-      linear-gradient(180deg, rgba(11, 11, 13, 0.55) 0%, rgba(11, 11, 13, 0.82) 45%, var(--color-ink) 100%);
+      radial-gradient(ellipse 70% 55% at 20% 30%, color-mix(in srgb, var(--color-accent) 7.2%, transparent), transparent 55%),
+      linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 55%, transparent) 0%, color-mix(in srgb, var(--color-bg) 82%, transparent) 45%, var(--color-bg) 100%);
   }
 
   .release-detail__cover {
@@ -195,8 +195,8 @@ const primaryListenUrl = release.externalUrl;
     overflow: hidden;
     border-radius: 0.35rem;
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.08),
-      0 28px 80px rgba(0, 0, 0, 0.55);
+      0 0 0 1px color-mix(in srgb, var(--color-fg) 8%, transparent),
+      0 28px 80px color-mix(in srgb, var(--color-shadow) 22%, transparent);
   }
 
   .release-detail__cover-img,
@@ -211,8 +211,8 @@ const primaryListenUrl = release.externalUrl;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--color-paper);
+    background: color-mix(in srgb, var(--color-fg) 4%, transparent);
+    color: var(--color-fg);
     font-size: 0.75rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;

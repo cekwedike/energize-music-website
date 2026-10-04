@@ -29,7 +29,7 @@ function parseOEmbedPayload(payload: Record<string, unknown>): LinkMeta {
 
   let artistName: string | undefined;
   if (title) {
-    const byMatch = title.match(/^(.+?)\s[-–—]\s/);
+    const byMatch = title.match(/^(.+?)\s[-\u2013\u2014]\s/);
     if (byMatch?.[1]) artistName = byMatch[1].trim();
   }
 
@@ -62,7 +62,7 @@ function parseOgTags(html: string): LinkMeta {
   if (imageMatch?.[1]) meta.thumbnailUrl = decodeHtmlEntities(imageMatch[1]);
 
   if (meta.title) {
-    const byMatch = meta.title.match(/^(.+?)\s[-–—]\s/);
+    const byMatch = meta.title.match(/^(.+?)\s[-\u2013\u2014]\s/);
     if (byMatch?.[1]) meta.artistName = byMatch[1].trim();
   }
 

@@ -39,7 +39,7 @@ const isCenter = align === 'center';
     <div class:list={['max-w-4xl', isCenter && 'mx-auto text-center']}>
       {
         eyebrow && (
-          <p class="page-hero-reveal page-hero-reveal-1 text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--color-glow)] sm:text-xs sm:tracking-[0.35em]">
+          <p class="page-hero-reveal page-hero-reveal-1 text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--color-accent)] sm:text-xs sm:tracking-[0.35em]">
             {eyebrow}
           </p>
         )
@@ -47,14 +47,14 @@ const isCenter = align === 'center';
       {
         eyebrow && (
           <div
-            class:list={['page-hero-reveal page-hero-reveal-2 mt-3 h-px w-10 bg-[var(--color-glow)] sm:mt-4', isCenter && 'mx-auto']}
+            class:list={['page-hero-reveal page-hero-reveal-2 mt-3 h-px w-10 bg-[var(--color-accent)] sm:mt-4', isCenter && 'mx-auto']}
             aria-hidden="true"
           />
         )
       }
       <h1
         class:list={[
-          'page-hero-reveal font-display leading-[0.95] tracking-tight text-paper',
+          'page-hero-reveal font-display leading-[0.95] tracking-tight text-fg',
           eyebrow ? 'page-hero-reveal-3 mt-5 sm:mt-6' : 'page-hero-reveal-1',
           isSlim ? 'text-h2 sm:text-h1' : 'text-h1 max-w-3xl',
           isCenter && 'mx-auto',
@@ -66,7 +66,7 @@ const isCenter = align === 'center';
         description && (
           <p
             class:list={[
-              'page-hero-reveal text-lead mt-4 text-paper sm:mt-5',
+              'page-hero-reveal text-lead mt-4 text-fg sm:mt-5',
               eyebrow ? 'page-hero-reveal-4' : 'page-hero-reveal-2',
               isSlim ? 'max-w-2xl' : 'max-w-xl',
               isCenter && 'mx-auto',
@@ -95,8 +95,8 @@ const isCenter = align === 'center';
                   class:list={[
                     'inline-flex min-h-11 items-center rounded-full px-5 py-2.5 text-sm font-semibold transition sm:px-6 sm:py-3',
                     cta.variant === 'secondary'
-                      ? 'border border-white/25 text-paper hover:border-white/45 hover:bg-white/5'
-                      : 'bg-[var(--color-glow)] text-white hover:bg-[var(--color-glow)]/90',
+                      ? 'border border-fg/25 text-fg hover:border-fg/45 hover:bg-fg/5'
+                      : 'bg-[var(--color-accent)] text-[var(--color-on-accent)] hover:bg-[var(--color-accent)]/90',
                   ]}
                 >
                   {cta.label}
@@ -114,7 +114,7 @@ const isCenter = align === 'center';
 
 <style>
   .page-hero {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
   }
 
   .page-hero--slim {
@@ -135,9 +135,9 @@ const isCenter = align === 'center';
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(77, 168, 255, 0.12), transparent 55%),
-      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(103, 232, 249, 0.06), transparent 50%),
-      linear-gradient(165deg, var(--color-ink) 0%, #0f0f12 45%, var(--color-ink-raised) 100%);
+      radial-gradient(ellipse 80% 60% at 15% 20%, color-mix(in srgb, var(--color-accent) 7.2%, transparent), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 85% 75%, color-mix(in srgb, var(--color-accent) 3%, transparent), transparent 50%),
+      linear-gradient(165deg, var(--color-bg) 0%, var(--color-bg) 45%, var(--color-surface) 100%);
   }
 
   .page-hero__grain {
@@ -161,7 +161,7 @@ const isCenter = align === 'center';
     left: -12%;
     width: min(280px, 70vw);
     height: min(280px, 70vw);
-    background: rgba(77, 168, 255, 0.1);
+    background: color-mix(in srgb, var(--color-accent) 6%, transparent);
   }
 
   .page-hero__glow--right {
@@ -169,7 +169,7 @@ const isCenter = align === 'center';
     right: -8%;
     width: min(220px, 55vw);
     height: min(220px, 55vw);
-    background: rgba(255, 255, 255, 0.035);
+    background: color-mix(in srgb, var(--color-fg) 3.5%, transparent);
   }
 
   .page-hero-reveal {

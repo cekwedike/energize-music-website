@@ -1,6 +1,7 @@
 ---
 import type { ArtistCard } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
+import SocialIcon from '../ui/SocialIcon.astro';
 
 interface Props {
   artists: ArtistCard[];
@@ -14,6 +15,13 @@ const roster = artists
   .map((artist: ArtistCard) => ({
     ...artist,
     photoUrl: urlForImage(artist.photo).width(360).height(480).fit('crop').auto('format').url(),
+    streams: (
+      [
+        { label: 'Spotify', href: artist.streaming?.spotify },
+        { label: 'YouTube', href: artist.streaming?.youtube },
+        { label: 'Apple Music', href: artist.streaming?.appleMusic },
+      ] as const
+    ).filter((link) => Boolean(link.href)),
   }));
 
 const marqueeNames = [
@@ -50,11 +58,8 @@ const marqueeNames = [
         <div class="home-artists__stage home-h-scroll__stage" data-home-h-scroll>
           <div class="home-artists__track" data-home-artists-track>
             {roster.map((artist: (typeof roster)[number]) => (
-              <a
-                href={`/artists/${artist.slug}`}
-                class="home-artists__card"
-                data-home-artist
-              >
+              <article class="home-artists__card theme-dark" data-home-artist>
+                <a href={`/artists/${artist.slug}`} class="home-artists__link">
                 <div class="home-artists__media" data-home-artist-media>
                   <img
                     src={artist.photoUrl}
@@ -70,7 +75,25 @@ const marqueeNames = [
                   <p class="home-artists__name">{artist.name}</p>
                   {artist.tagline && <p class="home-artists__tag">{artist.tagline}</p>}
                 </div>
-              </a>
+                </a>
+                {artist.streams.length > 0 && (
+                  <ul class="home-artists__streams" aria-label={`Listen to ${artist.name}`}>
+                    {artist.streams.map((link) => (
+                      <li>
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="home-artists__stream"
+                          aria-label={`${artist.name} on ${link.label}`}
+                        >
+                          <SocialIcon label={link.label} />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </article>
             ))}
           </div>
         </div>
@@ -92,10 +115,10 @@ const marqueeNames = [
 <style>
   .home-artists {
     position: relative;
-    padding: 5rem 0 2.5rem;
+    padding: clamp(5rem, 4rem + 4vw, 8rem) 0 clamp(3rem, 2rem + 3vw, 5rem);
     background:
-      radial-gradient(ellipse 60% 50% at 0% 0%, rgba(77, 168, 255, 0.12), transparent 55%),
-      #080b10;
+      radial-gradient(ellipse 60% 50% at 0% 0%, color-mix(in srgb, var(--color-accent) 7.2%, transparent), transparent 55%),
+      var(--color-bg);
     /* visible so ScrollTrigger pin spacers are not clipped into a blank void */
     overflow: visible;
   }
@@ -145,7 +168,7 @@ const marqueeNames = [
     position: relative;
     flex: 0 0 auto;
     width: min(72vw, 18rem);
-    color: inherit;
+    color: var(--color-fg);
     text-decoration: none;
     transform-style: preserve-3d;
   }
@@ -156,11 +179,57 @@ const marqueeNames = [
     }
   }
 
+  .home-artists__link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .home-artists__streams {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    display: flex;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .home-artists__stream {
+    display: inline-flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--color-line);
+    background: color-mix(in srgb, var(--color-scrim) 55%, transparent);
+    color: var(--color-fg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .home-artists__stream:hover,
+  .home-artists__stream:focus-visible {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .home-artists__stream :global(svg) {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
   .home-artists__media {
     aspect-ratio: 3 / 4;
     overflow: hidden;
-    background: #12161c;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    background: var(--color-surface);
+    box-shadow: 0 24px 60px color-mix(in srgb, var(--color-shadow) 18%, transparent);
   }
 
   .home-artists__media img {
@@ -179,7 +248,7 @@ const marqueeNames = [
     position: absolute;
     inset: auto 0 0;
     padding: 3.5rem 1rem 1.1rem;
-    background: linear-gradient(180deg, transparent, rgba(4, 8, 12, 0.95));
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--color-scrim) 95%, transparent));
   }
 
   .home-artists__name {
@@ -193,7 +262,7 @@ const marqueeNames = [
   .home-artists__tag {
     margin-top: 0.35rem;
     font-size: 0.78rem;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .home-artists__card::after {
@@ -206,8 +275,8 @@ const marqueeNames = [
   }
 
   .home-artists__card:hover::after {
-    border-color: rgba(77, 168, 255, 0.65);
-    box-shadow: inset 0 0 0 1px rgba(77, 168, 255, 0.2), 0 0 40px rgba(77, 168, 255, 0.15);
+    border-color: color-mix(in srgb, var(--color-accent) 39%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 12%, transparent), 0 0 40px color-mix(in srgb, var(--color-accent) 9%, transparent);
   }
 
   .home-artists__hint {
@@ -219,7 +288,7 @@ const marqueeNames = [
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   @media (min-width: 900px) {

@@ -11,7 +11,8 @@ export const artistCardFragment = /* groq */ `{
   tagline,
   bio,
   quote,
-  genres
+  genres,
+  streaming
 }`;
 
 export const artistDetailFragment = /* groq */ `{
@@ -38,8 +39,8 @@ export const allArtistsQuery = /* groq */ `*[_type == "artist"] | ${artistListOr
 
 export const featuredArtistsQuery = /* groq */ `*[_type == "artist" && featured == true] | ${artistListOrder} ${artistCardFragment}`;
 
-/** Homepage roster strip: only artists marked Featured on homepage. */
-export const homeArtistsQuery = /* groq */ `*[_type == "artist" && featured == true && defined(photo.asset)] | ${artistListOrder} [0...8] ${artistCardFragment}`;
+/** Homepage roster strip: featured artists first, then the rest of the roster, newest first. */
+export const homeArtistsQuery = /* groq */ `*[_type == "artist" && defined(photo.asset)] | order(coalesce(featured, false) desc, coalesce(displayOrder, 1000000) asc, _createdAt desc) [0...8] ${artistCardFragment}`;
 
 export const artistSlugsQuery = /* groq */ `*[_type == "artist" && defined(slug.current)]{ "slug": slug.current }`;
 

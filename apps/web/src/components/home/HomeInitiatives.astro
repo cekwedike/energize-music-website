@@ -22,7 +22,7 @@ const items = initiativesNav;
       <div class="home-initiatives__track" data-home-initiatives-track>
         {
           items.map((item) => (
-            <a href={item.href} class="home-initiatives__panel" data-home-initiative>
+            <a href={item.href} class="home-initiatives__panel theme-dark" data-home-initiative>
               <img
                 src={item.image}
                 alt={`${item.label} initiative`}
@@ -58,8 +58,8 @@ const items = initiativesNav;
 
 <style>
   .home-initiatives {
-    padding: 5rem 0 0;
-    background: #05070a;
+    padding: clamp(5rem, 4rem + 4vw, 8rem) 0 0;
+    background: var(--color-bg);
     /* visible: clipping ancestors breaks position:fixed GSAP pins and causes blank voids */
     overflow: visible;
   }
@@ -84,7 +84,7 @@ const items = initiativesNav;
     max-width: 28rem;
     font-size: 1rem;
     line-height: 1.6;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .home-initiatives__stage {
@@ -108,9 +108,9 @@ const items = initiativesNav;
     width: min(92vw, 42rem);
     height: clamp(22rem, 70vh, 34rem);
     overflow: hidden;
-    color: inherit;
+    color: var(--color-fg);
     text-decoration: none;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
   }
 
   .home-initiatives__img {
@@ -127,8 +127,8 @@ const items = initiativesNav;
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(180deg, rgba(5, 8, 12, 0.15) 0%, rgba(5, 8, 12, 0.88) 78%),
-      linear-gradient(90deg, rgba(5, 8, 12, 0.55), transparent 50%);
+      linear-gradient(180deg, color-mix(in srgb, var(--color-scrim) 15%, transparent) 0%, color-mix(in srgb, var(--color-scrim) 88%, transparent) 78%),
+      linear-gradient(90deg, color-mix(in srgb, var(--color-scrim) 55%, transparent), transparent 50%);
   }
 
   .home-initiatives__content {
@@ -160,7 +160,7 @@ const items = initiativesNav;
     max-width: 28rem;
     font-size: 0.95rem;
     line-height: 1.55;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .home-initiatives__panel:hover .home-initiatives__img {

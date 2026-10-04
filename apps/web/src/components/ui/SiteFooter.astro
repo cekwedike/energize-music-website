@@ -23,7 +23,7 @@ const year = new Date().getFullYear();
           <Logo size="sm" animated={false} />
         </a>
 
-        <p class="site-footer__tagline font-instrument mt-3 text-[clamp(1rem,0.92rem+0.35vw,1.375rem)] italic leading-snug text-paper">
+        <p class="site-footer__tagline font-instrument mt-3 text-[clamp(1rem,0.92rem+0.35vw,1.375rem)] italic leading-snug text-fg">
           The Energy Different
         </p>
 
@@ -109,8 +109,8 @@ const year = new Date().getFullYear();
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    background: var(--color-ink-raised);
+    border-top: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
+    background: var(--color-surface);
   }
 
   .site-footer__mesh {
@@ -118,9 +118,9 @@ const year = new Date().getFullYear();
     inset: 0;
     pointer-events: none;
     background:
-      radial-gradient(ellipse 70% 55% at 0% 100%, rgba(77, 168, 255, 0.1), transparent 55%),
-      radial-gradient(ellipse 55% 45% at 100% 0%, rgba(37, 99, 235, 0.08), transparent 50%),
-      radial-gradient(ellipse 40% 35% at 55% 45%, rgba(103, 232, 249, 0.04), transparent 45%);
+      radial-gradient(ellipse 70% 55% at 0% 100%, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 55%),
+      radial-gradient(ellipse 55% 45% at 100% 0%, color-mix(in srgb, var(--color-accent-strong) 4.8%, transparent), transparent 50%),
+      radial-gradient(ellipse 40% 35% at 55% 45%, color-mix(in srgb, var(--color-accent) 2%, transparent), transparent 45%);
   }
 
   .site-footer__grain {
@@ -145,7 +145,7 @@ const year = new Date().getFullYear();
     left: -10%;
     width: min(30vmax, 280px);
     height: min(30vmax, 280px);
-    background: radial-gradient(circle, rgba(77, 168, 255, 0.1) 0%, transparent 68%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 6%, transparent) 0%, transparent 68%);
   }
 
   .site-footer__glow--right {
@@ -153,7 +153,7 @@ const year = new Date().getFullYear();
     right: -8%;
     width: min(22vmax, 220px);
     height: min(22vmax, 220px);
-    background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-accent-strong) 4.8%, transparent) 0%, transparent 70%);
   }
 
   .site-footer__inner {
@@ -221,9 +221,9 @@ const year = new Date().getFullYear();
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    color: var(--color-paper);
-    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid color-mix(in srgb, var(--color-fg) 14%, transparent);
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-fg) 2%, transparent);
     transition:
       border-color 0.2s ease,
       color 0.2s ease,
@@ -238,10 +238,10 @@ const year = new Date().getFullYear();
   }
 
   .site-footer__social-link:hover {
-    border-color: rgba(77, 168, 255, 0.45);
-    color: var(--color-paper);
-    background: rgba(77, 168, 255, 0.08);
-    box-shadow: 0 0 20px rgba(77, 168, 255, 0.15);
+    border-color: color-mix(in srgb, var(--color-accent) 27%, transparent);
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-accent) 4.8%, transparent);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--color-accent) 9%, transparent);
     transform: translateY(-1px);
   }
 
@@ -249,8 +249,8 @@ const year = new Date().getFullYear();
     position: relative;
     padding: 0.875rem 1rem;
     border-radius: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
+    background: color-mix(in srgb, var(--color-fg) 1.5%, transparent);
   }
 
   @media (min-width: 768px) {
@@ -274,10 +274,10 @@ const year = new Date().getFullYear();
     padding: 1px;
     background: linear-gradient(
       145deg,
-      rgba(77, 168, 255, 0.35) 0%,
-      rgba(255, 255, 255, 0.06) 35%,
-      rgba(255, 255, 255, 0) 55%,
-      rgba(37, 99, 235, 0.2) 100%
+      color-mix(in srgb, var(--color-accent) 21%, transparent) 0%,
+      color-mix(in srgb, var(--color-fg) 6%, transparent) 35%,
+      transparent 55%,
+      color-mix(in srgb, var(--color-accent-strong) 12%, transparent) 100%
     );
     -webkit-mask:
       linear-gradient(#fff 0 0) content-box,
@@ -304,7 +304,7 @@ const year = new Date().getFullYear();
     font-weight: 700;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: rgba(77, 168, 255, 0.75);
+    color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   }
 
   .site-footer__nav-list {
@@ -320,7 +320,7 @@ const year = new Date().getFullYear();
     min-height: 2.75rem;
     padding-block: 0.25rem;
     text-decoration: none;
-    color: var(--color-paper);
+    color: var(--color-fg);
     transition: color 0.2s ease;
   }
 
@@ -359,12 +359,12 @@ const year = new Date().getFullYear();
     bottom: -2px;
     width: 0;
     height: 1px;
-    background: linear-gradient(90deg, var(--color-glow), var(--color-glow-cyan));
+    background: linear-gradient(90deg, var(--color-accent), var(--color-accent));
     transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .site-footer__nav-link:hover {
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .site-footer__nav-link:hover .site-footer__nav-link-text {
@@ -397,9 +397,9 @@ const year = new Date().getFullYear();
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(77, 168, 255, 0.35) 18%,
-      rgba(255, 255, 255, 0.12) 50%,
-      rgba(37, 99, 235, 0.25) 82%,
+      color-mix(in srgb, var(--color-accent) 21%, transparent) 18%,
+      color-mix(in srgb, var(--color-fg) 12%, transparent) 50%,
+      color-mix(in srgb, var(--color-accent-strong) 15%, transparent) 82%,
       transparent 100%
     );
   }
@@ -415,7 +415,7 @@ const year = new Date().getFullYear();
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-paper);
+    color: var(--color-fg);
     text-decoration: none;
   }
 
@@ -447,24 +447,24 @@ const year = new Date().getFullYear();
     font-size: clamp(0.875rem, 0.82rem + 0.2vw, 0.9375rem);
     font-style: italic;
     line-height: 1.4;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .site-footer__copyright-symbol {
     font-style: normal;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .site-footer__copyright-year {
     font-style: normal;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .site-footer__copyright-brand {
     font-weight: 500;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .site-footer__copyright-secondary {
@@ -474,7 +474,7 @@ const year = new Date().getFullYear();
     letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1.5;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   @media (prefers-reduced-motion: reduce) {

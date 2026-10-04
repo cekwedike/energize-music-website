@@ -47,19 +47,19 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
       />
 
       <div class="profile-hero__meta min-w-0">
-        <h1 class="font-display text-[clamp(2rem,1.2rem+4vw,3.75rem)] leading-none tracking-tight text-paper">
+        <h1 class="font-display text-[clamp(2rem,1.2rem+4vw,3.75rem)] leading-none tracking-tight text-fg">
           {artist.name}
-          <span class="mt-2 block text-[clamp(1rem,0.85rem+1vw,1.35rem)] font-sans font-medium tracking-normal text-paper/80">
+          <span class="mt-2 block text-[clamp(1rem,0.85rem+1vw,1.35rem)] font-sans font-medium tracking-normal text-fg/80">
             {(artist.genres?.[0] ?? 'Afro-Gospel')} Artist
           </span>
         </h1>
-        {artist.tagline && <p class="mt-3 max-w-xl text-base text-paper sm:text-lg">{artist.tagline}</p>}
+        {artist.tagline && <p class="mt-3 max-w-xl text-base text-fg sm:text-lg">{artist.tagline}</p>}
 
         {
           artist.genres && artist.genres.length > 0 && (
             <ul class="mt-4 flex flex-wrap gap-2" aria-label="Genres">
               {artist.genres.map((genre: string) => (
-                <li class="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-medium text-paper">{genre}</li>
+                <li class="rounded-full bg-fg/[0.08] px-3 py-1 text-xs font-medium text-fg">{genre}</li>
               ))}
             </ul>
           )
@@ -82,7 +82,7 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
     position: relative;
     z-index: 2;
     margin-top: calc(-1 * var(--header-height, 4rem));
-    background: var(--color-ink);
+    background: var(--color-bg);
   }
 
   .profile-hero__banner-wrap {
@@ -98,8 +98,8 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
     box-sizing: border-box;
     padding-top: var(--header-height, 4rem);
     background:
-      radial-gradient(ellipse 70% 90% at 50% 40%, rgba(77, 168, 255, 0.08), transparent 60%),
-      var(--color-ink-raised);
+      radial-gradient(ellipse 70% 90% at 50% 40%, color-mix(in srgb, var(--color-accent) 4.8%, transparent), transparent 60%),
+      var(--color-surface);
   }
 
   .profile-hero__banner {
@@ -121,7 +121,7 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
   .profile-hero__banner-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(11, 11, 13, 0.15) 0%, rgba(11, 11, 13, 0.75) 70%, var(--color-ink) 100%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 15%, transparent) 0%, color-mix(in srgb, var(--color-bg) 75%, transparent) 70%, var(--color-bg) 100%);
   }
 
   .profile-hero__body {
@@ -156,7 +156,7 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
     flex-shrink: 0;
     border-radius: 0.875rem;
     object-fit: cover;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-    border: 4px solid var(--color-ink);
+    box-shadow: 0 24px 60px color-mix(in srgb, var(--color-shadow) 22%, transparent);
+    border: 4px solid var(--color-bg);
   }
 </style>

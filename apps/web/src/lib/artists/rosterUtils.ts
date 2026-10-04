@@ -11,12 +11,12 @@ export interface RosterAccent {
 /** Brand-token accent rotation: glow blue, neutral mono, glow-cyan. */
 export const ROSTER_ACCENTS: RosterAccent[] = [
   {
-    color: 'var(--color-glow)',
-    glow: 'rgba(77, 168, 255, 0.22)',
-    muted: 'rgba(77, 168, 255, 0.55)',
+    color: 'var(--color-accent)',
+    glow: 'color-mix(in srgb, var(--color-accent) 13.2%, transparent)',
+    muted: 'color-mix(in srgb, var(--color-accent) 33%, transparent)',
     panelInk: '#fafaf8',
     duotone:
-      'linear-gradient(160deg, rgba(11, 11, 13, 0.35) 0%, rgba(77, 168, 255, 0.38) 38%, rgba(11, 11, 13, 0.88) 100%)',
+      'linear-gradient(160deg, color-mix(in srgb, var(--color-bg) 35%, transparent) 0%, color-mix(in srgb, var(--color-accent) 22.8%, transparent) 38%, color-mix(in srgb, var(--color-bg) 88%, transparent) 100%)',
   },
   {
     color: '#a3a3a3',
@@ -24,15 +24,15 @@ export const ROSTER_ACCENTS: RosterAccent[] = [
     muted: 'rgba(163, 163, 163, 0.55)',
     panelInk: '#fafaf8',
     duotone:
-      'linear-gradient(160deg, rgba(11, 11, 13, 0.35) 0%, rgba(163, 163, 163, 0.32) 38%, rgba(11, 11, 13, 0.9) 100%)',
+      'linear-gradient(160deg, color-mix(in srgb, var(--color-bg) 35%, transparent) 0%, rgba(163, 163, 163, 0.32) 38%, color-mix(in srgb, var(--color-bg) 90%, transparent) 100%)',
   },
   {
-    color: 'var(--color-glow-cyan)',
-    glow: 'rgba(103, 232, 249, 0.2)',
-    muted: 'rgba(103, 232, 249, 0.55)',
+    color: 'var(--color-accent)',
+    glow: 'color-mix(in srgb, var(--color-accent) 10%, transparent)',
+    muted: 'color-mix(in srgb, var(--color-accent) 27.5%, transparent)',
     panelInk: '#fafaf8',
     duotone:
-      'linear-gradient(160deg, rgba(11, 11, 13, 0.35) 0%, rgba(103, 232, 249, 0.34) 38%, rgba(11, 11, 13, 0.88) 100%)',
+      'linear-gradient(160deg, color-mix(in srgb, var(--color-bg) 35%, transparent) 0%, color-mix(in srgb, var(--color-accent) 17%, transparent) 38%, color-mix(in srgb, var(--color-bg) 88%, transparent) 100%)',
   },
 ];
 

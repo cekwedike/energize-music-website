@@ -75,7 +75,7 @@ const { animated = true, class: className = '' } = Astro.props;
 
   .next-logo-el--bar,
   .next-logo-el--stroke {
-    fill: #fff;
+    fill: var(--color-fg);
   }
 
   .next-logo-el--accent {
@@ -84,13 +84,13 @@ const { animated = true, class: className = '' } = Astro.props;
 
   .next-logo-el--rule {
     fill: none;
-    stroke: #fff;
+    stroke: var(--color-fg);
     stroke-width: 16.67;
     stroke-miterlimit: 2.61313;
   }
 
   .next-logo-el--copy {
-    fill: #fff;
+    fill: var(--color-fg);
     font-family: Poppins, Inter, system-ui, sans-serif;
     font-size: 215.5px;
     font-weight: 700;

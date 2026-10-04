@@ -20,10 +20,10 @@
   .roster-intro {
     display: grid;
     grid-template-columns: 1fr;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 100%),
-      var(--color-ink);
+      linear-gradient(180deg, color-mix(in srgb, var(--color-fg) 1.5%, transparent) 0%, transparent 100%),
+      var(--color-bg);
   }
 
   .roster-intro__cell {
@@ -37,8 +37,8 @@
     line-height: 1.55;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--color-paper);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--color-fg);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 6%, transparent);
   }
 
   .roster-intro__cell:last-child {
@@ -53,7 +53,7 @@
   }
 
   .roster-intro__marker {
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   @media (min-width: 768px) {
@@ -63,7 +63,7 @@
 
     .roster-intro__cell {
       border-bottom: none;
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      border-right: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
     }
 
     .roster-intro__cell:last-child {

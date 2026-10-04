@@ -2,15 +2,18 @@
 interface Props {
   size?: 'sm' | 'lg';
   animated?: boolean;
-  /** 'light' is the white logo for dark backgrounds, 'dark' is the black logo for light backgrounds. */
-  tone?: 'dark' | 'light';
+  /**
+   * 'auto' follows the surrounding colour tokens (black on light sections, white inside .theme-dark).
+   * 'light' forces the white logo, 'dark' forces the black logo.
+   */
+  tone?: 'auto' | 'dark' | 'light';
 }
 
-const { size = 'lg', animated = true, tone = 'light' } = Astro.props;
+const { size = 'lg', animated = true, tone = 'auto' } = Astro.props;
 const sizeClass = size === 'sm' ? 'w-[118px] sm:w-[136px]' : 'w-[220px] sm:w-[280px] md:w-[340px]';
 ---
 
-<div class={`js-logo ${animated ? 'js-logo-animated' : ''} ${tone === 'dark' ? 'js-logo--dark' : ''} ${sizeClass}`}>
+<div class={`js-logo ${animated ? 'js-logo-animated' : ''} ${tone === 'auto' ? '' : `js-logo--${tone}`} ${sizeClass}`}>
   <svg viewBox="0 0 827 267" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-auto w-full overflow-visible">
     <g class="logo-bars">
           <g transform="translate(91,32)"><path style="--i: 0" data-side="left" class="logo-el logo-bar" d="M0 0 C34.65 0 69.3 0 105 0 C105 6 105 6 104 8 C69.35 8 34.7 8 -1 8 C-0.67 5.36 -0.34 2.72 0 0 Z"/></g>
@@ -54,20 +57,17 @@ const sizeClass = size === 'sm' ? 'w-[118px] sm:w-[136px]' : 'w-[220px] sm:w-[28
 </div>
 
 <style>
-  .js-logo {
-    filter: drop-shadow(0 0 22px rgba(0, 0, 0, 0.35));
-  }
-
   .logo-el {
-    fill: #fdfdfd;
+    fill: var(--color-fg);
+    transition: fill 0.35s ease;
   }
 
-  .js-logo--dark {
-    filter: none;
+  .js-logo--light .logo-el {
+    fill: var(--color-on-dark);
   }
 
   .js-logo--dark .logo-el {
-    fill: #0b0b0d;
+    fill: var(--color-scrim);
   }
 
   .js-logo-animated .logo-el {

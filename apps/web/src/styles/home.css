@@ -26,7 +26,7 @@
   font-weight: 800;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--color-glow);
+  color: var(--color-accent);
 }
 
 .home-kicker::before {
@@ -53,14 +53,14 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--color-fg);
   text-decoration: none;
 }
 
 .home-link__line {
   width: 2rem;
   height: 1px;
-  background: var(--color-glow);
+  background: var(--color-accent);
   transition: width 0.3s ease;
 }
 
@@ -87,31 +87,30 @@
 }
 
 .home-btn--solid {
-  background: var(--color-glow);
-  color: #041018;
-  box-shadow: 0 14px 40px rgba(77, 168, 255, 0.32);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--color-accent) 19.2%, transparent);
 }
 
 .home-btn--solid:hover {
   transform: translateY(-2px);
-  background: color-mix(in srgb, var(--color-glow) 88%, white);
+  background: var(--color-accent-strong);
 }
 
 .home-btn--ghost {
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #fff;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--color-fg) 40%, transparent);
+  color: var(--color-fg);
+  background: transparent;
 }
 
 .home-btn--ghost:hover {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--color-fg);
+  background: color-mix(in srgb, var(--color-fg) 6%, transparent);
 }
 
 .home-marquee {
   overflow: hidden;
-  border-block: 1px solid rgba(255, 255, 255, 0.08);
+  border-block: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
 
@@ -124,13 +123,13 @@
     font-weight: 800;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--color-fg);
     transform: translate3d(0, 0, 0);
     animation: home-marquee-x var(--home-marquee-duration, 26s) linear infinite;
   }
 
 .home-marquee__track span:nth-child(odd) {
-  color: rgba(77, 168, 255, 0.7);
+  color: color-mix(in srgb, var(--color-accent) 42%, transparent);
 }
 
 @keyframes home-marquee-x {
@@ -191,15 +190,15 @@
   flex: 1;
   height: 2px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.12);
+  background: color-mix(in srgb, var(--color-fg) 12%, transparent);
 }
 
 .home-h-scroll__thumb {
   position: absolute;
   inset: 0 auto 0 0;
   width: 34%;
-  background: linear-gradient(90deg, var(--color-glow), color-mix(in srgb, var(--color-glow) 55%, white));
-  box-shadow: 0 0 12px rgba(77, 168, 255, 0.55);
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-soft));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 33%, transparent);
   transform: translateX(0);
   will-change: transform, width;
 }
@@ -210,5 +209,5 @@
   font-weight: 800;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--color-paper);
+  color: var(--color-fg);
 }

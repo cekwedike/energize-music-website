@@ -13,7 +13,7 @@ const collageReleases = releases
   .slice(0, 10);
 ---
 
-<section class="releases-hero relative overflow-hidden border-b border-white/8" data-releases-hero>
+<section class="releases-hero relative overflow-hidden border-b border-fg/8" data-releases-hero>
   <div class="releases-hero__mesh" aria-hidden="true"></div>
   <div class="releases-hero__grain" aria-hidden="true"></div>
   <div class="releases-hero__glow releases-hero__glow--a" aria-hidden="true"></div>
@@ -48,15 +48,15 @@ const collageReleases = releases
 
   <div class="relative mx-auto max-w-7xl px-5 pb-8 pt-20 sm:px-6 sm:pb-10 sm:pt-24">
     <div class="max-w-2xl">
-      <p class="releases-hero__reveal releases-hero__reveal-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-glow)]">
+      <p class="releases-hero__reveal releases-hero__reveal-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-accent)]">
         Catalog
       </p>
 
-      <h1 class="releases-hero__headline releases-hero__reveal releases-hero__reveal-2 mt-5 font-display text-[clamp(2.75rem,2rem+5vw,5.5rem)] leading-[0.9] tracking-tight text-paper">
+      <h1 class="releases-hero__headline releases-hero__reveal releases-hero__reveal-2 mt-5 font-display text-[clamp(2.75rem,2rem+5vw,5.5rem)] leading-[0.9] tracking-tight text-fg">
         Releases
       </h1>
 
-      <p class="releases-hero__reveal releases-hero__reveal-3 text-lead mt-5 max-w-xl text-paper">
+      <p class="releases-hero__reveal releases-hero__reveal-3 text-lead mt-5 max-w-xl text-fg">
         Browse every single, EP, and album on the Energize Music roster. Filter by artist or scroll the full stage lineup.
       </p>
     </div>
@@ -84,9 +84,9 @@ const collageReleases = releases
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 75% 60% at 8% 12%, rgba(77, 168, 255, 0.18), transparent 55%),
-      radial-gradient(ellipse 55% 45% at 95% 65%, rgba(103, 232, 249, 0.1), transparent 50%),
-      linear-gradient(165deg, var(--color-ink) 0%, #0e0e11 50%, var(--color-ink-raised) 100%);
+      radial-gradient(ellipse 75% 60% at 8% 12%, color-mix(in srgb, var(--color-accent) 10.8%, transparent), transparent 55%),
+      radial-gradient(ellipse 55% 45% at 95% 65%, color-mix(in srgb, var(--color-accent) 5%, transparent), transparent 50%),
+      linear-gradient(165deg, var(--color-bg) 0%, var(--color-bg) 50%, var(--color-surface) 100%);
   }
 
   .releases-hero__grain {
@@ -110,7 +110,7 @@ const collageReleases = releases
     right: -4%;
     width: 280px;
     height: 280px;
-    background: rgba(77, 168, 255, 0.16);
+    background: color-mix(in srgb, var(--color-accent) 9.6%, transparent);
   }
 
   .releases-hero__glow--b {
@@ -118,7 +118,7 @@ const collageReleases = releases
     left: -6%;
     width: 220px;
     height: 220px;
-    background: rgba(37, 99, 235, 0.12);
+    background: color-mix(in srgb, var(--color-accent-strong) 7.2%, transparent);
   }
 
   .releases-hero__line {
@@ -127,7 +127,7 @@ const collageReleases = releases
     left: 0;
     width: 38%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(77, 168, 255, 0.35), transparent);
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-accent) 21%, transparent), transparent);
     opacity: 0.6;
   }
 
@@ -145,8 +145,8 @@ const collageReleases = releases
     aspect-ratio: 1;
     border-radius: 0.65rem;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    border: 1px solid color-mix(in srgb, var(--color-fg) 12%, transparent);
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--color-shadow) 16%, transparent);
     opacity: 0.24;
     transform: rotate(var(--collage-rotate, 0deg));
     animation: releases-collage-float 14s ease-in-out infinite;

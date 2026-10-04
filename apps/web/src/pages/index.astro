@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/home/Hero.astro';
+import HomeLatest from '../components/home/HomeLatest.astro';
 import HomeArtists from '../components/home/HomeArtists.astro';
 import HomeReleases from '../components/home/HomeReleases.astro';
 import HomeInitiatives from '../components/home/HomeInitiatives.astro';
@@ -33,6 +34,8 @@ try {
 const releases = await Promise.all(
   homeReleases.map((release) => enrichRelease(release, { coverSize: 480 })),
 );
+// The query already puts featured releases first, then the newest.
+const [latestRelease, ...moreReleases] = releases;
 ---
 
 <BaseLayout
@@ -47,15 +50,16 @@ const releases = await Promise.all(
     'Ellie Scotte',
   ]}
   hideAmbient
-  showTopMarquee
+  headerVariant="overlay"
 >
   <link slot="head" rel="preload" as="image" href={HERO_VIDEO_POSTER} type="image/webp" fetchpriority="high" />
   <div data-home-page data-hero-ready="false">
     <Hero />
     <div data-home-below class="home-below">
-      <HomeReleases releases={releases} />
-      <HomeInitiatives />
+      <HomeLatest release={latestRelease} />
+      <HomeReleases releases={moreReleases} />
       <HomeArtists artists={artists} />
+      <HomeInitiatives />
       <HomeAbout />
       <HomeNewsletter />
     </div>

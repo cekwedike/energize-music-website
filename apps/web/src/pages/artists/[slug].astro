@@ -117,7 +117,7 @@ const jsonLd = {
   .artist-profile-page :global(.profile-hero) {
     position: relative;
     z-index: 2;
-    background: var(--color-ink);
+    background: var(--color-bg);
   }
 
   .artist-profile-body__backdrop {
@@ -153,12 +153,12 @@ const jsonLd = {
     background:
       linear-gradient(
         180deg,
-        rgba(11, 11, 13, 0.52) 0%,
-        rgba(11, 11, 13, 0.68) 18%,
-        rgba(11, 11, 13, 0.84) 52%,
-        var(--color-ink) 100%
+        color-mix(in srgb, var(--color-bg) 52%, transparent) 0%,
+        color-mix(in srgb, var(--color-bg) 68%, transparent) 18%,
+        color-mix(in srgb, var(--color-bg) 84%, transparent) 52%,
+        var(--color-bg) 100%
       ),
-      radial-gradient(ellipse 130% 90% at 50% 0%, rgba(11, 11, 13, 0.55), transparent 62%);
+      radial-gradient(ellipse 130% 90% at 50% 0%, color-mix(in srgb, var(--color-bg) 55%, transparent), transparent 62%);
   }
 
   .artist-profile-body > :global(*:not(.artist-profile-body__scrim)) {

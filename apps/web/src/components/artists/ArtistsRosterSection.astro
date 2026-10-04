@@ -28,7 +28,7 @@ const isReversed = index % 2 === 1;
 
 <section
   id={`artist-${artist.slug}`}
-  class="roster-card"
+  class="roster-card theme-dark"
   data-roster-section
   data-index={index}
   data-reverse={isReversed ? 'true' : undefined}
@@ -112,9 +112,9 @@ const isReversed = index % 2 === 1;
     position: relative;
     min-height: min(88svh, 820px);
     overflow: clip;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
     scroll-margin-top: 5rem;
-    background: var(--color-ink);
+    background: var(--color-bg);
   }
 
   .roster-card__backdrop {
@@ -168,8 +168,8 @@ const isReversed = index % 2 === 1;
     height: 62%;
     background: linear-gradient(
       to top,
-      rgba(11, 11, 13, 0.92) 0%,
-      rgba(11, 11, 13, 0.45) 42%,
+      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 45%, transparent) 42%,
       transparent 100%
     );
     pointer-events: none;
@@ -179,7 +179,7 @@ const isReversed = index % 2 === 1;
     display: flex;
     flex-direction: column;
     min-height: auto;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
   }
 
   .roster-card__info-panel {
@@ -188,8 +188,8 @@ const isReversed = index % 2 === 1;
     flex-direction: column;
     justify-content: flex-end;
     padding: clamp(1.35rem, 3.5vh, 2rem) clamp(1.25rem, 4vw, 2.5rem);
-    color: var(--color-paper);
-    background: rgba(11, 11, 13, 0.42);
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-bg) 42%, transparent);
     backdrop-filter: blur(8px) saturate(1.08);
     -webkit-backdrop-filter: blur(8px) saturate(1.08);
   }
@@ -265,7 +265,7 @@ const isReversed = index % 2 === 1;
     font-weight: 700;
     letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .roster-card__content {
@@ -279,12 +279,12 @@ const isReversed = index % 2 === 1;
     margin: 0;
     font-size: clamp(0.9375rem, 0.88rem + 0.25vw, 1.0625rem);
     line-height: 1.68;
-    color: var(--color-paper);
+    color: var(--color-fg);
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 4;
     overflow: hidden;
-    text-shadow: 0 1px 12px rgba(11, 11, 13, 0.45);
+    text-shadow: 0 1px 12px color-mix(in srgb, var(--color-bg) 45%, transparent);
   }
 
   .roster-card__cta {
@@ -295,15 +295,15 @@ const isReversed = index % 2 === 1;
     min-height: 2.75rem;
     margin-top: 0.25rem;
     padding: 0.65rem 1.1rem;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid color-mix(in srgb, var(--color-fg) 18%, transparent);
     border-radius: 9999px;
     font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     text-decoration: none;
-    color: var(--color-paper);
-    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-fg) 5%, transparent);
     transition:
       border-color 0.25s ease,
       color 0.25s ease,
@@ -321,7 +321,7 @@ const isReversed = index % 2 === 1;
   .roster-card__cta:focus-visible {
     border-color: color-mix(in srgb, var(--roster-accent) 55%, white 10%);
     color: var(--roster-accent);
-    background: rgba(255, 255, 255, 0.08);
+    background: color-mix(in srgb, var(--color-fg) 8%, transparent);
     transform: translateY(-1px);
   }
 
@@ -343,7 +343,7 @@ const isReversed = index % 2 === 1;
 
     .roster-card__info {
       border-top: none;
-      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
     }
 
     .roster-card__info-panel {
@@ -365,7 +365,7 @@ const isReversed = index % 2 === 1;
     .roster-card[data-reverse='true'] .roster-card__info {
       order: 1;
       border-left: none;
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      border-right: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
     }
   }
 
@@ -377,13 +377,13 @@ const isReversed = index % 2 === 1;
     .roster-card__info-panel {
       justify-content: center;
       padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
-      background: rgba(11, 11, 13, 0.28);
+      background: color-mix(in srgb, var(--color-bg) 28%, transparent);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
 
     .roster-card__eyebrow {
-      text-shadow: 0 1px 10px rgba(11, 11, 13, 0.55);
+      text-shadow: 0 1px 10px color-mix(in srgb, var(--color-bg) 55%, transparent);
     }
 
     .roster-card__content {
@@ -400,8 +400,8 @@ const isReversed = index % 2 === 1;
       top: 28%;
       background: linear-gradient(
         to top,
-        rgba(11, 11, 13, 0.58) 0%,
-        rgba(11, 11, 13, 0.2) 52%,
+        color-mix(in srgb, var(--color-bg) 58%, transparent) 0%,
+        color-mix(in srgb, var(--color-bg) 20%, transparent) 52%,
         transparent 100%
       );
       pointer-events: none;
@@ -409,21 +409,21 @@ const isReversed = index % 2 === 1;
     }
 
     .roster-card__bio {
-      color: var(--color-paper);
+      color: var(--color-fg);
       text-shadow:
-        0 1px 3px rgba(11, 11, 13, 0.78),
-        0 2px 18px rgba(11, 11, 13, 0.52);
+        0 1px 3px color-mix(in srgb, var(--color-bg) 78%, transparent),
+        0 2px 18px color-mix(in srgb, var(--color-bg) 52%, transparent);
     }
   }
 
   @supports not (backdrop-filter: blur(1px)) {
     .roster-card__info-panel {
-      background: rgba(11, 11, 13, 0.72);
+      background: color-mix(in srgb, var(--color-bg) 72%, transparent);
     }
 
     @media (min-width: 1024px) {
       .roster-card__info-panel {
-        background: rgba(11, 11, 13, 0.34);
+        background: color-mix(in srgb, var(--color-bg) 34%, transparent);
       }
     }
   }
@@ -465,15 +465,15 @@ const isReversed = index % 2 === 1;
     }
 
     .roster-card__visual {
-      background: var(--color-ink);
+      background: var(--color-bg);
     }
 
     .roster-card__visual-scrim {
       height: 48%;
       background: linear-gradient(
         to top,
-        rgba(11, 11, 13, 0.94) 0%,
-        rgba(11, 11, 13, 0.35) 55%,
+        color-mix(in srgb, var(--color-bg) 94%, transparent) 0%,
+        color-mix(in srgb, var(--color-bg) 35%, transparent) 55%,
         transparent 100%
       );
     }

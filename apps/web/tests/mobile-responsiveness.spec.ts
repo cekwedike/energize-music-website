@@ -8,6 +8,7 @@ const VIEWPORTS = [
   { name: '390', width: 390, height: 844 },
   { name: '414', width: 414, height: 896 },
   { name: '768', width: 768, height: 1024 },
+  { name: '1440', width: 1440, height: 900 },
 ] as const;
 
 const ROUTES = [

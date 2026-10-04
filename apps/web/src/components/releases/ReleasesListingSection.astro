@@ -23,7 +23,7 @@ function artistPhotoUrl(
 
 {
   artistGroups.length === 0 ? (
-    <p class="releases-listing__empty rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-8 py-16 text-center text-paper">
+    <p class="releases-listing__empty rounded-2xl border border-dashed border-fg/15 bg-fg/[0.02] px-8 py-16 text-center text-fg">
       Releases will appear here once you add them in Sanity Studio.
     </p>
   ) : (
@@ -164,7 +164,7 @@ function artistPhotoUrl(
     flex-direction: column;
     gap: 1.25rem;
     margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
     padding-bottom: 1.25rem;
   }
 
@@ -218,7 +218,7 @@ function artistPhotoUrl(
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-paper);
+    color: var(--color-fg);
     cursor: pointer;
     white-space: nowrap;
     transition: color 0.25s ease;
@@ -240,24 +240,24 @@ function artistPhotoUrl(
 
   .releases-filter__pill:hover,
   .releases-filter__pill:focus-visible {
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .releases-filter__pill:hover::after,
   .releases-filter__pill:focus-visible::after {
-    border-color: var(--color-glow);
-    background: rgba(77, 168, 255, 0.06);
-    box-shadow: 0 0 10px rgba(77, 168, 255, 0.24);
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 3.6%, transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 14.4%, transparent);
   }
 
   .releases-filter__pill[aria-current='true'] {
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .releases-filter__pill[aria-current='true']::after {
-    border-color: var(--color-glow);
-    background: rgba(77, 168, 255, 0.1);
-    box-shadow: 0 0 12px rgba(77, 168, 255, 0.32);
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 19.2%, transparent);
   }
 
   .releases-filter__photo {
@@ -267,7 +267,7 @@ function artistPhotoUrl(
     height: 2rem;
     border-radius: 9999px;
     object-fit: cover;
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    border: 1px solid color-mix(in srgb, var(--color-fg) 14%, transparent);
   }
 
   .releases-filter__pill span {
@@ -282,8 +282,8 @@ function artistPhotoUrl(
     gap: 0.375rem;
     padding: 0.25rem;
     border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
+    background: color-mix(in srgb, var(--color-fg) 2%, transparent);
   }
 
   @media (min-width: 1024px) {
@@ -303,7 +303,7 @@ function artistPhotoUrl(
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-paper);
+    color: var(--color-fg);
     cursor: pointer;
     transition:
       color 0.2s ease,
@@ -313,13 +313,13 @@ function artistPhotoUrl(
 
   .releases-view__btn:hover,
   .releases-view__btn:focus-visible {
-    color: var(--color-paper);
+    color: var(--color-fg);
   }
 
   .releases-view__btn[aria-pressed='true'] {
-    color: var(--color-paper);
-    background: rgba(77, 168, 255, 0.14);
-    box-shadow: 0 0 12px rgba(77, 168, 255, 0.18);
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-accent) 8.4%, transparent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 10.8%, transparent);
   }
 
   /* View mode styles use :global() so they reach child Astro components. */
@@ -352,14 +352,14 @@ function artistPhotoUrl(
       align-items: center;
       padding: 0.625rem 0.75rem;
       border-radius: 0.875rem;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
+      background: color-mix(in srgb, var(--color-fg) 2%, transparent);
     }
 
     .releases-listing[data-view-mode='list'] :global(.catalog-card:hover) {
       transform: none;
-      border-color: rgba(77, 168, 255, 0.28);
-      background: rgba(255, 255, 255, 0.035);
+      border-color: color-mix(in srgb, var(--color-accent) 16.8%, transparent);
+      background: color-mix(in srgb, var(--color-fg) 3.5%, transparent);
     }
 
     .releases-listing[data-view-mode='list'] :global(.catalog-card__cover) {
@@ -422,8 +422,8 @@ function artistPhotoUrl(
 
     .releases-listing[data-view-mode='compact'] :global(.catalog-card:hover) {
       transform: none;
-      border-color: rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.03);
+      border-color: color-mix(in srgb, var(--color-fg) 8%, transparent);
+      background: color-mix(in srgb, var(--color-fg) 3%, transparent);
     }
 
     .releases-listing[data-view-mode='compact'] :global(.catalog-card__cover) {
@@ -542,14 +542,14 @@ function artistPhotoUrl(
       align-items: center;
       padding: 0.625rem 0.75rem;
       border-radius: 0.875rem;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
+      background: color-mix(in srgb, var(--color-fg) 2%, transparent);
     }
 
     .releases-listing[data-view-mode='list'] :global(.catalog-card:hover) {
       transform: none;
-      border-color: rgba(77, 168, 255, 0.28);
-      background: rgba(255, 255, 255, 0.035);
+      border-color: color-mix(in srgb, var(--color-accent) 16.8%, transparent);
+      background: color-mix(in srgb, var(--color-fg) 3.5%, transparent);
     }
 
     .releases-listing[data-view-mode='list'] :global(.catalog-card__cover) {
@@ -610,8 +610,8 @@ function artistPhotoUrl(
 
     .releases-listing[data-view-mode='compact'] :global(.catalog-card:hover) {
       transform: none;
-      border-color: rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.03);
+      border-color: color-mix(in srgb, var(--color-fg) 8%, transparent);
+      background: color-mix(in srgb, var(--color-fg) 3%, transparent);
     }
 
     .releases-listing[data-view-mode='compact'] :global(.catalog-card__cover) {

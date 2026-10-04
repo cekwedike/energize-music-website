@@ -36,23 +36,23 @@ const pillars = [
   breadcrumbs={crumbs({ name: 'Energize Kids', path: '/energize-kids' })}
 >
   <!-- Hero -->
-  <section class="relative min-h-[32rem] overflow-hidden border-b border-white/10 sm:min-h-[38rem] lg:min-h-[42rem]">
-    <div class="absolute inset-0 bg-[#1a1218]">
+  <section class="theme-dark relative min-h-[32rem] overflow-hidden border-b border-fg/10 sm:min-h-[38rem] lg:min-h-[42rem]">
+    <div class="absolute inset-0 bg-[var(--color-bg)]">
       <img
         src="/initiatives/energize-kids.webp"
         alt="Energize Kids colorful brand artwork"
         class="h-full w-full object-contain object-center sm:object-cover sm:object-[center_38%] lg:object-[center_35%]"
         loading="eager"
       />
-      <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-ink)]/30 via-[var(--color-ink)]/45 to-[var(--color-ink)]/88"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-bg)]/30 via-[var(--color-bg)]/45 to-[var(--color-bg)]/88"></div>
     </div>
 
     <div class="relative mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-32">
-      <p class="scroll-reveal text-xs font-semibold uppercase tracking-[0.35em] text-paper">
+      <p class="scroll-reveal text-xs font-semibold uppercase tracking-[0.35em] text-fg">
         Music · Movement · Learning · Joy
       </p>
       <h1 class="scroll-reveal text-h1 mt-6 max-w-3xl" style="--reveal-delay: 80ms">Christian Kids Entertainment from Energize Music</h1>
-      <p class="scroll-reveal text-lead mt-6 max-w-2xl text-paper" style="--reveal-delay: 160ms">
+      <p class="scroll-reveal text-lead mt-6 max-w-2xl text-fg" style="--reveal-delay: 160ms">
         Energize Kids is the family wing of Energize Music: clean songs, movement games, learning prompts, and joy-first activities. Details and registration live on energize-kids.com.
       </p>
       <div class="scroll-reveal mt-10 flex flex-wrap gap-3" style="--reveal-delay: 240ms">
@@ -60,13 +60,13 @@ const pillars = [
           href={LIVE_SITE}
           target="_blank"
           rel="noopener noreferrer"
-          class="button-glow rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+          class="button-glow rounded-full bg-fg px-7 py-3.5 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90"
         >
           Visit Energize Kids
         </a>
         <a
           href="#pillars"
-          class="rounded-full border border-white/30 px-7 py-3.5 text-sm font-semibold text-paper transition hover:border-white/50 hover:bg-white/5"
+          class="rounded-full border border-fg/30 px-7 py-3.5 text-sm font-semibold text-fg transition hover:border-fg/50 hover:bg-fg/5"
         >
           Explore the pillars
         </a>
@@ -75,19 +75,19 @@ const pillars = [
   </section>
 
   <!-- Highlights -->
-  <section class="border-b border-white/10 bg-[var(--color-ink-raised)]">
+  <section class="border-b border-fg/10 bg-[var(--color-surface)]">
     <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
       <ul class="scroll-reveal-stagger grid gap-6 sm:grid-cols-3">
-        <li class="text-sm text-paper">
-          <strong class="block text-paper">Play Zone challenges</strong>
+        <li class="text-sm text-fg">
+          <strong class="block text-fg">Play Zone challenges</strong>
           Short prompts kids can try at home, like saying one kind thing to a friend
         </li>
-        <li class="text-sm text-paper">
-          <strong class="block text-paper">Community powered</strong>
+        <li class="text-sm text-fg">
+          <strong class="block text-fg">Community powered</strong>
           By Energize Music and Energize Central
         </li>
-        <li class="text-sm text-paper">
-          <strong class="block text-paper">Parent-led registration</strong>
+        <li class="text-sm text-fg">
+          <strong class="block text-fg">Parent-led registration</strong>
           A parent or guardian signs a child up and stays in control of updates
         </li>
       </ul>
@@ -95,12 +95,12 @@ const pillars = [
   </section>
 
   <!-- Event -->
-  <section id="events" class="scroll-mt-24 border-b border-white/10">
+  <section id="events" class="scroll-mt-24 border-b border-fg/10">
     <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
-      <div class="scroll-reveal mb-10 rounded-2xl border border-[var(--color-glow)]/30 bg-[var(--color-glow)]/[0.06] px-6 py-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
+      <div class="scroll-reveal mb-10 rounded-2xl border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/[0.06] px-6 py-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-glow)]">Live events &amp; registration</p>
-          <p class="mt-2 text-sm text-paper">
+          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-accent)]">Live events &amp; registration</p>
+          <p class="mt-2 text-sm text-fg">
             Dates, Zoom links, and sign-up live on the Energize Kids site. Visit Energize Kids for the latest.
           </p>
         </div>
@@ -108,7 +108,7 @@ const pillars = [
           href={LIVE_SITE}
           target="_blank"
           rel="noopener noreferrer"
-          class="button-glow mt-4 inline-flex shrink-0 items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90 sm:mt-0"
+          class="button-glow mt-4 inline-flex shrink-0 items-center rounded-full bg-fg px-6 py-3 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90 sm:mt-0"
         >
           Go to Energize Kids
         </a>
@@ -116,9 +116,9 @@ const pillars = [
 
       <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
         <div class="scroll-reveal">
-          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-glow)]">Online event for parents and guardians</p>
+          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-accent)]">Online event for parents and guardians</p>
           <h2 class="text-h2 mt-3">Crowned, Not Cloned.</h2>
-          <p class="mt-4 text-paper">
+          <p class="mt-4 text-fg">
             Join a Zoom conversation for parents and guardians about raising kids with identity, conviction, purpose, and confidence in God. Date: 25 July 2026. Register on energize-kids.com.
           </p>
           <div class="mt-8 flex flex-wrap gap-3">
@@ -126,7 +126,7 @@ const pillars = [
               href={LIVE_SITE}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-block rounded-full bg-[var(--color-glow)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-glow)]/90"
+              class="inline-block rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-on-accent)] transition hover:bg-[var(--color-accent)]/90"
             >
               Register at Energize Kids
             </a>
@@ -134,21 +134,21 @@ const pillars = [
               href={LIVE_SITE}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-block rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-paper transition hover:border-white/45 hover:bg-white/5"
+              class="inline-block rounded-full border border-fg/25 px-6 py-3 text-sm font-semibold text-fg transition hover:border-fg/45 hover:bg-fg/5"
             >
               View all events
             </a>
           </div>
         </div>
-        <div class="scroll-reveal scroll-reveal-pixel rounded-2xl border border-white/10 bg-white/5 p-8" style="--reveal-delay: 120ms">
-          <p class="text-xs font-semibold uppercase tracking-widest text-paper">Featured Artist</p>
+        <div class="scroll-reveal scroll-reveal-pixel rounded-2xl border border-fg/10 bg-fg/5 p-8" style="--reveal-delay: 120ms">
+          <p class="text-xs font-semibold uppercase tracking-widest text-fg">Featured Artist</p>
           <h3 class="text-h3 mt-2">Xade</h3>
-          <p class="mt-4 text-paper">
+          <p class="mt-4 text-fg">
             Xade brings a soulful blend of Afro-Gospel, Afrobeats, and Hip-Hop. His single <em>Prayer</em> is available across all platforms.
           </p>
           <ul class="mt-4 flex flex-wrap gap-2">
             {['Afro-Gospel', 'Afrobeats', 'Hip-Hop', 'Clean Energy'].map((tag) => (
-              <li class="rounded-full border border-white/15 px-3 py-1 text-xs text-paper">{tag}</li>
+              <li class="rounded-full border border-fg/15 px-3 py-1 text-xs text-fg">{tag}</li>
             ))}
           </ul>
         </div>
@@ -157,18 +157,18 @@ const pillars = [
   </section>
 
   <!-- Pillars -->
-  <section id="pillars" class="scroll-mt-24 border-b border-white/10 bg-[var(--color-ink-raised)]">
+  <section id="pillars" class="scroll-mt-24 border-b border-fg/10 bg-[var(--color-surface)]">
     <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
       <div class="scroll-reveal max-w-2xl">
-        <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-glow)]">The Energize Kids World</p>
+        <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-accent)]">The Energize Kids World</p>
         <h2 class="text-h2 mt-3">More than music, built for joyful discovery.</h2>
       </div>
       <div class="scroll-reveal-stagger mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal-variant="pixel">
         {pillars.map((pillar) => (
-          <article class="rounded-xl border border-white/10 bg-white/5 p-6">
-            <span class="text-2xl text-[var(--color-glow)]" aria-hidden="true">{pillar.icon}</span>
+          <article class="rounded-xl border border-fg/10 bg-fg/5 p-6">
+            <span class="text-2xl text-[var(--color-accent)]" aria-hidden="true">{pillar.icon}</span>
             <h3 class="mt-4 font-display text-lg font-medium">{pillar.title}</h3>
-            <p class="mt-2 text-sm text-paper">{pillar.body}</p>
+            <p class="mt-2 text-sm text-fg">{pillar.body}</p>
           </article>
         ))}
       </div>
@@ -179,14 +179,14 @@ const pillars = [
   <section>
     <div class="mx-auto max-w-6xl px-5 py-20 text-center sm:px-6 sm:py-28">
       <h2 class="scroll-reveal text-h2">Stay with Energize Kids online</h2>
-      <p class="scroll-reveal mx-auto mt-4 max-w-xl text-paper" style="--reveal-delay: 80ms">
+      <p class="scroll-reveal mx-auto mt-4 max-w-xl text-fg" style="--reveal-delay: 80ms">
         Powered by Energize Music and Energize Central. Find Play Zone challenges, child registration, Xade's single Prayer, and event sign-ups on energize-kids.com.
       </p>
       <a
         href={LIVE_SITE}
         target="_blank"
         rel="noopener noreferrer"
-        class="scroll-reveal button-glow mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-white/90"
+        class="scroll-reveal button-glow mt-8 inline-block rounded-full bg-fg px-8 py-3.5 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90"
         style="--reveal-delay: 160ms"
       >
         Visit Energize Kids

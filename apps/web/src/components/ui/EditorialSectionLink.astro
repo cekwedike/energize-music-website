@@ -37,17 +37,17 @@ const isBack = variant === 'back';
     min-height: 2.5rem;
     padding: 0.45rem 1rem;
     border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    border: 1px solid color-mix(in srgb, var(--color-fg) 14%, transparent);
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%),
-      rgba(255, 255, 255, 0.02);
+      linear-gradient(135deg, color-mix(in srgb, var(--color-fg) 5%, transparent) 0%, color-mix(in srgb, var(--color-fg) 2%, transparent) 100%),
+      color-mix(in srgb, var(--color-fg) 2%, transparent);
     backdrop-filter: blur(10px);
     font-size: 0.625rem;
     font-weight: 700;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     text-decoration: none;
-    color: var(--color-paper);
+    color: var(--color-fg);
     transition:
       border-color 0.2s ease,
       color 0.2s ease,
@@ -58,12 +58,12 @@ const isBack = variant === 'back';
 
   .editorial-link:hover,
   .editorial-link:focus-visible {
-    border-color: rgba(77, 168, 255, 0.45);
-    color: var(--color-glow);
+    border-color: color-mix(in srgb, var(--color-accent) 27%, transparent);
+    color: var(--color-accent);
     background:
-      linear-gradient(135deg, rgba(77, 168, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%),
-      rgba(77, 168, 255, 0.04);
-    box-shadow: 0 0 28px rgba(77, 168, 255, 0.1);
+      linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 6%, transparent) 0%, color-mix(in srgb, var(--color-fg) 3%, transparent) 100%),
+      color-mix(in srgb, var(--color-accent) 2.4%, transparent);
+    box-shadow: 0 0 28px color-mix(in srgb, var(--color-accent) 6%, transparent);
     transform: translateY(-1px);
   }
 

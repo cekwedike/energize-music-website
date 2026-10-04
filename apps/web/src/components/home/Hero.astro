@@ -11,7 +11,7 @@ import {
 const freqBars = Array.from({ length: 12 }, (_, i) => i);
 ---
 
-<section class="hero" data-hero style={`--hero-poster: url('${HERO_VIDEO_POSTER}')`}>
+<section class="hero theme-dark" data-hero style={`--hero-poster: url('${HERO_VIDEO_POSTER}')`}>
   <video
     id="hero-video"
     class="hero-video"
@@ -67,13 +67,13 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
 
   <div id="hero-content" class="hero-content">
     <Logo />
-    <p class="hero-text-el font-inter mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-white sm:mt-6 sm:text-xs">
+    <p class="hero-text-el font-inter mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--color-on-dark)] sm:mt-6 sm:text-xs">
       The Energy Different
     </p>
-    <h1 class="hero-text-el hero-text-el-heading font-instrument mt-5 max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-white sm:mt-8 sm:max-w-2xl md:mt-9 md:max-w-4xl">
+    <h1 class="hero-text-el hero-text-el-heading font-instrument mt-5 max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-[var(--color-on-dark)] sm:mt-8 sm:max-w-2xl md:mt-9 md:max-w-4xl">
       The Afro-Gospel Label Behind Africa's Biggest Christian Voices
     </h1>
-    <p class="hero-text-el hero-text-el-sub font-inter mt-4 max-w-xl text-sm text-white sm:mt-5 md:mt-7 md:text-base">
+    <p class="hero-text-el hero-text-el-sub font-inter mt-4 max-w-xl text-sm text-[var(--color-on-dark)] sm:mt-5 md:mt-7 md:text-base">
       Energize Music is a Lagos record label for Afro-gospel and soul-fusion listeners who want faith-filled music with real craft.
     </p>
   </div>
@@ -104,10 +104,11 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     z-index: 0;
     height: 100svh;
     min-height: 36rem;
+    margin-top: calc(-1 * var(--header-height, 4rem));
     width: 100%;
     overflow: hidden;
     isolation: isolate;
-    background: #04080c;
+    background: var(--color-bg);
   }
 
   .hero-video {
@@ -122,7 +123,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     will-change: opacity;
     opacity: 0;
     transition: opacity 0.55s ease;
-    background-color: #04080c;
+    background-color: var(--color-bg);
     background-image: var(--hero-poster);
     background-size: cover;
     background-position: center bottom;
@@ -137,8 +138,8 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     inset: 0;
     z-index: 1;
     background:
-      radial-gradient(ellipse 70% 55% at 50% 28%, rgba(77, 168, 255, 0.14), transparent 60%),
-      linear-gradient(180deg, rgba(4, 8, 12, 0.35) 0%, rgba(4, 8, 12, 0.12) 42%, rgba(4, 8, 12, 0.55) 100%);
+      radial-gradient(ellipse 70% 55% at 50% 28%, color-mix(in srgb, var(--color-accent) 8.4%, transparent), transparent 60%),
+      linear-gradient(180deg, color-mix(in srgb, var(--color-scrim) 35%, transparent) 0%, color-mix(in srgb, var(--color-scrim) 12%, transparent) 42%, color-mix(in srgb, var(--color-scrim) 55%, transparent) 100%);
     pointer-events: none;
   }
 
@@ -152,7 +153,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     height: min(72vw, 30rem);
     translate: -50% 0;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(77, 168, 255, 0.22) 0%, rgba(77, 168, 255, 0.06) 42%, transparent 70%);
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 13.2%, transparent) 0%, color-mix(in srgb, var(--color-accent) 3.6%, transparent) 42%, transparent 70%);
     opacity: 0.7;
     pointer-events: none;
   }
@@ -170,7 +171,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     letter-spacing: -0.06em;
     line-height: 0.85;
     color: transparent;
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.14);
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--color-fg) 14%, transparent);
     white-space: nowrap;
     pointer-events: none;
     user-select: none;
@@ -188,7 +189,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     font-weight: 800;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--color-fg);
     white-space: nowrap;
     pointer-events: none;
   }
@@ -208,8 +209,8 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   .hero-rail__dot {
     width: 0.28rem;
     height: 0.28rem;
-    background: var(--color-glow);
-    box-shadow: 0 0 10px rgba(77, 168, 255, 0.8);
+    background: var(--color-accent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 48%, transparent);
   }
 
   @media (min-width: 1100px) {
@@ -235,7 +236,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     position: absolute;
     width: 1.75rem;
     height: 1.75rem;
-    border-color: rgba(77, 168, 255, 0.55);
+    border-color: color-mix(in srgb, var(--color-accent) 33%, transparent);
     border-style: solid;
     opacity: 0;
     transition: opacity 0.6s ease;
@@ -304,7 +305,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
 
   .hero-text-el-heading {
     transition-delay: 0.2s;
-    text-shadow: 0 0 40px rgba(255, 255, 255, 0.28);
+    text-shadow: 0 0 40px color-mix(in srgb, var(--color-fg) 28%, transparent);
   }
 
   .hero-text-el-sub {
@@ -345,7 +346,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   .hero-signal__bar {
     width: 0.18rem;
     height: 100%;
-    background: linear-gradient(180deg, var(--color-glow), rgba(255, 255, 255, 0.35));
+    background: linear-gradient(180deg, var(--color-accent), color-mix(in srgb, var(--color-fg) 35%, transparent));
     transform: scaleY(0.25) translateZ(0);
     transform-origin: bottom center;
     opacity: 0.55;
@@ -373,7 +374,7 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     font-weight: 800;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--color-fg);
     text-decoration: none;
     opacity: 0;
     transform: translate3d(0, 10px, 0);
@@ -394,14 +395,14 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   }
 
   .hero-scroll:hover {
-    color: #fff;
+    color: var(--color-fg);
   }
 
   .hero-scroll__line {
     display: block;
     width: 1px;
     height: 1.6rem;
-    background: linear-gradient(180deg, var(--color-glow), transparent);
+    background: linear-gradient(180deg, var(--color-accent), transparent);
     transform: scaleY(0.55) translateZ(0);
     transform-origin: top center;
   }

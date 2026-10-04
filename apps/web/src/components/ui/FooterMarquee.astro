@@ -29,24 +29,24 @@ const loopItems = Array.from({ length: 12 }, () => phrase);
     position: relative;
     overflow: hidden;
     contain: paint;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 6%, transparent);
     padding-block: clamp(0.4375rem, 0.4rem + 0.2vw, 0.75rem);
   }
 
   .footer-marquee--top {
     position: relative;
     z-index: 30;
-    background: rgba(11, 11, 13, 0.72);
+    background: color-mix(in srgb, var(--color-bg) 72%, transparent);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
 
   .footer-marquee--top .footer-marquee__fade--left {
-    background: linear-gradient(90deg, var(--color-ink) 0%, transparent 100%);
+    background: linear-gradient(90deg, var(--color-bg) 0%, transparent 100%);
   }
 
   .footer-marquee--top .footer-marquee__fade--right {
-    background: linear-gradient(270deg, var(--color-ink) 0%, transparent 100%);
+    background: linear-gradient(270deg, var(--color-bg) 0%, transparent 100%);
   }
 
   .footer-marquee__fade {
@@ -66,12 +66,12 @@ const loopItems = Array.from({ length: 12 }, () => phrase);
 
   .footer-marquee__fade--left {
     left: 0;
-    background: linear-gradient(90deg, var(--color-ink-raised) 0%, transparent 100%);
+    background: linear-gradient(90deg, var(--color-surface) 0%, transparent 100%);
   }
 
   .footer-marquee__fade--right {
     right: 0;
-    background: linear-gradient(270deg, var(--color-ink-raised) 0%, transparent 100%);
+    background: linear-gradient(270deg, var(--color-surface) 0%, transparent 100%);
   }
 
   .footer-marquee__track {
@@ -96,7 +96,7 @@ const loopItems = Array.from({ length: 12 }, () => phrase);
     font-size: clamp(0.8125rem, 0.78rem + 0.3vw, 1.125rem);
     font-style: italic;
     letter-spacing: 0.04em;
-    color: var(--color-paper);
+    color: var(--color-fg);
     white-space: nowrap;
   }
 
@@ -105,9 +105,9 @@ const loopItems = Array.from({ length: 12 }, () => phrase);
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: var(--color-glow);
+    background: var(--color-accent);
     opacity: 0.45;
-    box-shadow: 0 0 12px rgba(77, 168, 255, 0.5);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 30%, transparent);
   }
 
   @keyframes footer-marquee-scroll {
