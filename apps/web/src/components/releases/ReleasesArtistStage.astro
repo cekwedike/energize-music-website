@@ -137,17 +137,17 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
   .artist-stage__portrait-wrap {
     position: relative;
     overflow: hidden;
-    border-radius: 1rem;
+    border-radius: var(--radius-card);
     min-height: clamp(200px, 42vw, 300px);
     max-height: 320px;
-    box-shadow: 0 24px 64px color-mix(in srgb, var(--color-shadow) 16.8%, transparent);
+    box-shadow: var(--shadow-card);
   }
 
   @media (min-width: 1024px) {
     .artist-stage__portrait-wrap {
       min-height: clamp(280px, 36vh, 420px);
       max-height: 460px;
-      border-radius: 1.125rem;
+      border-radius: var(--radius-card);
     }
   }
 

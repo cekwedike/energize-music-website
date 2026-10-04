@@ -193,10 +193,8 @@ const primaryListenUrl = release.externalUrl;
     width: 100%;
     aspect-ratio: 1;
     overflow: hidden;
-    border-radius: 0.35rem;
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--color-fg) 8%, transparent),
-      0 28px 80px color-mix(in srgb, var(--color-shadow) 22%, transparent);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
   }
 
   .release-detail__cover-img,

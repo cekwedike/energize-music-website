@@ -85,7 +85,6 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
             </div>
 
             <div class="release-spotlight__visual">
-              <div class="release-spotlight__cover-ring" aria-hidden="true"></div>
               {
                 coverUrl ? (
                   <img
@@ -329,14 +328,6 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
     }
   }
 
-  .release-spotlight__cover-ring {
-    position: absolute;
-    inset: -8%;
-    border-radius: 1.5rem;
-    border: 1px solid color-mix(in srgb, var(--color-accent) 16.8%, transparent);
-    box-shadow: 0 0 32px color-mix(in srgb, var(--color-accent) 7.2%, transparent);
-    pointer-events: none;
-  }
 
   .release-spotlight__cover {
     position: relative;
@@ -344,9 +335,9 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
     display: block;
     width: 100%;
     aspect-ratio: 1;
-    border-radius: 1.125rem;
+    border-radius: var(--radius-card);
     object-fit: cover;
-    box-shadow: 0 28px 72px color-mix(in srgb, var(--color-shadow) 19.2%, transparent);
+    box-shadow: var(--shadow-card);
   }
 
   .release-spotlight__cover--fallback {

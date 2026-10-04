@@ -97,7 +97,7 @@ const jsonLd = {
   keywords={[event.title, 'Energize Music', 'live event', 'Afro-gospel', event.location].filter(Boolean) as string[]}
   breadcrumbs={crumbs({ name: event.title, path: `/events/${event.slug}` })}
   ambientVariant="editorial"
-  headerVariant="overlay"
+
 >
   <JsonLd data={jsonLd} />
   <EventDetailView event={event} shareUrl={shareUrl} />

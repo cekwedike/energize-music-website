@@ -14,7 +14,7 @@ const roster = artists
   .slice(0, 8)
   .map((artist: ArtistCard) => ({
     ...artist,
-    photoUrl: urlForImage(artist.photo).width(360).height(480).fit('crop').auto('format').url(),
+    photoUrl: urlForImage(artist.photo).width(640).height(800).fit('crop').auto('format').url(),
     streams: (
       [
         { label: 'Spotify', href: artist.streaming?.spotify },
@@ -50,17 +50,16 @@ const roster = artists
             style={`--artist-cols: ${Math.min(roster.length, 4)}`}
           >
             {roster.map((artist: (typeof roster)[number]) => (
-              <article class="home-artists__card theme-dark" data-home-artist>
+              <article class="home-artists__card" data-home-artist>
                 <a href={`/artists/${artist.slug}`} class="home-artists__link">
-                <div class="home-artists__media" data-home-artist-media>
+                <div class="home-artists__media media-frame" data-home-artist-media>
                   <img
                     src={artist.photoUrl}
                     alt={`${artist.name}, Energize Music artist`}
-                    width="360"
-                    height="480"
+                    width="640"
+                    height="800"
                     loading="lazy"
                     decoding="async"
-                    sizes="(max-width: 640px) 70vw, 280px"
                   />
                 </div>
                 <div class="home-artists__meta">
@@ -101,12 +100,79 @@ const roster = artists
 }
 
 <style>
+  .home-artists__media {
+    aspect-ratio: 4 / 5;
+  }
+
+  .home-artists__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .home-artists__link:hover .home-artists__media img {
+    transform: scale(1.04);
+  }
+
+  .home-artists__meta {
+    padding-top: 1rem;
+  }
+
+  .home-artists__name {
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--color-fg);
+  }
+
+  .home-artists__tag {
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .home-artists__streams {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0.85rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .home-artists__stream {
+    display: inline-flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    color: var(--color-fg);
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .home-artists__stream:hover,
+  .home-artists__stream:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .home-artists__stream :global(svg) {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
   .home-artists {
     position: relative;
     padding: clamp(5rem, 4rem + 4vw, 8rem) 0 clamp(3rem, 2rem + 3vw, 5rem);
-    background:
-      radial-gradient(ellipse 60% 50% at 0% 0%, color-mix(in srgb, var(--color-accent) 7.2%, transparent), transparent 55%),
-      var(--color-bg);
+    background: var(--color-bg);
     /* visible so ScrollTrigger pin spacers are not clipped into a blank void */
     overflow: visible;
   }
@@ -128,7 +194,6 @@ const roster = artists
       padding-inline: 1.5rem;
     }
   }
-
 
   .home-artists__stage {
     overflow: hidden;
@@ -177,100 +242,6 @@ const roster = artists
     display: block;
     color: inherit;
     text-decoration: none;
-  }
-
-  .home-artists__streams {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    z-index: 2;
-    display: flex;
-    gap: 0.4rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .home-artists__stream {
-    display: inline-flex;
-    width: 2.75rem;
-    height: 2.75rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    border: 1px solid var(--color-line);
-    background: color-mix(in srgb, var(--color-scrim) 55%, transparent);
-    color: var(--color-fg);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition:
-      background 0.2s ease,
-      border-color 0.2s ease;
-  }
-
-  .home-artists__stream:hover,
-  .home-artists__stream:focus-visible {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-  }
-
-  .home-artists__stream :global(svg) {
-    width: 1.05rem;
-    height: 1.05rem;
-  }
-
-  .home-artists__media {
-    aspect-ratio: 3 / 4;
-    overflow: hidden;
-    background: var(--color-surface);
-    box-shadow: 0 24px 60px color-mix(in srgb, var(--color-shadow) 18%, transparent);
-  }
-
-  .home-artists__media img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .home-artists__card:hover .home-artists__media img {
-    transform: scale(1.08);
-  }
-
-  .home-artists__meta {
-    position: absolute;
-    inset: auto 0 0;
-    padding: 3.5rem 1rem 1.1rem;
-    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--color-scrim) 95%, transparent));
-  }
-
-  .home-artists__name {
-    font-family: var(--font-display);
-    font-size: 1.55rem;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
-  }
-
-  .home-artists__tag {
-    margin-top: 0.35rem;
-    font-size: 0.78rem;
-    color: var(--color-fg);
-  }
-
-  .home-artists__card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border: 1px solid transparent;
-    pointer-events: none;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
-  }
-
-  .home-artists__card:hover::after {
-    border-color: color-mix(in srgb, var(--color-accent) 39%, transparent);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 12%, transparent), 0 0 40px color-mix(in srgb, var(--color-accent) 9%, transparent);
   }
 
   @media (max-width: 899px) {

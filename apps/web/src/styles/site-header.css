@@ -296,11 +296,6 @@
     transform: scale(1.05);
   }
 
-  .initiatives-card__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent 35%, color-mix(in srgb, var(--color-bg) 75%, transparent) 100%);
-  }
 
   .initiatives-card__copy {
     display: flex;

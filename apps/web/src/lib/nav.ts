@@ -34,21 +34,21 @@ export const initiativesNav: InitiativeItem[] = [
     href: '/next',
     blurb:
       'Pan-African Afrogospel competition. Ten finalists earn a spot on the ENERGIZE Afrogospel Album and the launch stage.',
-    image: '/initiatives/next.jpg',
+    image: '/initiatives/cards/next.webp',
   },
   {
     label: 'Energize Kids',
     href: '/energize-kids',
     blurb:
       'Clean kids entertainment with music, Play Zone challenges, and artist Xade. Register a child at energize-kids.com.',
-    image: '/initiatives/energize-kids.webp',
+    image: '/initiatives/cards/energize-kids.webp',
   },
   {
     label: 'Energize Fest',
     href: '/events/energize-fest',
     blurb:
       'Annual live showcase for the full Energize Music roster. Next date: 1 December 2026. Venue TBA.',
-    image: '/initiatives/energize-fest.webp',
+    image: '/initiatives/cards/energize-fest.webp',
   },
 ];
 

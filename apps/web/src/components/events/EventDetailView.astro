@@ -53,19 +53,9 @@ const shareLinks = [
 ---
 
 <article class="event-detail">
-  <header class="event-detail__hero theme-dark">
-    <div class="event-detail__media" aria-hidden="true">
-      {
-        coverUrl ? (
-          <img src={coverUrl} alt="" class="event-detail__bg" width="1800" height="1200" />
-        ) : (
-          <div class="event-detail__bg-fallback" />
-        )
-      }
-      <div class="event-detail__shade"></div>
-    </div>
-
+  <header class="event-detail__hero">
     <div class="event-detail__hero-inner">
+      <div class="event-detail__hero-copy">
       <a href="/" class="event-detail__back">← Home</a>
       <p class="event-detail__date">{formatEventDate(event.startDate)}</p>
       <h1 class="event-detail__title font-display">{event.title}</h1>
@@ -82,6 +72,19 @@ const shareLinks = [
       <div class="event-detail__actions">
         <a href={ctaHref} class="event-detail__cta event-detail__cta--primary">{ctaLabel}</a>
       </div>
+      </div>
+      {
+        coverUrl && (
+          <img
+            src={coverUrl}
+            alt={event.cover?.alt ?? event.title}
+            class="media-frame event-detail__photo"
+            width="1800"
+            height="1200"
+            decoding="async"
+          />
+        )
+      }
     </div>
   </header>
 
@@ -340,52 +343,35 @@ const shareLinks = [
   }
 
   .event-detail__hero {
-    position: relative;
-    min-height: min(88vh, 52rem);
-    margin-top: calc(-1 * var(--header-height, 4rem));
-    display: flex;
-    align-items: flex-end;
-    overflow: hidden;
-  }
-
-  .event-detail__media {
-    position: absolute;
-    inset: 0;
-  }
-
-  .event-detail__bg,
-  .event-detail__bg-fallback {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .event-detail__bg-fallback {
-    background:
-      radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-accent) 16.8%, transparent), transparent 45%),
-      var(--color-surface);
-  }
-
-  .event-detail__shade {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 25%, transparent) 0%, color-mix(in srgb, var(--color-bg) 78%, transparent) 70%, var(--color-bg) 100%),
-      linear-gradient(90deg, color-mix(in srgb, var(--color-bg) 50%, transparent) 0%, transparent 55%);
+    border-bottom: 1px solid var(--color-line);
   }
 
   .event-detail__hero-inner {
-    position: relative;
-    z-index: 1;
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
     width: min(100%, 72rem);
     margin-inline: auto;
-    padding: 7.5rem 1.25rem 3.25rem;
+    padding: 3.5rem 1.25rem 3.5rem;
   }
 
   @media (min-width: 640px) {
     .event-detail__hero-inner {
-      padding: 8.5rem 1.5rem 4rem;
+      padding: 5rem 1.5rem 4.5rem;
     }
+  }
+
+  @media (min-width: 900px) {
+    .event-detail__hero-inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 4rem;
+    }
+  }
+
+  .event-detail__photo {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
   }
 
   .event-detail__back {
@@ -417,7 +403,6 @@ const shareLinks = [
     font-size: clamp(2.8rem, 1.5rem + 5vw, 5.5rem);
     line-height: 0.92;
     letter-spacing: -0.04em;
-    text-transform: uppercase;
   }
 
   .event-detail__subtitle {

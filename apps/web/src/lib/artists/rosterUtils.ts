@@ -1,49 +1,5 @@
 import type { ArtistCard } from '@energize/shared';
 
-export interface RosterAccent {
-  color: string;
-  glow: string;
-  muted: string;
-  panelInk: string;
-  duotone: string;
-}
-
-/** Brand-token accent rotation: glow blue, neutral mono, glow-cyan. */
-export const ROSTER_ACCENTS: RosterAccent[] = [
-  {
-    color: 'var(--color-accent)',
-    glow: 'color-mix(in srgb, var(--color-accent) 13.2%, transparent)',
-    muted: 'color-mix(in srgb, var(--color-accent) 33%, transparent)',
-    panelInk: '#fafaf8',
-    duotone:
-      'linear-gradient(160deg, color-mix(in srgb, var(--color-bg) 35%, transparent) 0%, color-mix(in srgb, var(--color-accent) 22.8%, transparent) 38%, color-mix(in srgb, var(--color-bg) 88%, transparent) 100%)',
-  },
-  {
-    color: '#a3a3a3',
-    glow: 'rgba(163, 163, 163, 0.18)',
-    muted: 'rgba(163, 163, 163, 0.55)',
-    panelInk: '#fafaf8',
-    duotone:
-      'linear-gradient(160deg, color-mix(in srgb, var(--color-bg) 35%, transparent) 0%, rgba(163, 163, 163, 0.32) 38%, color-mix(in srgb, var(--color-bg) 90%, transparent) 100%)',
-  },
-  {
-    color: 'var(--color-accent)',
-    glow: 'color-mix(in srgb, var(--color-accent) 10%, transparent)',
-    muted: 'color-mix(in srgb, var(--color-accent) 27.5%, transparent)',
-    panelInk: '#fafaf8',
-    duotone:
-      'linear-gradient(160deg, color-mix(in srgb, var(--color-bg) 35%, transparent) 0%, color-mix(in srgb, var(--color-accent) 17%, transparent) 38%, color-mix(in srgb, var(--color-bg) 88%, transparent) 100%)',
-  },
-];
-
-export function getRosterAccent(index: number): RosterAccent {
-  return ROSTER_ACCENTS[index % ROSTER_ACCENTS.length]!;
-}
-
-export function getFirstName(name: string): string {
-  return name.trim().split(/\s+/)[0] ?? name;
-}
-
 export function getShortLabel(name: string, maxLength = 18): string {
   const trimmed = name.trim();
   if (trimmed.length <= maxLength) return trimmed.toUpperCase();

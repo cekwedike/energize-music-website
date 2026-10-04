@@ -178,9 +178,9 @@ const sorted = [...releases].sort(
   .discography__cover-wrap {
     aspect-ratio: 1;
     overflow: hidden;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-card);
     background: color-mix(in srgb, var(--color-fg) 4%, transparent);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--color-shadow) 10%, transparent);
+    box-shadow: var(--shadow-card);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 

@@ -36,35 +36,37 @@ const pillars = [
   breadcrumbs={crumbs({ name: 'Energize Kids', path: '/energize-kids' })}
 >
   <!-- Hero -->
-  <section class="theme-dark relative min-h-[32rem] overflow-hidden border-b border-fg/10 sm:min-h-[38rem] lg:min-h-[42rem]">
-    <div class="absolute inset-0 bg-[var(--color-bg)]">
+  <section class="border-b border-[var(--color-line)]">
+    <div class="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 sm:px-6 sm:py-24 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-16">
+      <div>
+        <p class="scroll-reveal text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-accent)]">
+          Music · Movement · Learning · Joy
+        </p>
+        <h1 class="scroll-reveal text-h1 mt-6 max-w-3xl" style="--reveal-delay: 80ms">Christian Kids Entertainment from Energize Music</h1>
+        <p class="scroll-reveal text-lead mt-6 max-w-2xl text-fg" style="--reveal-delay: 160ms">
+          Energize Kids is the family wing of Energize Music: clean songs, movement games, learning prompts, and joy-first activities. Details and registration live on energize-kids.com.
+        </p>
+        <div class="scroll-reveal mt-10 flex flex-wrap gap-3" style="--reveal-delay: 240ms">
+          <a
+            href={LIVE_SITE}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-full bg-fg px-7 py-3.5 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90"
+          >
+            Visit Energize Kids
+          </a>
+        </div>
+      </div>
       <img
         src="/initiatives/energize-kids.webp"
-        alt="Energize Kids colorful brand artwork"
-        class="h-full w-full object-contain object-center sm:object-cover sm:object-[center_38%] lg:object-[center_35%]"
+        alt="A young Energize Kids performer"
+        width="1080"
+        height="1439"
+        class="scroll-reveal media-frame aspect-[4/5] w-full max-w-md object-cover object-top lg:justify-self-end"
+        style="--reveal-delay: 120ms"
         loading="eager"
+        decoding="async"
       />
-      <div class="absolute inset-0 bg-gradient-to-b from-[var(--color-bg)]/30 via-[var(--color-bg)]/45 to-[var(--color-bg)]/88"></div>
-    </div>
-
-    <div class="relative mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-32">
-      <p class="scroll-reveal text-xs font-semibold uppercase tracking-[0.35em] text-fg">
-        Music · Movement · Learning · Joy
-      </p>
-      <h1 class="scroll-reveal text-h1 mt-6 max-w-3xl" style="--reveal-delay: 80ms">Christian Kids Entertainment from Energize Music</h1>
-      <p class="scroll-reveal text-lead mt-6 max-w-2xl text-fg" style="--reveal-delay: 160ms">
-        Energize Kids is the family wing of Energize Music: clean songs, movement games, learning prompts, and joy-first activities. Details and registration live on energize-kids.com.
-      </p>
-      <div class="scroll-reveal mt-10 flex flex-wrap gap-3" style="--reveal-delay: 240ms">
-        <a
-          href={LIVE_SITE}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button-glow rounded-full bg-fg px-7 py-3.5 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90"
-        >
-          Visit Energize Kids
-        </a>
-      </div>
     </div>
   </section>
 
@@ -123,14 +125,6 @@ const pillars = [
               class="inline-block rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-on-accent)] transition hover:bg-[var(--color-accent)]/90"
             >
               Register at Energize Kids
-            </a>
-            <a
-              href={LIVE_SITE}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-block rounded-full border border-fg/25 px-6 py-3 text-sm font-semibold text-fg transition hover:border-fg/45 hover:bg-fg/5"
-            >
-              View all events
             </a>
           </div>
         </div>

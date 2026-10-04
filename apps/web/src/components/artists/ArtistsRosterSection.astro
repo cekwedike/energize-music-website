@@ -1,13 +1,7 @@
 ---
 import type { ArtistCard as ArtistCardType } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
-import {
-  bioSnippet,
-  getFirstName,
-  getRosterAccent,
-  rosterPortraitLabel,
-  type RosterNavItem,
-} from '../../lib/artists/rosterUtils';
+import { bioSnippet, rosterPortraitLabel, type RosterNavItem } from '../../lib/artists/rosterUtils';
 import ArtistsRosterPagination from './ArtistsRosterPagination.astro';
 
 interface Props {
@@ -18,9 +12,7 @@ interface Props {
 
 const { artist, index, navItems } = Astro.props;
 
-const accent = getRosterAccent(index);
-const firstName = getFirstName(artist.name);
-const photoUrl = urlForImage(artist.photo).width(1400).height(1800).fit('crop').auto('format').url();
+const photoUrl = urlForImage(artist.photo).width(960).height(1200).fit('crop').auto('format').url();
 const portraitLabel = rosterPortraitLabel(artist);
 const bio = bioSnippet(artist);
 const isReversed = index % 2 === 1;
@@ -28,79 +20,40 @@ const isReversed = index % 2 === 1;
 
 <section
   id={`artist-${artist.slug}`}
-  class="roster-card theme-dark"
+  class="roster-card"
   data-roster-section
   data-index={index}
   data-reverse={isReversed ? 'true' : undefined}
   aria-labelledby={`roster-name-${artist.slug}`}
-  style={`--roster-accent: ${accent.color}; --roster-accent-glow: ${accent.glow}; --roster-duotone: ${accent.duotone}; --roster-panel-ink: ${accent.panelInk}`}
 >
-  <figure class="roster-card__backdrop" data-motion="portrait" aria-hidden="true">
-    <img
-      src={photoUrl}
-      alt=""
-      loading={index < 2 ? 'eager' : 'lazy'}
-      decoding="async"
-      class="roster-card__photo"
-    />
-    <div class="roster-card__duotone"></div>
-  </figure>
-
-  <div class="roster-card__split">
-    <div class="roster-card__visual">
-      <figure class="roster-card__panel-portrait" data-motion="portrait" aria-hidden="true">
-        <img
-          src={photoUrl}
-          alt=""
-          loading={index < 2 ? 'eager' : 'lazy'}
-          decoding="async"
-          class="roster-card__panel-photo"
-        />
-        <div class="roster-card__panel-duotone"></div>
-      </figure>
-
-      <span class="roster-card__marker roster-card__marker--tl" aria-hidden="true"></span>
-      <span class="roster-card__marker roster-card__marker--tr" aria-hidden="true"></span>
-
-      <p class="roster-card__watermark" data-motion="bg-name" aria-hidden="true">
-        {firstName}
-      </p>
-
-      <div class="roster-card__visual-scrim" aria-hidden="true"></div>
-
-      <div class="roster-card__identity" data-motion="reveal">
-        <h2 id={`roster-name-${artist.slug}`} class="roster-card__name">
-          {artist.name}
-        </h2>
-        <p class="roster-card__tagline">{portraitLabel}</p>
-      </div>
-    </div>
+  <div class="roster-card__inner">
+    <a href={`/artists/${artist.slug}`} class="roster-card__photo-link" tabindex="-1" aria-hidden="true">
+      <img
+        src={photoUrl}
+        alt=""
+        width="960"
+        height="1200"
+        loading={index === 0 ? 'eager' : 'lazy'}
+        decoding="async"
+        class="media-frame roster-card__photo"
+        data-motion="portrait"
+      />
+    </a>
 
     <div class="roster-card__info">
-      <div class="roster-card__info-panel">
-        <p class="roster-card__eyebrow" data-motion="reveal">Profile</p>
-
-        <div class="roster-card__content">
-          {
-            bio ? (
-              <p class="roster-card__bio" data-motion="reveal">
-                {bio}
-              </p>
-            ) : (
-              <p class="roster-card__bio" data-motion="reveal">
-                Explore {artist.name} on the Energize Music roster.
-              </p>
-            )
-          }
-
-          <a href={`/artists/${artist.slug}`} class="roster-card__cta" data-motion="reveal">
-            View profile
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6"></path>
-            </svg>
-          </a>
-        </div>
-      </div>
+      <p class="roster-card__eyebrow" data-motion="reveal">{portraitLabel}</p>
+      <h2 id={`roster-name-${artist.slug}`} class="roster-card__name" data-motion="reveal">
+        {artist.name}
+      </h2>
+      <p class="roster-card__bio" data-motion="reveal">
+        {bio || `Explore ${artist.name} on the Energize Music roster.`}
+      </p>
+      <a href={`/artists/${artist.slug}`} class="roster-card__cta" data-motion="reveal">
+        View profile
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6"></path>
+        </svg>
+      </a>
     </div>
   </div>
 
@@ -109,381 +62,102 @@ const isReversed = index % 2 === 1;
 
 <style>
   .roster-card {
-    position: relative;
-    min-height: min(88svh, 820px);
-    overflow: clip;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
-    scroll-margin-top: 5rem;
-    background: var(--color-bg);
+    border-top: 1px solid var(--color-line);
+    padding-block: clamp(3.5rem, 2.5rem + 4vw, 6rem) 2rem;
   }
 
-  .roster-card__backdrop {
-    position: absolute;
-    z-index: 0;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
+  .roster-card__inner {
+    display: grid;
+    gap: 2rem;
+    width: min(100%, 80rem);
+    margin-inline: auto;
+    margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+    padding-inline: 1.25rem;
+    align-items: center;
+  }
+
+  @media (min-width: 640px) {
+    .roster-card__inner {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .roster-card__inner {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+      gap: clamp(3rem, 2rem + 4vw, 6rem);
+    }
+
+    .roster-card[data-reverse='true'] .roster-card__photo-link {
+      order: 2;
+    }
+  }
+
+  .roster-card__photo-link {
+    display: block;
+    max-width: 30rem;
   }
 
   .roster-card__photo {
     width: 100%;
-    height: 100%;
+    aspect-ratio: 4 / 5;
     object-fit: cover;
-    object-position: center 18%;
-    filter: grayscale(1) contrast(1.14) brightness(0.88);
-    transform-origin: center top;
-  }
-
-  .roster-card__duotone {
-    position: absolute;
-    inset: 0;
-    background: var(--roster-duotone);
-    mix-blend-mode: color;
-    pointer-events: none;
-  }
-
-  .roster-card__split {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    min-height: min(78svh, 720px);
-    grid-template-columns: 1fr;
-  }
-
-  .roster-card__visual {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    min-height: min(48svh, 480px);
-    padding: clamp(1.25rem, 3vw, 2rem);
-    color: var(--roster-panel-ink);
-    overflow: clip;
-  }
-
-  .roster-card__visual-scrim {
-    position: absolute;
-    z-index: 0;
-    inset: auto 0 0 0;
-    height: 62%;
-    background: linear-gradient(
-      to top,
-      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
-      color-mix(in srgb, var(--color-bg) 45%, transparent) 42%,
-      transparent 100%
-    );
-    pointer-events: none;
-  }
-
-  .roster-card__info {
-    display: flex;
-    flex-direction: column;
-    min-height: auto;
-    border-top: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
-  }
-
-  .roster-card__info-panel {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: clamp(1.35rem, 3.5vh, 2rem) clamp(1.25rem, 4vw, 2.5rem);
-    color: var(--color-fg);
-    background: color-mix(in srgb, var(--color-bg) 42%, transparent);
-    backdrop-filter: blur(8px) saturate(1.08);
-    -webkit-backdrop-filter: blur(8px) saturate(1.08);
-  }
-
-  .roster-card__marker {
-    position: absolute;
-    z-index: 2;
-    width: 0.35rem;
-    height: 0.35rem;
-    border-radius: 9999px;
-    background: color-mix(in srgb, var(--roster-panel-ink) 55%, transparent);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--roster-panel-ink) 25%, transparent);
-  }
-
-  .roster-card__marker--tl {
-    top: clamp(1rem, 2.5vh, 1.35rem);
-    left: clamp(1rem, 3vw, 1.75rem);
-  }
-
-  .roster-card__marker--tr {
-    top: clamp(1rem, 2.5vh, 1.35rem);
-    right: clamp(1rem, 3vw, 1.75rem);
-  }
-
-  .roster-card__watermark {
-    position: absolute;
-    z-index: 0;
-    left: -0.04em;
-    top: clamp(2.5rem, 8vh, 5rem);
-    margin: 0;
-    font-family: var(--font-body);
-    font-size: clamp(5.5rem, 2rem + 22vw, 19rem);
-    font-weight: 900;
-    line-height: 0.76;
-    letter-spacing: -0.045em;
-    text-transform: uppercase;
-    color: var(--roster-panel-ink);
-    opacity: 0.1;
-    pointer-events: none;
-    user-select: none;
-    white-space: nowrap;
-  }
-
-  .roster-card__identity {
-    position: relative;
-    z-index: 2;
-    max-width: min(100%, 26rem);
-    padding: clamp(1rem, 2.5vh, 1.35rem) 0 0.25rem;
-  }
-
-  .roster-card__name {
-    margin: 0;
-    font-family: var(--font-body);
-    font-size: clamp(1.5rem, 1.1rem + 2vw, 2.75rem);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    color: var(--roster-panel-ink);
-  }
-
-  .roster-card__tagline {
-    margin: 0.55rem 0 0;
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--roster-panel-ink);
   }
 
   .roster-card__eyebrow {
-    margin: 0;
-    font-size: 0.625rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.32em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--color-fg);
+    color: var(--color-accent);
   }
 
-  .roster-card__content {
-    display: grid;
-    gap: 1.25rem;
-    margin-top: 0.85rem;
-    max-width: 34rem;
+  .roster-card__name {
+    margin-top: 0.9rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 1.6rem + 3vw, 4.25rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--color-fg);
   }
 
   .roster-card__bio {
-    margin: 0;
-    font-size: clamp(0.9375rem, 0.88rem + 0.25vw, 1.0625rem);
-    line-height: 1.68;
-    color: var(--color-fg);
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    overflow: hidden;
-    text-shadow: 0 1px 12px color-mix(in srgb, var(--color-bg) 45%, transparent);
+    margin-top: 1.25rem;
+    max-width: 34rem;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--color-muted);
   }
 
   .roster-card__cta {
     display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
-    width: fit-content;
+    gap: 0.5rem;
+    margin-top: 1.75rem;
     min-height: 2.75rem;
-    margin-top: 0.25rem;
-    padding: 0.65rem 1.1rem;
-    border: 1px solid color-mix(in srgb, var(--color-fg) 18%, transparent);
+    padding: 0.65rem 1.25rem;
+    border: 1px solid var(--color-fg);
     border-radius: 9999px;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    text-decoration: none;
     color: var(--color-fg);
-    background: color-mix(in srgb, var(--color-fg) 5%, transparent);
+    text-decoration: none;
     transition:
-      border-color 0.25s ease,
-      color 0.25s ease,
-      background 0.25s ease,
-      transform 0.25s ease;
-  }
-
-  .roster-card__cta svg {
-    width: 0.95rem;
-    height: 0.95rem;
-    transition: transform 0.25s ease;
+      background 0.2s ease,
+      color 0.2s ease;
   }
 
   .roster-card__cta:hover,
   .roster-card__cta:focus-visible {
-    border-color: color-mix(in srgb, var(--roster-accent) 55%, white 10%);
-    color: var(--roster-accent);
-    background: color-mix(in srgb, var(--color-fg) 8%, transparent);
-    transform: translateY(-1px);
+    background: var(--color-fg);
+    color: var(--color-bg);
   }
 
-  .roster-card__cta:hover svg,
-  .roster-card__cta:focus-visible svg {
-    transform: translateX(3px);
-  }
-
-  @media (min-width: 900px) {
-    .roster-card__split {
-      grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
-      min-height: min(88svh, 820px);
-    }
-
-    .roster-card__visual,
-    .roster-card__info {
-      min-height: inherit;
-    }
-
-    .roster-card__info {
-      border-top: none;
-      border-left: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
-    }
-
-    .roster-card__info-panel {
-      padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
-    }
-
-    .roster-card__photo {
-      object-position: 58% 16%;
-    }
-
-    .roster-card[data-reverse='true'] .roster-card__photo {
-      object-position: 42% 16%;
-    }
-
-    .roster-card[data-reverse='true'] .roster-card__visual {
-      order: 2;
-    }
-
-    .roster-card[data-reverse='true'] .roster-card__info {
-      order: 1;
-      border-left: none;
-      border-right: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .roster-card__info {
-      min-height: min(48svh, 480px);
-    }
-
-    .roster-card__info-panel {
-      justify-content: center;
-      padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 4vw, 2.5rem);
-      background: color-mix(in srgb, var(--color-bg) 28%, transparent);
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
-    }
-
-    .roster-card__eyebrow {
-      text-shadow: 0 1px 10px color-mix(in srgb, var(--color-bg) 55%, transparent);
-    }
-
-    .roster-card__content {
-      position: relative;
-      isolation: isolate;
-      margin-top: 1.25rem;
-    }
-
-    .roster-card__content::before {
-      content: '';
-      position: absolute;
-      z-index: -1;
-      inset: auto -0.75rem -0.5rem;
-      top: 28%;
-      background: linear-gradient(
-        to top,
-        color-mix(in srgb, var(--color-bg) 58%, transparent) 0%,
-        color-mix(in srgb, var(--color-bg) 20%, transparent) 52%,
-        transparent 100%
-      );
-      pointer-events: none;
-      border-radius: 0.35rem;
-    }
-
-    .roster-card__bio {
-      color: var(--color-fg);
-      text-shadow:
-        0 1px 3px color-mix(in srgb, var(--color-bg) 78%, transparent),
-        0 2px 18px color-mix(in srgb, var(--color-bg) 52%, transparent);
-    }
-  }
-
-  @supports not (backdrop-filter: blur(1px)) {
-    .roster-card__info-panel {
-      background: color-mix(in srgb, var(--color-bg) 72%, transparent);
-    }
-
-    @media (min-width: 1024px) {
-      .roster-card__info-panel {
-        background: color-mix(in srgb, var(--color-bg) 34%, transparent);
-      }
-    }
-  }
-
-  .roster-card__panel-portrait {
-    display: none;
-  }
-
-  @media (min-width: 1600px) {
-    .roster-card__backdrop {
-      display: none;
-    }
-
-    .roster-card__panel-portrait {
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      display: block;
-      margin: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .roster-card__panel-photo {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center bottom;
-      filter: grayscale(1) contrast(1.14) brightness(0.88);
-      transform-origin: center bottom;
-    }
-
-    .roster-card__panel-duotone {
-      position: absolute;
-      inset: 0;
-      background: var(--roster-duotone);
-      mix-blend-mode: color;
-      pointer-events: none;
-    }
-
-    .roster-card__visual {
-      background: var(--color-bg);
-    }
-
-    .roster-card__visual-scrim {
-      height: 48%;
-      background: linear-gradient(
-        to top,
-        color-mix(in srgb, var(--color-bg) 94%, transparent) 0%,
-        color-mix(in srgb, var(--color-bg) 35%, transparent) 55%,
-        transparent 100%
-      );
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .roster-card__cta:hover,
-    .roster-card__cta:focus-visible {
-      transform: none;
-    }
-
+  .roster-card__cta svg {
+    width: 1rem;
+    height: 1rem;
   }
 </style>
