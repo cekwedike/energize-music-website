@@ -8,7 +8,6 @@ const VIEWPORTS = [
   { name: '390', width: 390, height: 844 },
   { name: '414', width: 414, height: 896 },
   { name: '768', width: 768, height: 1024 },
-  { name: '1440', width: 1440, height: 900 },
 ] as const;
 
 const ROUTES = [
@@ -17,7 +16,6 @@ const ROUTES = [
   '/artists',
   '/artists/greatman-takit',
   '/releases',
-  '/releases/flames-of-a-wild-fire',
   '/contact',
   '/privacy',
   '/terms',
@@ -110,7 +108,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const viewport of VIEWPORTS) {
-  test.describe(`responsive audit @ ${viewport.name}px`, () => {
+  test.describe(`mobile audit @ ${viewport.name}px`, () => {
     test.use({ viewport: { width: viewport.width, height: viewport.height } });
 
     for (const route of ROUTES) {

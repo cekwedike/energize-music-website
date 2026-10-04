@@ -1,12 +1,22 @@
 ---
 ---
 
-<section class="home-newsletter" aria-labelledby="home-newsletter-title">
-  <div class="home-newsletter__inner mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-    <h2 id="home-newsletter-title" class="home-newsletter__title scroll-reveal">Stay in the Energy</h2>
+<section class="home-newsletter" data-home-newsletter aria-labelledby="home-newsletter-title">
+  <div class="home-newsletter__glow" data-home-newsletter-glow aria-hidden="true"></div>
 
-    <form class="home-newsletter__form scroll-reveal" style="--reveal-delay: 80ms" aria-label="Newsletter signup">
-      <label class="sr-only" for="home-newsletter-email">Email address</label>
+  <div class="home-newsletter__inner">
+    <div data-home-reveal>
+      <p class="home-kicker">Newsletter</p>
+      <h2 id="home-newsletter-title" class="home-title">
+        New music and<br />label news by email
+      </h2>
+      <p class="home-newsletter__lead">
+        Releases, artist updates, and show dates from Energize Music. No spam.
+      </p>
+    </div>
+
+    <form class="home-newsletter__form" data-home-newsletter-form>
+      <label class="home-newsletter__label" for="home-newsletter-email">Email address</label>
       <div class="home-newsletter__row">
         <input
           id="home-newsletter-email"
@@ -17,102 +27,131 @@
           placeholder="you@example.com"
           class="home-newsletter__input"
         />
-        <button type="submit" class="home-newsletter__submit">Subscribe</button>
+        <button type="submit" class="home-btn home-btn--solid">Subscribe</button>
       </div>
-      <p class="home-newsletter__note">New music only. No spam.</p>
+      <p class="home-newsletter__note" data-home-newsletter-note>No spam. Just the Energy.</p>
     </form>
   </div>
 </section>
 
 <style>
   .home-newsletter {
-    padding-block: clamp(4rem, 10vw, 8rem);
-    border-top: 1px solid var(--color-line);
+    position: relative;
+    overflow: hidden;
+    padding: 5.5rem 0 6rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: #0a0e14;
+  }
+
+  .home-newsletter__glow {
+    position: absolute;
+    top: 50%;
+    right: -10%;
+    width: min(55vw, 28rem);
+    height: min(55vw, 28rem);
+    translate: 0 -50%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(77, 168, 255, 0.35), transparent 70%);
+    opacity: 0.4;
+    pointer-events: none;
   }
 
   .home-newsletter__inner {
+    position: relative;
+    z-index: 1;
     display: grid;
-    gap: clamp(2rem, 4vw, 3rem);
+    gap: 2.25rem;
+    width: min(100%, 80rem);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-newsletter__inner {
+      padding-inline: 1.5rem;
+    }
   }
 
   @media (min-width: 900px) {
     .home-newsletter__inner {
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      grid-template-columns: 1.1fr 0.9fr;
       align-items: end;
+      gap: 3.5rem;
     }
   }
 
-  .home-newsletter__title {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(3rem, 1.4rem + 7vw, 7.5rem);
-    font-weight: 400;
-    line-height: 0.88;
+  .home-newsletter__lead {
+    margin-top: 1rem;
+    max-width: 30rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--color-paper);
+  }
+
+  .home-newsletter__label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--color-ink);
+    color: var(--color-paper);
   }
 
   .home-newsletter__row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     gap: 0.75rem;
+    margin-top: 0.85rem;
+  }
+
+  @media (min-width: 560px) {
+    .home-newsletter__row {
+      grid-template-columns: 1fr auto;
+    }
   }
 
   .home-newsletter__input {
-    flex: 1 1 14rem;
-    min-width: 0;
-    min-height: 3.25rem;
-    padding: 0 1rem;
-    border: 1px solid var(--color-line);
-    border-radius: 0.25rem;
-    background: var(--color-bg);
-    font-size: 1rem;
-    color: var(--color-ink);
+    width: 100%;
+    min-height: 3rem;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0;
+    background: transparent;
+    padding: 0.75rem 0.1rem;
+    color: var(--color-paper);
+    font-size: 1.05rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .home-newsletter__input::placeholder {
-    color: var(--color-muted);
+    color: var(--color-paper);
   }
 
-  .home-newsletter__input:focus-visible {
-    outline: none;
-    border-color: var(--color-ink);
-  }
-
-  .home-newsletter__submit {
-    flex: 0 0 auto;
-    min-height: 3.25rem;
-    padding: 0 1.75rem;
-    border: 0;
-    border-radius: 0.25rem;
-    background: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #ffffff;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-
-  .home-newsletter__submit:hover,
-  .home-newsletter__submit:focus-visible {
-    background: var(--color-ink);
+  .home-newsletter__input:focus {
+    border-bottom-color: var(--color-glow);
+    box-shadow: 0 1px 0 0 var(--color-glow);
   }
 
   .home-newsletter__note {
-    margin: 0.875rem 0 0;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-muted);
+    margin-top: 0.85rem;
+    font-size: 0.82rem;
+    color: var(--color-paper);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .home-newsletter__submit {
-      transition: none;
-    }
+  .home-newsletter__note.is-success {
+    color: var(--color-glow-cyan);
   }
 </style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-home-newsletter-form]');
+  const note = document.querySelector<HTMLElement>('[data-home-newsletter-note]');
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!note) return;
+    note.textContent = 'Thanks. Follow us on socials while we confirm your spot.';
+    note.classList.add('is-success');
+    form.reset();
+  });
+</script>

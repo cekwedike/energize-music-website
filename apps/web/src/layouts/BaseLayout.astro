@@ -3,6 +3,7 @@ import SEO from '../components/ui/SEO.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import SiteHeader, { type HeaderVariant } from '../components/ui/SiteHeader.astro';
 import SiteFooter from '../components/ui/SiteFooter.astro';
+import AmbientBackground, { type AmbientVariant } from '../components/ui/AmbientBackground.astro';
 import { buildBreadcrumbSchema, buildSiteGraph } from '../lib/seo/schema';
 import type { BreadcrumbItem } from '../lib/seo/site';
 import '../styles/global.css';
@@ -19,7 +20,11 @@ interface Props {
   breadcrumbs?: BreadcrumbItem[];
   hideHeader?: boolean;
   hideFooter?: boolean;
+  ambientVariant?: AmbientVariant;
+  /** Skip decorative ambient layers (e.g. homepage hero already fills the viewport). */
+  hideAmbient?: boolean;
   headerVariant?: HeaderVariant;
+  pageTheme?: 'dark' | 'light';
 }
 
 const {
@@ -34,11 +39,22 @@ const {
   breadcrumbs,
   hideHeader = false,
   hideFooter = false,
+  ambientVariant,
+  hideAmbient = false,
   headerVariant = 'default',
+  pageTheme = 'dark',
 } = Astro.props;
 
+const pathname = Astro.url.pathname;
 const siteGraph = buildSiteGraph();
 const breadcrumbGraph = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs) : null;
+
+function resolveAmbientVariant(): AmbientVariant {
+  if (ambientVariant) return ambientVariant;
+  if (pathname === '/') return 'home';
+  if (pathname.startsWith('/about') || pathname.startsWith('/artists')) return 'editorial';
+  return 'cosmic';
+}
 ---
 
 <!doctype html>
@@ -46,22 +62,19 @@ const breadcrumbGraph = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs)
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script is:inline>
-      document.documentElement.classList.add('js');
-    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="author" type="text/plain" href="/humans.txt" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@700&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@700&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
       />
     </noscript>
@@ -80,7 +93,12 @@ const breadcrumbGraph = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs)
     {breadcrumbGraph && <JsonLd data={breadcrumbGraph} />}
     <slot name="head" />
   </head>
-  <body class="site-body">
+  <body class:list={['site-body', pageTheme === 'light' && 'site-body--light']}>
+    {
+      pageTheme === 'light' || hideAmbient ? null : (
+        <AmbientBackground variant={resolveAmbientVariant()} />
+      )
+    }
     <a href="#main-content" class="skip-link">Skip to content</a>
     {!hideHeader && <SiteHeader variant={headerVariant} />}
     <main id="main-content" class="site-main relative">
@@ -93,7 +111,29 @@ const breadcrumbGraph = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs)
 <script>
   (function () {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const reveals = document.querySelectorAll('.scroll-reveal');
+    const REVEAL_SELECTOR =
+      '.scroll-reveal, .scroll-reveal-pixel, .about-scroll-reveal';
+
+    document.querySelectorAll<HTMLElement>('.scroll-reveal-stagger').forEach((host) => {
+      const variant = host.dataset.revealVariant === 'pixel' ? 'scroll-reveal-pixel' : 'scroll-reveal';
+      const step = Number(host.dataset.revealStep) || 70;
+
+      host.querySelectorAll<HTMLElement>(':scope > *').forEach((node, index) => {
+        if (
+          !node.classList.contains('scroll-reveal') &&
+          !node.classList.contains('scroll-reveal-pixel') &&
+          !node.classList.contains('about-scroll-reveal')
+        ) {
+          node.classList.add(variant);
+        }
+
+        if (!node.style.getPropertyValue('--reveal-delay')) {
+          node.style.setProperty('--reveal-delay', `${index * step}ms`);
+        }
+      });
+    });
+
+    const reveals = document.querySelectorAll(REVEAL_SELECTOR);
     if (reveals.length === 0) return;
 
     if (reduced) {

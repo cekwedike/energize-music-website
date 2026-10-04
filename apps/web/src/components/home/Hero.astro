@@ -1,4 +1,5 @@
 ---
+import Logo from '../ui/Logo.astro';
 import {
   HERO_VIDEO_MP4,
   HERO_VIDEO_POSTER,
@@ -6,6 +7,8 @@ import {
   HERO_VIDEO_USES_CDN_FALLBACK,
   HERO_VIDEO_WEBM,
 } from '../../lib/hero-video';
+
+const freqBars = Array.from({ length: 12 }, (_, i) => i);
 ---
 
 <section class="hero" data-hero style={`--hero-poster: url('${HERO_VIDEO_POSTER}')`}>
@@ -36,30 +39,75 @@ import {
   </video>
 
   <div class="hero-veil" aria-hidden="true"></div>
+  <div class="hero-glow" aria-hidden="true"></div>
 
-  <div class="hero-content mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
-    <h1 class="hero-title">
-      <span class="hero-title__line">The Energy</span>
-      <span class="hero-title__line hero-title__line--accent">Is Different.</span>
-    </h1>
-    <p class="hero-sub">Afro-Gospel. Soul-Fusion. Lagos.</p>
+  <p class="hero-watermark" aria-hidden="true">ENERGY</p>
+
+  <div class="hero-rail hero-rail--left" aria-hidden="true">
+    <span>Lagos</span>
+    <span class="hero-rail__dot"></span>
+    <span>Afro-gospel</span>
+    <span class="hero-rail__dot"></span>
+    <span>Soul-fusion</span>
   </div>
+  <div class="hero-rail hero-rail--right" aria-hidden="true">
+    <span>Global</span>
+    <span class="hero-rail__dot"></span>
+    <span>Family-friendly</span>
+    <span class="hero-rail__dot"></span>
+    <span>Uplifting</span>
+  </div>
+
+  <div class="hero-frame" aria-hidden="true">
+    <span class="hero-frame__corner hero-frame__corner--tl"></span>
+    <span class="hero-frame__corner hero-frame__corner--tr"></span>
+    <span class="hero-frame__corner hero-frame__corner--bl"></span>
+    <span class="hero-frame__corner hero-frame__corner--br"></span>
+  </div>
+
+  <div id="hero-content" class="hero-content">
+    <Logo />
+    <p class="hero-text-el font-inter mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-white sm:mt-6 sm:text-xs">
+      The Energy Different
+    </p>
+    <h1 class="hero-text-el hero-text-el-heading font-instrument mt-5 max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-white sm:mt-8 sm:max-w-2xl md:mt-9 md:max-w-4xl">
+      The Afro-Gospel Label Behind Africa's Biggest Christian Voices
+    </h1>
+    <p class="hero-text-el hero-text-el-sub font-inter mt-4 max-w-xl text-sm text-white sm:mt-5 md:mt-7 md:text-base">
+      Energize Music is a Lagos record label for Afro-gospel and soul-fusion listeners who want faith-filled music with real craft.
+    </p>
+  </div>
+
+  <div class="hero-signal" aria-hidden="true">
+    <div class="hero-signal__bars">
+      {
+        freqBars.map((i) => (
+          <span class="hero-signal__bar" style={`--bar-i: ${i}`}></span>
+        ))
+      }
+    </div>
+  </div>
+
+  <a
+    href="#now-spinning"
+    class="hero-scroll"
+    aria-label="Scroll to Now Spinning"
+  >
+    <span>Scroll</span>
+    <span class="hero-scroll__line" aria-hidden="true"></span>
+  </a>
 </section>
 
 <style>
   .hero {
     position: relative;
     z-index: 0;
-    display: flex;
-    align-items: flex-end;
-    /* Sits under the transparent overlay header. */
-    margin-top: calc(-1 * var(--header-height, 4rem));
     height: 100svh;
-    min-height: 34rem;
+    min-height: 36rem;
+    width: 100%;
     overflow: hidden;
     isolation: isolate;
-    /* Poster paints first, before the video has frames. */
-    background: #0a0a0a var(--hero-poster) center bottom / cover no-repeat;
+    background: #04080c;
   }
 
   .hero-video {
@@ -71,89 +119,386 @@ import {
     object-fit: cover;
     /* Own compositor layer so decode is not blocked by overlay paints. */
     transform: translateZ(0);
+    will-change: opacity;
+    opacity: 0;
     transition: opacity 0.55s ease;
-    background-color: #0a0a0a;
+    background-color: #04080c;
     background-image: var(--hero-poster);
     background-size: cover;
     background-position: center bottom;
   }
 
-  /* Only hide the video until frames are ready when JS can reveal it. */
-  :global(.js) .hero-video {
-    opacity: 0;
-  }
-
-  :global(.js) .hero.is-playing .hero-video {
+  .hero.is-playing .hero-video {
     opacity: 1;
   }
 
-  /* Flat tint so white text passes contrast on any frame. */
   .hero-veil {
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: rgba(10, 10, 10, 0.65);
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 28%, rgba(77, 168, 255, 0.14), transparent 60%),
+      linear-gradient(180deg, rgba(4, 8, 12, 0.35) 0%, rgba(4, 8, 12, 0.12) 42%, rgba(4, 8, 12, 0.55) 100%);
     pointer-events: none;
   }
 
-  .hero-content {
-    position: relative;
+  /* Soft glow without filter:blur (blur over video is a major jank source). */
+  .hero-glow {
+    position: absolute;
+    top: 14%;
+    left: 50%;
+    z-index: 1;
+    width: min(72vw, 30rem);
+    height: min(72vw, 30rem);
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(77, 168, 255, 0.22) 0%, rgba(77, 168, 255, 0.06) 42%, transparent 70%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .hero-watermark {
+    position: absolute;
+    top: 46%;
+    left: 50%;
     z-index: 2;
-    padding-bottom: clamp(3rem, 10vh, 7rem);
-  }
-
-  .hero-title {
     margin: 0;
+    translate: -50% -50%;
     font-family: var(--font-display);
-    font-size: clamp(3.5rem, 1.2rem + 11vw, 11rem);
-    font-weight: 400;
-    line-height: 0.88;
-    text-transform: uppercase;
-    color: #ffffff;
+    font-size: clamp(5rem, 22vw, 16rem);
+    font-weight: 600;
+    letter-spacing: -0.06em;
+    line-height: 0.85;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.14);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.8;
   }
 
-  .hero-title__line {
+  .hero-rail {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: none;
+    align-items: center;
+    gap: 0.85rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #ffffff;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .hero-rail--left {
+    left: max(1.25rem, env(safe-area-inset-left, 0px));
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: left center;
+  }
+
+  .hero-rail--right {
+    right: max(1.25rem, env(safe-area-inset-right, 0px));
+    transform: translateY(-50%) rotate(90deg);
+    transform-origin: right center;
+  }
+
+  .hero-rail__dot {
+    width: 0.28rem;
+    height: 0.28rem;
+    background: var(--color-glow);
+    box-shadow: 0 0 10px rgba(77, 168, 255, 0.8);
+  }
+
+  @media (min-width: 1100px) {
+    .hero-rail {
+      display: flex;
+    }
+  }
+
+  .hero-frame {
+    position: absolute;
+    inset: 1.1rem;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  @media (min-width: 640px) {
+    .hero-frame {
+      inset: 1.5rem;
+    }
+  }
+
+  .hero-frame__corner {
+    position: absolute;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-color: rgba(77, 168, 255, 0.55);
+    border-style: solid;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .hero.is-playing .hero-frame__corner {
+    opacity: 1;
+    transition-delay: 0.35s;
+  }
+
+  .hero-frame__corner--tl {
+    top: 0;
+    left: 0;
+    border-width: 1px 0 0 1px;
+  }
+
+  .hero-frame__corner--tr {
+    top: 0;
+    right: 0;
+    border-width: 1px 1px 0 0;
+  }
+
+  .hero-frame__corner--bl {
+    bottom: 0;
+    left: 0;
+    border-width: 0 0 1px 1px;
+  }
+
+  .hero-frame__corner--br {
+    right: 0;
+    bottom: 0;
+    border-width: 0 1px 1px 0;
+  }
+
+  .hero-content {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6rem 1.25rem 7.5rem;
+    text-align: center;
+  }
+
+  @media (min-width: 640px) {
+    .hero-content {
+      padding: 8rem 1.5rem 8rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .hero-content {
+      padding-top: 9rem;
+    }
+  }
+
+  .hero-text-el {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: 0.1s;
+  }
+
+  .hero-text-el-heading {
+    transition-delay: 0.2s;
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.28);
+  }
+
+  .hero-text-el-sub {
+    transition-delay: 0.3s;
+  }
+
+  #hero-content.is-visible .hero-text-el {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .hero-signal {
+    position: absolute;
+    right: 0;
+    bottom: 4.75rem;
+    left: 0;
+    z-index: 4;
+    width: min(14rem, 60vw);
+    margin-inline: auto;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    transition-delay: 0.5s;
+  }
+
+  #hero-content.is-visible ~ .hero-signal {
+    opacity: 0.85;
+  }
+
+  .hero-signal__bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0.28rem;
+    height: 1.75rem;
+  }
+
+  .hero-signal__bar {
+    width: 0.18rem;
+    height: 100%;
+    background: linear-gradient(180deg, var(--color-glow), rgba(255, 255, 255, 0.35));
+    transform: scaleY(0.25) translateZ(0);
+    transform-origin: bottom center;
+    opacity: 0.55;
+  }
+
+  /* Transform-only motion (no height layout thrash). Starts after settle. */
+  .hero.is-settled .hero-signal__bar {
+    animation: hero-freq 1.2s ease-in-out infinite;
+    animation-delay: calc(var(--bar-i) * 0.08s);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    right: 0;
+    bottom: max(1.15rem, env(safe-area-inset-bottom, 0px));
+    left: 0;
+    z-index: 5;
+    display: flex;
+    width: fit-content;
+    margin-inline: auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-decoration: none;
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease,
+      color 0.2s ease;
+    transition-delay: 0.55s;
+  }
+
+  #hero-content.is-visible ~ .hero-scroll {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .hero-scroll > span:first-child {
+    padding-left: 0.28em;
+  }
+
+  .hero-scroll:hover {
+    color: #fff;
+  }
+
+  .hero-scroll__line {
     display: block;
+    width: 1px;
+    height: 1.6rem;
+    background: linear-gradient(180deg, var(--color-glow), transparent);
+    transform: scaleY(0.55) translateZ(0);
+    transform-origin: top center;
   }
 
-  .hero-title__line--accent {
-    color: var(--color-accent);
+  .hero.is-settled .hero-scroll__line {
+    animation: hero-scroll-pulse 1.8s ease-in-out infinite;
   }
 
-  .hero-sub {
-    margin: clamp(1.25rem, 3vh, 2rem) 0 0;
-    font-family: var(--font-mono);
-    font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.9375rem);
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: #ffffff;
+  @keyframes hero-freq {
+    0%,
+    100% {
+      transform: scaleY(0.28);
+      opacity: 0.45;
+    }
+    50% {
+      transform: scaleY(calc(0.45 + (var(--bar-i) % 4) * 0.14));
+      opacity: 1;
+    }
+  }
+
+  @keyframes hero-scroll-pulse {
+    0%,
+    100% {
+      transform: scaleY(0.55);
+      opacity: 0.45;
+    }
+    50% {
+      transform: scaleY(1);
+      opacity: 1;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .hero-video {
-      transition: none;
+      opacity: 1 !important;
+      transition: none !important;
+    }
+
+    .hero-text-el,
+    .hero-scroll,
+    .hero-signal,
+    .hero-frame__corner {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+      animation: none !important;
+    }
+
+    .hero-signal__bar,
+    .hero-scroll__line {
+      animation: none !important;
     }
   }
 </style>
 
 <script
-  is:inline
   define:vars={{
     heroVideoUsesCdnFallback: HERO_VIDEO_USES_CDN_FALLBACK,
   }}
 >
   const hero = document.querySelector('[data-hero]');
+  const heroContent = document.getElementById('hero-content');
+  const homePage = document.querySelector('[data-home-page]');
   const video = document.getElementById('hero-video');
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const READY_EVENT = 'energize:hero-ready';
   const MAX_WAIT_MS = 4000;
+  const SETTLE_MS = 700;
+  let readyFired = false;
+  let settleTimer = 0;
 
-  // Fade the video in over the poster once it has real frames (or give up and show it).
+  const revealHeroCopy = () => {
+    heroContent?.classList.add('is-visible');
+  };
+
   const markHeroReady = () => {
+    if (readyFired) return;
+    readyFired = true;
+    if (homePage instanceof HTMLElement) homePage.dataset.heroReady = 'true';
+    document.documentElement.dataset.heroReady = 'true';
+    if (hero instanceof HTMLElement) hero.classList.add('is-settled');
+    revealHeroCopy();
+    window.dispatchEvent(new CustomEvent(READY_EVENT));
+  };
+
+  const onFirstPaint = () => {
     if (hero instanceof HTMLElement) hero.classList.add('is-playing');
+    revealHeroCopy();
+    // Let the decoder run a few frames before mounting the rest of the page.
+    window.clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(markHeroReady, SETTLE_MS);
   };
 
   if (prefersReducedMotion) {
+    if (hero instanceof HTMLElement) {
+      hero.classList.add('is-playing', 'is-settled');
+    }
     markHeroReady();
   }
 
@@ -191,9 +536,9 @@ import {
     // Wait for real frames, not just canplay (which fires before decode is warm).
     const onPlaying = () => {
       if ('requestVideoFrameCallback' in video) {
-        video.requestVideoFrameCallback(() => markHeroReady());
+        video.requestVideoFrameCallback(() => onFirstPaint());
       } else {
-        markHeroReady();
+        onFirstPaint();
       }
     };
 

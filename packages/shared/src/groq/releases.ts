@@ -30,11 +30,8 @@ export const allReleasesQuery = /* groq */ `*[_type == "release"] | order(releas
 
 export const featuredReleasesQuery = /* groq */ `*[_type == "release" && featured == true] | order(releaseDate desc) ${releaseCardFragment}`;
 
-/** Homepage selected releases rail: Studio-featured releases first, then the newest, max 8. */
-export const homeReleasesQuery = /* groq */ `*[_type == "release"] | order(coalesce(featured, false) desc, releaseDate desc) [0...8] ${releaseCardFragment}`;
-
-/** Homepage latest project: the newest release, featured or not. */
-export const latestReleaseQuery = /* groq */ `*[_type == "release" && defined(releaseDate)] | order(releaseDate desc) [0] ${releaseDetailFragment}`;
+/** Homepage Now Spinning: only releases explicitly featured in Studio. */
+export const homeReleasesQuery = /* groq */ `*[_type == "release" && featured == true] | order(releaseDate desc) [0...4] ${releaseCardFragment}`;
 
 export const releaseBySlugQuery = /* groq */ `*[_type == "release" && slug.current == $slug][0] ${releaseDetailFragment}`;
 

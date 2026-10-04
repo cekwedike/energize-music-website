@@ -1,18 +1,18 @@
 ---
-// Two identical runs so the track can loop seamlessly at -50%.
-const runs = [0, 1];
-const words = Array.from({ length: 4 }, () => 'Energize');
+const phrase = 'The Energy Different';
+const loopItems = Array.from({ length: 12 }, () => phrase);
 ---
 
 <div class="footer-marquee" aria-hidden="true">
+  <div class="footer-marquee__fade footer-marquee__fade--left"></div>
+  <div class="footer-marquee__fade footer-marquee__fade--right"></div>
   <div class="footer-marquee__track">
     {
-      runs.map(() => (
-        <div class="footer-marquee__run">
-          {words.map((word) => (
-            <span class="footer-marquee__word">{word}</span>
-          ))}
-        </div>
+      loopItems.map((item) => (
+        <span class="footer-marquee__item">
+          <span class="footer-marquee__word">{item}</span>
+          <span class="footer-marquee__dot" aria-hidden="true"></span>
+        </span>
       ))
     }
   </div>
@@ -20,32 +20,75 @@ const words = Array.from({ length: 4 }, () => 'Energize');
 
 <style>
   .footer-marquee {
+    position: relative;
     overflow: hidden;
-    padding-top: clamp(1rem, 3vw, 2.5rem);
+    contain: paint;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-block: clamp(0.4375rem, 0.4rem + 0.2vw, 0.75rem);
+  }
+
+  .footer-marquee__fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: min(14vw, 5rem);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @media (min-width: 768px) {
+    .footer-marquee__fade {
+      width: min(12vw, 7rem);
+    }
+  }
+
+  .footer-marquee__fade--left {
+    left: 0;
+    background: linear-gradient(90deg, var(--color-ink-raised) 0%, transparent 100%);
+  }
+
+  .footer-marquee__fade--right {
+    right: 0;
+    background: linear-gradient(270deg, var(--color-ink-raised) 0%, transparent 100%);
   }
 
   .footer-marquee__track {
     display: flex;
     width: max-content;
-    animation: footer-marquee 40s linear infinite;
+    align-items: center;
+    gap: 0;
+    transform: translate3d(0, 0, 0);
+    animation: footer-marquee-scroll 52s linear infinite;
   }
 
-  .footer-marquee__run {
-    display: flex;
+  .footer-marquee__item {
+    display: inline-flex;
     flex-shrink: 0;
+    align-items: center;
+    gap: clamp(0.875rem, 0.7rem + 0.8vw, 2rem);
+    padding-inline: clamp(0.875rem, 0.7rem + 0.8vw, 2rem);
   }
 
   .footer-marquee__word {
-    padding-right: 0.25em;
-    font-family: var(--font-display);
-    font-size: clamp(5rem, 2rem + 16vw, 16rem);
-    line-height: 0.85;
-    text-transform: uppercase;
-    color: var(--color-ink);
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(0.8125rem, 0.78rem + 0.3vw, 1.125rem);
+    font-style: italic;
+    letter-spacing: 0.04em;
+    color: var(--color-paper);
     white-space: nowrap;
   }
 
-  @keyframes footer-marquee {
+  .footer-marquee__dot {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-glow);
+    opacity: 0.45;
+    box-shadow: 0 0 12px rgba(77, 168, 255, 0.5);
+  }
+
+  @keyframes footer-marquee-scroll {
     from {
       transform: translate3d(0, 0, 0);
     }

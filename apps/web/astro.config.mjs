@@ -33,6 +33,7 @@ export default defineConfig({
       rollupOptions: {
         output: {
           manualChunks(id) {
+            if (id.includes('node_modules/gsap')) return 'gsap';
             if (id.includes('node_modules/react-dom')) return 'react';
             if (id.includes('node_modules/react/')) return 'react';
           },

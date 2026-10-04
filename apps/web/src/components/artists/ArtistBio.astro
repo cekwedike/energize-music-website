@@ -1,43 +1,25 @@
 ---
-import type { Artist } from '@energize/shared';
-import Eyebrow from '../ui/Eyebrow.astro';
-import StreamingIcons from '../ui/StreamingIcons.astro';
-
 interface Props {
-  artist: Artist;
+  bio: string;
+  name: string;
 }
 
-const { artist } = Astro.props;
+const { bio, name } = Astro.props;
 
-const paragraphs = (artist.bio ?? '')
+const paragraphs = bio
   .split(/\n\s*\n/)
   .map((block) => block.trim())
   .filter(Boolean);
-
-// Show three short paragraphs; the rest sits behind a native "Read more" toggle.
-const lead = paragraphs.slice(0, 3);
-const rest = paragraphs.slice(3);
 ---
 
 <section class="artist-bio" aria-labelledby="artist-bio-heading">
-  <div class="artist-bio__grid mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-    <div>
-      <Eyebrow>Biography</Eyebrow>
-      <h2 id="artist-bio-heading" class="artist-bio__heading">About {artist.name}</h2>
-      <StreamingIcons links={artist.streaming} name={artist.name} class="mt-8" />
-    </div>
-
-    <div class="artist-bio__text">
-      {lead.map((paragraph) => <p>{paragraph}</p>)}
+  <div class="artist-bio__inner mx-auto max-w-7xl px-5 py-12 sm:px-6 sm:py-16">
+    <h2 id="artist-bio-heading" class="font-display text-xl text-paper sm:text-2xl">About {name}</h2>
+    <div class="artist-bio__content mt-5 max-w-3xl">
       {
-        rest.length > 0 && (
-          <details class="artist-bio__more">
-            <summary>Read more</summary>
-            {rest.map((paragraph) => (
-              <p>{paragraph}</p>
-            ))}
-          </details>
-        )
+        paragraphs.map((paragraph) => (
+          <p class="artist-bio__paragraph">{paragraph}</p>
+        ))
       }
     </div>
   </div>
@@ -45,61 +27,26 @@ const rest = paragraphs.slice(3);
 
 <style>
   .artist-bio {
-    padding-block: clamp(4rem, 9vw, 7rem);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .artist-bio__grid {
-    display: grid;
-    gap: 2.5rem;
+  .artist-bio__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
   }
 
-  @media (min-width: 900px) {
-    .artist-bio__grid {
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-      gap: 4rem;
+  .artist-bio__paragraph {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-paper);
+    white-space: pre-line;
+  }
+
+  @media (min-width: 640px) {
+    .artist-bio__paragraph {
+      font-size: 1.0625rem;
     }
-  }
-
-  .artist-bio__heading {
-    margin: 0.75rem 0 0;
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 1.5rem + 3vw, 4rem);
-    font-weight: 400;
-    line-height: 0.95;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
-  .artist-bio__text {
-    max-width: 40rem;
-    color: var(--color-ink);
-  }
-
-  .artist-bio__text p {
-    margin: 0 0 1.25rem;
-    line-height: 1.7;
-  }
-
-  .artist-bio__more summary {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-    cursor: pointer;
-    list-style: none;
-  }
-
-  .artist-bio__more summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .artist-bio__more[open] summary {
-    margin-bottom: 1rem;
-    color: var(--color-muted);
   }
 </style>

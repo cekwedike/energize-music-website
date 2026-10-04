@@ -26,7 +26,6 @@ export interface ArtistCard {
   bio?: string;
   quote?: string;
   genres?: string[];
-  streaming?: StreamingLinks;
 }
 
 export interface Artist extends ArtistCard {

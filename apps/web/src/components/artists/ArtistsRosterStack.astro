@@ -1,0 +1,34 @@
+---
+import type { ArtistCard as ArtistCardType } from '@energize/shared';
+import ArtistsRosterIntro from './ArtistsRosterIntro.astro';
+import ArtistsRosterSection from './ArtistsRosterSection.astro';
+import ArtistsRosterMotion from './ArtistsRosterMotion';
+import { buildRosterNavItems } from '../../lib/artists/rosterUtils';
+
+interface Props {
+  artists: ArtistCardType[];
+}
+
+const { artists } = Astro.props;
+const navItems = buildRosterNavItems(artists);
+---
+
+<div class="roster-index" data-roster-stack>
+  <ArtistsRosterIntro />
+
+  <div class="roster-index__sections">
+    {artists.map((artist, index) => <ArtistsRosterSection artist={artist} index={index} navItems={navItems} />)}
+  </div>
+
+  <ArtistsRosterMotion client:load />
+</div>
+
+<style>
+  .roster-index {
+    position: relative;
+  }
+
+  .roster-index__sections {
+    position: relative;
+  }
+</style>

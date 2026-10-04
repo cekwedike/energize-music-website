@@ -1,25 +1,32 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
-import SectionTitle from '../../components/ui/SectionTitle.astro';
-import MediaCard from '../../components/ui/MediaCard.astro';
+import ReleasesHero from '../../components/releases/ReleasesHero.astro';
+import ReleaseSpotlight from '../../components/releases/ReleaseSpotlight.astro';
+import ReleasesListingSection from '../../components/releases/ReleasesListingSection.astro';
 import { sanityClient } from '../../lib/sanity/client';
-import { enrichReleases } from '../../lib/metadata/enrichReleases';
-import { releaseMeta } from '../../lib/releases/format';
-import { allReleasesQuery, type Release } from '@energize/shared';
+import { enrichReleases, enrichRelease } from '../../lib/metadata/enrichReleases';
+import {
+  allReleasesQuery,
+  releasesPageQuery,
+  type Release,
+  type ReleasesPage,
+} from '@energize/shared';
 import { crumbs } from '../../lib/seo/schema';
 import { absoluteUrl } from '../../lib/seo/site';
 
 const rawReleases = await sanityClient.fetch<Release[]>(allReleasesQuery);
 const releases = await enrichReleases(rawReleases);
 
-// One chip per artist that has at least one release, in roster order of first appearance.
-const artistChips = new Map<string, string>();
-for (const release of releases) {
-  for (const artist of release.artists ?? []) {
-    if (artist?.slug && artist.name && !artistChips.has(artist.slug)) artistChips.set(artist.slug, artist.name);
-  }
-}
+const releasesPage = await sanityClient.fetch<ReleasesPage | null>(releasesPageQuery);
+
+const configuredSpotlights = releasesPage?.releaseSpotlights?.filter(Boolean) ?? [];
+const spotlightReleases =
+  configuredSpotlights.length > 0
+    ? await Promise.all(
+        configuredSpotlights.map((release: Release) => enrichRelease(release, { coverSize: 800 })),
+      )
+    : [];
 
 const itemList =
   releases.length > 0
@@ -41,132 +48,14 @@ const itemList =
   title="Music Releases | Energize Music"
   description="Stream the latest Afro-gospel and soul-fusion releases from Energize Music artists, including Greatman Takit, TY Bello, and Ellie Scotte."
   keywords={['new Afro-gospel music', 'Energize Music releases', 'Greatman Takit', 'TY Bello']}
-  breadcrumbs={crumbs({ name: 'Music', path: '/releases' })}
+  breadcrumbs={crumbs({ name: 'Releases', path: '/releases' })}
+  ambientVariant="editorial"
 >
   {itemList && <JsonLd data={itemList} />}
-  <section class="mx-auto max-w-7xl px-5 pb-24 pt-14 sm:px-6 sm:pb-32 sm:pt-20 lg:px-8">
-    <SectionTitle tag="h1" title="Music" eyebrow="Releases" />
+  <ReleasesHero releases={releases} totalCount={releases.length} />
 
-    {
-      artistChips.size > 1 && (
-        <div class="music-filter" role="group" aria-label="Filter by artist">
-          <button type="button" class="music-filter__chip" data-filter="all" aria-pressed="true">
-            All
-          </button>
-          {[...artistChips].map(([slug, name]) => (
-            <button type="button" class="music-filter__chip" data-filter={slug} aria-pressed="false">
-              {name}
-            </button>
-          ))}
-        </div>
-      )
-    }
-
-    {
-      releases.length === 0 ? (
-        <p class="mt-10 text-muted">Releases will appear here once they are published in Sanity Studio.</p>
-      ) : (
-        <ul class="music-grid" data-music-grid>
-          {releases.map((release, index) => (
-            <li data-artists={(release.artists ?? []).map((artist) => artist?.slug).filter(Boolean).join(' ')}>
-              <MediaCard
-                href={`/releases/${release.slug}`}
-                image={release.coverUrl}
-                imageAlt={`${release.displayTitle} cover art`}
-                title={release.displayTitle}
-                meta={releaseMeta(release)}
-                subtitle={release.artistNames.join(', ')}
-                eager={index < 4}
-              />
-            </li>
-          ))}
-        </ul>
-      )
-    }
+  <section class="mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20">
+    {spotlightReleases.length > 0 ? <ReleaseSpotlight releases={spotlightReleases} /> : null}
+    <ReleasesListingSection releases={releases} />
   </section>
 </BaseLayout>
-
-<script>
-  const chips = document.querySelectorAll<HTMLButtonElement>('.music-filter__chip');
-  const items = document.querySelectorAll<HTMLElement>('[data-music-grid] > li');
-
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const filter = chip.dataset.filter ?? 'all';
-      chips.forEach((other) => other.setAttribute('aria-pressed', String(other === chip)));
-      items.forEach((item) => {
-        const artists = (item.dataset.artists ?? '').split(' ');
-        item.hidden = filter !== 'all' && !artists.includes(filter);
-      });
-    });
-  });
-</script>
-
-<style>
-  /* Chips need JS; without it the full grid shows. */
-  :global(html:not(.js)) .music-filter {
-    display: none;
-  }
-
-  .music-filter {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: clamp(2rem, 4vw, 3rem);
-  }
-
-  .music-filter__chip {
-    min-height: 2.75rem;
-    padding: 0 1.125rem;
-    border: 1px solid var(--color-line);
-    border-radius: 9999px;
-    background: var(--color-bg);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-ink);
-    cursor: pointer;
-    transition:
-      border-color 0.2s ease,
-      background 0.2s ease,
-      color 0.2s ease;
-  }
-
-  .music-filter__chip:hover,
-  .music-filter__chip:focus-visible {
-    border-color: var(--color-ink);
-  }
-
-  .music-filter__chip[aria-pressed='true'] {
-    border-color: var(--color-ink);
-    background: var(--color-ink);
-    color: var(--color-bg);
-  }
-
-  .music-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2.5vw, 1.75rem);
-    margin-top: clamp(2rem, 4vw, 3rem);
-  }
-
-  @media (min-width: 768px) {
-    .music-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .music-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .music-filter__chip {
-      transition: none;
-    }
-  }
-</style>
