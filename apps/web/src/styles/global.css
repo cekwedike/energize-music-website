@@ -158,31 +158,10 @@
   transform: translateY(0);
 }
 
-/* Pixelated dissolve: blur-to-sharp with stepped opacity */
-.js .scroll-reveal-pixel {
-  opacity: 0;
-  transform: translateY(14px) scale(0.985);
-  filter: blur(10px);
-  transition:
-    opacity 0.9s steps(8, end),
-    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.85s ease;
-  transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform, filter;
-}
-
-.js .scroll-reveal-pixel.is-visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .scroll-reveal,
-  .scroll-reveal-pixel {
+  .scroll-reveal {
     opacity: 1 !important;
     transform: none !important;
-    filter: none !important;
     transition: none !important;
   }
 }

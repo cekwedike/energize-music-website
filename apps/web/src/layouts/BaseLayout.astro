@@ -93,29 +93,7 @@ const breadcrumbGraph = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs)
 <script>
   (function () {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const REVEAL_SELECTOR =
-      '.scroll-reveal, .scroll-reveal-pixel, .about-scroll-reveal';
-
-    document.querySelectorAll<HTMLElement>('.scroll-reveal-stagger').forEach((host) => {
-      const variant = host.dataset.revealVariant === 'pixel' ? 'scroll-reveal-pixel' : 'scroll-reveal';
-      const step = Number(host.dataset.revealStep) || 70;
-
-      host.querySelectorAll<HTMLElement>(':scope > *').forEach((node, index) => {
-        if (
-          !node.classList.contains('scroll-reveal') &&
-          !node.classList.contains('scroll-reveal-pixel') &&
-          !node.classList.contains('about-scroll-reveal')
-        ) {
-          node.classList.add(variant);
-        }
-
-        if (!node.style.getPropertyValue('--reveal-delay')) {
-          node.style.setProperty('--reveal-delay', `${index * step}ms`);
-        }
-      });
-    });
-
-    const reveals = document.querySelectorAll(REVEAL_SELECTOR);
+    const reveals = document.querySelectorAll('.scroll-reveal');
     if (reveals.length === 0) return;
 
     if (reduced) {
