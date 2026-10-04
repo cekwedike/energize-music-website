@@ -2,14 +2,14 @@
 import { hqLink, initiativesNav, legalNav, primaryNav, socialLinks } from '../../lib/nav';
 import SocialIcon from './SocialIcon.astro';
 import Logo from './Logo.astro';
-import FooterMarquee from './FooterMarquee.astro';
+import Marquee from './Marquee.astro';
 
 const moreNav = [...initiativesNav.map(({ label, href }) => ({ label, href })), hqLink];
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <FooterMarquee />
+  <Marquee items={['The Energy Different']} class="site-footer__marquee" />
 
   <div class="site-footer__inner mx-auto max-w-7xl px-4 pb-5 pt-6 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8 lg:pb-10 lg:pt-10">
     <div class="site-footer__grid">
@@ -112,6 +112,10 @@ const year = new Date().getFullYear();
 
 
 
+
+  .site-footer :global(.site-footer__marquee) {
+    border-bottom: 1px solid var(--color-line);
+  }
 
   .site-footer__inner {
     position: relative;

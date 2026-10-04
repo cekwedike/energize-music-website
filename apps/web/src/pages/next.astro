@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import NextLogo from '../components/next/NextLogo.astro';
 import NextMusicPlayer from '../components/next/NextMusicPlayer.astro';
+import Marquee from '../components/ui/Marquee.astro';
 import { sanityClient } from '../lib/sanity/client';
 import { nextPageQuery, type NextPageSettings } from '@energize/shared';
 import { mergeNextPageSettings } from '../lib/next/pageDefaults';
@@ -148,18 +149,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
     </div>
 
     <div class="next-hero__rail" aria-hidden="true">
-      <div class="next-hero__rail-track">
-        <span>Submit</span>
-        <span>Vote</span>
-        <span>Rise</span>
-        <span>Album</span>
-        <span>Stage</span>
-        <span>Submit</span>
-        <span>Vote</span>
-        <span>Rise</span>
-        <span>Album</span>
-        <span>Stage</span>
-      </div>
+      <Marquee items={['Submit', 'Vote', 'Rise', 'Album', 'Stage']} variant="caps" />
     </div>
   </section>
 
@@ -432,33 +422,6 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
     overflow: hidden;
     border-top: 1px solid var(--color-line);
     background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--color-shadow) 35%, transparent));
-    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  }
-
-  .next-hero__rail-track {
-    display: flex;
-    width: max-content;
-    gap: 2.5rem;
-    padding: 0.85rem 0 1.1rem;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-fg);
-    animation: next-hero-rail 28s linear infinite;
-  }
-
-  .next-hero__rail-track span:nth-child(odd) {
-    color: var(--color-accent);
-  }
-
-  @keyframes next-hero-rail {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
   }
 
   .next-glass-card {
@@ -527,10 +490,6 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
       opacity: 1 !important;
       transform: none !important;
       transition: none !important;
-    }
-
-    .next-hero__rail-track {
-      animation: none;
     }
   }
 </style>

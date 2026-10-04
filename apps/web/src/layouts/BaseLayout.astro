@@ -3,7 +3,6 @@ import SEO from '../components/ui/SEO.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import SiteHeader, { type HeaderVariant } from '../components/ui/SiteHeader.astro';
 import SiteFooter from '../components/ui/SiteFooter.astro';
-import FooterMarquee from '../components/ui/FooterMarquee.astro';
 import { buildBreadcrumbSchema, buildSiteGraph } from '../lib/seo/schema';
 import type { BreadcrumbItem } from '../lib/seo/site';
 import '../styles/global.css';
@@ -20,7 +19,6 @@ interface Props {
   breadcrumbs?: BreadcrumbItem[];
   hideHeader?: boolean;
   hideFooter?: boolean;
-  showTopMarquee?: boolean;
   headerVariant?: HeaderVariant;
 }
 
@@ -36,7 +34,6 @@ const {
   breadcrumbs,
   hideHeader = false,
   hideFooter = false,
-  showTopMarquee = false,
   headerVariant = 'default',
 } = Astro.props;
 
@@ -84,7 +81,6 @@ const breadcrumbGraph = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs)
   <body class="site-body">
     <a href="#main-content" class="skip-link">Skip to content</a>
     {!hideHeader && <SiteHeader variant={headerVariant} />}
-    {showTopMarquee && <FooterMarquee placement="top" />}
     <main id="main-content" class="site-main relative">
       <slot />
     </main>

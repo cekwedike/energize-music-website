@@ -1,0 +1,146 @@
+---
+interface Props {
+  items: string[];
+  /** 'serif' is the italic Instrument Serif strip, 'caps' the letter-spaced uppercase strip. */
+  variant?: 'serif' | 'caps';
+  class?: string;
+}
+
+const { items, variant = 'serif', class: className } = Astro.props;
+
+// One copy must be wider than a 2560px screen so the strip is always full.
+// Rough width per item at the largest font size, padded so the estimate errs on the wide side.
+const perChar = variant === 'serif' ? 10 : 13;
+const perItemPadding = variant === 'serif' ? 72 : 44;
+const setWidth = items.reduce((sum, item) => sum + item.length * perChar + perItemPadding, 0);
+const repeats = Math.max(2, Math.ceil((2560 * 1.3) / setWidth));
+const copy = Array.from({ length: repeats }, () => items).flat();
+---
+
+<div class:list={['marquee', `marquee--${variant}`, className]} aria-hidden="true" data-marquee>
+  <div class="marquee__track" data-marquee-track>
+    {
+      [0, 1].map((copyIndex) => (
+        <div class="marquee__copy" data-marquee-copy={copyIndex === 0 ? '' : undefined}>
+          {copy.map((item, i) => (
+            <span class="marquee__item">
+              <span class:list={['marquee__word', i % 2 === 1 && 'marquee__word--alt']}>{item}</span>
+              {variant === 'serif' && <span class="marquee__dot" />}
+            </span>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  // Same speed everywhere: duration = width of one copy / pixels per second.
+  const SPEED_PX_PER_SECOND = 60;
+
+  const setDuration = (marquee: HTMLElement) => {
+    const copy = marquee.querySelector<HTMLElement>('[data-marquee-copy]');
+    const track = marquee.querySelector<HTMLElement>('[data-marquee-track]');
+    if (!copy || !track) return;
+    const seconds = copy.offsetWidth / SPEED_PX_PER_SECOND;
+    if (seconds > 0) track.style.setProperty('--marquee-duration', `${seconds}s`);
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-marquee]').forEach((marquee) => {
+    setDuration(marquee);
+    // Re-measure when the copy changes width (web fonts swapping in, viewport font sizes).
+    const copy = marquee.querySelector<HTMLElement>('[data-marquee-copy]');
+    if (copy && 'ResizeObserver' in window) {
+      new ResizeObserver(() => setDuration(marquee)).observe(copy);
+    }
+  });
+</script>
+
+<style>
+  .marquee {
+    position: relative;
+    overflow: hidden;
+    contain: paint;
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll var(--marquee-duration, 60s) linear infinite;
+    will-change: transform;
+  }
+
+  .marquee__copy {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .marquee__item {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .marquee--serif {
+    padding-block: clamp(0.4375rem, 0.4rem + 0.2vw, 0.75rem);
+  }
+
+  .marquee--serif .marquee__item {
+    gap: clamp(0.875rem, 0.7rem + 0.8vw, 2rem);
+    padding-inline: clamp(0.875rem, 0.7rem + 0.8vw, 2rem);
+  }
+
+  .marquee--serif .marquee__word {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(0.8125rem, 0.78rem + 0.3vw, 1.125rem);
+    font-style: italic;
+    letter-spacing: 0.04em;
+    color: var(--color-fg);
+  }
+
+  .marquee__dot {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  .marquee--caps {
+    padding-block: 0.85rem 1.1rem;
+  }
+
+  .marquee--caps .marquee__item {
+    padding-inline: 1.25rem;
+  }
+
+  .marquee--caps .marquee__word {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-fg);
+  }
+
+  .marquee--caps .marquee__word--alt {
+    color: var(--color-accent);
+  }
+
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+  }
+</style>
