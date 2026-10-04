@@ -33,7 +33,14 @@ Seed starter copy once with: `pnpm --filter @energize/studio seed:legal`
 
 ## Publish news
 
-**News post** → title, slug, date, cover, body → Publish.
+**News post** (Studio label: **Blogs**) → title, slug, date, cover, body → **Publish** (not just Save).
+
+Blog posts are **not** hardcoded in the website code. They are loaded from Sanity when the site is built.
+
+- **Local (`pnpm dev`):** hard-refresh after publish; you should see the change.
+- **Live site:** wait for the automatic rebuild (Sanity webhook → GitHub Actions), or run a manual build/deploy. Until then the live site can still show old posts.
+
+See `docs/DEPLOY.md` → **Automatic rebuild when Sanity changes**.
 
 ## Site settings
 

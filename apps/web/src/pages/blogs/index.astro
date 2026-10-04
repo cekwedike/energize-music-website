@@ -8,6 +8,7 @@ import { allNewsListQuery, type NewsPostSummary } from '@energize/shared';
 import { crumbs } from '../../lib/seo/schema';
 
 const posts = await sanityClient.fetch<NewsPostSummary[]>(allNewsListQuery);
+// Posts come only from published Sanity `newsPost` documents (never hardcoded).
 
 const featuredPosts = posts.slice(0, 3);
 const latestPosts = posts.slice(featuredPosts.length, featuredPosts.length + 6);

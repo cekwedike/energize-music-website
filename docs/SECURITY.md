@@ -7,9 +7,10 @@ Never commit `.env` files. Use GitHub Actions secrets for CI:
 - `PUBLIC_SANITY_PROJECT_ID`
 - `SANITY_READ_TOKEN` (optional; build currently uses the public Sanity API)
 - `FORM_ENDPOINT` / `PUBLIC_FORM_ENDPOINT`
-- Hostinger / deploy secrets only when deploy automation is restored
+- `VERCEL_DEPLOY_HOOK_URL` (optional; Sanity-triggered Vercel rebuild)
+- Hostinger FTP for auto-deploy: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`
 
-Rotate any credential that may have been shared outside a private machine.
+For Sanity → GitHub webhook auth, use a dedicated GitHub PAT stored only in the Sanity webhook headers (not in the repo). Rotate any credential that may have been shared outside a private machine.
 Local Studio write tokens (`SANITY_WRITE_TOKEN`) are for seed scripts only and must stay gitignored.
 
 ## Sanity

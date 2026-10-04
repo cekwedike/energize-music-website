@@ -1,16 +1,16 @@
 import { imageFragment } from './fragments';
 import { releaseCardFragment } from './releases';
 
-export const allNewsQuery = /* groq */ `*[_type == "newsPost"] | order(date desc){
+export const allNewsQuery = /* groq */ `*[_type == "newsPost" && !(_id in path("drafts.**"))] | order(date desc){
   _id, title, "slug": slug.current, date, cover${imageFragment}, tags
 }`;
 
-export const allNewsListQuery = /* groq */ `*[_type == "newsPost"] | order(date desc){
+export const allNewsListQuery = /* groq */ `*[_type == "newsPost" && !(_id in path("drafts.**"))] | order(date desc){
   _id, title, "slug": slug.current, date, cover${imageFragment}, tags,
   "excerpt": pt::text(body)
 }`;
 
-export const newsBySlugQuery = /* groq */ `*[_type == "newsPost" && slug.current == $slug][0]{
+export const newsBySlugQuery = /* groq */ `*[_type == "newsPost" && !(_id in path("drafts.**")) && slug.current == $slug][0]{
   _id, title, "slug": slug.current, date, cover${imageFragment}, body, tags
 }`;
 

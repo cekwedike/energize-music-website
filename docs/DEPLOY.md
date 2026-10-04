@@ -1,6 +1,15 @@
 # Deploy
 
-## Build
+## How content gets onto the live site (plain English)
+
+1. You edit and **Publish** in Sanity Studio.
+2. The marketing site is a **static** Astro build. It does **not** read Sanity on every visitor click.
+3. A rebuild copies the latest published Sanity content into HTML files (`apps/web/dist/`).
+4. Those files must be uploaded (Hostinger) or rebuilt on Vercel.
+
+So: blogs are **not hardcoded**. They come from Sanity at build time. If you delete a post in Studio and still see it live, you are looking at an **old build**.
+
+## Build (manual)
 
 ```bash
 pnpm install
@@ -8,6 +17,74 @@ pnpm build
 ```
 
 Output: `apps/web/dist/`
+
+## Automatic rebuild when Sanity changes
+
+Workflow: `.github/workflows/deploy-content.yml`
+
+It runs when:
+
+- Sanity sends a webhook (`repository_dispatch` / `sanity-rebuild`)
+- Or you click **Run workflow** in GitHub Actions
+
+### 1. GitHub secrets
+
+Repo → Settings → Secrets and variables → Actions:
+
+| Secret | Required | Purpose |
+|--------|----------|---------|
+| `PUBLIC_SANITY_PROJECT_ID` | Yes | Sanity project id |
+| `SANITY_READ_TOKEN` | Optional | Private dataset / draft access (public dataset usually fine without it) |
+| `FORM_ENDPOINT` | Optional | Contact form |
+| `VERCEL_DEPLOY_HOOK_URL` | Optional | Triggers a Vercel rebuild |
+| `FTP_SERVER` | Optional | Hostinger FTP host |
+| `FTP_USERNAME` | Optional | Hostinger FTP user |
+| `FTP_PASSWORD` | Optional | Hostinger FTP password |
+
+For Hostinger FTP deploy, set all three `FTP_*` secrets. Files upload to `public_html/`.
+
+For Vercel-only preview/production, set `VERCEL_DEPLOY_HOOK_URL` (Vercel → Project → Settings → Git → Deploy Hooks).
+
+### 2. GitHub token for Sanity → Actions
+
+Create a fine-grained personal access token (or classic PAT) with permission to trigger workflows on this repo (`contents: write` / ability to create `repository_dispatch`).
+
+Save it somewhere safe. You will paste it into the Sanity webhook Authorization header.
+
+### 3. Sanity webhook
+
+1. Open [Sanity Manage](https://www.sanity.io/manage) → project **Energize Music** → **API** → **Webhooks**
+2. Create webhook:
+   - **Name:** `Rebuild site`
+   - **URL:** `https://api.github.com/repos/cekwedike/energize-music-website/dispatches`
+   - **Dataset:** `production`
+   - **Trigger on:** Create, Update, Delete (and ideally only after publish)
+   - **HTTP method:** POST
+   - **HTTP headers:**
+     - `Accept`: `application/vnd.github+json`
+     - `Authorization`: `Bearer YOUR_GITHUB_PAT`
+     - `X-GitHub-Api-Version`: `2022-11-28`
+     - `Content-Type`: `application/json`
+   - **Projection / body** (static JSON):
+
+```json
+{
+  "event_type": "sanity-rebuild",
+  "client_payload": {
+    "source": "sanity"
+  }
+}
+```
+
+3. Save. Publish or delete a blog in Studio. Check GitHub → Actions → **Deploy content**.
+
+### Simpler Vercel-only path
+
+If the site you care about is on Vercel:
+
+1. Create a Deploy Hook in Vercel
+2. Point the Sanity webhook **URL** straight at that Deploy Hook (POST, no GitHub PAT needed)
+3. Skip FTP secrets
 
 ## Vercel (preview / share links)
 
@@ -32,11 +109,9 @@ If the build fails with `Missing Sanity env` / Zod `Required`, the vars are not 
 
 If the build log shows `sanity build` / `@energize/studio`, Root Directory is still pointing at Studio.
 
-Production domain can stay on Hostinger; Vercel is fine as preview-only.
-
 ## Hostinger (production static)
 
-Upload contents of `apps/web/dist/` to `public_html`.
+Upload contents of `apps/web/dist/` to `public_html`, or use the FTP secrets above so Actions uploads after each Sanity rebuild.
 
 ### Manual
 
@@ -48,7 +123,6 @@ Upload contents of `apps/web/dist/` to `public_html`.
 
 Enable Hostinger SSL; `.htaccess` includes HTTPS redirect when available.
 
-## GitHub Actions
+## Local development
 
-If present, `.github/workflows/deploy.yml` can push to Hostinger on `main` / Sanity webhook.
-Configure secrets per `docs/SECURITY.md`.
+`pnpm dev` fetches Sanity on each request. After Publish in Studio, hard-refresh the browser (`Ctrl+Shift+R`). Restart `pnpm dev` if a new route still 404s.

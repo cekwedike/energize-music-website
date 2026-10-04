@@ -1,0 +1,63 @@
+name: Deploy content
+
+# Rebuild the static site when Sanity content changes (or when run manually).
+# Sanity webhook should POST repository_dispatch with event_type: sanity-rebuild.
+#
+# Required secrets: PUBLIC_SANITY_PROJECT_ID
+# Optional: SANITY_READ_TOKEN, FORM_ENDPOINT / PUBLIC_FORM_ENDPOINT
+# Hostinger deploy (optional): FTP_SERVER, FTP_USERNAME, FTP_PASSWORD
+# Vercel rebuild (optional): VERCEL_DEPLOY_HOOK_URL
+
+on:
+  repository_dispatch:
+    types: [sanity-rebuild]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-content
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_SANITY_PROJECT_ID: ${{ secrets.PUBLIC_SANITY_PROJECT_ID }}
+      PUBLIC_SANITY_DATASET: production
+      PUBLIC_SANITY_API_VERSION: '2024-01-01'
+      PUBLIC_SITE_URL: https://energize-music.com
+      PUBLIC_FORM_ENDPOINT: ${{ secrets.FORM_ENDPOINT }}
+      SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}
+      VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build site from latest Sanity content
+        run: pnpm build
+
+      - name: Trigger Vercel deploy hook
+        if: env.VERCEL_DEPLOY_HOOK_URL != ''
+        run: curl -fsS -X POST "$VERCEL_DEPLOY_HOOK_URL"
+
+      - name: Deploy to Hostinger (FTP)
+        if: env.FTP_SERVER != '' && env.FTP_USERNAME != '' && env.FTP_PASSWORD != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ env.FTP_SERVER }}
+          username: ${{ env.FTP_USERNAME }}
+          password: ${{ env.FTP_PASSWORD }}
+          local-dir: ./apps/web/dist/
+          server-dir: public_html/
+          dangerous-clean-slate: false
