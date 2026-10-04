@@ -3,7 +3,6 @@ import SEO from '../components/ui/SEO.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import SiteHeader, { type HeaderVariant } from '../components/ui/SiteHeader.astro';
 import SiteFooter from '../components/ui/SiteFooter.astro';
-import FooterMarquee from '../components/ui/FooterMarquee.astro';
 import AmbientBackground, { type AmbientVariant } from '../components/ui/AmbientBackground.astro';
 import { buildBreadcrumbSchema, buildSiteGraph } from '../lib/seo/schema';
 import type { BreadcrumbItem } from '../lib/seo/site';
@@ -21,7 +20,6 @@ interface Props {
   breadcrumbs?: BreadcrumbItem[];
   hideHeader?: boolean;
   hideFooter?: boolean;
-  showTopMarquee?: boolean;
   ambientVariant?: AmbientVariant;
   /** Skip decorative ambient layers (e.g. homepage hero already fills the viewport). */
   hideAmbient?: boolean;
@@ -41,7 +39,6 @@ const {
   breadcrumbs,
   hideHeader = false,
   hideFooter = false,
-  showTopMarquee = false,
   ambientVariant,
   hideAmbient = false,
   headerVariant = 'default',
@@ -56,14 +53,6 @@ function resolveAmbientVariant(): AmbientVariant {
   if (ambientVariant) return ambientVariant;
   if (pathname === '/') return 'home';
   if (pathname.startsWith('/about') || pathname.startsWith('/artists')) return 'editorial';
-  if (pathname.startsWith('/next')) return 'pulse';
-  if (
-    pathname.startsWith('/energize-kids') ||
-    pathname.startsWith('/energize-fest') ||
-    pathname.startsWith('/events')
-  ) {
-    return 'warm';
-  }
   return 'cosmic';
 }
 ---
@@ -112,7 +101,6 @@ function resolveAmbientVariant(): AmbientVariant {
     }
     <a href="#main-content" class="skip-link">Skip to content</a>
     {!hideHeader && <SiteHeader variant={headerVariant} />}
-    {showTopMarquee && <FooterMarquee placement="top" />}
     <main id="main-content" class="site-main relative">
       <slot />
     </main>
@@ -124,7 +112,7 @@ function resolveAmbientVariant(): AmbientVariant {
   (function () {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const REVEAL_SELECTOR =
-      '.scroll-reveal, .scroll-reveal-pixel, .about-scroll-reveal, .next-scroll-reveal';
+      '.scroll-reveal, .scroll-reveal-pixel, .about-scroll-reveal';
 
     document.querySelectorAll<HTMLElement>('.scroll-reveal-stagger').forEach((host) => {
       const variant = host.dataset.revealVariant === 'pixel' ? 'scroll-reveal-pixel' : 'scroll-reveal';
@@ -134,8 +122,7 @@ function resolveAmbientVariant(): AmbientVariant {
         if (
           !node.classList.contains('scroll-reveal') &&
           !node.classList.contains('scroll-reveal-pixel') &&
-          !node.classList.contains('about-scroll-reveal') &&
-          !node.classList.contains('next-scroll-reveal')
+          !node.classList.contains('about-scroll-reveal')
         ) {
           node.classList.add(variant);
         }

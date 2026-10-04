@@ -162,28 +162,6 @@ function initReleaseStage(root: ParentNode, reduced: boolean) {
   });
 }
 
-function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
-  const section = root.querySelector<HTMLElement>('[data-home-initiatives]');
-  const track = section?.querySelector<HTMLElement>('[data-home-initiatives-track]');
-  const panels = track?.querySelectorAll<HTMLElement>('[data-home-initiative]');
-  if (!section || !track || !panels?.length) return;
-
-  gsap.fromTo(
-    panels,
-    { y: 28 },
-    {
-      y: 0,
-      duration: 0.85,
-      stagger: 0.12,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: section, start: 'top 82%', once: true },
-    },
-  );
-
-  if (reduced || mobile) return;
-  pinHorizontalTrack({ section, track, headerOffset: 64, scrub: 0.75 });
-}
-
 function initAbout(root: ParentNode) {
   const section = root.querySelector<HTMLElement>('[data-home-about]');
   const words = section?.querySelectorAll<HTMLElement>('[data-home-word]');
@@ -318,9 +296,7 @@ function schedulePinRefresh(root: HTMLElement) {
   window.addEventListener('load', refresh, { once: true, signal });
 
   root
-    .querySelectorAll<HTMLImageElement>(
-      '[data-home-initiatives] img, [data-home-artists] img',
-    )
+    .querySelectorAll<HTMLImageElement>('[data-home-artists] img')
     .forEach((img) => {
       if (img.complete) return;
       img.addEventListener('load', refresh, { once: true, signal });
@@ -353,7 +329,6 @@ export async function initHomePage(): Promise<void> {
     revealBasics(root);
     initArtistRunway(root, reduced, mobile);
     initReleaseStage(root, reduced);
-    initInitiatives(root, reduced, mobile);
     initAbout(root);
     initNewsletter(root, reduced);
   }, root);

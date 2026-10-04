@@ -4,6 +4,7 @@ import AboutHero from '../components/about/AboutHero.astro';
 import AboutValues from '../components/about/AboutValues.astro';
 import AboutStory from '../components/about/AboutStory.astro';
 import AboutTeam from '../components/about/AboutTeam.astro';
+import AboutBeyond from '../components/about/AboutBeyond.astro';
 import AboutCta from '../components/about/AboutCta.astro';
 import { sanityClient } from '../lib/sanity/client';
 import {
@@ -35,5 +36,6 @@ const pageTitle = aboutPage?.title ?? legacyPage?.title ?? 'About Energize Music
   <AboutValues />
   <AboutStory aboutPage={aboutPage} legacyPage={legacyPage} />
   <AboutTeam team={team} aboutPage={aboutPage} />
+  <AboutBeyond />
   <AboutCta />
 </BaseLayout>

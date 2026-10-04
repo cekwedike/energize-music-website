@@ -3,69 +3,32 @@ export interface NavLink {
   href: string;
 }
 
-// Used by the footer's "Explore" column.
+export const HQ_URL = 'https://energizehq.netlify.app';
+
+// Public contact email. Empty until confirmed; the contact page falls back to the form.
+export const CONTACT_EMAIL = '';
+
+// Header and footer "Explore" column share this list.
 export const primaryNav: NavLink[] = [
-  { label: 'About Us', href: '/about' },
   { label: 'Artists', href: '/artists' },
-  { label: 'Releases', href: '/releases' },
-  { label: 'Events', href: '/events' },
-  { label: 'Blogs', href: '/blogs' },
-  { label: 'Careers', href: '/careers' },
+  { label: 'Music', href: '/releases' },
+  { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ];
 
-export const secondaryNav: NavLink[] = [
-  { label: 'Energize Kids', href: '/energize-kids' },
-  { label: 'NEXT', href: '/next' },
-  { label: 'Energize Fest', href: '/events/energize-fest' },
+export const hqLink: NavLink = { label: 'Energize HQ', href: HQ_URL };
+
+// Footer "The House" column. These live on Energize HQ, not on this site.
+export const houseNav: NavLink[] = [
+  { label: 'Energize HQ', href: HQ_URL },
+  { label: 'Energize Central', href: `${HQ_URL}/central` },
+  { label: 'Energize Mind', href: `${HQ_URL}/mind` },
+  { label: 'EnergizeFest', href: `${HQ_URL}/live/energizefest` },
+];
+
+export const legalNav: NavLink[] = [
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
-];
-
-export interface InitiativeItem extends NavLink {
-  blurb: string;
-  image: string;
-}
-
-export const initiativesNav: InitiativeItem[] = [
-  {
-    label: 'Energize Kids',
-    href: '/energize-kids',
-    blurb:
-      'Clean kids entertainment with music, Play Zone challenges, and artist Xade. Register a child at energize-kids.com.',
-    image: '/initiatives/energize-kids.webp',
-  },
-  {
-    label: 'NEXT',
-    href: '/next',
-    blurb:
-      'Pan-African Afrogospel competition. Ten finalists earn a spot on the ENERGIZE Afrogospel Album and the launch stage.',
-    image: '/initiatives/next.jpg',
-  },
-  {
-    label: 'Energize Fest',
-    href: '/events/energize-fest',
-    blurb:
-      'Annual live showcase for the full Energize Music roster. Next date: 1 December 2026. Venue TBA.',
-    image: '/initiatives/energize-fest.webp',
-  },
-];
-
-export type HeaderNavEntry =
-  | ({ type: 'link' } & NavLink)
-  | { type: 'dropdown'; label: string; items: InitiativeItem[] };
-
-// Drives SiteHeader specifically. Order and Home visibility are handled there.
-export const headerNav: HeaderNavEntry[] = [
-  { type: 'link', label: 'Home', href: '/' },
-  { type: 'link', label: 'About Us', href: '/about' },
-  { type: 'link', label: 'Artists', href: '/artists' },
-  { type: 'link', label: 'Releases', href: '/releases' },
-  { type: 'dropdown', label: 'Initiatives', items: initiativesNav },
-  { type: 'link', label: 'Events', href: '/events' },
-  { type: 'link', label: 'Blogs', href: '/blogs' },
-  { type: 'link', label: 'Careers', href: '/careers' },
-  { type: 'link', label: 'Contact', href: '/contact' },
 ];
 
 export interface SocialLink {

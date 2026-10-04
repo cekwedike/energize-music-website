@@ -16,13 +16,10 @@ const ROUTES = [
   '/artists',
   '/artists/greatman-takit',
   '/releases',
-  '/blogs',
   '/contact',
+  '/privacy',
+  '/terms',
   '/404',
-  '/events',
-  '/events/energize-fest',
-  '/energize-kids',
-  '/next',
 ] as const;
 
 const ARTIFACT_DIR = path.join(process.cwd(), 'playwright-artifacts', 'mobile-audit');

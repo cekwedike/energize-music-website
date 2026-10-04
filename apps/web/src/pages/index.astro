@@ -3,19 +3,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/home/Hero.astro';
 import HomeArtists from '../components/home/HomeArtists.astro';
 import HomeReleases from '../components/home/HomeReleases.astro';
-import HomeInitiatives from '../components/home/HomeInitiatives.astro';
-import HomeEvents from '../components/home/HomeEvents.astro';
 import HomeAbout from '../components/home/HomeAbout.astro';
 import HomeNewsletter from '../components/home/HomeNewsletter.astro';
 import { sanityClient } from '../lib/sanity/client';
 import { enrichRelease } from '../lib/metadata/enrichReleases';
-import { isValidEventCard } from '../lib/events/format';
 import {
-  featuredEventsQuery,
   homeArtistsQuery,
   homeReleasesQuery,
   type ArtistCard,
-  type EventCard,
   type Release,
 } from '@energize/shared';
 import { HERO_VIDEO_POSTER } from '../lib/hero-video';
@@ -23,25 +18,20 @@ import '../styles/home.css';
 
 let artists: ArtistCard[] = [];
 let homeReleases: Release[] = [];
-let featuredEvents: EventCard[] = [];
 
 try {
-  [artists, homeReleases, featuredEvents] = await Promise.all([
+  [artists, homeReleases] = await Promise.all([
     sanityClient.fetch<ArtistCard[]>(homeArtistsQuery),
     sanityClient.fetch<Release[]>(homeReleasesQuery),
-    sanityClient.fetch<EventCard[]>(featuredEventsQuery),
   ]);
 } catch {
   artists = [];
   homeReleases = [];
-  featuredEvents = [];
 }
 
 const releases = await Promise.all(
   homeReleases.map((release) => enrichRelease(release, { coverSize: 480 })),
 );
-
-const homeEvents = featuredEvents.filter(isValidEventCard);
 ---
 
 <BaseLayout
@@ -56,15 +46,12 @@ const homeEvents = featuredEvents.filter(isValidEventCard);
     'Ellie Scotte',
   ]}
   hideAmbient
-  showTopMarquee
 >
   <link slot="head" rel="preload" as="image" href={HERO_VIDEO_POSTER} type="image/webp" fetchpriority="high" />
   <div data-home-page data-hero-ready="false">
     <Hero />
     <div data-home-below class="home-below">
       <HomeReleases releases={releases} />
-      <HomeInitiatives />
-      <HomeEvents events={homeEvents} />
       <HomeArtists artists={artists} />
       <HomeAbout />
       <HomeNewsletter />
