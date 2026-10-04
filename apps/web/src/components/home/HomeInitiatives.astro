@@ -17,42 +17,31 @@ const items = initiativesNav;
     </p>
   </div>
 
-  <div class="home-h-scroll home-initiatives__scroll">
-    <div class="home-initiatives__stage home-h-scroll__stage" data-home-h-scroll>
-      <div class="home-initiatives__track" data-home-initiatives-track>
-        {
-          items.map((item) => (
-            <a href={item.href} class="home-initiatives__panel theme-dark" data-home-initiative>
-              <img
-                src={item.image}
-                alt={`${item.label} initiative`}
-                width="640"
-                height="400"
-                class="home-initiatives__img"
-                loading="lazy"
-                decoding="async"
-                sizes="(max-width: 640px) 85vw, 420px"
-              />
-              <div class="home-initiatives__veil" aria-hidden="true"></div>
-              <div class="home-initiatives__content">
-                <h3 class="home-initiatives__name">{item.label}</h3>
-                <p class="home-initiatives__blurb">{item.blurb}</p>
-                <span class="home-link">
-                  <span class="home-link__line" aria-hidden="true"></span>
-                  Enter
-                </span>
-              </div>
-            </a>
-          ))
-        }
-      </div>
-    </div>
-    <div class="home-h-scroll__meter" aria-hidden="true">
-      <div class="home-h-scroll__track">
-        <div class="home-h-scroll__thumb" data-home-h-scroll-thumb></div>
-      </div>
-      <span class="home-h-scroll__label">Swipe</span>
-    </div>
+  <div class="home-initiatives__track" data-home-initiatives-track>
+    {
+      items.map((item) => (
+        <a href={item.href} class="home-initiatives__panel theme-dark" data-home-initiative>
+          <img
+            src={item.image}
+            alt={`${item.label} initiative`}
+            width="640"
+            height="400"
+            class="home-initiatives__img"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="home-initiatives__veil" aria-hidden="true"></div>
+          <div class="home-initiatives__content">
+            <h3 class="home-initiatives__name">{item.label}</h3>
+            <p class="home-initiatives__blurb">{item.blurb}</p>
+            <span class="home-link">
+              <span class="home-link__line" aria-hidden="true"></span>
+              Enter
+            </span>
+          </div>
+        </a>
+      ))
+    }
   </div>
 </section>
 
@@ -87,30 +76,36 @@ const items = initiativesNav;
     color: var(--color-fg);
   }
 
-  .home-initiatives__stage {
-    overflow: hidden;
+  /* Same container and side padding as the heading: stacked on mobile, an even 3-column grid on wide screens. */
+  .home-initiatives__track {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    width: min(100%, 80rem);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
   }
 
-  @media (max-width: 899px) {
-    .home-initiatives__stage.home-h-scroll__stage {
-      overflow-x: auto;
+  @media (min-width: 640px) {
+    .home-initiatives__track {
+      padding-inline: 1.5rem;
     }
   }
 
-  .home-initiatives__track {
-    display: flex;
-    width: max-content;
+  @media (min-width: 900px) {
+    .home-initiatives__track {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
   }
 
   .home-initiatives__panel {
     position: relative;
-    flex: 0 0 auto;
-    width: min(92vw, 42rem);
+    width: 100%;
     height: clamp(22rem, 70vh, 34rem);
     overflow: hidden;
     color: var(--color-fg);
     text-decoration: none;
-    border-right: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
   }
 
   .home-initiatives__img {
@@ -165,12 +160,5 @@ const items = initiativesNav;
 
   .home-initiatives__panel:hover .home-initiatives__img {
     transform: scale(1.14);
-  }
-
-  @media (max-width: 899px) {
-    .home-initiatives__panel {
-      width: min(88vw, 28rem);
-      scroll-snap-align: start;
-    }
   }
 </style>
