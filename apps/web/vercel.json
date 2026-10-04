@@ -31,23 +31,13 @@
       "statusCode": 301
     },
     {
-      "source": "/events/:path*",
+      "source": "/events/:path((?!energize-fest/?$).+)",
       "destination": "https://energizehq.netlify.app/live",
       "statusCode": 301
     },
     {
       "source": "/energize-fest",
-      "destination": "https://energizehq.netlify.app/live",
-      "statusCode": 301
-    },
-    {
-      "source": "/energize-kids",
-      "destination": "https://energize-kids.com",
-      "statusCode": 301
-    },
-    {
-      "source": "/next",
-      "destination": "/about",
+      "destination": "/events/energize-fest",
       "statusCode": 301
     }
   ],

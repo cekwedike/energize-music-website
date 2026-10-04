@@ -1,6 +1,6 @@
 ---
 import '../../styles/site-header.css';
-import { hqLink, primaryNav } from '../../lib/nav';
+import { headerNav, hqLink } from '../../lib/nav';
 import Logo from './Logo.astro';
 
 export type HeaderVariant = 'default' | 'ambient' | 'overlay' | 'light';
@@ -15,8 +15,18 @@ const currentPath = Astro.url.pathname;
 const isHome = currentPath === '/';
 
 function isActive(href: string) {
-  return currentPath.startsWith(href);
+  return href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 }
+
+const navEntries = headerNav.filter((entry) => !(entry.type === 'link' && entry.href === '/' && isHome));
+
+const initiativesEntry = headerNav.find((entry) => entry.type === 'dropdown');
+const isInitiativeActive =
+  initiativesEntry?.type === 'dropdown'
+    ? initiativesEntry.items.some((link) => isActive(link.href))
+    : false;
+
+const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.href === '/contact');
 ---
 
 <header
@@ -38,27 +48,102 @@ function isActive(href: string) {
         <nav aria-label="Primary">
           <ul class="flex items-center gap-0.5 lg:gap-1">
             {
-              primaryNav.map((link) => (
-                <li>
-                  <a
-                    href={link.href}
-                    aria-current={isActive(link.href) ? 'page' : undefined}
-                    class="nav-link"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))
+              navEntries.map((entry) =>
+                entry.type === 'link' && entry.href !== '/contact' ? (
+                  <li>
+                    <a
+                      href={entry.href}
+                      aria-current={isActive(entry.href) ? 'page' : undefined}
+                      class="nav-link"
+                    >
+                      {entry.label}
+                    </a>
+                  </li>
+                ) : entry.type === 'dropdown' ? (
+                  <li class="initiatives-dropdown relative">
+                    <button
+                      type="button"
+                      id="initiatives-trigger"
+                      aria-expanded="false"
+                      aria-controls="initiatives-menu"
+                      aria-haspopup="true"
+                      aria-current={isInitiativeActive ? 'page' : undefined}
+                      class="nav-link flex items-center gap-1.5"
+                    >
+                      {entry.label}
+                      <svg
+                        id="initiatives-chevron"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="h-3 w-3 shrink-0 transition-transform duration-200"
+                        aria-hidden="true"
+                      >
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+
+                    <div
+                      id="initiatives-menu"
+                      role="menu"
+                      aria-label="Initiatives"
+                      class="initiatives-panel hidden"
+                    >
+                      <div class="initiatives-panel__mesh" aria-hidden="true"></div>
+                      <div class="initiatives-panel__header">
+                        <p class="initiatives-panel__eyebrow">Our initiatives</p>
+                        <p class="initiatives-panel__lede">Programs Shaping The Energize Ecosystem</p>
+                      </div>
+                      <ul class="initiatives-panel__grid">
+                        {
+                          entry.items.map((link) => (
+                            <li>
+                              <a
+                                href={link.href}
+                                role="menuitem"
+                                aria-current={isActive(link.href) ? 'page' : undefined}
+                                class="initiatives-card group"
+                              >
+                                <span class="initiatives-card__media">
+                                  <img src={link.image} alt="" loading="lazy" class="initiatives-card__image" />
+                                  <span class="initiatives-card__overlay" aria-hidden="true"></span>
+                                </span>
+                                <span class="initiatives-card__copy">
+                                  <span class="initiatives-card__title">{link.label}</span>
+                                  <span class="initiatives-card__blurb">{link.blurb}</span>
+                                  <span class="initiatives-card__cta">Explore</span>
+                                </span>
+                              </a>
+                            </li>
+                          ))
+                        }
+                      </ul>
+                    </div>
+                  </li>
+                ) : null,
+              )
             }
           </ul>
         </nav>
       </div>
 
-      <a href={hqLink.href} class="nav-hq">
+      {
+        contactEntry?.type === 'link' ? (
+          <a
+            href={contactEntry.href}
+            aria-current={isActive(contactEntry.href) ? 'page' : undefined}
+            class="nav-cta"
+          >
+            {contactEntry.label}
+          </a>
+        ) : null
+      }
+
+      <a href={hqLink.href} target="_blank" rel="noopener noreferrer" class="nav-hq-link">
         {hqLink.label}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5 shrink-0" aria-hidden="true">
-          <path d="M7 17L17 7M9 7h8v8" />
-        </svg>
       </a>
     </div>
 
@@ -86,24 +171,69 @@ function isActive(href: string) {
   <nav id="mobile-nav" aria-label="Primary mobile" class="mobile-nav lg:hidden" inert>
     <ul class="mobile-nav__list">
       {
-        primaryNav.map((link) => (
-          <li>
-            <a
-              href={link.href}
-              aria-current={isActive(link.href) ? 'page' : undefined}
-              class="mobile-nav__link"
-            >
-              {link.label}
-            </a>
-          </li>
-        ))
+        navEntries.map((entry) =>
+          entry.type === 'link' ? (
+            <li>
+              <a
+                href={entry.href}
+                aria-current={isActive(entry.href) ? 'page' : undefined}
+                class="mobile-nav__link"
+              >
+                {entry.label}
+              </a>
+            </li>
+          ) : (
+            <li class="mobile-nav__accordion">
+              <button
+                type="button"
+                id="mobile-initiatives-trigger"
+                class="mobile-nav__accordion-trigger"
+                aria-expanded="false"
+                aria-controls="mobile-initiatives-panel"
+              >
+                <span>{entry.label}</span>
+                <svg
+                  class="mobile-nav__accordion-chevron"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              <div id="mobile-initiatives-panel" class="mobile-initiatives-panel" hidden>
+                <p class="mobile-initiatives-panel__lede">Programs shaping the Energize ecosystem</p>
+                <ul class="mobile-initiatives-panel__grid">
+                  {
+                    entry.items.map((link) => (
+                      <li>
+                        <a
+                          href={link.href}
+                          aria-current={isActive(link.href) ? 'page' : undefined}
+                          class="mobile-initiative-card"
+                        >
+                          <span class="mobile-initiative-card__media">
+                            <img src={link.image} alt="" loading="lazy" class="h-full w-full object-cover" />
+                          </span>
+                          <span class="mobile-initiative-card__copy">
+                            <span class="mobile-initiative-card__title">{link.label}</span>
+                            <span class="mobile-initiative-card__blurb">{link.blurb}</span>
+                          </span>
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+            </li>
+          ),
+        )
       }
       <li>
-        <a href={hqLink.href} class="mobile-nav__link mobile-nav__link--hq">
+        <a href={hqLink.href} target="_blank" rel="noopener noreferrer" class="mobile-nav__hq-link">
           {hqLink.label}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0" aria-hidden="true">
-            <path d="M7 17L17 7M9 7h8v8" />
-          </svg>
         </a>
       </li>
     </ul>
@@ -116,6 +246,8 @@ function isActive(href: string) {
   const panel = document.getElementById('mobile-nav');
   const backdrop = document.getElementById('mobile-nav-backdrop');
   const toggleLabel = toggle?.querySelector<HTMLElement>('.nav-toggle__label');
+  const mobileInitiativesTrigger = document.getElementById('mobile-initiatives-trigger');
+  const mobileInitiativesPanel = document.getElementById('mobile-initiatives-panel');
 
   let releaseFocusTrap: (() => void) | null = null;
   let headerHeightFrame = 0;
@@ -191,9 +323,15 @@ function isActive(href: string) {
   backdrop?.addEventListener('click', () => setMobileMenuOpen(false));
 
   panel?.addEventListener('click', (event) => {
-    if ((event.target as HTMLElement).closest('a')) {
+    if ((event.target as HTMLElement).tagName === 'A') {
       setMobileMenuOpen(false);
     }
+  });
+
+  mobileInitiativesTrigger?.addEventListener('click', () => {
+    const isOpen = mobileInitiativesTrigger.getAttribute('aria-expanded') === 'true';
+    mobileInitiativesTrigger.setAttribute('aria-expanded', String(!isOpen));
+    mobileInitiativesPanel?.toggleAttribute('hidden', isOpen);
   });
 
   document.addEventListener('keydown', (event) => {
@@ -211,4 +349,111 @@ function isActive(href: string) {
   window.addEventListener('resize', syncHeaderHeight);
   syncHeaderHeight();
   syncToggleLabel(false);
+
+  const initiativesTrigger = document.getElementById('initiatives-trigger');
+  const initiativesMenu = document.getElementById('initiatives-menu');
+  const initiativesDropdown = initiativesTrigger?.closest('.initiatives-dropdown');
+  const desktopInitiativesHover = window.matchMedia('(hover: hover) and (min-width: 1024px)');
+  let initiativesCloseTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function isInitiativesOpen() {
+    return initiativesTrigger?.getAttribute('aria-expanded') === 'true';
+  }
+
+  function openInitiatives() {
+    initiativesMenu?.classList.remove('hidden');
+    initiativesTrigger?.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeInitiatives() {
+    initiativesMenu?.classList.add('hidden');
+    initiativesTrigger?.setAttribute('aria-expanded', 'false');
+  }
+
+  function cancelInitiativesClose() {
+    if (initiativesCloseTimer !== null) {
+      clearTimeout(initiativesCloseTimer);
+      initiativesCloseTimer = null;
+    }
+  }
+
+  function scheduleInitiativesClose() {
+    cancelInitiativesClose();
+    initiativesCloseTimer = setTimeout(() => {
+      closeInitiatives();
+      initiativesCloseTimer = null;
+    }, 150);
+  }
+
+  function toggleInitiatives() {
+    if (isInitiativesOpen()) {
+      closeInitiatives();
+    } else {
+      openInitiatives();
+    }
+  }
+
+  function bindDesktopInitiativesHover() {
+    if (!desktopInitiativesHover.matches || !initiativesDropdown) return;
+
+    const onEnter = () => {
+      cancelInitiativesClose();
+      openInitiatives();
+    };
+
+    const onLeave = () => {
+      scheduleInitiativesClose();
+    };
+
+    initiativesDropdown.addEventListener('mouseenter', onEnter);
+    initiativesDropdown.addEventListener('mouseleave', onLeave);
+
+    return () => {
+      initiativesDropdown.removeEventListener('mouseenter', onEnter);
+      initiativesDropdown.removeEventListener('mouseleave', onLeave);
+    };
+  }
+
+  let releaseInitiativesHover: (() => void) | null = bindDesktopInitiativesHover() ?? null;
+  desktopInitiativesHover.addEventListener('change', () => {
+    cancelInitiativesClose();
+    closeInitiatives();
+    releaseInitiativesHover?.();
+    releaseInitiativesHover = bindDesktopInitiativesHover() ?? null;
+  });
+
+  initiativesTrigger?.addEventListener('click', (event) => {
+    if (desktopInitiativesHover.matches) {
+      event.preventDefault();
+      return;
+    }
+
+    event.stopPropagation();
+    toggleInitiatives();
+  });
+
+  initiativesTrigger?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    toggleInitiatives();
+  });
+
+  initiativesMenu?.querySelectorAll('a[role="menuitem"]').forEach((link) => {
+    link.addEventListener('click', () => closeInitiatives());
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!initiativesDropdown || !isInitiativesOpen()) return;
+    const target = event.target as Node;
+    if (!initiativesDropdown.contains(target)) {
+      closeInitiatives();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && isInitiativesOpen()) {
+      closeInitiatives();
+      initiativesTrigger?.focus();
+    }
+  });
 </script>

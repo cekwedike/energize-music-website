@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/home/Hero.astro';
 import HomeArtists from '../components/home/HomeArtists.astro';
 import HomeReleases from '../components/home/HomeReleases.astro';
+import HomeInitiatives from '../components/home/HomeInitiatives.astro';
 import HomeAbout from '../components/home/HomeAbout.astro';
 import HomeNewsletter from '../components/home/HomeNewsletter.astro';
 import { sanityClient } from '../lib/sanity/client';
@@ -46,12 +47,14 @@ const releases = await Promise.all(
     'Ellie Scotte',
   ]}
   hideAmbient
+  showTopMarquee
 >
   <link slot="head" rel="preload" as="image" href={HERO_VIDEO_POSTER} type="image/webp" fetchpriority="high" />
   <div data-home-page data-hero-ready="false">
     <Hero />
     <div data-home-below class="home-below">
       <HomeReleases releases={releases} />
+      <HomeInitiatives />
       <HomeArtists artists={artists} />
       <HomeAbout />
       <HomeNewsletter />

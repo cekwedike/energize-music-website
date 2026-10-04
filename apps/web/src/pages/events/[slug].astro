@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventDetailView from '../../components/events/EventDetailView.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import { sanityClient } from '../../lib/sanity/client';
+import { eventBySlugQuery, type EventDetail } from '@energize/shared';
+import { getEventCoverUrl } from '../../lib/events/media';
+import { ENERGIZE_FEST_SLUG, energizeFestFallback } from '../../lib/events/festFallback';
+import { crumbs, organizationId } from '../../lib/seo/schema';
+import { absoluteUrl } from '../../lib/seo/site';
+
+// The events listing is gone, so only Energize Fest is built here. Other /events/* paths redirect to HQ.
+export function getStaticPaths() {
+  return [{ params: { slug: ENERGIZE_FEST_SLUG } }];
+}
+
+const { slug } = Astro.params;
+
+let event: EventDetail | null = null;
+try {
+  event = await sanityClient.fetch<EventDetail | null>(eventBySlugQuery, { slug });
+} catch {
+  event = null;
+}
+
+if (!event && slug === ENERGIZE_FEST_SLUG) {
+  event = energizeFestFallback;
+}
+
+if (!event) {
+  return Astro.redirect('/');
+}
+
+const shareImage = getEventCoverUrl(event.shareImage, 1200, 630);
+const coverUrl = getEventCoverUrl(event.cover, 1200, 630);
+const ogImage = shareImage || coverUrl || undefined;
+const shareUrl = absoluteUrl(`/events/${event.slug}`);
+
+const pageTitle =
+  event.slug === 'energize-fest'
+    ? 'Energize Fest | Annual Afro-Gospel Live Showcase'
+    : event.title;
+const pageDescription =
+  event.slug === 'energize-fest'
+    ? 'Energize Fest brings the full Energize Music roster together on one stage each year. See dates, lineup, and how to attend.'
+    : (event.summary ?? `${event.title} by Energize Music`);
+
+const performers = (event.lineup ?? [])
+  .map((entry) => entry.name?.trim())
+  .filter((name): name is string => Boolean(name))
+  .map((name) => ({
+    '@type': 'PerformingGroup',
+    name,
+  }));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicEvent',
+  '@id': `${shareUrl}#event`,
+  name: event.title,
+  startDate: event.startDate,
+  endDate: event.endDate || event.startDate,
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  image: ogImage ? [ogImage] : undefined,
+  url: shareUrl,
+  description: event.summary ?? event.title,
+  inLanguage: 'en',
+  location: event.location
+    ? {
+        '@type': 'Place',
+        name: event.location,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: event.location,
+        },
+      }
+    : undefined,
+  organizer: { '@id': organizationId() },
+  performer: performers.length > 0 ? performers : undefined,
+  ...(event.ticketUrl
+    ? {
+        offers: {
+          '@type': 'Offer',
+          url: event.ticketUrl,
+          availability: 'https://schema.org/InStock',
+        },
+      }
+    : {}),
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  ogImage={ogImage}
+  keywords={[event.title, 'Energize Music', 'live event', 'Afro-gospel', event.location].filter(Boolean) as string[]}
+  breadcrumbs={crumbs({ name: event.title, path: `/events/${event.slug}` })}
+  ambientVariant="editorial"
+  headerVariant="overlay"
+>
+  <JsonLd data={jsonLd} />
+  <EventDetailView event={event} shareUrl={shareUrl} />
+</BaseLayout>

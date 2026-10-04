@@ -1,9 +1,10 @@
 ---
-import { houseNav, legalNav, primaryNav, socialLinks } from '../../lib/nav';
+import { hqLink, initiativesNav, legalNav, primaryNav, socialLinks } from '../../lib/nav';
 import SocialIcon from './SocialIcon.astro';
 import Logo from './Logo.astro';
 import FooterMarquee from './FooterMarquee.astro';
 
+const moreNav = [...initiativesNav.map(({ label, href }) => ({ label, href })), hqLink];
 const year = new Date().getFullYear();
 ---
 
@@ -62,11 +63,11 @@ const year = new Date().getFullYear();
             </ul>
           </nav>
 
-          <nav aria-label="The House" class="site-footer__nav-col">
-            <p class="site-footer__nav-label">The House</p>
+          <nav aria-label="Initiatives" class="site-footer__nav-col">
+            <p class="site-footer__nav-label">Initiatives</p>
             <ul class="site-footer__nav-list">
               {
-                houseNav.map((link) => (
+                moreNav.map((link) => (
                   <li>
                     <a href={link.href} class="site-footer__nav-link">
                       <span class="site-footer__nav-link-text">{link.label}</span>

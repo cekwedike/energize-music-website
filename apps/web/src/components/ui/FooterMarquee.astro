@@ -1,9 +1,15 @@
 ---
+interface Props {
+  placement?: 'footer' | 'top';
+}
+
+const { placement = 'footer' } = Astro.props;
+
 const phrase = 'The Energy Different';
 const loopItems = Array.from({ length: 12 }, () => phrase);
 ---
 
-<div class="footer-marquee" aria-hidden="true">
+<div class:list={['footer-marquee', placement === 'top' && 'footer-marquee--top']} aria-hidden="true">
   <div class="footer-marquee__fade footer-marquee__fade--left"></div>
   <div class="footer-marquee__fade footer-marquee__fade--right"></div>
   <div class="footer-marquee__track">
@@ -25,6 +31,22 @@ const loopItems = Array.from({ length: 12 }, () => phrase);
     contain: paint;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     padding-block: clamp(0.4375rem, 0.4rem + 0.2vw, 0.75rem);
+  }
+
+  .footer-marquee--top {
+    position: relative;
+    z-index: 30;
+    background: rgba(11, 11, 13, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .footer-marquee--top .footer-marquee__fade--left {
+    background: linear-gradient(90deg, var(--color-ink) 0%, transparent 100%);
+  }
+
+  .footer-marquee--top .footer-marquee__fade--right {
+    background: linear-gradient(270deg, var(--color-ink) 0%, transparent 100%);
   }
 
   .footer-marquee__fade {

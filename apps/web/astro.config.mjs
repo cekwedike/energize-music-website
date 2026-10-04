@@ -17,7 +17,7 @@ export default defineConfig({
         if (url.endsWith('/') || url.endsWith('energize-music.com')) {
           return { ...item, changefreq: 'daily', priority: 1 };
         }
-        if (url.includes('/artists/') || url.includes('/releases/')) {
+        if (url.includes('/artists/') || url.includes('/releases/') || url.includes('/events/')) {
           return { ...item, changefreq: 'weekly', priority: 0.8 };
         }
         if (url.includes('/privacy') || url.includes('/terms')) {
