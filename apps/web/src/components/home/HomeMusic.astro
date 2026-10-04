@@ -190,9 +190,8 @@ const year = releaseYear(lead?.releaseDate);
     margin-inline: auto;
     overflow: hidden;
     background: var(--color-surface);
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--color-fg) 10%, transparent),
-      0 40px 100px color-mix(in srgb, var(--color-shadow) 22%, transparent);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
   }
 
   .home-releases__cover img,
