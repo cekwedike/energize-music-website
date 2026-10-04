@@ -5,6 +5,7 @@ import SiteHeader, { type HeaderVariant } from '../components/ui/SiteHeader.astr
 import SiteFooter from '../components/ui/SiteFooter.astro';
 import { buildBreadcrumbSchema, buildSiteGraph } from '../lib/seo/schema';
 import type { BreadcrumbItem } from '../lib/seo/site';
+import 'lenis/dist/lenis.css';
 import '../styles/global.css';
 
 interface Props {
@@ -87,6 +88,12 @@ const breadcrumbGraph = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs)
     {!hideFooter && <SiteFooter />}
   </body>
 </html>
+
+<script>
+  import { initSmoothScroll } from '../lib/smoothScroll';
+
+  initSmoothScroll();
+</script>
 
 <script>
   (function () {

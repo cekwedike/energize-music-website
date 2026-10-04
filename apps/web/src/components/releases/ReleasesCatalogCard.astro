@@ -33,6 +33,8 @@ const listenUrl = release.externalUrl;
       coverUrl ? (
         <img
           src={coverUrl}
+          width="480"
+          height="480"
           alt={release.cover?.alt ?? release.displayTitle}
           loading="lazy"
           referrerpolicy="no-referrer"

@@ -46,8 +46,17 @@ const copy = Array.from({ length: repeats }, () => items).flat();
     if (seconds > 0) track.style.setProperty('--marquee-duration', `${seconds}s`);
   };
 
+  // Only animate strips that are on screen.
+  const visibility =
+    'IntersectionObserver' in window
+      ? new IntersectionObserver((entries) => {
+          entries.forEach((entry) => entry.target.classList.toggle('is-offscreen', !entry.isIntersecting));
+        })
+      : null;
+
   document.querySelectorAll<HTMLElement>('[data-marquee]').forEach((marquee) => {
     setDuration(marquee);
+    visibility?.observe(marquee);
     // Re-measure when the copy changes width (web fonts swapping in, viewport font sizes).
     const copy = marquee.querySelector<HTMLElement>('[data-marquee-copy]');
     if (copy && 'ResizeObserver' in window) {
@@ -69,6 +78,10 @@ const copy = Array.from({ length: repeats }, () => items).flat();
     width: max-content;
     animation: marquee-scroll var(--marquee-duration, 60s) linear infinite;
     will-change: transform;
+  }
+
+  .marquee.is-offscreen .marquee__track {
+    animation-play-state: paused;
   }
 
   .marquee__copy {

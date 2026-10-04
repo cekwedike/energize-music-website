@@ -67,7 +67,7 @@ const year = releaseYear(lead?.releaseDate);
             )}
 
             {embedUrl && spotifyUrl && (
-              <div class="home-releases__player" data-spotify-slot>
+              <div class="home-releases__player" data-spotify-slot data-lenis-prevent>
                 <a
                   href={spotifyUrl}
                   target="_blank"

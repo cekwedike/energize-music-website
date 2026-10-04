@@ -106,7 +106,7 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
                                 class="initiatives-card group"
                               >
                                 <span class="initiatives-card__media">
-                                  <img src={link.image} alt="" loading="lazy" class="initiatives-card__image" />
+                                  <img src={link.image} alt="" width="800" height="1000" loading="lazy" decoding="async" class="initiatives-card__image" />
                                 </span>
                                 <span class="initiatives-card__copy">
                                   <span class="initiatives-card__title">{link.label}</span>
@@ -166,7 +166,7 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
 
   <div id="mobile-nav-backdrop" class="mobile-nav-backdrop lg:hidden" aria-hidden="true"></div>
 
-  <nav id="mobile-nav" aria-label="Primary mobile" class="mobile-nav lg:hidden" inert>
+  <nav id="mobile-nav" aria-label="Primary mobile" class="mobile-nav lg:hidden" inert data-lenis-prevent>
     <ul class="mobile-nav__list">
       {
         navEntries.map((entry) =>
@@ -213,7 +213,7 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
                           class="mobile-initiative-card"
                         >
                           <span class="mobile-initiative-card__media">
-                            <img src={link.image} alt="" loading="lazy" class="h-full w-full object-cover" />
+                            <img src={link.image} alt="" width="800" height="1000" loading="lazy" decoding="async" class="h-full w-full object-cover" />
                           </span>
                           <span class="mobile-initiative-card__copy">
                             <span class="mobile-initiative-card__title">{link.label}</span>
@@ -240,6 +240,8 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
 </header>
 
 <script>
+  import { setScrollLocked } from '../../lib/smoothScroll';
+
   const header = document.getElementById('site-header');
   const toggle = document.getElementById('nav-toggle');
   const panel = document.getElementById('mobile-nav');
@@ -302,6 +304,7 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
     panel?.toggleAttribute('inert', !isOpen);
     syncToggleLabel(isOpen);
     document.body.style.overflow = isOpen ? 'hidden' : '';
+    setScrollLocked(isOpen);
     syncHeaderHeight();
 
     if (isOpen) {
@@ -339,12 +342,14 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
     }
   });
 
-  function updateScrollState() {
-    header?.classList.toggle('is-scrolled', window.scrollY > 12);
-  }
-
-  updateScrollState();
-  window.addEventListener('scroll', updateScrollState, { passive: true });
+  // Scrolled state without a scroll listener: watch a 1px marker 12px down the page.
+  const scrollSentinel = document.createElement('div');
+  scrollSentinel.setAttribute('aria-hidden', 'true');
+  scrollSentinel.style.cssText = 'position:absolute;top:12px;left:0;width:1px;height:1px;pointer-events:none;';
+  document.body.prepend(scrollSentinel);
+  new IntersectionObserver(([entry]) => {
+    header?.classList.toggle('is-scrolled', !entry.isIntersecting);
+  }).observe(scrollSentinel);
   window.addEventListener('resize', syncHeaderHeight);
   syncHeaderHeight();
   syncToggleLabel(false);

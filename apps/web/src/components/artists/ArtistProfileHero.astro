@@ -25,6 +25,8 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
     <img
       src={bannerUrl}
       alt=""
+      width={hasCoverImage ? 1600 : 827}
+      height={hasCoverImage ? 900 : 267}
       class:list={['profile-hero__banner', !hasCoverImage && 'profile-hero__banner--logo']}
       loading="eager"
       decoding="async"
@@ -41,6 +43,8 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
       <img
         src={avatarUrl}
         alt={artist.photo.alt ?? `${artist.name} portrait`}
+        width="800"
+        height="800"
         class="profile-hero__avatar"
         loading="eager"
         decoding="async"

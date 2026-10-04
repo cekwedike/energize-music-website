@@ -238,10 +238,19 @@ import {
     if (!video.paused && video.readyState >= 2) onPlaying();
     video.play().catch(() => markHeroReady());
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) video.pause();
+    // Pause when the tab is hidden or the hero has scrolled out of view.
+    let heroInView = true;
+    const syncPlayback = () => {
+      if (document.hidden || !heroInView) video.pause();
       else if (!prefersReducedMotion) video.play().catch(() => {});
-    });
+    };
+    document.addEventListener('visibilitychange', syncPlayback);
+    if ('IntersectionObserver' in window && hero instanceof HTMLElement) {
+      new IntersectionObserver(([entry]) => {
+        heroInView = entry.isIntersecting;
+        syncPlayback();
+      }).observe(hero);
+    }
   } else {
     markHeroReady();
   }

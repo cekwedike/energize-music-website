@@ -59,6 +59,8 @@ const sorted = [...releases].sort(
                       release.coverUrl ? (
                         <img
                           src={release.coverUrl}
+                          width="480"
+                          height="480"
                           alt={release.cover?.alt ?? release.displayTitle}
                           loading="lazy"
                           decoding="async"

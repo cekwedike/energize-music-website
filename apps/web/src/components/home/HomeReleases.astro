@@ -12,7 +12,7 @@ const { releases } = Astro.props;
 {
   releases.length > 0 && (
     <div class="home-row">
-      <ul class="home-row__track" aria-label="More releases">
+      <ul class="home-row__track" aria-label="More releases" data-lenis-prevent>
         {releases.map((release) => (
           <li class="home-row__item">
             <ReleasesCatalogCard release={release} />

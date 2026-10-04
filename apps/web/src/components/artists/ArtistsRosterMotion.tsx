@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { animate, inView, scroll, stagger } from 'motion';
+import { animate, inView, stagger } from 'motion';
+import { scrollToElement } from '../../lib/smoothScroll';
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -16,7 +17,7 @@ export default function ArtistsRosterMotion() {
         const section = document.querySelector<HTMLElement>(
           `[data-roster-section][data-index="${index}"]`,
         );
-        section?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        if (section) scrollToElement(section);
       });
     });
 
@@ -40,11 +41,6 @@ export default function ArtistsRosterMotion() {
             { duration: 0.65, delay: stagger(0.06), ease: [0.22, 1, 0.36, 1] },
           );
 
-          const bgName = section.querySelector<HTMLElement>('[data-motion="bg-name"]');
-          if (bgName) {
-            animate(bgName, { x: ['-2%', '0%'] }, { duration: 0.9, ease: [0.22, 1, 0.36, 1] });
-          }
-
           section.querySelectorAll<HTMLElement>('[data-motion="portrait"]').forEach((portrait) => {
             animate(portrait, { scale: [1.02, 1] }, { duration: 0.8, ease: [0.22, 1, 0.36, 1] });
           });
@@ -53,14 +49,6 @@ export default function ArtistsRosterMotion() {
       );
 
       cleanups.push(() => stopInView());
-
-      section.querySelectorAll<HTMLElement>('[data-motion="portrait"]').forEach((portrait) => {
-        const stopScroll = scroll(animate(portrait, { y: ['0%', '6%'] }), {
-          target: section,
-          offset: ['start end', 'end start'],
-        });
-        cleanups.push(() => stopScroll());
-      });
     });
 
     return () => {

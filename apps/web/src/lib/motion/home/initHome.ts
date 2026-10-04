@@ -1,3 +1,4 @@
+import { getLenis } from '../../smoothScroll';
 import type GSAP from 'gsap';
 import type { ScrollTrigger as ScrollTriggerType } from 'gsap/ScrollTrigger';
 
@@ -52,49 +53,7 @@ function revealBasics(root: ParentNode) {
   });
 }
 
-/** Horizontal travel needed to reveal the full track inside the viewport. */
-function trackOverflow(track: HTMLElement): number {
-  return Math.max(track.scrollWidth - window.innerWidth, 0);
-}
-
-/**
- * Pin a section and scrub its track sideways. End distance matches overflow 1:1
- * so we do not leave a long blank pin-spacer after the cards finish moving.
- */
-function pinHorizontalTrack(options: {
-  section: HTMLElement;
-  track: HTMLElement;
-  headerOffset: number;
-  scrub: number;
-}): void {
-  const { section, track, headerOffset, scrub } = options;
-
-  const overflow = () => trackOverflow(track);
-  if (overflow() < 48) return;
-
-  gsap.set(track, { x: 0, force3D: true });
-
-  gsap.to(track, {
-    x: () => -overflow(),
-    ease: 'none',
-    scrollTrigger: {
-      trigger: section,
-      start: `top top+=${headerOffset}`,
-      end: () => `+=${overflow()}`,
-      pin: true,
-      pinSpacing: true,
-      // transform pin survives body overflow-x:clip and ancestor compositing;
-      // fixed pins were leaving a blank void while the track scrubbed.
-      pinType: 'transform',
-      scrub,
-      invalidateOnRefresh: true,
-      anticipatePin: 0,
-      fastScrollEnd: true,
-    },
-  });
-}
-
-function initArtistRunway(root: ParentNode, reduced: boolean, mobile: boolean) {
+function initArtistRunway(root: ParentNode, mobile: boolean) {
   const section = root.querySelector<HTMLElement>('[data-home-artists]');
   const track = section?.querySelector<HTMLElement>('[data-home-artists-track]');
   const cards = track?.querySelectorAll<HTMLElement>('[data-home-artist]');
@@ -117,9 +76,6 @@ function initArtistRunway(root: ParentNode, reduced: boolean, mobile: boolean) {
       },
     },
   );
-
-  if (reduced || mobile || cards.length < 3) return;
-  pinHorizontalTrack({ section, track, headerOffset: 68, scrub: 0.65 });
 }
 
 function initReleaseStage(root: ParentNode, reduced: boolean) {
@@ -146,23 +102,9 @@ function initReleaseStage(root: ParentNode, reduced: boolean) {
       '-=0.65',
     );
   }
-
-  if (reduced) return;
-
-  gsap.to(cover, {
-    yPercent: -10,
-    rotate: 2,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: section,
-      start: 'top bottom',
-      end: 'bottom top',
-      scrub: true,
-    },
-  });
 }
 
-function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
+function initInitiatives(root: ParentNode) {
   const section = root.querySelector<HTMLElement>('[data-home-initiatives]');
   const track = section?.querySelector<HTMLElement>('[data-home-initiatives-track]');
   const panels = track?.querySelectorAll<HTMLElement>('[data-home-initiative]');
@@ -179,11 +121,7 @@ function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
       scrollTrigger: { trigger: section, start: 'top 82%', once: true },
     },
   );
-
-  if (reduced || mobile) return;
-  pinHorizontalTrack({ section, track, headerOffset: 64, scrub: 0.75 });
 }
-
 
 function initNewsletter(root: ParentNode) {
   const section = root.querySelector<HTMLElement>('[data-home-newsletter]');
@@ -203,9 +141,7 @@ function initNewsletter(root: ParentNode) {
       },
     );
   }
-
 }
-
 
 function syncHScrollThumb(stage: HTMLElement, thumb: HTMLElement) {
   const track = thumb.parentElement;
@@ -260,8 +196,16 @@ function initHScrollMeters(root: ParentNode) {
     const thumb = wrap?.querySelector<HTMLElement>('[data-home-h-scroll-thumb]');
     if (!thumb) return;
 
-    const update = () => syncHScrollThumb(stage, thumb);
-    update();
+    // At most one thumb update per frame, however many scroll events fire.
+    let frame = 0;
+    const update = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        syncHScrollThumb(stage, thumb);
+      });
+    };
+    syncHScrollThumb(stage, thumb);
     stage.addEventListener('scroll', update, { passive: true, signal });
     window.addEventListener('resize', update, { passive: true, signal });
   });
@@ -312,12 +256,14 @@ export async function initHomePage(): Promise<void> {
   if (reduced) return;
 
   await loadGsap();
+  // Keep ScrollTrigger in step with Lenis smooth scrolling.
+  getLenis()?.on('scroll', ScrollTrigger.update);
 
   homeMotionCtx = gsap.context(() => {
     revealBasics(root);
-    initArtistRunway(root, reduced, mobile);
+    initArtistRunway(root, mobile);
     initReleaseStage(root, reduced);
-    initInitiatives(root, reduced, mobile);
+    initInitiatives(root);
     initNewsletter(root);
   }, root);
 
