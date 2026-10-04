@@ -50,6 +50,14 @@
     border-bottom-color: color-mix(in srgb, var(--color-fg) 8%, transparent);
   }
 
+  /* Mobile browsers often skip the backdrop blur, so the scrolled header needs a solid fill. */
+  @media (max-width: 1023px) {
+    .site-header.is-scrolled {
+      background: var(--color-bg);
+      border-bottom-color: color-mix(in srgb, var(--color-fg) 8%, transparent);
+    }
+  }
+
   .site-header--ambient .nav-link,
   .site-header--ambient .site-header__logo,
   .site-header--overlay .nav-link,

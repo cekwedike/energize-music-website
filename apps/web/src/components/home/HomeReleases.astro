@@ -90,9 +90,15 @@ const { releases } = Astro.props;
     scroll-snap-align: start;
   }
 
+  /* Wide screens: four cards span the content width; centre the row when it is too short to scroll. */
   @media (min-width: 1024px) {
+    .home-row__track {
+      justify-content: flex-start;
+      justify-content: safe center;
+    }
+
     .home-row__item {
-      flex-basis: 16.5rem;
+      flex-basis: calc((100% - 3 * 1.25rem) / 4);
     }
   }
 </style>

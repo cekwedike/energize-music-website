@@ -56,7 +56,11 @@ const marqueeNames = [
 
       <div class="home-h-scroll home-artists__scroll">
         <div class="home-artists__stage home-h-scroll__stage" data-home-h-scroll>
-          <div class="home-artists__track" data-home-artists-track>
+          <div
+            class="home-artists__track"
+            data-home-artists-track
+            style={`--artist-cols: ${Math.min(roster.length, 4)}`}
+          >
             {roster.map((artist: (typeof roster)[number]) => (
               <article class="home-artists__card theme-dark" data-home-artist>
                 <a href={`/artists/${artist.slug}`} class="home-artists__link">
@@ -104,10 +108,6 @@ const marqueeNames = [
           <span class="home-h-scroll__label">Swipe</span>
         </div>
       </div>
-
-      <p class="home-artists__hint" data-home-reveal data-home-reveal-delay="120" aria-hidden="true">
-        Scroll to move through the roster
-      </p>
     </section>
   )
 }
@@ -173,9 +173,18 @@ const marqueeNames = [
     transform-style: preserve-3d;
   }
 
+  /* Wide screens: an even grid that fills the content width (no horizontal runway). */
   @media (min-width: 900px) {
+    .home-artists__track {
+      display: grid;
+      grid-template-columns: repeat(var(--artist-cols, 3), minmax(0, 1fr));
+      gap: 1.25rem;
+      width: min(100%, 80rem);
+      margin-inline: auto;
+    }
+
     .home-artists__card {
-      width: clamp(16rem, 22vw, 20rem);
+      width: auto;
     }
   }
 
@@ -277,24 +286,6 @@ const marqueeNames = [
   .home-artists__card:hover::after {
     border-color: color-mix(in srgb, var(--color-accent) 39%, transparent);
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 12%, transparent), 0 0 40px color-mix(in srgb, var(--color-accent) 9%, transparent);
-  }
-
-  .home-artists__hint {
-    display: none;
-    width: min(100%, 80rem);
-    margin: 0.5rem auto 0;
-    padding: 0 1.5rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-fg);
-  }
-
-  @media (min-width: 900px) {
-    .home-artists__hint {
-      display: block;
-    }
   }
 
   @media (max-width: 899px) {
