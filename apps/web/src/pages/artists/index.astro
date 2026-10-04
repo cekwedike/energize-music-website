@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
-import ArtistsRosterStack from '../../components/artists/ArtistsRosterStack.astro';
+import ArtistGrid from '../../components/artists/ArtistGrid.astro';
+import SectionTitle from '../../components/ui/SectionTitle.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { allArtistsQuery, type ArtistCard as ArtistCardType } from '@energize/shared';
 import { crumbs } from '../../lib/seo/schema';
@@ -32,16 +33,14 @@ const itemList =
   breadcrumbs={crumbs({ name: 'Artists', path: '/artists' })}
 >
   {itemList && <JsonLd data={itemList} />}
-  {
-    artists.length === 0 ? (
-      <section class="mx-auto max-w-6xl px-5 py-20 sm:px-6">
-        <p class="text-center text-ink">
-          Artists will appear here once you add them in Sanity Studio. Each published artist automatically gets a page
-          at <code class="text-accent">/artists/their-slug</code> on the next site build.
-        </p>
-      </section>
-    ) : (
-      <ArtistsRosterStack artists={artists} />
-    )
-  }
+  <section class="mx-auto max-w-7xl px-5 pb-24 pt-14 sm:px-6 sm:pb-32 sm:pt-20 lg:px-8">
+    <SectionTitle tag="h1" title="Our Artists" eyebrow="The roster" />
+    {
+      artists.length === 0 ? (
+        <p class="mt-10 text-muted">Artists will appear here once they are published in Sanity Studio.</p>
+      ) : (
+        <ArtistGrid artists={artists} eager class="mt-10 sm:mt-14" />
+      )
+    }
+  </section>
 </BaseLayout>

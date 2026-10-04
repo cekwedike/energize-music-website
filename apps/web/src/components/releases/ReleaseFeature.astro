@@ -1,0 +1,290 @@
+---
+import type { EnrichedRelease } from '@energize/shared';
+import Eyebrow from '../ui/Eyebrow.astro';
+import StreamingIcons from '../ui/StreamingIcons.astro';
+import { releaseTypeLabels, releaseYear, spotifyEmbedUrl } from '../../lib/releases/format';
+
+interface Props {
+  release: EnrichedRelease;
+  eyebrow: string;
+  /** h1 on the release page, h2 when used as a section on another page. */
+  tag?: 'h1' | 'h2';
+  /** Show the "Release page" button (off on the release page itself). */
+  showReleaseLink?: boolean;
+  /** Show artist links and the streaming icon row (release page only). */
+  showDetails?: boolean;
+  /** Load the cover eagerly when it is above the fold. */
+  eager?: boolean;
+}
+
+const { release, eyebrow, tag: Heading = 'h2', showReleaseLink = true, showDetails = false, eager = false } = Astro.props;
+
+// No track count in Sanity yet, so the meta line uses the release type instead.
+const meta = [
+  release.artistNames.length > 0 ? release.artistNames.join(', ') : 'Energize Music',
+  releaseYear(release.releaseDate),
+  releaseTypeLabels[release.type],
+]
+  .filter(Boolean)
+  .join(' · ');
+
+const spotifyUrl = release.links?.spotify;
+const embedUrl = spotifyEmbedUrl(spotifyUrl);
+const listenUrl = release.externalUrl ?? spotifyUrl;
+const artists = (release.artists ?? []).filter((artist) => Boolean(artist?.slug && artist.name));
+const headingId = `release-feature-${release.slug}`;
+---
+
+<article class="release-feature" aria-labelledby={headingId}>
+  <div class="release-feature__cover scroll-reveal">
+    {
+      release.coverUrl ? (
+        <img
+          src={release.coverUrl}
+          alt={`${release.displayTitle} cover art`}
+          width="960"
+          height="960"
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      ) : (
+        <span class="release-feature__cover-fallback" aria-hidden="true">{release.displayTitle.charAt(0)}</span>
+      )
+    }
+  </div>
+
+  <div class="release-feature__body scroll-reveal" style="--reveal-delay: 80ms">
+    <Eyebrow>{eyebrow}</Eyebrow>
+    <Heading id={headingId} class="release-feature__title">{release.displayTitle}</Heading>
+    <Eyebrow tone="muted" class="mt-4">{meta}</Eyebrow>
+
+    {
+      showDetails && artists.length > 0 && (
+        <p class="release-feature__artists">
+          {artists.map((artist, index) => (
+            <>
+              {index > 0 && ', '}
+              <a href={`/artists/${artist.slug}`}>{artist.name}</a>
+            </>
+          ))}
+        </p>
+      )
+    }
+
+    {
+      embedUrl && spotifyUrl && (
+        <div class="release-feature__player" data-spotify-slot>
+          <a
+            href={spotifyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="release-feature__player-load"
+            data-spotify-embed={embedUrl}
+            data-spotify-title={`${release.displayTitle} on Spotify`}
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Load Spotify player
+          </a>
+        </div>
+      )
+    }
+
+    <div class="release-feature__actions">
+      {
+        listenUrl && (
+          <a href={listenUrl} target="_blank" rel="noopener noreferrer" class="release-feature__btn release-feature__btn--solid">
+            Listen
+          </a>
+        )
+      }
+      {
+        showReleaseLink && (
+          <a href={`/releases/${release.slug}`} class="release-feature__btn release-feature__btn--ghost">
+            Release page
+          </a>
+        )
+      }
+    </div>
+
+    {showDetails && <StreamingIcons links={release.links} name={release.displayTitle} class="mt-6" />}
+  </div>
+</article>
+
+<script>
+  // Click to load: the Spotify iframe only mounts after a tap, keeping the page light.
+  document.querySelectorAll<HTMLAnchorElement>('[data-spotify-embed]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      const src = link.dataset.spotifyEmbed;
+      const slot = link.closest('[data-spotify-slot]');
+      if (!src || !slot) return;
+      event.preventDefault();
+      const frame = document.createElement('iframe');
+      frame.src = src;
+      frame.title = link.dataset.spotifyTitle ?? 'Spotify player';
+      frame.width = '100%';
+      frame.height = '152';
+      frame.loading = 'lazy';
+      frame.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+      frame.className = 'release-feature__frame';
+      slot.replaceChildren(frame);
+    });
+  });
+</script>
+
+<style>
+  .release-feature {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .release-feature {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  .release-feature__cover {
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 0.25rem;
+    background: var(--color-surface);
+  }
+
+  .release-feature__cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .release-feature__cover-fallback {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 6rem;
+    color: var(--color-faint);
+  }
+
+  .release-feature__body {
+    min-width: 0;
+  }
+
+  .release-feature__title {
+    margin: 1rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 1.6rem + 5vw, 6rem);
+    font-weight: 400;
+    line-height: 0.92;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+  }
+
+  .release-feature__artists {
+    margin: 1rem 0 0;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
+  .release-feature__artists a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 4px;
+  }
+
+  .release-feature__player {
+    margin-top: 2rem;
+    min-height: 152px;
+  }
+
+  .release-feature__player-load {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    width: 100%;
+    min-height: 152px;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    background: var(--color-surface);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .release-feature__player-load:hover,
+  .release-feature__player-load:focus-visible {
+    border-color: var(--color-ink);
+  }
+
+  .release-feature__player :global(.release-feature__frame) {
+    display: block;
+    border: 0;
+    border-radius: 0.75rem;
+  }
+
+  .release-feature__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .release-feature__btn {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .release-feature__btn--solid {
+    background: var(--color-accent);
+    color: #ffffff;
+  }
+
+  .release-feature__btn--solid:hover,
+  .release-feature__btn--solid:focus-visible {
+    background: var(--color-ink);
+  }
+
+  .release-feature__btn--ghost {
+    border: 1px solid var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .release-feature__btn--ghost:hover,
+  .release-feature__btn--ghost:focus-visible {
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .release-feature__player-load,
+    .release-feature__btn {
+      transition: none;
+    }
+  }
+</style>

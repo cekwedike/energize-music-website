@@ -2,15 +2,15 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArtistProfileHero from '../../components/artists/ArtistProfileHero.astro';
 import ArtistBio from '../../components/artists/ArtistBio.astro';
-import ArtistQuote from '../../components/artists/ArtistQuote.astro';
 import ArtistDiscography from '../../components/artists/ArtistDiscography.astro';
-import ArtistExploreMore from '../../components/artists/ArtistExploreMore.astro';
+import ArtistGrid from '../../components/artists/ArtistGrid.astro';
+import SectionTitle from '../../components/ui/SectionTitle.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient, urlForImage } from '../../lib/sanity/client';
 import { enrichReleases } from '../../lib/metadata/enrichReleases';
 import { crumbs, organizationId } from '../../lib/seo/schema';
 import { absoluteUrl } from '../../lib/seo/site';
-import { excerptCompleteSentences } from '../../lib/artists/rosterUtils';
+import { excerptCompleteSentences } from '../../lib/artists/text';
 import {
   artistSlugsQuery,
   artistBySlugQuery,
@@ -43,6 +43,7 @@ if (!artist) {
 }
 
 const enrichedDiscography = await enrichReleases(discography);
+const otherArtists = allArtists.filter((entry) => entry.slug !== artist.slug).slice(0, 4);
 
 const photoUrl = urlForImage(artist.photo).width(1200).height(630).fit('crop').auto('format').url();
 const pageUrl = absoluteUrl(`/artists/${artist.slug}`);
@@ -86,22 +87,24 @@ const jsonLd = {
   headerVariant="overlay"
 >
   <JsonLd data={jsonLd} />
-  <div class="artist-profile-page">
-    <ArtistProfileHero artist={artist} />
-    <div class="artist-profile-body">
-      <ArtistBio bio={artist.bio} name={artist.name} />
-      {artist.quote && <ArtistQuote quote={artist.quote} name={artist.name} />}
-      <ArtistDiscography releases={enrichedDiscography} artistName={artist.name} />
-      <ArtistExploreMore artists={allArtists} currentSlug={artist.slug} />
-    </div>
-  </div>
+  <ArtistProfileHero artist={artist} />
+  <ArtistBio artist={artist} />
+  <ArtistDiscography releases={enrichedDiscography} />
+  {
+    otherArtists.length > 0 && (
+      <section class="other-artists" aria-labelledby="other-artists-heading">
+        <div class="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <SectionTitle id="other-artists-heading" title="Other Artists" link={{ label: 'All artists', href: '/artists' }} />
+          <ArtistGrid artists={otherArtists} class="mt-8 sm:mt-12" />
+        </div>
+      </section>
+    )
+  }
 </BaseLayout>
 
 <style>
-  .artist-profile-page :global(.profile-hero) {
-    position: relative;
-    z-index: 2;
-    background: var(--color-bg);
+  .other-artists {
+    padding-block: clamp(4rem, 9vw, 7rem);
+    border-top: 1px solid var(--color-line);
   }
 </style>
-

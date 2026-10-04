@@ -1,7 +1,7 @@
 ---
 import type { PortableTextBlock } from '@energize/shared';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PageHero from '../ui/PageHero.astro';
+import SectionTitle from '../ui/SectionTitle.astro';
 import PortableText from '../portable/PortableText.astro';
 import type { BreadcrumbItem } from '../../lib/seo/site';
 
@@ -26,7 +26,10 @@ const updated = new Date().toLocaleDateString('en-US', {
   description={description}
   breadcrumbs={breadcrumbs}
 >
-  <PageHero size="slim" eyebrow={eyebrow} title={title} description={description} />
+  <section class="mx-auto max-w-6xl px-5 pt-14 sm:px-6 sm:pt-20">
+    <SectionTitle tag="h1" title={title} eyebrow={eyebrow} />
+    <p class="mt-6 max-w-2xl text-muted">{description}</p>
+  </section>
 
   <section class="legal-page">
     <div class="legal-page__shell mx-auto max-w-6xl px-5 pb-20 pt-10 sm:px-6 sm:pb-28 sm:pt-14">

@@ -1,6 +1,6 @@
 ---
 interface Props {
-  label: 'Instagram' | 'YouTube' | 'Spotify' | 'TikTok' | 'Apple Music';
+  label: 'Instagram' | 'YouTube' | 'Spotify' | 'TikTok' | 'Apple Music' | 'Link';
 }
 
 const { label } = Astro.props;
@@ -45,6 +45,14 @@ const { label } = Astro.props;
       <path d="M9 17.5V6.5l10-2v11" stroke-linecap="round" stroke-linejoin="round" />
       <circle cx="6.5" cy="17.5" r="2.5" />
       <circle cx="16.5" cy="15.5" r="2.5" />
+    </svg>
+  )
+}
+{
+  label === 'Link' && (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+      <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1" stroke-linecap="round" />
+      <path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1" stroke-linecap="round" />
     </svg>
   )
 }

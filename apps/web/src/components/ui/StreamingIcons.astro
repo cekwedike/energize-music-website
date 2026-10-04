@@ -1,0 +1,90 @@
+---
+import SocialIcon from './SocialIcon.astro';
+
+interface Links {
+  spotify?: string;
+  appleMusic?: string;
+  youtube?: string;
+  instagram?: string;
+  smartLink?: string;
+}
+
+interface Props {
+  links?: Links | null;
+  /** Used in each button's accessible name, e.g. "Greatman Takit on Spotify". */
+  name: string;
+  class?: string;
+}
+
+const { links, name, class: className } = Astro.props;
+
+const platforms = [
+  { key: 'spotify', label: 'Spotify', icon: 'Spotify' },
+  { key: 'appleMusic', label: 'Apple Music', icon: 'Apple Music' },
+  { key: 'youtube', label: 'YouTube', icon: 'YouTube' },
+  { key: 'instagram', label: 'Instagram', icon: 'Instagram' },
+  { key: 'smartLink', label: 'all platforms', icon: 'Link' },
+] as const;
+
+const entries = platforms.filter(({ key }) => Boolean(links?.[key]));
+---
+
+{
+  entries.length > 0 && (
+    <ul class:list={['streaming-icons', className]} aria-label={`${name} streaming links`}>
+      {entries.map(({ key, label, icon }) => (
+        <li>
+          <a
+            href={links?.[key]}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${name} on ${label}`}
+            title={label}
+            class="streaming-icons__link"
+          >
+            <SocialIcon label={icon} />
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .streaming-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .streaming-icons__link {
+    display: flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-line);
+    border-radius: 9999px;
+    color: var(--color-ink);
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .streaming-icons__link:hover,
+  .streaming-icons__link:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .streaming-icons__link :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .streaming-icons__link {
+      transition: none;
+    }
+  }
+</style>

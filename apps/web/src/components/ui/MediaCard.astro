@@ -9,10 +9,12 @@ interface Props {
   subtitle?: string;
   /** Rendered image size hint in px, used for width and height attributes. */
   size?: number;
+  /** Load eagerly when the card is above the fold. */
+  eager?: boolean;
   class?: string;
 }
 
-const { title, href, image, imageAlt = '', meta, subtitle, size = 480, class: className } = Astro.props;
+const { title, href, image, imageAlt = '', meta, subtitle, size = 480, eager = false, class: className } = Astro.props;
 const Tag = href ? 'a' : 'div';
 ---
 
@@ -20,7 +22,7 @@ const Tag = href ? 'a' : 'div';
   <div class="media-card__media">
     {
       image ? (
-        <img src={image} alt={imageAlt} width={size} height={size} loading="lazy" decoding="async" class="media-card__img" />
+        <img src={image} alt={imageAlt} width={size} height={size} loading={eager ? 'eager' : 'lazy'} decoding="async" class="media-card__img" />
       ) : (
         <span class="media-card__fallback" aria-hidden="true">{title.charAt(0)}</span>
       )

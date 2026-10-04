@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import AboutHero from '../components/about/AboutHero.astro';
-import AboutValues from '../components/about/AboutValues.astro';
-import AboutStory from '../components/about/AboutStory.astro';
-import AboutTeam from '../components/about/AboutTeam.astro';
+import SectionTitle from '../components/ui/SectionTitle.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import TeamMemberCard from '../components/team/TeamMemberCard.astro';
 import AboutBeyond from '../components/about/AboutBeyond.astro';
-import AboutCta from '../components/about/AboutCta.astro';
 import { sanityClient } from '../lib/sanity/client';
+import { splitAboutIntro, type AboutValue } from '../lib/about/splitIntro';
+import { HQ_URL } from '../lib/nav';
 import {
   aboutPageQuery,
   pageBySlugQuery,
@@ -23,7 +23,22 @@ const [aboutPage, legacyPage, team] = await Promise.all([
   sanityClient.fetch<TeamMember[]>(allTeamMembersQuery),
 ]);
 
-const pageTitle = aboutPage?.title ?? legacyPage?.title ?? 'About Energize Music';
+const fallbackStory = [
+  'Energize Music is an Afro-gospel and soul-fusion record label from Lagos, making high-quality, family-friendly, uplifting music.',
+  'We champion artists who blend African rhythm with gospel truth, creating a sound that resonates across generations.',
+];
+
+const fallbackValues: AboutValue[] = [
+  { title: 'Mission', body: 'Inspire positive emotions through music that uplifts, connects and speaks to audiences everywhere.' },
+  { title: 'Vision', body: 'Influence and inspire 1,000,000,000 minds with the good news, carried from Lagos to every corner of the earth.' },
+  { title: 'Values', body: 'Excellence in music and lyrics, uplifting content, and family-friendly work across cultures.' },
+];
+
+const source = aboutPage?.intro?.length ? aboutPage.intro : (legacyPage?.blocks ?? []);
+const split = splitAboutIntro(source);
+// Keep the story short: at most four paragraphs.
+const story = (split.story.length > 0 ? split.story : fallbackStory).slice(0, 4);
+const values = (split.values.length > 0 ? split.values : fallbackValues).slice(0, 4);
 ---
 
 <BaseLayout
@@ -32,10 +47,156 @@ const pageTitle = aboutPage?.title ?? legacyPage?.title ?? 'About Energize Music
   keywords={['Afro-gospel label mission', 'Energize Music team', 'Dr. Foy', 'Lagos']}
   breadcrumbs={crumbs({ name: 'About', path: '/about' })}
 >
-  <AboutHero title={pageTitle} />
-  <AboutValues />
-  <AboutStory aboutPage={aboutPage} legacyPage={legacyPage} />
-  <AboutTeam team={team} aboutPage={aboutPage} />
+  <section class="mx-auto max-w-7xl px-5 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20 lg:px-8">
+    <SectionTitle tag="h1" title="About" eyebrow="The label" />
+    <div class="about-story">
+      {story.map((paragraph, index) => <p class:list={['scroll-reveal', index === 0 && 'about-story__lead']}>{paragraph}</p>)}
+    </div>
+  </section>
+
+  <section class="about-values" aria-labelledby="about-values-heading">
+    <div class="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+      <SectionTitle id="about-values-heading" title="What Drives Us" />
+      <ol class="about-values__list">
+        {
+          values.map((value, index) => (
+            <li class="about-values__item scroll-reveal">
+              <span class="about-values__num">{String(index + 1).padStart(2, '0')}</span>
+              <div>
+                <h3 class="about-values__title">{value.title}</h3>
+                <p class="about-values__body">{value.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  {
+    team.length > 0 && (
+      <section class="about-team" aria-labelledby="about-team-heading">
+        <div class="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <SectionTitle id="about-team-heading" title={aboutPage?.teamSectionTitle ?? 'Meet Our Team'} />
+          <ul class="about-team__grid">
+            {team.map((member) => (
+              <li class="scroll-reveal">
+                <TeamMemberCard member={member} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
   <AboutBeyond />
-  <AboutCta />
+
+  <section class="about-hq">
+    <div class="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+      <Eyebrow tone="muted">
+        Energize Music is part of <a href={HQ_URL} class="about-hq__link">Energize HQ</a>
+      </Eyebrow>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .about-story {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 44rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
+    color: var(--color-ink);
+    line-height: 1.7;
+  }
+
+  .about-story p {
+    margin: 0;
+  }
+
+  .about-story__lead {
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.75rem);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .about-values,
+  .about-team {
+    padding-block: clamp(4rem, 9vw, 7rem);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .about-values__list {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .about-values__item {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    gap: 1rem;
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  @media (min-width: 768px) {
+    .about-values__item {
+      grid-template-columns: 6rem minmax(0, 1fr);
+    }
+  }
+
+  .about-values__num {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+  }
+
+  .about-values__title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
+  .about-values__body {
+    margin: 0.5rem 0 0;
+    max-width: 40rem;
+    color: var(--color-muted);
+    line-height: 1.65;
+  }
+
+  .about-team__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.5rem, 3vw, 2rem) clamp(1rem, 2.5vw, 1.5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  @media (min-width: 768px) {
+    .about-team__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .about-team__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .about-hq {
+    padding-block: 2.5rem clamp(4rem, 8vw, 6rem);
+  }
+
+  .about-hq__link {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 4px;
+  }
+</style>

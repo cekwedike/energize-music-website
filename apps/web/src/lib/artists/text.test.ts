@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { excerptCompleteSentences } from './rosterUtils.ts';
+import { excerptCompleteSentences } from './text.ts';
 
 describe('excerptCompleteSentences', () => {
   it('returns full text when under max', () => {

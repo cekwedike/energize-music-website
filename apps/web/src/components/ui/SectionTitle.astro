@@ -6,12 +6,12 @@ interface Props {
   eyebrow?: string;
   /** Optional "All music" style link shown on the right. */
   link?: { label: string; href: string };
-  as?: 'h1' | 'h2';
+  tag?: 'h1' | 'h2';
   id?: string;
   class?: string;
 }
 
-const { title, eyebrow, link, as: Tag = 'h2', id, class: className } = Astro.props;
+const { title, eyebrow, link, tag: Tag = 'h2', id, class: className } = Astro.props;
 ---
 
 <div class:list={['section-title', className]}>

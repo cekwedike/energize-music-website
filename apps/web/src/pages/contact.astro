@@ -1,17 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHero from '../components/ui/PageHero.astro';
+import SectionTitle from '../components/ui/SectionTitle.astro';
 import { contactIntents } from '@energize/shared';
 import { crumbs } from '../lib/seo/schema';
 import { CONTACT_EMAIL } from '../lib/nav';
 
+// Grouped by purpose. Values stay as the shared contact intents.
 const intentLabels: Record<(typeof contactIntents)[number], string> = {
-  'a&r': 'A&R',
+  booking: 'Bookings',
+  partnership: 'Partnerships',
   press: 'Press',
-  partnership: 'Partnership',
-  booking: 'Booking',
-  general: 'General',
+  'a&r': 'Artist submissions',
+  general: 'Something else',
 };
+const intentOrder: (typeof contactIntents)[number][] = ['booking', 'partnership', 'press', 'a&r', 'general'];
 
 const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
 const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20with%20Energize%20Music` : '#contact-form';
@@ -23,63 +25,43 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
   keywords={['contact Energize Music', 'booking', 'press', 'A&R']}
   breadcrumbs={crumbs({ name: 'Contact', path: '/contact' })}
 >
-  <PageHero
-    size="slim"
-    title="Contact Energize Music"
-    description="Tell us what you're reaching out about and we'll route it to the right team."
-  />
+  <section class="mx-auto max-w-7xl px-5 pb-24 pt-14 sm:px-6 sm:pb-32 sm:pt-20 lg:px-8">
+    <SectionTitle tag="h1" title="Let's Talk" eyebrow="Contact" />
+    <p class="mt-6 max-w-xl text-muted">Bookings, partnerships, press or artist submissions. Tell us what it is about and we will route it to the right person.</p>
 
-  <section class="mx-auto max-w-2xl px-5 pb-16 pt-10 sm:px-6 sm:pb-24 sm:pt-12">
     <form
       id="contact-form"
-      class="scroll-reveal space-y-5"
-      style="--reveal-delay: 80ms"
+      class="contact-form"
       data-endpoint-configured={formEndpoint ? 'true' : 'false'}
     >
-      <div>
-        <label for="name" class="block text-sm font-medium text-ink">Name</label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          required
-          class="mt-1.5 w-full rounded-lg border border-line bg-transparent px-4 py-3 text-base text-ink focus-visible:border-accent sm:py-2.5 sm:text-sm"
-        />
+      <fieldset class="contact-form__purpose">
+        <legend class="contact-form__label">What is it about?</legend>
+        <div class="contact-form__chips">
+          {
+            intentOrder.map((intent, index) => (
+              <label class="contact-form__chip">
+                <input type="radio" name="intent" value={intent} checked={index === 0} />
+                <span>{intentLabels[intent]}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <div class="contact-form__row">
+        <div>
+          <label for="name" class="contact-form__label">Name</label>
+          <input id="name" name="name" type="text" required autocomplete="name" class="contact-form__input" />
+        </div>
+        <div>
+          <label for="email" class="contact-form__label">Email</label>
+          <input id="email" name="email" type="email" required autocomplete="email" class="contact-form__input" />
+        </div>
       </div>
 
       <div>
-        <label for="email" class="block text-sm font-medium text-ink">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          class="mt-1.5 w-full rounded-lg border border-line bg-transparent px-4 py-3 text-base text-ink focus-visible:border-accent sm:py-2.5 sm:text-sm"
-        />
-      </div>
-
-      <div>
-        <label for="intent" class="block text-sm font-medium text-ink">I'm reaching out about</label>
-        <select
-          id="intent"
-          name="intent"
-          class="mt-1.5 w-full rounded-lg border border-line bg-bg px-4 py-3 text-base text-ink focus-visible:border-accent sm:py-2.5 sm:text-sm"
-        >
-          {contactIntents.map((intent) => (
-            <option value={intent}>{intentLabels[intent]}</option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label for="message" class="block text-sm font-medium text-ink">Message</label>
-        <textarea
-          id="message"
-          name="message"
-          rows={5}
-          required
-          class="mt-1.5 w-full rounded-lg border border-line bg-transparent px-4 py-3 text-base text-ink focus-visible:border-accent sm:py-2.5 sm:text-sm"
-        />
+        <label for="message" class="contact-form__label">Message</label>
+        <textarea id="message" name="message" rows={6} required class="contact-form__input"></textarea>
       </div>
 
       <!-- Honeypot: hidden from real users, bots that fill it are rejected. -->
@@ -88,18 +70,13 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
         <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
       </div>
 
-      <button
-        type="submit"
-        class="inline-flex min-h-11 items-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent/90"
-      >
-        Send message
-      </button>
+      <button type="submit" class="contact-form__submit">Send message</button>
 
       <p id="contact-form-status" class="text-sm text-ink" role="status"></p>
     </form>
 
-    <p class="mt-10 text-sm text-ink">
-      Want to work with us? <a href={workWithUsHref} class="font-semibold underline underline-offset-4">Email us.</a>
+    <p class="contact-work">
+      Want to work with us? <a href={workWithUsHref}>Email us.</a>
     </p>
   </section>
 </BaseLayout>
@@ -108,13 +85,12 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
   (function () {
     const form = document.getElementById('contact-form') as HTMLFormElement | null;
     const status = document.getElementById('contact-form-status');
-    const intentSelect = document.getElementById('intent') as HTMLSelectElement | null;
 
     const params = new URLSearchParams(window.location.search);
     const requestedIntent = params.get('intent');
-    if (requestedIntent && intentSelect) {
-      const match = Array.from(intentSelect.options).find((opt) => opt.value === requestedIntent);
-      if (match) intentSelect.value = requestedIntent;
+    if (requestedIntent) {
+      const match = form?.querySelector<HTMLInputElement>(`input[name="intent"][value="${CSS.escape(requestedIntent)}"]`);
+      if (match) match.checked = true;
     }
 
     form?.addEventListener('submit', (event) => {
@@ -125,10 +101,137 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
       if (form.dataset.endpointConfigured !== 'true') {
         if (status) {
           status.textContent =
-            'Thanks - the contact form is not wired to a delivery provider yet. Please email us directly in the meantime.';
+            'Thanks. The contact form is not connected to a delivery provider yet, so please reach us on social media for now.';
         }
         return;
       }
     });
   })();
 </script>
+
+<style>
+  .contact-form {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 44rem;
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  .contact-form__purpose {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .contact-form__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .contact-form__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .contact-form__chip input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .contact-form__chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 1.125rem;
+    border: 1px solid var(--color-line);
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+
+  .contact-form__chip input:checked + span {
+    border-color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+
+  .contact-form__chip input:focus-visible + span {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .contact-form__row {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .contact-form__row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .contact-form__input {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.25rem;
+    background: var(--color-bg);
+    font-size: 1rem;
+    color: var(--color-ink);
+  }
+
+  .contact-form__input:focus-visible {
+    outline: none;
+    border-color: var(--color-ink);
+  }
+
+  .contact-form__submit {
+    justify-self: start;
+    min-height: 3.25rem;
+    padding: 0 1.75rem;
+    border: 0;
+    border-radius: 9999px;
+    background: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #ffffff;
+    cursor: pointer;
+  }
+
+  .contact-form__submit:hover,
+  .contact-form__submit:focus-visible {
+    background: var(--color-ink);
+  }
+
+  .contact-work {
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-line);
+    color: var(--color-ink);
+  }
+
+  .contact-work a {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 4px;
+  }
+</style>

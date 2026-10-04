@@ -12,18 +12,18 @@ import {
   homeArtistsQuery,
   homeReleasesQuery,
   latestReleaseQuery,
-  type Artist,
+  type ArtistCard,
   type Release,
 } from '@energize/shared';
 import { HERO_VIDEO_POSTER } from '../lib/hero-video';
 
-let artists: Artist[] = [];
+let artists: ArtistCard[] = [];
 let featuredReleases: Release[] = [];
 let latest: Release | null = null;
 
 try {
   [artists, featuredReleases, latest] = await Promise.all([
-    sanityClient.fetch<Artist[]>(homeArtistsQuery),
+    sanityClient.fetch<ArtistCard[]>(homeArtistsQuery),
     sanityClient.fetch<Release[]>(homeReleasesQuery),
     sanityClient.fetch<Release | null>(latestReleaseQuery),
   ]);

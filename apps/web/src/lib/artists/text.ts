@@ -1,0 +1,34 @@
+export function truncateBio(text: string, maxLength = 220): string {
+  const trimmed = text.trim();
+  if (trimmed.length <= maxLength) return trimmed;
+  const slice = trimmed.slice(0, maxLength);
+  const lastSpace = slice.lastIndexOf(' ');
+  const base = lastSpace > maxLength * 0.6 ? slice.slice(0, lastSpace) : slice;
+  return `${base.trimEnd()}…`;
+}
+
+/** Prefer ending on a full sentence. Only use ellipsis when no sentence boundary fits. */
+export function excerptCompleteSentences(text: string, maxLength = 220): string {
+  const trimmed = text.trim();
+  if (trimmed.length <= maxLength) return trimmed;
+
+  const window = trimmed.slice(0, maxLength + 1);
+  const sentenceEnds: number[] = [];
+  for (let i = 0; i < window.length; i++) {
+    const ch = window[i];
+    if (
+      (ch === '.' || ch === '!' || ch === '?') &&
+      (i === window.length - 1 || /\s/.test(window[i + 1] ?? ''))
+    ) {
+      sentenceEnds.push(i + 1);
+    }
+  }
+
+  const minKeep = Math.floor(maxLength * 0.45);
+  const viable = sentenceEnds.filter((end) => end >= minKeep && end <= maxLength);
+  if (viable.length > 0) {
+    return trimmed.slice(0, viable[viable.length - 1]!).trimEnd();
+  }
+
+  return truncateBio(trimmed, maxLength);
+}

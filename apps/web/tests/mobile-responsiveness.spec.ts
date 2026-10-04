@@ -17,6 +17,7 @@ const ROUTES = [
   '/artists',
   '/artists/greatman-takit',
   '/releases',
+  '/releases/flames-of-a-wild-fire',
   '/contact',
   '/privacy',
   '/terms',
