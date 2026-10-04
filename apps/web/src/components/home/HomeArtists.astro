@@ -1,237 +1,193 @@
 ---
-import type { ArtistCard } from '@energize/shared';
+import type { Artist } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
+import SectionTitle from '../ui/SectionTitle.astro';
+import SocialIcon from '../ui/SocialIcon.astro';
 
 interface Props {
-  artists: ArtistCard[];
+  artists: Artist[];
 }
 
 const { artists } = Astro.props;
 
-const roster = artists
-  .filter((artist: ArtistCard) => artist.photo?.asset)
-  .slice(0, 8)
-  .map((artist: ArtistCard) => ({
-    ...artist,
-    photoUrl: urlForImage(artist.photo).width(360).height(480).fit('crop').auto('format').url(),
-  }));
+type IconLabel = 'Spotify' | 'YouTube' | 'Apple Music';
 
-const marqueeNames = [
-  ...roster.map((a: (typeof roster)[number]) => a.name),
-  ...roster.map((a: (typeof roster)[number]) => a.name),
-];
+const roster = artists
+  .filter((artist) => artist.photo?.asset)
+  .slice(0, 8)
+  .map((artist) => {
+    const links: { label: IconLabel; href: string }[] = [];
+    if (artist.streaming?.spotify) links.push({ label: 'Spotify', href: artist.streaming.spotify });
+    if (artist.streaming?.youtube) links.push({ label: 'YouTube', href: artist.streaming.youtube });
+    if (artist.streaming?.appleMusic) links.push({ label: 'Apple Music', href: artist.streaming.appleMusic });
+    return {
+      ...artist,
+      links,
+      photoUrl: urlForImage(artist.photo).width(720).height(960).fit('crop').auto('format').url(),
+    };
+  });
 ---
 
 {
   roster.length > 0 && (
-    <section class="home-artists" data-home-artists aria-labelledby="home-artists-title">
-      <div class="home-artists__head">
-        <div data-home-reveal>
-          <p class="home-kicker">The roster</p>
-          <h2 id="home-artists-title" class="home-title">
-            Greatman Takit,<br />TY Bello, Ellie Scotte
-          </h2>
-        </div>
-        <a href="/artists" class="home-link" data-home-reveal data-home-reveal-delay="80">
-          <span class="home-link__line" aria-hidden="true"></span>
-          Full roster
-        </a>
-      </div>
+    <section class="home-artists" aria-labelledby="home-artists-title">
+      <div class="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+        <SectionTitle
+          id="home-artists-title"
+          title="Our Artists"
+          link={{ label: 'All artists', href: '/artists' }}
+          class="scroll-reveal"
+        />
 
-      <div class="home-marquee home-artists__marquee" data-home-reveal data-home-reveal-delay="40" aria-hidden="true">
-        <div class="home-marquee__track" data-home-marquee data-home-marquee-duration="32">
-          {marqueeNames.map((name) => (
-            <span>{name}</span>
-          ))}
-        </div>
-      </div>
-
-      <div class="home-h-scroll home-artists__scroll">
-        <div class="home-artists__stage home-h-scroll__stage" data-home-h-scroll>
-          <div class="home-artists__track" data-home-artists-track>
-            {roster.map((artist: (typeof roster)[number]) => (
-              <a
-                href={`/artists/${artist.slug}`}
-                class="home-artists__card"
-                data-home-artist
-              >
-                <div class="home-artists__media" data-home-artist-media>
-                  <img
-                    src={artist.photoUrl}
-                    alt={`${artist.name}, Energize Music artist`}
-                    width="360"
-                    height="480"
-                    loading="lazy"
-                    decoding="async"
-                    sizes="(max-width: 640px) 70vw, 280px"
-                  />
-                </div>
-                <div class="home-artists__meta">
-                  <p class="home-artists__name">{artist.name}</p>
-                  {artist.tagline && <p class="home-artists__tag">{artist.tagline}</p>}
-                </div>
+        <ul class="home-artists__grid">
+          {roster.map((artist, index) => (
+            <li class="artist-card scroll-reveal" style={`--reveal-delay: ${Math.min(index, 3) * 70}ms`}>
+              <img
+                src={artist.photoUrl}
+                alt=""
+                width="720"
+                height="960"
+                loading="lazy"
+                decoding="async"
+                class="artist-card__img"
+              />
+              <span class="artist-card__tint" aria-hidden="true" />
+              <a href={`/artists/${artist.slug}`} class="artist-card__link">
+                <span class="artist-card__name">{artist.name}</span>
               </a>
-            ))}
-          </div>
-        </div>
-        <div class="home-h-scroll__meter" aria-hidden="true">
-          <div class="home-h-scroll__track">
-            <div class="home-h-scroll__thumb" data-home-h-scroll-thumb></div>
-          </div>
-          <span class="home-h-scroll__label">Swipe</span>
-        </div>
+              {artist.links.length > 0 && (
+                <ul class="artist-card__icons" aria-label={`${artist.name} streaming links`}>
+                  {artist.links.map((link) => (
+                    <li>
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${artist.name} on ${link.label}`}
+                        class="artist-card__icon"
+                      >
+                        <SocialIcon label={link.label} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
-
-      <p class="home-artists__hint" data-home-reveal data-home-reveal-delay="120" aria-hidden="true">
-        Scroll to move through the roster
-      </p>
     </section>
   )
 }
 
 <style>
   .home-artists {
+    padding-block: clamp(4rem, 10vw, 8rem);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .home-artists__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  @media (min-width: 1024px) {
+    .home-artists__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .artist-card {
     position: relative;
-    padding: 5rem 0 2.5rem;
-    background:
-      var(--color-bg);
-    /* visible so ScrollTrigger pin spacers are not clipped into a blank void */
-    overflow: visible;
-  }
-
-  .home-artists__head {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    width: min(100%, 80rem);
-    margin-inline: auto;
-    padding: 0 1.25rem 1.75rem;
-  }
-
-  @media (min-width: 640px) {
-    .home-artists__head {
-      flex-direction: row;
-      align-items: flex-end;
-      justify-content: space-between;
-      padding-inline: 1.5rem;
-    }
-  }
-
-  .home-artists__marquee {
-    margin-bottom: 1.5rem;
-  }
-
-  .home-artists__stage {
-    overflow: hidden;
-  }
-
-  .home-artists__track {
-    display: flex;
-    gap: 0.85rem;
-    width: max-content;
-    padding: 0.5rem 1.25rem 1rem;
-    perspective: 1200px;
-  }
-
-  @media (min-width: 640px) {
-    .home-artists__track {
-      gap: 1rem;
-      padding-inline: 1.5rem;
-    }
-  }
-
-  .home-artists__card {
-    position: relative;
-    flex: 0 0 auto;
-    width: min(72vw, 18rem);
-    color: inherit;
-    text-decoration: none;
-    transform-style: preserve-3d;
-  }
-
-  @media (min-width: 900px) {
-    .home-artists__card {
-      width: clamp(16rem, 22vw, 20rem);
-    }
-  }
-
-  .home-artists__media {
     aspect-ratio: 3 / 4;
     overflow: hidden;
+    border-radius: 0.25rem;
     background: var(--color-surface);
   }
 
-  .home-artists__media img {
+  .artist-card__img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
-    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    object-position: center top;
+    transition: transform 0.5s ease;
   }
 
-  .home-artists__card:hover .home-artists__media img {
-    transform: scale(1.08);
+  .artist-card:hover .artist-card__img,
+  .artist-card:focus-within .artist-card__img {
+    transform: scale(1.03);
   }
 
-  .home-artists__meta {
-    position: absolute;
-    inset: auto 0 0;
-    padding: 3.5rem 1rem 1.1rem;
-    background: linear-gradient(180deg, transparent, rgba(4, 8, 12, 0.95));
-  }
-
-  .home-artists__name {
-    font-family: var(--font-display);
-    font-size: 1.55rem;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
-  }
-
-  .home-artists__tag {
-    margin-top: 0.35rem;
-    font-size: 0.78rem;
-    color: var(--color-ink);
-  }
-
-  .home-artists__card::after {
-    content: '';
+  /* Flat tint keeps the white name readable on light photos. */
+  .artist-card__tint {
     position: absolute;
     inset: 0;
-    border: 1px solid transparent;
+    background: rgba(10, 10, 10, 0.28);
     pointer-events: none;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .home-artists__card:hover::after {
-    border-color: var(--color-accent);
+  .artist-card__link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    padding: clamp(0.875rem, 2vw, 1.25rem);
+    color: #ffffff;
+    text-decoration: none;
   }
 
-  .home-artists__hint {
-    display: none;
-    width: min(100%, 80rem);
-    margin: 0.5rem auto 0;
-    padding: 0 1.5rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.22em;
+  .artist-card__link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -4px;
+  }
+
+  .artist-card__name {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    line-height: 0.95;
     text-transform: uppercase;
-    color: var(--color-ink);
   }
 
-  @media (min-width: 900px) {
-    .home-artists__hint {
-      display: block;
-    }
+  .artist-card__icons {
+    position: absolute;
+    top: clamp(0.625rem, 1.5vw, 1rem);
+    left: clamp(0.625rem, 1.5vw, 1rem);
+    z-index: 2;
+    display: flex;
+    gap: 0.375rem;
   }
 
-  @media (max-width: 899px) {
-    .home-artists__stage.home-h-scroll__stage {
-      overflow-x: auto;
-    }
+  .artist-card__icon {
+    display: flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: rgba(10, 10, 10, 0.5);
+    color: #ffffff;
+    transition: background 0.2s ease;
+  }
 
-    .home-artists__card {
-      scroll-snap-align: start;
+  .artist-card__icon:hover,
+  .artist-card__icon:focus-visible {
+    background: var(--color-accent);
+  }
+
+  .artist-card__icon :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .artist-card__img,
+    .artist-card__icon {
+      transition: none;
     }
   }
 </style>

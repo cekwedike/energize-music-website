@@ -1,0 +1,251 @@
+---
+import type { EnrichedRelease } from '@energize/shared';
+import Eyebrow from '../ui/Eyebrow.astro';
+import { releaseTypeLabels, releaseYear, spotifyEmbedUrl } from '../../lib/releases/format';
+
+interface Props {
+  release: EnrichedRelease;
+}
+
+const { release } = Astro.props;
+
+// No track count in Sanity yet, so the meta line uses the release type instead.
+const meta = [
+  release.artistNames.length > 0 ? release.artistNames.join(', ') : 'Energize Music',
+  releaseYear(release.releaseDate),
+  releaseTypeLabels[release.type],
+]
+  .filter(Boolean)
+  .join(' · ');
+
+const spotifyUrl = release.links?.spotify;
+const embedUrl = spotifyEmbedUrl(spotifyUrl);
+const listenUrl = release.externalUrl ?? spotifyUrl;
+---
+
+<section class="home-latest" aria-labelledby="home-latest-title">
+  <div class="home-latest__grid mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+    <div class="home-latest__cover scroll-reveal">
+      {
+        release.coverUrl ? (
+          <img
+            src={release.coverUrl}
+            alt={`${release.displayTitle} cover art`}
+            width="960"
+            height="960"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <span class="home-latest__cover-fallback" aria-hidden="true">{release.displayTitle.charAt(0)}</span>
+        )
+      }
+    </div>
+
+    <div class="home-latest__body scroll-reveal" style="--reveal-delay: 80ms">
+      <Eyebrow>Latest project</Eyebrow>
+      <h2 id="home-latest-title" class="home-latest__title">{release.displayTitle}</h2>
+      <Eyebrow tone="muted" class="mt-4">{meta}</Eyebrow>
+
+      {
+        embedUrl && spotifyUrl && (
+          <div class="home-latest__player" data-spotify-slot>
+            <a
+              href={spotifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="home-latest__player-load"
+              data-spotify-embed={embedUrl}
+              data-spotify-title={`${release.displayTitle} on Spotify`}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5" aria-hidden="true">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              Load Spotify player
+            </a>
+          </div>
+        )
+      }
+
+      <div class="home-latest__actions">
+        {
+          listenUrl && (
+            <a href={listenUrl} target="_blank" rel="noopener noreferrer" class="home-latest__btn home-latest__btn--solid">
+              Listen
+            </a>
+          )
+        }
+        <a href={`/releases/${release.slug}`} class="home-latest__btn home-latest__btn--ghost">Release page</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Click to load: the Spotify iframe only mounts after a tap, keeping the page light.
+  document.querySelectorAll<HTMLAnchorElement>('[data-spotify-embed]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      const src = link.dataset.spotifyEmbed;
+      const slot = link.closest('[data-spotify-slot]');
+      if (!src || !slot) return;
+      event.preventDefault();
+      const frame = document.createElement('iframe');
+      frame.src = src;
+      frame.title = link.dataset.spotifyTitle ?? 'Spotify player';
+      frame.width = '100%';
+      frame.height = '152';
+      frame.loading = 'lazy';
+      frame.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+      frame.className = 'home-latest__frame';
+      slot.replaceChildren(frame);
+    });
+  });
+</script>
+
+<style>
+  .home-latest {
+    padding-block: clamp(4rem, 10vw, 8rem);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .home-latest__grid {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .home-latest__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  .home-latest__cover {
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 0.25rem;
+    background: var(--color-surface);
+  }
+
+  .home-latest__cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .home-latest__cover-fallback {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 6rem;
+    color: var(--color-faint);
+  }
+
+  .home-latest__body {
+    min-width: 0;
+  }
+
+  .home-latest__title {
+    margin: 1rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 1.6rem + 5vw, 6rem);
+    font-weight: 400;
+    line-height: 0.92;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+  }
+
+  .home-latest__player {
+    margin-top: 2rem;
+    min-height: 152px;
+  }
+
+  .home-latest__player-load {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    width: 100%;
+    min-height: 152px;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    background: var(--color-surface);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .home-latest__player-load:hover,
+  .home-latest__player-load:focus-visible {
+    border-color: var(--color-ink);
+  }
+
+  .home-latest__player :global(.home-latest__frame) {
+    display: block;
+    border: 0;
+    border-radius: 0.75rem;
+  }
+
+  .home-latest__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .home-latest__btn {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .home-latest__btn--solid {
+    background: var(--color-accent);
+    color: #ffffff;
+  }
+
+  .home-latest__btn--solid:hover,
+  .home-latest__btn--solid:focus-visible {
+    background: var(--color-ink);
+  }
+
+  .home-latest__btn--ghost {
+    border: 1px solid var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .home-latest__btn--ghost:hover,
+  .home-latest__btn--ghost:focus-visible {
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-latest__player-load,
+    .home-latest__btn {
+      transition: none;
+    }
+  }
+</style>

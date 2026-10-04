@@ -144,7 +144,7 @@
 
 /* Shared scroll reveal */
 
-.scroll-reveal {
+.js .scroll-reveal {
   opacity: 0;
   transform: translateY(18px);
   transition:
@@ -153,13 +153,13 @@
   transition-delay: var(--reveal-delay, 0ms);
 }
 
-.scroll-reveal.is-visible {
+.js .scroll-reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
 /* Pixelated dissolve: blur-to-sharp with stepped opacity */
-.scroll-reveal-pixel {
+.js .scroll-reveal-pixel {
   opacity: 0;
   transform: translateY(14px) scale(0.985);
   filter: blur(10px);
@@ -171,7 +171,7 @@
   will-change: opacity, transform, filter;
 }
 
-.scroll-reveal-pixel.is-visible {
+.js .scroll-reveal-pixel.is-visible {
   opacity: 1;
   transform: translateY(0) scale(1);
   filter: blur(0);
