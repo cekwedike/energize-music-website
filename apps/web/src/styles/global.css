@@ -15,6 +15,10 @@
   --color-on-dark: #fafaf8;
   --color-scrim: #0b0b0d;
   --color-shadow: #0b0b0d;
+
+  /* Shared photo treatment: one corner radius and one soft shadow everywhere. */
+  --radius-card: 0.875rem;
+  --shadow-card: 0 10px 30px color-mix(in srgb, var(--color-shadow) 8%, transparent);
   --font-display: 'Fraunces', 'Georgia', serif;
   --font-body: 'Inter', system-ui, sans-serif;
 
@@ -498,4 +502,14 @@
     filter: none !important;
     transition: none !important;
   }
+}
+
+/* ── Shared photo frame ──────────────────────────────────────────────────── */
+
+.media-frame {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }

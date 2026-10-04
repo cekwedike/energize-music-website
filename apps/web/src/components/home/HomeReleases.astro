@@ -11,28 +11,15 @@ const { releases } = Astro.props;
 
 {
   releases.length > 0 && (
-    <section class="home-row" aria-labelledby="home-row-title">
-      <div class="home-row__head">
-        <div data-home-reveal>
-          <p class="home-kicker">The catalog</p>
-          <h2 id="home-row-title" class="home-title">
-            More <em class="home-row__accent">releases</em>
-          </h2>
-        </div>
-        <a href="/releases" class="home-link" data-home-reveal data-home-reveal-delay="70">
-          <span class="home-link__line" aria-hidden="true"></span>
-          All releases
-        </a>
-      </div>
-
-      <ul class="home-row__track" aria-label="Releases">
+    <div class="home-row">
+      <ul class="home-row__track" aria-label="More releases">
         {releases.map((release) => (
           <li class="home-row__item">
             <ReleasesCatalogCard release={release} />
           </li>
         ))}
       </ul>
-    </section>
+    </div>
   )
 }
 
@@ -40,29 +27,10 @@ const { releases } = Astro.props;
   .home-row {
     width: min(100%, 80rem);
     margin-inline: auto;
-    padding: clamp(5rem, 4rem + 4vw, 8rem) 0;
+    padding-top: clamp(3rem, 2.5rem + 2vw, 4.5rem);
   }
 
-  .home-row__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1.5rem;
-    padding-inline: 1.25rem;
-  }
 
-  @media (min-width: 640px) {
-    .home-row__head {
-      padding-inline: 1.5rem;
-    }
-  }
-
-  .home-row__accent {
-    font-family: 'Instrument Serif', Georgia, serif;
-    font-style: italic;
-    font-weight: 400;
-  }
 
   .home-row__track {
     display: flex;

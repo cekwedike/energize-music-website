@@ -108,45 +108,6 @@
   background: color-mix(in srgb, var(--color-fg) 6%, transparent);
 }
 
-.home-marquee {
-  overflow: hidden;
-  border-block: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-}
-
-.home-marquee__track {
-    display: flex;
-    width: max-content;
-    gap: 2.5rem;
-    padding: 0.85rem 0;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-fg);
-    transform: translate3d(0, 0, 0);
-    animation: home-marquee-x var(--home-marquee-duration, 26s) linear infinite;
-  }
-
-.home-marquee__track span:nth-child(odd) {
-  color: color-mix(in srgb, var(--color-accent) 42%, transparent);
-}
-
-@keyframes home-marquee-x {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .home-marquee__track {
-    animation: none;
-  }
-}
-
 /* Custom mobile horizontal scroller (hides native scrollbar) */
 .home-h-scroll {
   position: relative;

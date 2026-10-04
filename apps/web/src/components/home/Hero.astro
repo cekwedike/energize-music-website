@@ -1,5 +1,4 @@
 ---
-import Logo from '../ui/Logo.astro';
 import {
   HERO_VIDEO_MP4,
   HERO_VIDEO_POSTER,
@@ -7,8 +6,6 @@ import {
   HERO_VIDEO_USES_CDN_FALLBACK,
   HERO_VIDEO_WEBM,
 } from '../../lib/hero-video';
-
-const freqBars = Array.from({ length: 12 }, (_, i) => i);
 ---
 
 <section class="hero theme-dark" data-hero style={`--hero-poster: url('${HERO_VIDEO_POSTER}')`}>
@@ -39,63 +36,16 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
   </video>
 
   <div class="hero-veil" aria-hidden="true"></div>
-  <div class="hero-glow" aria-hidden="true"></div>
-
-  <p class="hero-watermark" aria-hidden="true">ENERGY</p>
-
-  <div class="hero-rail hero-rail--left" aria-hidden="true">
-    <span>Lagos</span>
-    <span class="hero-rail__dot"></span>
-    <span>Afro-gospel</span>
-    <span class="hero-rail__dot"></span>
-    <span>Soul-fusion</span>
-  </div>
-  <div class="hero-rail hero-rail--right" aria-hidden="true">
-    <span>Global</span>
-    <span class="hero-rail__dot"></span>
-    <span>Family-friendly</span>
-    <span class="hero-rail__dot"></span>
-    <span>Uplifting</span>
-  </div>
-
-  <div class="hero-frame" aria-hidden="true">
-    <span class="hero-frame__corner hero-frame__corner--tl"></span>
-    <span class="hero-frame__corner hero-frame__corner--tr"></span>
-    <span class="hero-frame__corner hero-frame__corner--bl"></span>
-    <span class="hero-frame__corner hero-frame__corner--br"></span>
-  </div>
 
   <div id="hero-content" class="hero-content">
-    <Logo />
-    <p class="hero-text-el font-inter mt-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--color-on-dark)] sm:mt-6 sm:text-xs">
-      The Energy Different
-    </p>
-    <h1 class="hero-text-el hero-text-el-heading font-instrument mt-5 max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-[var(--color-on-dark)] sm:mt-8 sm:max-w-2xl md:mt-9 md:max-w-4xl">
+    <h1 class="hero-text-el hero-text-el-heading font-instrument max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-[var(--color-on-dark)] sm:max-w-2xl md:max-w-4xl">
       The Afro-Gospel Label Behind Africa's Biggest Christian Voices
     </h1>
-    <p class="hero-text-el hero-text-el-sub font-inter mt-4 max-w-xl text-sm text-[var(--color-on-dark)] sm:mt-5 md:mt-7 md:text-base">
+    <p class="hero-text-el hero-text-el-sub font-inter mt-5 max-w-xl text-sm text-[var(--color-on-dark)] sm:mt-6 md:mt-7 md:text-base">
       Energize Music is a Lagos record label for Afro-gospel and soul-fusion listeners who want faith-filled music with real craft.
     </p>
+    <a href="/releases" class="hero-text-el hero-text-el-cta home-btn home-btn--solid mt-8 md:mt-10">Hear the music</a>
   </div>
-
-  <div class="hero-signal" aria-hidden="true">
-    <div class="hero-signal__bars">
-      {
-        freqBars.map((i) => (
-          <span class="hero-signal__bar" style={`--bar-i: ${i}`}></span>
-        ))
-      }
-    </div>
-  </div>
-
-  <a
-    href="#now-spinning"
-    class="hero-scroll"
-    aria-label="Scroll to Now Spinning"
-  >
-    <span>Scroll</span>
-    <span class="hero-scroll__line" aria-hidden="true"></span>
-  </a>
 </section>
 
 <style>
@@ -137,138 +87,8 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     position: absolute;
     inset: 0;
     z-index: 1;
-    background:
-      radial-gradient(ellipse 70% 55% at 50% 28%, color-mix(in srgb, var(--color-accent) 8.4%, transparent), transparent 60%),
-      linear-gradient(180deg, color-mix(in srgb, var(--color-scrim) 55%, transparent) 0%, color-mix(in srgb, var(--color-scrim) 45%, transparent) 42%, color-mix(in srgb, var(--color-scrim) 65%, transparent) 100%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--color-scrim) 55%, transparent) 0%, color-mix(in srgb, var(--color-scrim) 45%, transparent) 42%, color-mix(in srgb, var(--color-scrim) 65%, transparent) 100%);
     pointer-events: none;
-  }
-
-  /* Soft glow without filter:blur (blur over video is a major jank source). */
-  .hero-glow {
-    position: absolute;
-    top: 14%;
-    left: 50%;
-    z-index: 1;
-    width: min(72vw, 30rem);
-    height: min(72vw, 30rem);
-    translate: -50% 0;
-    border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 13.2%, transparent) 0%, color-mix(in srgb, var(--color-accent) 3.6%, transparent) 42%, transparent 70%);
-    opacity: 0.7;
-    pointer-events: none;
-  }
-
-  .hero-watermark {
-    position: absolute;
-    top: 46%;
-    left: 50%;
-    z-index: 2;
-    margin: 0;
-    translate: -50% -50%;
-    font-family: var(--font-display);
-    font-size: clamp(5rem, 22vw, 16rem);
-    font-weight: 600;
-    letter-spacing: -0.06em;
-    line-height: 0.85;
-    color: transparent;
-    -webkit-text-stroke: 1px color-mix(in srgb, var(--color-fg) 14%, transparent);
-    white-space: nowrap;
-    pointer-events: none;
-    user-select: none;
-    opacity: 0.8;
-  }
-
-  .hero-rail {
-    position: absolute;
-    top: 50%;
-    z-index: 3;
-    display: none;
-    align-items: center;
-    gap: 0.85rem;
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-fg);
-    white-space: nowrap;
-    pointer-events: none;
-  }
-
-  .hero-rail--left {
-    left: max(1.25rem, env(safe-area-inset-left, 0px));
-    transform: translateY(-50%) rotate(-90deg);
-    transform-origin: left center;
-  }
-
-  .hero-rail--right {
-    right: max(1.25rem, env(safe-area-inset-right, 0px));
-    transform: translateY(-50%) rotate(90deg);
-    transform-origin: right center;
-  }
-
-  .hero-rail__dot {
-    width: 0.28rem;
-    height: 0.28rem;
-    background: var(--color-accent);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 48%, transparent);
-  }
-
-  @media (min-width: 1100px) {
-    .hero-rail {
-      display: flex;
-    }
-  }
-
-  .hero-frame {
-    position: absolute;
-    inset: 1.1rem;
-    z-index: 3;
-    pointer-events: none;
-  }
-
-  @media (min-width: 640px) {
-    .hero-frame {
-      inset: 1.5rem;
-    }
-  }
-
-  .hero-frame__corner {
-    position: absolute;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-color: color-mix(in srgb, var(--color-accent) 33%, transparent);
-    border-style: solid;
-    opacity: 0;
-    transition: opacity 0.6s ease;
-  }
-
-  .hero.is-playing .hero-frame__corner {
-    opacity: 1;
-    transition-delay: 0.35s;
-  }
-
-  .hero-frame__corner--tl {
-    top: 0;
-    left: 0;
-    border-width: 1px 0 0 1px;
-  }
-
-  .hero-frame__corner--tr {
-    top: 0;
-    right: 0;
-    border-width: 1px 1px 0 0;
-  }
-
-  .hero-frame__corner--bl {
-    bottom: 0;
-    left: 0;
-    border-width: 0 0 1px 1px;
-  }
-
-  .hero-frame__corner--br {
-    right: 0;
-    bottom: 0;
-    border-width: 0 1px 1px 0;
   }
 
   .hero-content {
@@ -278,19 +98,14 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 6rem 1.25rem 7.5rem;
+    justify-content: center;
+    padding: calc(var(--header-height, 4rem) + 1.5rem) 1.25rem 3rem;
     text-align: center;
   }
 
   @media (min-width: 640px) {
     .hero-content {
-      padding: 8rem 1.5rem 8rem;
-    }
-  }
-
-  @media (min-width: 768px) {
-    .hero-content {
-      padding-top: 9rem;
+      padding-inline: 1.5rem;
     }
   }
 
@@ -305,134 +120,19 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
 
   .hero-text-el-heading {
     transition-delay: 0.2s;
-    text-shadow: 0 0 40px color-mix(in srgb, var(--color-fg) 28%, transparent);
   }
 
   .hero-text-el-sub {
     transition-delay: 0.3s;
   }
 
+  .hero-text-el-cta {
+    transition-delay: 0.4s;
+  }
+
   #hero-content.is-visible .hero-text-el {
     opacity: 1;
     transform: translate3d(0, 0, 0);
-  }
-
-  .hero-signal {
-    position: absolute;
-    right: 0;
-    bottom: 4.75rem;
-    left: 0;
-    z-index: 4;
-    width: min(14rem, 60vw);
-    margin-inline: auto;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.6s ease;
-    transition-delay: 0.5s;
-  }
-
-  #hero-content.is-visible ~ .hero-signal {
-    opacity: 0.85;
-  }
-
-  .hero-signal__bars {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 0.28rem;
-    height: 1.75rem;
-  }
-
-  .hero-signal__bar {
-    width: 0.18rem;
-    height: 100%;
-    background: linear-gradient(180deg, var(--color-accent), color-mix(in srgb, var(--color-fg) 35%, transparent));
-    transform: scaleY(0.25) translateZ(0);
-    transform-origin: bottom center;
-    opacity: 0.55;
-  }
-
-  /* Transform-only motion (no height layout thrash). Starts after settle. */
-  .hero.is-settled .hero-signal__bar {
-    animation: hero-freq 1.2s ease-in-out infinite;
-    animation-delay: calc(var(--bar-i) * 0.08s);
-  }
-
-  .hero-scroll {
-    position: absolute;
-    right: 0;
-    bottom: max(1.15rem, env(safe-area-inset-bottom, 0px));
-    left: 0;
-    z-index: 5;
-    display: flex;
-    width: fit-content;
-    margin-inline: auto;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-fg);
-    text-decoration: none;
-    opacity: 0;
-    transform: translate3d(0, 10px, 0);
-    transition:
-      opacity 0.6s ease,
-      transform 0.6s ease,
-      color 0.2s ease;
-    transition-delay: 0.55s;
-  }
-
-  #hero-content.is-visible ~ .hero-scroll {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-
-  .hero-scroll > span:first-child {
-    padding-left: 0.28em;
-  }
-
-  .hero-scroll:hover {
-    color: var(--color-fg);
-  }
-
-  .hero-scroll__line {
-    display: block;
-    width: 1px;
-    height: 1.6rem;
-    background: linear-gradient(180deg, var(--color-accent), transparent);
-    transform: scaleY(0.55) translateZ(0);
-    transform-origin: top center;
-  }
-
-  .hero.is-settled .hero-scroll__line {
-    animation: hero-scroll-pulse 1.8s ease-in-out infinite;
-  }
-
-  @keyframes hero-freq {
-    0%,
-    100% {
-      transform: scaleY(0.28);
-      opacity: 0.45;
-    }
-    50% {
-      transform: scaleY(calc(0.45 + (var(--bar-i) % 4) * 0.14));
-      opacity: 1;
-    }
-  }
-
-  @keyframes hero-scroll-pulse {
-    0%,
-    100% {
-      transform: scaleY(0.55);
-      opacity: 0.45;
-    }
-    50% {
-      transform: scaleY(1);
-      opacity: 1;
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -441,19 +141,10 @@ const freqBars = Array.from({ length: 12 }, (_, i) => i);
       transition: none !important;
     }
 
-    .hero-text-el,
-    .hero-scroll,
-    .hero-signal,
-    .hero-frame__corner {
+    .hero-text-el {
       opacity: 1 !important;
       transform: none !important;
       transition: none !important;
-      animation: none !important;
-    }
-
-    .hero-signal__bar,
-    .hero-scroll__line {
-      animation: none !important;
     }
   }
 </style>

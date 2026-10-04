@@ -32,8 +32,8 @@ const pageTitle = aboutPage?.title ?? legacyPage?.title ?? 'About Energize Music
   breadcrumbs={crumbs({ name: 'About', path: '/about' })}
 >
   <AboutHero title={pageTitle} />
-  <AboutValues />
   <AboutStory aboutPage={aboutPage} legacyPage={legacyPage} />
+  <AboutValues />
   <AboutTeam team={team} aboutPage={aboutPage} />
   <AboutCta />
 </BaseLayout>

@@ -1,12 +1,14 @@
 ---
 import type { EnrichedRelease } from '@energize/shared';
 import { releaseYear, spotifyEmbedUrl } from '../../lib/releases/spotify';
+import HomeReleases from './HomeReleases.astro';
 
 interface Props {
-  release?: EnrichedRelease;
+  /** Featured first, then newest. The first one is the latest-release feature, the rest fill the row. */
+  releases: EnrichedRelease[];
 }
 
-const { release: lead } = Astro.props;
+const [lead, ...more] = Astro.props.releases;
 
 const spotifyUrl = lead?.links?.spotify;
 const embedUrl = spotifyEmbedUrl(spotifyUrl);
@@ -15,13 +17,17 @@ const year = releaseYear(lead?.releaseDate);
 
 {
   lead && (
-    <section class="home-releases" id="latest-release" data-home-releases aria-labelledby="home-latest-title">
-      <div class="home-releases__atmosphere" aria-hidden="true"></div>
-
+    <section class="home-releases" id="music" data-home-releases aria-labelledby="home-music-title">
       <div class="home-releases__inner">
-        <div class="home-releases__head" data-home-reveal>
-          <p class="home-kicker">Latest release</p>
-          <h2 id="home-latest-title" class="home-title">Fresh from<br />the Energize Corner</h2>
+        <div class="home-releases__head">
+          <div data-home-reveal>
+            <p class="home-kicker">Latest release</p>
+            <h2 id="home-music-title" class="home-title">Fresh from<br />the Energize Corner</h2>
+          </div>
+          <a href="/releases" class="home-link" data-home-reveal data-home-reveal-delay="70">
+            <span class="home-link__line" aria-hidden="true"></span>
+            All releases
+          </a>
         </div>
 
         <div class="home-releases__stage">
@@ -41,7 +47,6 @@ const year = releaseYear(lead?.releaseDate);
             ) : (
               <div class="home-releases__cover-fallback" aria-hidden="true"></div>
             )}
-            <span class="home-releases__ring" aria-hidden="true"></span>
           </a>
 
           <div class="home-releases__copy" data-home-release-copy>
@@ -82,8 +87,8 @@ const year = releaseYear(lead?.releaseDate);
               </div>
             )}
 
-            <div class="home-releases__actions">
-              {lead.externalUrl && (
+            {!embedUrl && lead.externalUrl && (
+              <div class="home-releases__actions">
                 <a
                   href={lead.externalUrl}
                   target="_blank"
@@ -92,14 +97,13 @@ const year = releaseYear(lead?.releaseDate);
                 >
                   Listen Now
                 </a>
-              )}
-              <a href={`/releases/${lead.slug}`} class="home-btn home-btn--ghost">
-                Release page
-              </a>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      <HomeReleases releases={more} />
     </section>
   )
 }
@@ -136,15 +140,18 @@ const year = releaseYear(lead?.releaseDate);
     background: var(--color-bg);
   }
 
-  .home-releases__atmosphere {
-    position: absolute;
-    inset: -10%;
-    z-index: 0;
-    opacity: 0.35;
-    pointer-events: none;
-    background:
-      radial-gradient(ellipse 70% 55% at 22% 18%, color-mix(in srgb, var(--color-accent) 13.2%, transparent), transparent 62%),
-      radial-gradient(ellipse 55% 45% at 78% 82%, color-mix(in srgb, var(--color-accent) 7.2%, transparent), transparent 58%);
+  .home-releases__head {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-releases__head {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
   }
 
   .home-releases__inner {
@@ -200,31 +207,6 @@ const year = releaseYear(lead?.releaseDate);
     background:
       radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--color-accent) 24%, transparent), transparent 55%),
       var(--color-surface);
-  }
-
-  .home-releases__ring {
-    position: absolute;
-    inset: 8%;
-    border: 1px solid color-mix(in srgb, var(--color-fg) 12%, transparent);
-    border-radius: 50%;
-    pointer-events: none;
-    border-color: color-mix(in srgb, var(--color-on-dark) 22%, transparent);
-    transform: translateZ(0);
-    animation: home-release-spin 18s linear infinite;
-  }
-
-  .home-releases__ring::after {
-    content: '';
-    position: absolute;
-    inset: 18%;
-    border: 1px dashed color-mix(in srgb, var(--color-accent) 21%, transparent);
-    border-radius: 50%;
-  }
-
-  @keyframes home-release-spin {
-    to {
-      transform: rotate(360deg) translateZ(0);
-    }
   }
 
   .home-releases__type {
@@ -329,9 +311,4 @@ const year = releaseYear(lead?.releaseDate);
     margin-top: 1.85rem;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .home-releases__ring {
-      animation: none;
-    }
-  }
 </style>

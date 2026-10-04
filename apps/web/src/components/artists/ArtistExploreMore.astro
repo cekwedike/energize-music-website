@@ -1,7 +1,6 @@
 ---
 import type { ArtistCard as ArtistCardType } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
-import EditorialSectionLink from '../ui/EditorialSectionLink.astro';
 
 interface Props {
   artists: ArtistCardType[];
@@ -14,96 +13,103 @@ const others = artists.filter((artist) => artist.slug !== currentSlug).slice(0, 
 if (others.length === 0) return null;
 ---
 
-<section class="explore-more mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20" aria-labelledby="explore-more-heading">
-  <div class="flex items-end justify-between gap-4">
-    <h2 id="explore-more-heading" class="font-display text-2xl text-fg sm:text-3xl">
-      More Artists
-    </h2>
-    <EditorialSectionLink href="/artists" label="View All" />
-  </div>
-
-  <div class="explore-more__scroll mt-6 -mx-5 px-5 sm:-mx-6 sm:px-6">
-    <ul class="explore-more__track">
+<section class="explore-more mx-auto max-w-7xl px-5 py-12 sm:px-6 sm:py-16" aria-labelledby="explore-more-heading">
+  <div class="explore-more__row">
+    <h2 id="explore-more-heading" class="explore-more__title">More artists</h2>
+    <ul class="explore-more__list">
       {
         others.map((artist) => {
-          const photoUrl = urlForImage(artist.photo).width(300).height(300).fit('crop').auto('format').url();
+          const photoUrl = urlForImage(artist.photo).width(112).height(112).fit('crop').auto('format').url();
           return (
-            <li class="explore-more__item">
-              <a href={`/artists/${artist.slug}`} class="explore-more__card group">
-                <div class="explore-more__art">
-                  <img
-                    src={photoUrl}
-                    alt={artist.photo.alt ?? artist.name}
-                    loading="lazy"
-                    decoding="async"
-                    class="explore-more__photo"
-                  />
-                </div>
-                <p class="explore-more__name">{artist.name}</p>
+            <li>
+              <a href={`/artists/${artist.slug}`} class="explore-more__chip">
+                <img
+                  src={photoUrl}
+                  alt=""
+                  width="56"
+                  height="56"
+                  loading="lazy"
+                  decoding="async"
+                  class="explore-more__avatar"
+                />
+                <span>{artist.name}</span>
               </a>
             </li>
           );
         })
       }
     </ul>
+    <a href="/artists" class="explore-more__all">All artists</a>
   </div>
 </section>
 
 <style>
-  .explore-more__scroll {
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+  .explore-more {
+    border-top: 1px solid var(--color-line);
   }
 
-  .explore-more__scroll::-webkit-scrollbar {
+  .explore-more__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+  }
+
+  .explore-more__title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--color-fg);
+  }
+
+  .explore-more__list {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .explore-more__list::-webkit-scrollbar {
     display: none;
   }
 
-  .explore-more__track {
-    display: flex;
-    gap: 1rem;
-    width: max-content;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .explore-more__item {
-    width: 9rem;
-    flex-shrink: 0;
-  }
-
-  .explore-more__card {
-    display: block;
+  .explore-more__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 2.75rem;
+    padding: 0.3rem 1rem 0.3rem 0.3rem;
+    border: 1px solid var(--color-line);
+    border-radius: 9999px;
+    background: var(--color-surface);
+    color: var(--color-fg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
     text-decoration: none;
+    transition: border-color 0.2s ease;
   }
 
-  .explore-more__art {
-    aspect-ratio: 1;
-    overflow: hidden;
-    border-radius: 0.75rem;
-    background: color-mix(in srgb, var(--color-fg) 4%, transparent);
-    transition: transform 0.2s ease;
+  .explore-more__chip:hover,
+  .explore-more__chip:focus-visible {
+    border-color: var(--color-accent);
   }
 
-  .explore-more__card:hover .explore-more__art {
-    transform: translateY(-2px);
-  }
-
-  .explore-more__photo {
-    height: 100%;
-    width: 100%;
+  .explore-more__avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
     object-fit: cover;
   }
 
-  .explore-more__name {
-    margin-top: 0.6rem;
+  .explore-more__all {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--color-fg);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
 </style>

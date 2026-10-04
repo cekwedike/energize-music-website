@@ -184,24 +184,6 @@ function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
   pinHorizontalTrack({ section, track, headerOffset: 64, scrub: 0.75 });
 }
 
-function initAbout(root: ParentNode) {
-  const section = root.querySelector<HTMLElement>('[data-home-about]');
-  const words = section?.querySelectorAll<HTMLElement>('[data-home-word]');
-  if (!section || !words?.length) return;
-
-  gsap.fromTo(
-    words,
-    { autoAlpha: 0, y: 28 },
-    {
-      autoAlpha: 1,
-      y: 0,
-      duration: 0.55,
-      stagger: 0.04,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: section, start: 'top 76%', once: true },
-    },
-  );
-}
 
 function initNewsletter(root: ParentNode, reduced: boolean) {
   const section = root.querySelector<HTMLElement>('[data-home-newsletter]');
@@ -235,12 +217,6 @@ function initNewsletter(root: ParentNode, reduced: boolean) {
   });
 }
 
-function initMarquee(root: ParentNode, reduced: boolean) {
-  root.querySelectorAll<HTMLElement>('[data-home-marquee]').forEach((track) => {
-    const duration = Number(track.dataset.homeMarqueeDuration || 26);
-    track.style.setProperty('--home-marquee-duration', `${reduced ? duration * 2.2 : duration}s`);
-  });
-}
 
 function syncHScrollThumb(stage: HTMLElement, thumb: HTMLElement) {
   const track = thumb.parentElement;
@@ -342,7 +318,6 @@ export async function initHomePage(): Promise<void> {
   const reduced = prefersReducedMotion();
   const mobile = isMobile();
 
-  initMarquee(root, reduced);
   initHScrollMeters(root);
 
   if (reduced) return;
@@ -354,7 +329,6 @@ export async function initHomePage(): Promise<void> {
     initArtistRunway(root, reduced, mobile);
     initReleaseStage(root, reduced);
     initInitiatives(root, reduced, mobile);
-    initAbout(root);
     initNewsletter(root, reduced);
   }, root);
 

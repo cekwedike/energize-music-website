@@ -1,11 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/home/Hero.astro';
-import HomeLatest from '../components/home/HomeLatest.astro';
+import HomeMusic from '../components/home/HomeMusic.astro';
 import HomeArtists from '../components/home/HomeArtists.astro';
-import HomeReleases from '../components/home/HomeReleases.astro';
 import HomeInitiatives from '../components/home/HomeInitiatives.astro';
-import HomeAbout from '../components/home/HomeAbout.astro';
 import HomeNewsletter from '../components/home/HomeNewsletter.astro';
 import { sanityClient } from '../lib/sanity/client';
 import { enrichRelease } from '../lib/metadata/enrichReleases';
@@ -34,8 +32,6 @@ try {
 const releases = await Promise.all(
   homeReleases.map((release) => enrichRelease(release, { coverSize: 480 })),
 );
-// The query already puts featured releases first, then the newest.
-const [latestRelease, ...moreReleases] = releases;
 ---
 
 <BaseLayout
@@ -56,11 +52,9 @@ const [latestRelease, ...moreReleases] = releases;
   <div data-home-page data-hero-ready="false">
     <Hero />
     <div data-home-below class="home-below">
-      <HomeLatest release={latestRelease} />
-      <HomeReleases releases={moreReleases} />
+      <HomeMusic releases={releases} />
       <HomeArtists artists={artists} />
       <HomeInitiatives />
-      <HomeAbout />
       <HomeNewsletter />
     </div>
   </div>

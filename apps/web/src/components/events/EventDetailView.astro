@@ -23,8 +23,6 @@ const sharePreviewUrl =
   getEventCoverUrl(event.shareImage, 720, 405) || getEventCoverUrl(event.cover, 720, 405);
 const ctaHref = event.ticketUrl || '/contact?intent=general';
 const ctaLabel = event.ctaLabel || 'Get tickets';
-const secondaryHref = event.secondaryCtaUrl || '/contact?intent=partnership';
-const secondaryLabel = event.secondaryCtaLabel || 'Partner with us';
 const highlights = event.highlights ?? [];
 const lineup = event.lineup ?? [];
 
@@ -83,7 +81,6 @@ const shareLinks = [
       </div>
       <div class="event-detail__actions">
         <a href={ctaHref} class="event-detail__cta event-detail__cta--primary">{ctaLabel}</a>
-        <a href={secondaryHref} class="event-detail__cta event-detail__cta--ghost">{secondaryLabel}</a>
       </div>
     </div>
   </header>
@@ -302,7 +299,6 @@ const shareLinks = [
       <h2 id="event-footer-cta-title" class="font-display">Ready for the stage?</h2>
       <div class="event-detail__actions">
         <a href={ctaHref} class="event-detail__cta event-detail__cta--primary">{ctaLabel}</a>
-        <a href="/artists" class="event-detail__cta event-detail__cta--ghost">Meet the artists</a>
       </div>
     </div>
   </section>

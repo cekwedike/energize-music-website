@@ -51,8 +51,6 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
         const artistLine =
           release.artistNames.length > 0 ? release.artistNames.join(', ') : 'Energize Music';
         const releaseYear = new Date(release.releaseDate).getFullYear();
-        const listenUrl = release.externalUrl;
-        const primaryArtist = release.artists?.find((artist) => artist?.slug);
 
         return (
           <div
@@ -83,28 +81,6 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
                 >
                   View Release
                 </a>
-                {
-                  listenUrl ? (
-                    <a
-                      href={listenUrl}
-                      class="release-spotlight__cta release-spotlight__cta--listen"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Listen Now
-                    </a>
-                  ) : null
-                }
-                {
-                  primaryArtist ? (
-                    <a
-                      href={`/artists/${primaryArtist.slug}`}
-                      class="release-spotlight__cta release-spotlight__cta--ghost"
-                    >
-                      {primaryArtist.name}
-                    </a>
-                  ) : null
-                }
               </div>
             </div>
 

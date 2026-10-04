@@ -136,12 +136,14 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
               {submitLabel}
             </a>
           ) : (
-            <span class="next-closed__badge">{closedLabel}</span>
+            <>
+              <span class="next-closed__badge">{closedLabel}</span>
+              <a href="#journey" class="next-hero__cta next-hero__cta--ghost">
+                How it works
+              </a>
+            </>
           )
         }
-        <a href="#journey" class="next-hero__cta next-hero__cta--ghost">
-          How It Works
-        </a>
       </div>
     </div>
 
