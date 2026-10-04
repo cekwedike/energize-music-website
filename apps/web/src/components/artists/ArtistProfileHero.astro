@@ -49,7 +49,7 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
       <div class="profile-hero__meta min-w-0">
         <h1 class="font-display text-[clamp(2rem,1.2rem+4vw,3.75rem)] leading-none tracking-tight text-fg">
           {artist.name}
-          <span class="mt-2 block text-[clamp(1rem,0.85rem+1vw,1.35rem)] font-sans font-medium tracking-normal text-fg/80">
+          <span class="mt-2 block text-[clamp(1rem,0.85rem+1vw,1.35rem)] font-sans font-medium tracking-normal text-[var(--color-muted)]">
             {(artist.genres?.[0] ?? 'Afro-Gospel')} Artist
           </span>
         </h1>
@@ -97,9 +97,7 @@ const avatarUrl = urlForImage(artist.photo).width(800).height(800).fit('crop').a
     justify-content: center;
     box-sizing: border-box;
     padding-top: var(--header-height, 4rem);
-    background:
-      radial-gradient(ellipse 70% 90% at 50% 40%, color-mix(in srgb, var(--color-accent) 4.8%, transparent), transparent 60%),
-      var(--color-surface);
+    background: var(--color-surface);
   }
 
   .profile-hero__banner {

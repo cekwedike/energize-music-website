@@ -25,10 +25,6 @@ const isCenter = align === 'center';
   class:list={['page-hero relative overflow-hidden', isSlim && 'page-hero--slim', isCenter && 'page-hero--center']}
   data-page-hero
 >
-  <div class="page-hero__mesh" aria-hidden="true"></div>
-  <div class="page-hero__grain" aria-hidden="true"></div>
-  <div class="page-hero__glow page-hero__glow--left" aria-hidden="true"></div>
-  <div class="page-hero__glow page-hero__glow--right" aria-hidden="true"></div>
 
   <div
     class:list={[
@@ -114,7 +110,7 @@ const isCenter = align === 'center';
 
 <style>
   .page-hero {
-    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
+    border-bottom: 1px solid var(--color-line);
   }
 
   .page-hero--slim {
@@ -129,47 +125,6 @@ const isCenter = align === 'center';
     .page-hero:not(.page-hero--slim) {
       min-height: min(58vh, 640px);
     }
-  }
-
-  .page-hero__mesh {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 15% 20%, color-mix(in srgb, var(--color-accent) 7.2%, transparent), transparent 55%),
-      radial-gradient(ellipse 60% 50% at 85% 75%, color-mix(in srgb, var(--color-accent) 3%, transparent), transparent 50%),
-      linear-gradient(165deg, var(--color-bg) 0%, var(--color-bg) 45%, var(--color-surface) 100%);
-  }
-
-  .page-hero__grain {
-    position: absolute;
-    inset: 0;
-    opacity: 0.3;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-    mix-blend-mode: overlay;
-    pointer-events: none;
-  }
-
-  .page-hero__glow {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(72px);
-    pointer-events: none;
-  }
-
-  .page-hero__glow--left {
-    top: 5%;
-    left: -12%;
-    width: min(280px, 70vw);
-    height: min(280px, 70vw);
-    background: color-mix(in srgb, var(--color-accent) 6%, transparent);
-  }
-
-  .page-hero__glow--right {
-    bottom: 0;
-    right: -8%;
-    width: min(220px, 55vw);
-    height: min(220px, 55vw);
-    background: color-mix(in srgb, var(--color-fg) 3.5%, transparent);
   }
 
   .page-hero-reveal {

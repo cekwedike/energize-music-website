@@ -4,7 +4,6 @@ import JsonLd from '../components/seo/JsonLd.astro';
 import SiteHeader, { type HeaderVariant } from '../components/ui/SiteHeader.astro';
 import SiteFooter from '../components/ui/SiteFooter.astro';
 import FooterMarquee from '../components/ui/FooterMarquee.astro';
-import AmbientBackground, { type AmbientVariant } from '../components/ui/AmbientBackground.astro';
 import { buildBreadcrumbSchema, buildSiteGraph } from '../lib/seo/schema';
 import type { BreadcrumbItem } from '../lib/seo/site';
 import '../styles/global.css';
@@ -22,11 +21,7 @@ interface Props {
   hideHeader?: boolean;
   hideFooter?: boolean;
   showTopMarquee?: boolean;
-  ambientVariant?: AmbientVariant;
-  /** Skip decorative ambient layers (e.g. homepage hero already fills the viewport). */
-  hideAmbient?: boolean;
   headerVariant?: HeaderVariant;
-  pageTheme?: 'dark' | 'light';
 }
 
 const {
@@ -42,30 +37,12 @@ const {
   hideHeader = false,
   hideFooter = false,
   showTopMarquee = false,
-  ambientVariant,
-  hideAmbient = false,
   headerVariant = 'default',
-  pageTheme = 'dark',
 } = Astro.props;
 
-const pathname = Astro.url.pathname;
 const siteGraph = buildSiteGraph();
 const breadcrumbGraph = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs) : null;
 
-function resolveAmbientVariant(): AmbientVariant {
-  if (ambientVariant) return ambientVariant;
-  if (pathname === '/') return 'home';
-  if (pathname.startsWith('/about') || pathname.startsWith('/artists')) return 'editorial';
-  if (pathname.startsWith('/next')) return 'pulse';
-  if (
-    pathname.startsWith('/energize-kids') ||
-    pathname.startsWith('/energize-fest') ||
-    pathname.startsWith('/events')
-  ) {
-    return 'warm';
-  }
-  return 'cosmic';
-}
 ---
 
 <!doctype html>
@@ -104,12 +81,7 @@ function resolveAmbientVariant(): AmbientVariant {
     {breadcrumbGraph && <JsonLd data={breadcrumbGraph} />}
     <slot name="head" />
   </head>
-  <body class:list={['site-body', pageTheme === 'light' && 'site-body--light']}>
-    {
-      pageTheme === 'light' || hideAmbient ? null : (
-        <AmbientBackground variant={resolveAmbientVariant()} />
-      )
-    }
+  <body class="site-body">
     <a href="#main-content" class="skip-link">Skip to content</a>
     {!hideHeader && <SiteHeader variant={headerVariant} />}
     {showTopMarquee && <FooterMarquee placement="top" />}

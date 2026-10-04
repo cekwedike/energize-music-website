@@ -5,17 +5,9 @@ const navLinks = [
   { label: 'Contact', href: '/contact', description: 'Reach The Team' },
 ];
 
-const marqueePhrases = ['Wrong turn', 'Signal lost', 'Keep the energy', 'Find your way back'];
 ---
 
 <section class="not-found" aria-labelledby="not-found-heading">
-  <div class="not-found__backdrop" aria-hidden="true">
-    <span class="not-found__ghost">404</span>
-    <div class="not-found__glow not-found__glow--left"></div>
-    <div class="not-found__glow not-found__glow--right"></div>
-    <div class="not-found__grain"></div>
-  </div>
-
   <div class="not-found__inner">
     <p class="not-found__eyebrow scroll-reveal">Off the map</p>
     <div class="not-found__rule scroll-reveal" style="--reveal-delay: 60ms" aria-hidden="true"></div>
@@ -40,18 +32,6 @@ const marqueePhrases = ['Wrong turn', 'Signal lost', 'Keep the energy', 'Find yo
     </nav>
   </div>
 
-  <div class="not-found__marquee" aria-hidden="true">
-    <div class="not-found__marquee-track">
-      {
-        Array.from({ length: 8 }, () => marqueePhrases).flat().map((phrase) => (
-          <span class="not-found__marquee-item">
-            <span>{phrase}</span>
-            <span class="not-found__marquee-dot"></span>
-          </span>
-        ))
-      }
-    </div>
-  </div>
 </section>
 
 <style>
@@ -63,57 +43,6 @@ const marqueePhrases = ['Wrong turn', 'Signal lost', 'Keep the energy', 'Find yo
     justify-content: center;
     overflow: hidden;
     padding-block: clamp(4rem, 10vw, 7rem);
-  }
-
-  .not-found__backdrop {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
-
-  .not-found__ghost {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -54%);
-    font-family: 'Instrument Serif', serif;
-    font-size: clamp(9rem, 28vw, 22rem);
-    font-weight: 400;
-    line-height: 0.82;
-    letter-spacing: -0.04em;
-    color: color-mix(in srgb, var(--color-fg) 5%, transparent);
-    user-select: none;
-    white-space: nowrap;
-  }
-
-  .not-found__glow {
-    position: absolute;
-    width: min(42vw, 28rem);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    filter: blur(90px);
-    opacity: 0.45;
-  }
-
-  .not-found__glow--left {
-    top: 8%;
-    left: -8%;
-    background: color-mix(in srgb, var(--color-accent) 13.2%, transparent);
-  }
-
-  .not-found__glow--right {
-    right: -6%;
-    bottom: 12%;
-    background: color-mix(in srgb, var(--color-accent-strong) 9.6%, transparent);
-  }
-
-  .not-found__grain {
-    position: absolute;
-    inset: 0;
-    opacity: 0.35;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-    mix-blend-mode: soft-light;
   }
 
   .not-found__inner {
@@ -152,7 +81,7 @@ const marqueePhrases = ['Wrong turn', 'Signal lost', 'Keep the energy', 'Find yo
     font-family: 'Instrument Serif', serif;
     font-style: italic;
     font-weight: 400;
-    color: color-mix(in srgb, var(--color-fg) 92%, transparent);
+    color: var(--color-fg);
   }
 
   .not-found__lead {
@@ -180,7 +109,7 @@ const marqueePhrases = ['Wrong turn', 'Signal lost', 'Keep the energy', 'Find yo
     flex-direction: column;
     gap: 0.35rem;
     padding: 1rem 1.1rem;
-    border: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
+    border: 1px solid var(--color-line);
     border-radius: 1rem;
     background: color-mix(in srgb, var(--color-fg) 2%, transparent);
     text-decoration: none;
@@ -209,58 +138,7 @@ const marqueePhrases = ['Wrong turn', 'Signal lost', 'Keep the energy', 'Find yo
     color: var(--color-fg);
   }
 
-  .not-found__marquee {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-    border-top: 1px solid color-mix(in srgb, var(--color-fg) 6%, transparent);
-    padding-block: clamp(0.5rem, 1vw, 0.75rem);
-    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-  }
-
-  .not-found__marquee-track {
-    display: flex;
-    width: max-content;
-    animation: not-found-marquee 38s linear infinite;
-  }
-
-  .not-found__marquee-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 1.25rem;
-    padding-inline: 1.25rem;
-    font-family: 'Instrument Serif', serif;
-    font-size: clamp(0.95rem, 0.85rem + 0.35vw, 1.125rem);
-    font-style: italic;
-    color: var(--color-fg);
-    white-space: nowrap;
-  }
-
-  .not-found__marquee-dot {
-    width: 0.35rem;
-    height: 0.35rem;
-    border-radius: 50%;
-    background: var(--color-accent);
-    opacity: 0.7;
-    flex-shrink: 0;
-  }
-
-  @keyframes not-found-marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .not-found__marquee-track {
-      animation: none;
-    }
-
     .not-found__link:hover,
     .not-found__link:focus-visible {
       transform: none;

@@ -185,9 +185,8 @@ function initInitiatives(root: ParentNode, reduced: boolean, mobile: boolean) {
 }
 
 
-function initNewsletter(root: ParentNode, reduced: boolean) {
+function initNewsletter(root: ParentNode) {
   const section = root.querySelector<HTMLElement>('[data-home-newsletter]');
-  const glow = section?.querySelector<HTMLElement>('[data-home-newsletter-glow]');
   const form = section?.querySelector<HTMLElement>('[data-home-newsletter-form]');
   if (!section) return;
 
@@ -205,16 +204,6 @@ function initNewsletter(root: ParentNode, reduced: boolean) {
     );
   }
 
-  if (!glow || reduced) return;
-
-  gsap.to(glow, {
-    scale: 1.2,
-    opacity: 0.65,
-    duration: 3.4,
-    yoyo: true,
-    repeat: -1,
-    ease: 'sine.inOut',
-  });
 }
 
 
@@ -329,7 +318,7 @@ export async function initHomePage(): Promise<void> {
     initArtistRunway(root, reduced, mobile);
     initReleaseStage(root, reduced);
     initInitiatives(root, reduced, mobile);
-    initNewsletter(root, reduced);
+    initNewsletter(root);
   }, root);
 
   schedulePinRefresh(root);

@@ -43,7 +43,7 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
           name="name"
           type="text"
           required
-          class="mt-1.5 w-full rounded-lg border border-fg/20 bg-transparent px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
+          class="mt-1.5 w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
         />
       </div>
 
@@ -54,7 +54,7 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
           name="email"
           type="email"
           required
-          class="mt-1.5 w-full rounded-lg border border-fg/20 bg-transparent px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
+          class="mt-1.5 w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
         />
       </div>
 
@@ -63,7 +63,7 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
         <select
           id="intent"
           name="intent"
-          class="mt-1.5 w-full rounded-lg border border-fg/20 bg-[var(--color-bg)] px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
+          class="mt-1.5 w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
         >
           {contactIntents.map((intent) => (
             <option value={intent}>{intentLabels[intent]}</option>
@@ -78,7 +78,7 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
           name="message"
           rows={5}
           required
-          class="mt-1.5 w-full rounded-lg border border-fg/20 bg-transparent px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
+          class="mt-1.5 w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
         />
       </div>
 

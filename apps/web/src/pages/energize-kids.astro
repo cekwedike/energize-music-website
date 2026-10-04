@@ -71,7 +71,7 @@ const pillars = [
   </section>
 
   <!-- Highlights -->
-  <section class="border-b border-fg/10 bg-[var(--color-surface)]">
+  <section class="border-b border-[var(--color-line)] bg-[var(--color-surface)]">
     <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
       <ul class="scroll-reveal-stagger grid gap-6 sm:grid-cols-3">
         <li class="text-sm text-fg">
@@ -91,7 +91,7 @@ const pillars = [
   </section>
 
   <!-- Event -->
-  <section id="events" class="scroll-mt-24 border-b border-fg/10">
+  <section id="events" class="scroll-mt-24 border-b border-[var(--color-line)]">
     <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
       <div class="scroll-reveal mb-10 rounded-2xl border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/[0.06] px-6 py-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
         <div>
@@ -128,7 +128,7 @@ const pillars = [
             </a>
           </div>
         </div>
-        <div class="scroll-reveal scroll-reveal-pixel rounded-2xl border border-fg/10 bg-fg/5 p-8" style="--reveal-delay: 120ms">
+        <div class="scroll-reveal scroll-reveal-pixel rounded-2xl border border-[var(--color-line)] bg-fg/5 p-8" style="--reveal-delay: 120ms">
           <p class="text-xs font-semibold uppercase tracking-widest text-fg">Featured Artist</p>
           <h3 class="text-h3 mt-2">Xade</h3>
           <p class="mt-4 text-fg">
@@ -136,7 +136,7 @@ const pillars = [
           </p>
           <ul class="mt-4 flex flex-wrap gap-2">
             {['Afro-Gospel', 'Afrobeats', 'Hip-Hop', 'Clean Energy'].map((tag) => (
-              <li class="rounded-full border border-fg/15 px-3 py-1 text-xs text-fg">{tag}</li>
+              <li class="rounded-full border border-[var(--color-line)] px-3 py-1 text-xs text-fg">{tag}</li>
             ))}
           </ul>
         </div>
@@ -145,7 +145,7 @@ const pillars = [
   </section>
 
   <!-- Pillars -->
-  <section id="pillars" class="scroll-mt-24 border-b border-fg/10 bg-[var(--color-surface)]">
+  <section id="pillars" class="scroll-mt-24 border-b border-[var(--color-line)] bg-[var(--color-surface)]">
     <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
       <div class="scroll-reveal max-w-2xl">
         <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-accent)]">The Energize Kids World</p>
@@ -153,7 +153,7 @@ const pillars = [
       </div>
       <div class="scroll-reveal-stagger mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal-variant="pixel">
         {pillars.map((pillar) => (
-          <article class="rounded-xl border border-fg/10 bg-fg/5 p-6">
+          <article class="rounded-xl border border-[var(--color-line)] bg-fg/5 p-6">
             <span class="text-2xl text-[var(--color-accent)]" aria-hidden="true">{pillar.icon}</span>
             <h3 class="mt-4 font-display text-lg font-medium">{pillar.title}</h3>
             <p class="mt-2 text-sm text-fg">{pillar.body}</p>

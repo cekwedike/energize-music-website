@@ -2,8 +2,6 @@
 ---
 
 <section class="home-newsletter" data-home-newsletter aria-labelledby="home-newsletter-title">
-  <div class="home-newsletter__glow" data-home-newsletter-glow aria-hidden="true"></div>
-
   <div class="home-newsletter__inner">
     <div data-home-reveal>
       <p class="home-kicker">Newsletter</p>
@@ -39,22 +37,10 @@
     position: relative;
     overflow: hidden;
     padding: clamp(5.5rem, 4rem + 4vw, 8.5rem) 0;
-    border-top: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
+    border-top: 1px solid var(--color-line);
     background: var(--color-bg);
   }
 
-  .home-newsletter__glow {
-    position: absolute;
-    top: 50%;
-    right: -10%;
-    width: min(55vw, 28rem);
-    height: min(55vw, 28rem);
-    translate: 0 -50%;
-    border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 21%, transparent), transparent 70%);
-    opacity: 0.4;
-    pointer-events: none;
-  }
 
   .home-newsletter__inner {
     position: relative;
@@ -94,7 +80,7 @@
     font-weight: 800;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--color-fg);
+    color: var(--color-accent);
   }
 
   .home-newsletter__row {
@@ -124,7 +110,7 @@
   }
 
   .home-newsletter__input::placeholder {
-    color: var(--color-fg);
+    color: var(--color-muted);
   }
 
   .home-newsletter__input:focus {

@@ -43,14 +43,6 @@ const primaryListenUrl = release.externalUrl;
 ---
 
 <section class="release-detail" data-release-detail>
-  {
-    coverUrl && (
-      <div class="release-detail__atmosphere" aria-hidden="true">
-        <img src={coverUrl} alt="" class="release-detail__atmosphere-img" decoding="async" referrerpolicy="no-referrer" />
-        <div class="release-detail__atmosphere-veil"></div>
-      </div>
-    )
-  }
 
   <div class="relative mx-auto flex w-full max-w-7xl flex-col px-5 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12">
     <EditorialSectionLink
@@ -160,30 +152,6 @@ const primaryListenUrl = release.externalUrl;
     isolation: isolate;
     overflow: hidden;
     min-height: min(92vh, 920px);
-  }
-
-  .release-detail__atmosphere {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .release-detail__atmosphere-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scale(1.12);
-    filter: blur(48px) saturate(1.15);
-    opacity: 0.35;
-  }
-
-  .release-detail__atmosphere-veil {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 70% 55% at 20% 30%, color-mix(in srgb, var(--color-accent) 7.2%, transparent), transparent 55%),
-      linear-gradient(180deg, color-mix(in srgb, var(--color-bg) 55%, transparent) 0%, color-mix(in srgb, var(--color-bg) 82%, transparent) 45%, var(--color-bg) 100%);
   }
 
   .release-detail__cover {

@@ -82,7 +82,6 @@ const jsonLd = {
   ogType="profile"
   keywords={[artist.name, 'Energize Music', 'Afro-gospel', ...(artist.genres ?? [])]}
   breadcrumbs={crumbs({ name: 'Artists', path: '/artists' }, { name: artist.name, path: `/artists/${artist.slug}` })}
-  ambientVariant="pulse"
   headerVariant="overlay"
 >
   <JsonLd data={jsonLd} />

@@ -20,7 +20,7 @@
   .roster-intro {
     display: grid;
     grid-template-columns: 1fr;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
+    border-bottom: 1px solid var(--color-line);
     background:
       linear-gradient(180deg, color-mix(in srgb, var(--color-fg) 1.5%, transparent) 0%, transparent 100%),
       var(--color-bg);
@@ -38,7 +38,7 @@
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--color-fg);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 6%, transparent);
+    border-bottom: 1px solid var(--color-line);
   }
 
   .roster-intro__cell:last-child {
@@ -63,7 +63,7 @@
 
     .roster-intro__cell {
       border-bottom: none;
-      border-right: 1px solid color-mix(in srgb, var(--color-fg) 8%, transparent);
+      border-right: 1px solid var(--color-line);
     }
 
     .roster-intro__cell:last-child {

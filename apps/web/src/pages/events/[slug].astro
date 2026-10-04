@@ -96,7 +96,6 @@ const jsonLd = {
   ogImage={ogImage}
   keywords={[event.title, 'Energize Music', 'live event', 'Afro-gospel', event.location].filter(Boolean) as string[]}
   breadcrumbs={crumbs({ name: event.title, path: `/events/${event.slug}` })}
-  ambientVariant="editorial"
 
 >
   <JsonLd data={jsonLd} />
