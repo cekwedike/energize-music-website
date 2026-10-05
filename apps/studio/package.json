@@ -19,8 +19,8 @@
     "styled-components": "^6.1.15"
   },
   "devDependencies": {
-    "@sanity/vision": "^6.9.1",
-    "@types/node": "^22.10.2",
+    "@sanity/vision": "^6.17.0",
+    "@types/node": "^22.20.5",
     "typescript": "^5.7.2"
   }
 }
