@@ -8,12 +8,12 @@ import { getEventCoverUrl } from '../../lib/events/media';
 import { formatEventLocation, isPastEvent } from '../../lib/events/format';
 import { crumbs, organizationId } from '../../lib/seo/schema';
 import { absoluteUrl } from '../../lib/seo/site';
+import { FEST_SLUG } from '../../lib/initiatives';
 
 // Other /events/* paths redirect to Energize HQ (see vercel.json), so only Energize Fest is built.
 // The page only exists when the event is published in Sanity: there is no hardcoded fallback.
-// getStaticPaths runs in isolation, so the slug is written inline.
 export async function getStaticPaths() {
-  const slug = 'energize-fest';
+  const slug = FEST_SLUG;
   const event = await sanityClient.fetch<EventDetail | null>(eventBySlugQuery, { slug });
   return event ? [{ params: { slug }, props: { event } }] : [];
 }

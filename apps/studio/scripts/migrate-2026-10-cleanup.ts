@@ -29,12 +29,12 @@ const key = (prefix: string, i: number) => `${prefix}${i}`;
 
 const festHighlights = [
   {
-    title: 'The Full Roster',
-    body: 'Every Energize Music artiste on one stage, joined by guest performers from the wider Afro-gospel scene.',
+    title: 'Live Performances',
+    body: 'Energize Music artistes and special guests on one stage. The lineup will be announced soon.',
   },
   {
     title: 'Tickets and Venue',
-    body: 'We are confirming the venue now. Join the list and you will hear first when tickets go on sale.',
+    body: 'Venue and ticket links will be posted here as soon as they are confirmed.',
   },
   {
     title: 'Made for Families',
@@ -88,7 +88,7 @@ async function run() {
     _type: 'event',
     title: 'Energize Fest',
     slug: { _type: 'slug', current: 'energize-fest' },
-    subtitle: 'The Full Energize Music Roster on One Stage',
+    subtitle: 'The Annual Energize Music Live Showcase',
     startDate: '2026-12-01T17:00:00.000Z',
     eventType: 'physical',
     cover: {
@@ -97,7 +97,7 @@ async function run() {
       asset: { _type: 'reference', _ref: FEST_COVER_ASSET },
     },
     summary:
-      'Our annual live showcase. Energize Music artistes and guests from across the Afro-gospel scene share one stage for one night. The venue and tickets will be announced soon.',
+      'Our annual live showcase, bringing Energize Music artistes and special guests together for one night of Afro-gospel. Venue and ticket details will be announced soon.',
     highlights: festHighlights,
     ctaLabel: 'Get Tickets',
     secondaryCtaLabel: 'Partner With Us',

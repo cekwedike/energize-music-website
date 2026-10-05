@@ -1,0 +1,308 @@
+---
+/**
+ * Email sign-up in a modal, on the same /api/subscribe endpoint as the home page section.
+ * Open it from any button with `data-subscribe-open`. Optional `data-subscribe-title` and
+ * `data-subscribe-lead` on that button change the heading and the line under it.
+ * Uses the native <dialog>: focus trap, Escape to close, and focus return come for free.
+ */
+interface Props {
+  title?: string;
+  lead?: string;
+}
+
+const {
+  title = 'Be the First to Know',
+  lead = 'New releases, artiste news, and show dates from Energize Music, sent to you first.',
+} = Astro.props;
+---
+
+<dialog class="subscribe-dialog" data-subscribe-dialog aria-labelledby="subscribe-dialog-title" aria-describedby="subscribe-dialog-lead">
+  <div class="subscribe-dialog__panel">
+    <button type="button" class="subscribe-dialog__close" data-subscribe-close aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+      </svg>
+    </button>
+
+    <p class="subscribe-dialog__kicker">Stay in the Loop</p>
+    <h2 id="subscribe-dialog-title" class="subscribe-dialog__title" data-default={title}>{title}</h2>
+    <p id="subscribe-dialog-lead" class="subscribe-dialog__lead" data-default={lead}>{lead}</p>
+
+    <form class="subscribe-dialog__form" data-subscribe-dialog-form novalidate>
+      <label class="subscribe-dialog__label" for="subscribe-dialog-email">Email address</label>
+      <div class="subscribe-dialog__row">
+        <input
+          id="subscribe-dialog-email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          inputmode="email"
+          placeholder="you@example.com"
+          class="subscribe-dialog__input"
+        />
+        <button type="submit" class="subscribe-dialog__submit" data-subscribe-dialog-submit>Notify Me</button>
+      </div>
+      <div class="subscribe-dialog__trap" aria-hidden="true">
+        <label for="subscribe-dialog-company">Company</label>
+        <input id="subscribe-dialog-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+    </form>
+
+    <p class="subscribe-dialog__note" data-subscribe-dialog-note role="status" aria-live="polite">
+      Only big news. Unsubscribe any time. See our <a href="/privacy">privacy policy</a>.
+    </p>
+  </div>
+</dialog>
+
+<style>
+  .subscribe-dialog {
+    width: min(100% - 2rem, 32rem);
+    max-width: none;
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    color: var(--color-fg);
+    box-shadow: 0 30px 80px color-mix(in srgb, var(--color-shadow) 28%, transparent);
+  }
+
+  .subscribe-dialog::backdrop {
+    background: color-mix(in srgb, var(--color-scrim) 62%, transparent);
+    backdrop-filter: blur(4px);
+  }
+
+  .subscribe-dialog[open] {
+    animation: subscribe-dialog-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .subscribe-dialog[open]::backdrop {
+    animation: subscribe-backdrop-in 0.32s ease;
+  }
+
+  @keyframes subscribe-dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+  }
+
+  @keyframes subscribe-backdrop-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .subscribe-dialog__panel {
+    position: relative;
+    padding: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+  }
+
+  .subscribe-dialog__close {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-fg);
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .subscribe-dialog__close:hover,
+  .subscribe-dialog__close:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .subscribe-dialog__close svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .subscribe-dialog__kicker {
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .subscribe-dialog__title {
+    margin-top: 0.75rem;
+    padding-right: 2.5rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.6rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .subscribe-dialog__lead {
+    margin-top: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .subscribe-dialog__form {
+    margin-top: 1.75rem;
+  }
+
+  .subscribe-dialog__label {
+    display: block;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .subscribe-dialog__row {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.6rem;
+  }
+
+  @media (min-width: 480px) {
+    .subscribe-dialog__row {
+      grid-template-columns: 1fr auto;
+    }
+  }
+
+  .subscribe-dialog__input {
+    width: 100%;
+    min-height: 3rem;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 30%, transparent);
+    border-radius: 0;
+    background: transparent;
+    padding: 0.75rem 0.1rem;
+    color: var(--color-fg);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .subscribe-dialog__input:focus {
+    border-bottom-color: var(--color-accent);
+    box-shadow: 0 1px 0 0 var(--color-accent);
+  }
+
+  .subscribe-dialog__submit {
+    min-height: 3rem;
+    padding: 0.85rem 1.4rem;
+    border: 0;
+    background: var(--color-accent-fill);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .subscribe-dialog__submit:hover {
+    background: var(--color-accent-fill-hover);
+  }
+
+  .subscribe-dialog__submit:disabled {
+    cursor: wait;
+    opacity: 0.7;
+  }
+
+  .subscribe-dialog__trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .subscribe-dialog__note {
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    color: var(--color-muted);
+  }
+
+  .subscribe-dialog__note a {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .subscribe-dialog__note.is-success {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .subscribe-dialog__note.is-error {
+    color: var(--color-danger);
+  }
+
+  /* After a successful sign-up the form steps aside and only the confirmation remains. */
+  .subscribe-dialog.is-done .subscribe-dialog__form {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .subscribe-dialog[open],
+    .subscribe-dialog[open]::backdrop {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { bindSubscribeForm } from '../../lib/forms';
+  import { getLenis } from '../../lib/smoothScroll';
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-subscribe-dialog]');
+  const form = dialog?.querySelector<HTMLFormElement>('[data-subscribe-dialog-form]');
+  const note = dialog?.querySelector<HTMLElement>('[data-subscribe-dialog-note]');
+  const title = dialog?.querySelector<HTMLElement>('#subscribe-dialog-title');
+  const lead = dialog?.querySelector<HTMLElement>('#subscribe-dialog-lead');
+
+  if (dialog && form && note) {
+    const defaultNote = note.innerHTML;
+
+    bindSubscribeForm({
+      form,
+      note,
+      button: dialog.querySelector<HTMLButtonElement>('[data-subscribe-dialog-submit]'),
+      onSuccess: () => dialog.classList.add('is-done'),
+    });
+
+    const open = (trigger: HTMLElement) => {
+      // Fresh state each time, with copy tailored to the button that opened it.
+      dialog.classList.remove('is-done');
+      note.innerHTML = defaultNote;
+      note.classList.remove('is-success', 'is-error');
+      if (title) title.textContent = trigger.dataset.subscribeTitle || title.dataset.default || '';
+      if (lead) lead.textContent = trigger.dataset.subscribeLead || lead.dataset.default || '';
+      getLenis()?.stop();
+      dialog.showModal();
+      dialog.querySelector<HTMLInputElement>('input[type="email"]')?.focus();
+    };
+
+    document.addEventListener('click', (event) => {
+      const trigger = (event.target as Element | null)?.closest<HTMLElement>('[data-subscribe-open]');
+      if (!trigger) return;
+      event.preventDefault();
+      open(trigger);
+    });
+
+    dialog.querySelector('[data-subscribe-close]')?.addEventListener('click', () => dialog.close());
+
+    // A click on the backdrop lands on the <dialog> itself, outside the panel.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    dialog.addEventListener('close', () => getLenis()?.start());
+  }
+</script>

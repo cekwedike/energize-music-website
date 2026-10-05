@@ -40,3 +40,52 @@ export function formToObject(form: HTMLFormElement): Record<string, string> {
   });
   return data;
 }
+
+interface SubscribeFormOptions {
+  form: HTMLFormElement;
+  note: HTMLElement | null;
+  button: HTMLButtonElement | null;
+  /** Called after a successful sign-up, with the server's message. */
+  onSuccess?: (message: string) => void;
+}
+
+/**
+ * Wires an email sign-up form (an `email` input, optional `company` honeypot) to /api/subscribe.
+ * Shared by the home page "Be the First to Know" section and the sign-up dialog.
+ */
+export function bindSubscribeForm({ form, note, button, onSuccess }: SubscribeFormOptions): void {
+  const email = form.querySelector<HTMLInputElement>('input[type="email"]');
+  const idleLabel = button?.textContent?.trim() ?? '';
+
+  const setNote = (message: string, state: 'success' | 'error') => {
+    if (!note) return;
+    note.textContent = message;
+    note.classList.toggle('is-success', state === 'success');
+    note.classList.toggle('is-error', state === 'error');
+  };
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!email?.checkValidity()) {
+      setNote('Please enter a valid email address.', 'error');
+      email?.focus();
+      return;
+    }
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Sending...';
+    }
+    const result = await submitForm('subscribe', formToObject(form));
+    if (button) {
+      button.disabled = false;
+      button.textContent = idleLabel;
+    }
+
+    setNote(result.message, result.ok ? 'success' : 'error');
+    if (result.ok) {
+      form.reset();
+      onSuccess?.(result.message);
+    }
+  });
+}

@@ -1,7 +1,7 @@
 ---
-import { initiativesNav } from '../../lib/nav';
+import { getInitiatives } from '../../lib/initiatives';
 
-const items = initiativesNav;
+const items = await getInitiatives();
 ---
 
 <section class="home-initiatives" data-home-initiatives aria-labelledby="home-initiatives-title">

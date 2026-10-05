@@ -154,39 +154,14 @@
 </style>
 
 <script>
-  import { formToObject, submitForm } from '../../lib/forms';
+  import { bindSubscribeForm } from '../../lib/forms';
 
   const form = document.querySelector<HTMLFormElement>('[data-home-newsletter-form]');
-  const note = document.querySelector<HTMLElement>('[data-home-newsletter-note]');
-  const button = document.querySelector<HTMLButtonElement>('[data-home-newsletter-submit]');
-  const email = document.querySelector<HTMLInputElement>('#home-newsletter-email');
-
-  const setNote = (message: string, state: 'success' | 'error') => {
-    if (!note) return;
-    note.textContent = message;
-    note.classList.toggle('is-success', state === 'success');
-    note.classList.toggle('is-error', state === 'error');
-  };
-
-  form?.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if (!email?.checkValidity()) {
-      setNote('Please enter a valid email address.', 'error');
-      email?.focus();
-      return;
-    }
-
-    if (button) {
-      button.disabled = true;
-      button.textContent = 'Sending...';
-    }
-    const result = await submitForm('subscribe', formToObject(form));
-    if (button) {
-      button.disabled = false;
-      button.textContent = 'Notify Me';
-    }
-
-    setNote(result.message, result.ok ? 'success' : 'error');
-    if (result.ok) form.reset();
-  });
+  if (form) {
+    bindSubscribeForm({
+      form,
+      note: document.querySelector<HTMLElement>('[data-home-newsletter-note]'),
+      button: document.querySelector<HTMLButtonElement>('[data-home-newsletter-submit]'),
+    });
+  }
 </script>

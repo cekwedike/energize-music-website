@@ -40,7 +40,7 @@ export default defineType({
       group: 'basics',
       title: 'Subtitle',
       type: 'string',
-      description: 'Short line under the title, e.g. "The Full Energize Music Roster on One Stage". Shown in Title Case.',
+      description: 'Short line under the title, e.g. "The Annual Energize Music Live Showcase". Shown in Title Case.',
     }),
     defineField({
       name: 'startDate',

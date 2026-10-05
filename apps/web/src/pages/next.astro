@@ -271,7 +271,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
     min-height: 100svh;
     margin-top: calc(-1 * var(--header-height, 4rem));
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     overflow: hidden;
     isolation: isolate;
   }
@@ -322,8 +322,12 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
     width: 100%;
     max-width: 52rem;
     margin: 0 auto;
-    /* Equal top and bottom padding (each clears the overlay header) keeps the copy in the true middle. */
-    padding: calc(var(--header-height, 4rem) + 1.5rem) 1.25rem;
+    /* Fill the space above the bottom rail and centre the copy inside it; the rail stays pinned to the bottom. */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: calc(var(--header-height, 4rem) + 1.5rem) 1.25rem 2.5rem;
     text-align: center;
   }
 

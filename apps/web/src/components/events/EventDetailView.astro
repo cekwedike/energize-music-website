@@ -7,6 +7,7 @@ import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
 import Marquee from '../ui/Marquee.astro';
 import EventShare from './EventShare.astro';
+import SubscribeDialog from '../forms/SubscribeDialog.astro';
 import { getEventCoverUrl } from '../../lib/events/media';
 import {
   formatEventDate,
@@ -30,9 +31,10 @@ const { event, shareUrl } = Astro.props;
 const coverUrl = getEventCoverUrl(event.cover, 2400, 1500);
 const isPast = isPastEvent(event.startDate, event.endDate);
 const hasTickets = Boolean(event.ticketUrl) && !isPast;
-// No ticket link yet: send people to the email list so they hear when sales open.
-const primaryHref = hasTickets ? event.ticketUrl! : '/#first-to-know';
+// No ticket link yet: the main button opens the email sign-up so people hear when sales open.
 const primaryLabel = hasTickets ? event.ctaLabel || 'Get Tickets' : 'Get Ticket Alerts';
+const alertsTitle = 'Get Ticket Alerts';
+const alertsLead = `Be the first to know when ${event.title} tickets go on sale and the lineup is announced.`;
 const secondaryHref = event.secondaryCtaUrl || '/contact?intent=partnership';
 const secondaryLabel = event.secondaryCtaLabel || 'Partner With Us';
 
@@ -106,13 +108,15 @@ const lineupCards = lineup.map((slot) => {
           {
             !isPast && (
               <div class="fest-actions">
-                <a
-                  href={primaryHref}
-                  class="fest-btn fest-btn--solid"
-                  {...(hasTickets ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                >
-                  {primaryLabel}
-                </a>
+                {hasTickets ? (
+                  <a href={event.ticketUrl} class="fest-btn fest-btn--solid" target="_blank" rel="noopener noreferrer">
+                    {primaryLabel}
+                  </a>
+                ) : (
+                  <button type="button" class="fest-btn fest-btn--solid" data-subscribe-open data-subscribe-title={alertsTitle} data-subscribe-lead={alertsLead}>
+                    {primaryLabel}
+                  </button>
+                )}
                 <a href={secondaryHref} class="fest-btn fest-btn--ghost">{secondaryLabel}</a>
               </div>
             )
@@ -200,7 +204,15 @@ const lineupCards = lineup.map((slot) => {
             <div class="fest-soon scroll-reveal">
               <p class="fest-soon__title">Lineup Announcements Coming Soon</p>
               <p class="fest-soon__body">Join the list and you will hear the names first.</p>
-              <a href="/#first-to-know" class="fest-btn fest-btn--solid">Notify Me</a>
+              <button
+                type="button"
+                class="fest-btn fest-btn--solid"
+                data-subscribe-open
+                data-subscribe-title="Hear the Lineup First"
+                data-subscribe-lead={`Get the ${event.title} lineup in your inbox the moment it is announced.`}
+              >
+                Notify Me
+              </button>
             </div>
           )}
         </div>
@@ -239,18 +251,22 @@ const lineupCards = lineup.map((slot) => {
             {formatEventDateLong(event.startDate)} · {venue}
           </p>
           <div class="fest-actions fest-actions--center">
-            <a
-              href={primaryHref}
-              class="fest-btn fest-btn--solid"
-              {...(hasTickets ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-            >
-              {primaryLabel}
-            </a>
+            {hasTickets ? (
+              <a href={event.ticketUrl} class="fest-btn fest-btn--solid" target="_blank" rel="noopener noreferrer">
+                {primaryLabel}
+              </a>
+            ) : (
+              <button type="button" class="fest-btn fest-btn--solid" data-subscribe-open data-subscribe-title={alertsTitle} data-subscribe-lead={alertsLead}>
+                {primaryLabel}
+              </button>
+            )}
           </div>
         </div>
       </section>
     )
   }
+
+  {!isPast && <SubscribeDialog />}
 </article>
 
 <script>
@@ -449,6 +465,9 @@ const lineupCards = lineup.map((slot) => {
   }
 
   .fest-btn {
+    border: 0;
+    cursor: pointer;
+    font-family: inherit;
     display: inline-flex;
     align-items: center;
     justify-content: center;
