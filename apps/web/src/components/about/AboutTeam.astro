@@ -1,5 +1,6 @@
 ---
 import TeamMemberCard from '../team/TeamMemberCard.astro';
+import TeamMemberRow from '../team/TeamMemberRow.astro';
 import type { AboutPage, TeamMember } from '@energize/shared';
 
 interface Props {
@@ -25,13 +26,21 @@ const teamIntro =
 
     {
       team.length > 0 ? (
-        <div class="about-team-grid mt-12">
-          {team.map((member, i) => (
-            <div class="scroll-reveal" style={`--reveal-delay: ${(i % 4) * 70}ms`}>
-              <TeamMemberCard member={member} />
-            </div>
-          ))}
-        </div>
+        <>
+          {/* Cards from tablet up; a compact expandable list on phones. */}
+          <div class="about-team-grid mt-12">
+            {team.map((member, i) => (
+              <div class="scroll-reveal" style={`--reveal-delay: ${(i % 4) * 70}ms`}>
+                <TeamMemberCard member={member} />
+              </div>
+            ))}
+          </div>
+          <div class="about-team-list mt-8 scroll-reveal">
+            {team.map((member) => (
+              <TeamMemberRow member={member} />
+            ))}
+          </div>
+        </>
       ) : (
         <p class="mt-12 text-[var(--color-muted)]">Team profiles will appear here once published.</p>
       )
@@ -41,9 +50,23 @@ const teamIntro =
 
 <style>
   .about-team-grid {
-    display: grid;
+    display: none;
     gap: 2.5rem 1.5rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .about-team-list {
+    border-top: 1px solid var(--color-line);
+  }
+
+  @media (min-width: 640px) {
+    .about-team-grid {
+      display: grid;
+    }
+
+    .about-team-list {
+      display: none;
+    }
   }
 
   @media (min-width: 1024px) {

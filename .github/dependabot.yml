@@ -1,19 +1,21 @@
 version: 2
 updates:
+  # Monthly, minor and patch updates only. Major versions carry breaking changes
+  # (e.g. zod 3 -> 4, @sanity/client 6 -> 8), so they are upgraded by hand and tested first.
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
     groups:
       dev-dependencies:
         dependency-type: 'development'
     ignore:
-      # TypeScript 7 (native Go compiler) does not expose the programmatic
-      # Language Service API that `astro check` / @astrojs/language-server need.
-      # Track: https://github.com/withastro/roadmap/discussions/1321
-      - dependency-name: 'typescript'
+      - dependency-name: '*'
         update-types: ['version-update:semver-major']
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
