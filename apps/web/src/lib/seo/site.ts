@@ -4,7 +4,7 @@ export const SITE_NAME = 'Energize Music';
 export const SITE_LEGAL_NAME = 'Energize Music Affairs';
 export const SITE_TAGLINE = 'The Energy Different';
 export const SITE_DESCRIPTION =
-  'Energize Music is a Lagos-based Afro-gospel and soul-fusion record label. Home to Greatman Takit, TY Bello, and Ellie Scotte, with NEXT, Energize Kids, and Energize Fest.';
+  'Energize Music is a Lagos-based Afro-gospel and soul-fusion record label, home to Greatman Takit and TY Bello, and the team behind NEXT, Energize Kids, and Energize Fest.';
 /** Landscape JPEG for WhatsApp / social previews (logo.webp is too small / webp-unfriendly). */
 export const SITE_DEFAULT_OG = '/brand/og.jpg';
 export const SITE_DEFAULT_OG_WIDTH = 1200;
@@ -48,8 +48,29 @@ export function getOrganizationSameAs(): string[] {
   });
 }
 
+/** Adds the brand suffix unless the title already names it or the result would be truncated in search (over 60 characters). */
 export function formatTitle(title: string): string {
-  return title.includes('Energize') ? title : `${title} · ${SITE_NAME}`;
+  if (title.includes(SITE_NAME)) return title;
+  const withSuffix = `${title} · ${SITE_NAME}`;
+  return withSuffix.length > 60 ? title : withSuffix;
+}
+
+/** "A", "A and B", "A, B, and C". */
+export function listNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? '';
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+}
+
+/**
+ * Sanity alt text is sometimes just the uploaded file name ("dr-foy", "energize-release-energy").
+ * Treat those as missing and use a descriptive fallback instead.
+ */
+export function imageAlt(alt: string | null | undefined, fallback: string): string {
+  const value = alt?.trim();
+  if (!value) return fallback;
+  const looksLikeFileName = !/\s/.test(value) && /[-_.]/.test(value);
+  return looksLikeFileName ? fallback : value;
 }
 
 export type BreadcrumbItem = {

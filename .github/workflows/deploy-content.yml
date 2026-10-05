@@ -4,7 +4,7 @@ name: Deploy content
 # Sanity webhook should POST repository_dispatch with event_type: sanity-rebuild.
 #
 # Required secrets: PUBLIC_SANITY_PROJECT_ID
-# Optional: SANITY_READ_TOKEN, FORM_ENDPOINT / PUBLIC_FORM_ENDPOINT
+# Optional: SANITY_READ_TOKEN, PUBLIC_FORMS_API_BASE, PUBLIC_GA4_ID, PUBLIC_GOOGLE_SITE_VERIFICATION
 # Hostinger deploy (optional): FTP_SERVER, FTP_USERNAME, FTP_PASSWORD
 # Vercel rebuild (optional): VERCEL_DEPLOY_HOOK_URL
 
@@ -25,7 +25,9 @@ jobs:
       PUBLIC_SANITY_DATASET: production
       PUBLIC_SANITY_API_VERSION: '2024-01-01'
       PUBLIC_SITE_URL: https://energize-music.com
-      PUBLIC_FORM_ENDPOINT: ${{ secrets.FORM_ENDPOINT }}
+      PUBLIC_FORMS_API_BASE: ${{ secrets.PUBLIC_FORMS_API_BASE }}
+      PUBLIC_GA4_ID: ${{ secrets.PUBLIC_GA4_ID }}
+      PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ secrets.PUBLIC_GOOGLE_SITE_VERIFICATION }}
       SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}
       VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
       FTP_SERVER: ${{ secrets.FTP_SERVER }}

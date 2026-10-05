@@ -2,6 +2,7 @@
 import type { ArtistCard } from '@energize/shared';
 import { urlForImage } from '../../lib/sanity/client';
 import SocialIcon from '../ui/SocialIcon.astro';
+import { imageAlt } from '../../lib/seo/site';
 
 interface Props {
   artists: ArtistCard[];
@@ -31,14 +32,19 @@ const roster = artists
     <section class="home-artists" data-home-artists aria-labelledby="home-artists-title">
       <div class="home-artists__head">
         <div data-home-reveal>
-          <p class="home-kicker">The roster</p>
+          <p class="home-kicker">The artistes</p>
           <h2 id="home-artists-title" class="home-title">
-            Greatman Takit,<br />TY Bello, Ellie Scotte
+            {roster.map((artist, index) => (
+              <>
+                {artist.name}
+                {index < roster.length - 1 && (index === roster.length - 2 ? <> and<br /></> : <>,<br /></>)}
+              </>
+            ))}
           </h2>
         </div>
         <a href="/artists" class="home-link" data-home-reveal data-home-reveal-delay="80">
           <span class="home-link__line" aria-hidden="true"></span>
-          Full roster
+          Meet the artistes
         </a>
       </div>
 
@@ -55,7 +61,7 @@ const roster = artists
                 <div class="home-artists__media media-frame" data-home-artist-media>
                   <img
                     src={artist.photoUrl}
-                    alt={`${artist.name}, Energize Music artist`}
+                    alt={imageAlt(artist.photo?.alt, `${artist.name}, Energize Music artiste`)}
                     width="640"
                     height="800"
                     loading="lazy"

@@ -1,0 +1,107 @@
+---
+/** "The belief": the label's why. Sits directly under the hero so it is the first thing read. */
+const quote =
+  'Music can carry hope without losing its edge. From Lagos, we create Afro-gospel and soul-fusion music that is uplifting, family-friendly, and made to travel.';
+const words = quote.split(' ');
+---
+
+<section class="home-belief" id="belief" data-home-belief aria-labelledby="home-belief-title">
+  <div class="home-belief__orb" aria-hidden="true"></div>
+  <div class="home-belief__inner">
+    <p class="home-kicker">The belief</p>
+    <h2 id="home-belief-title" class="sr-only">Why Energize Music exists</h2>
+    <blockquote class="home-belief__quote">
+      <p>
+        {
+          words.map((word) => (
+            <span class="home-belief__word" data-home-word>
+              {word}
+            </span>
+          ))
+        }
+      </p>
+    </blockquote>
+    <a href="/about" class="home-btn home-btn--ghost home-belief__cta">More about us</a>
+  </div>
+</section>
+
+<style>
+  .home-belief {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(5.5rem, 4rem + 4vw, 8.5rem) 1.25rem;
+    background: var(--color-bg);
+  }
+
+  @media (min-width: 640px) {
+    .home-belief {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .home-belief__orb {
+    position: absolute;
+    left: 50%;
+    bottom: -35%;
+    width: min(70vw, 34rem);
+    height: min(70vw, 34rem);
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 16.8%, transparent), transparent 68%);
+    pointer-events: none;
+    transform: translateZ(0);
+    animation: home-belief-pulse 5.5s ease-in-out infinite;
+  }
+
+  @keyframes home-belief-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scale(0.92) translateZ(0);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.08) translateZ(0);
+    }
+  }
+
+  .home-belief__inner {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 48rem);
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .home-belief__quote {
+    margin: 1.5rem 0 0;
+  }
+
+  .home-belief__quote p {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem 0.55rem;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(1.7rem, 1.2rem + 2.4vw, 2.9rem);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: var(--color-fg);
+  }
+
+  .home-belief__word {
+    display: inline-block;
+  }
+
+  .home-belief__cta {
+    margin-top: 1.85rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-belief__orb {
+      animation: none;
+    }
+  }
+</style>

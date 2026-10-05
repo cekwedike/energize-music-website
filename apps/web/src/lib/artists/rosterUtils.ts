@@ -60,7 +60,7 @@ export function rosterPortraitLabel(artist: ArtistCard): string {
   if (artist.tagline?.trim()) return artist.tagline.trim().toUpperCase();
   const genres = artist.genres?.filter(Boolean) ?? [];
   if (genres.length > 0) return genres.slice(0, 2).join(' · ').toUpperCase();
-  return 'ENERGIZE ARTIST';
+  return 'ENERGIZE ARTISTE';
 }
 
 export interface RosterNavItem {

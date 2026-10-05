@@ -2,6 +2,7 @@
 import type { EnrichedRelease, ReleaseType, StreamingLinks } from '@energize/shared';
 import EditorialSectionLink from '../ui/EditorialSectionLink.astro';
 import ArtistStreamingLinks from '../artists/ArtistStreamingLinks.astro';
+import { imageAlt } from '../../lib/seo/site';
 
 interface Props {
   release: EnrichedRelease;
@@ -18,7 +19,7 @@ const typeLabel: Record<ReleaseType, string> = {
 
 const releaseTypeLabel = typeLabel[release.type];
 const coverUrl = release.coverUrl;
-const coverAlt = release.cover?.alt ?? release.displayTitle;
+const coverAlt = imageAlt(release.cover?.alt, `${release.displayTitle} cover art`);
 
 const artists = (release.artists ?? []).filter(
   (artist): artist is NonNullable<typeof artist> => Boolean(artist?._id && artist.slug && artist.name),
@@ -86,7 +87,7 @@ const primaryListenUrl = release.externalUrl;
 
         {
           artists.length > 0 ? (
-            <ul class="release-reveal release-reveal-5 mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1" aria-label="Artists">
+            <ul class="release-reveal release-reveal-5 mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1" aria-label="Artistes">
               {artists.map((artist, index) => (
                 <li class="inline-flex items-baseline text-lg text-fg sm:text-xl">
                   <a

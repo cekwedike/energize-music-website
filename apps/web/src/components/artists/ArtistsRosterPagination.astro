@@ -11,7 +11,7 @@ const { items, activeIndex } = Astro.props;
 const dotLeft = pagerDotPosition(activeIndex, items.length);
 ---
 
-<footer class="roster-pager" aria-label={`Roster navigation, viewing ${items[activeIndex]?.name ?? 'artist'}`}>
+<footer class="roster-pager" aria-label={`Roster navigation, viewing ${items[activeIndex]?.name ?? 'artiste'}`}>
   <div class="roster-pager__track-wrap">
     <div class="roster-pager__track" aria-hidden="true">
       <span class="roster-pager__dot" style={`left: ${dotLeft}%`}></span>

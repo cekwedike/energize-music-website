@@ -41,6 +41,8 @@ const absoluteOg = absoluteImageUrl(ogPath);
 const isDefaultOg = ogPath === SITE_DEFAULT_OG || absoluteOg === absoluteImageUrl(SITE_DEFAULT_OG);
 const robots = noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 const keywordContent = keywords.filter(Boolean).join(', ');
+const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+const bingVerification = import.meta.env.PUBLIC_BING_SITE_VERIFICATION?.trim();
 ---
 
 <title>{fullTitle}</title>
@@ -52,8 +54,12 @@ const keywordContent = keywords.filter(Boolean).join(', ');
 <link rel="canonical" href={canonical} />
 
 <meta name="theme-color" content="#fafaf8" />
-<meta name="color-scheme" content="dark" />
-<link rel="apple-touch-icon" href="/brand/logo.webp" />
+<meta name="color-scheme" content="light" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="geo.region" content="NG-LA" />
+<meta name="geo.placename" content="Lagos" />
+{googleVerification && <meta name="google-site-verification" content={googleVerification} />}
+{bingVerification && <meta name="msvalidate.01" content={bingVerification} />}
 
 <meta property="og:type" content={ogType} />
 <meta property="og:site_name" content={SITE_NAME} />

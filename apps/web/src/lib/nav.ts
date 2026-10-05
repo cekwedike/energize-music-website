@@ -10,7 +10,7 @@ export const CONTACT_EMAIL = '';
 
 // Used by the footer's "Explore" column.
 export const primaryNav: NavLink[] = [
-  { label: 'Artists', href: '/artists' },
+  { label: 'Artistes', href: '/artists' },
   { label: 'Releases', href: '/releases' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
@@ -33,21 +33,21 @@ export const initiativesNav: InitiativeItem[] = [
     label: 'NEXT',
     href: '/next',
     blurb:
-      'Pan-African Afrogospel competition. Ten finalists earn a spot on the ENERGIZE Afrogospel Album and the launch stage.',
+      'A pan-African Afro-gospel talent competition. Ten finalists earn a place on the ENERGIZE Afrogospel Album and the launch concert stage.',
     image: '/initiatives/cards/next.webp',
   },
   {
     label: 'Energize Kids',
     href: '/energize-kids',
     blurb:
-      'Clean kids entertainment with music, Play Zone challenges, and artist Xade. Register a child at energize-kids.com.',
+      'Clean, faith-filled fun for children: songs, Play Zone challenges, and featured artiste Xade. Parents can register a child at energize-kids.com.',
     image: '/initiatives/cards/energize-kids.webp',
   },
   {
     label: 'Energize Fest',
     href: '/events/energize-fest',
     blurb:
-      'Annual live showcase for the full Energize Music roster. Next date: 1 December 2026. Venue TBA.',
+      'The annual live showcase for the full Energize Music roster. Next date: 1 December 2026. Venue to be announced.',
     image: '/initiatives/cards/energize-fest.webp',
   },
 ];
@@ -58,7 +58,7 @@ export type HeaderNavEntry =
 
 // Drives SiteHeader. Contact renders as the CTA button, Energize HQ as a small text link after it.
 export const headerNav: HeaderNavEntry[] = [
-  { type: 'link', label: 'Artists', href: '/artists' },
+  { type: 'link', label: 'Artistes', href: '/artists' },
   { type: 'link', label: 'Releases', href: '/releases' },
   { type: 'dropdown', label: 'Initiatives', items: initiativesNav },
   { type: 'link', label: 'About', href: '/about' },

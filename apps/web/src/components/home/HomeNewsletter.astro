@@ -1,19 +1,19 @@
 ---
 ---
 
-<section class="home-newsletter" data-home-newsletter aria-labelledby="home-newsletter-title">
+<section class="home-newsletter" id="first-to-know" data-home-newsletter aria-labelledby="home-newsletter-title">
   <div class="home-newsletter__inner">
     <div data-home-reveal>
-      <p class="home-kicker">Newsletter</p>
+      <p class="home-kicker">Stay in the loop</p>
       <h2 id="home-newsletter-title" class="home-title">
-        New music and<br />label news by email
+        Be the<br />first to know
       </h2>
       <p class="home-newsletter__lead">
-        Releases, artist updates, and show dates from Energize Music. No spam.
+        New releases, artiste news, and show dates from Energize Music, sent to you before anyone else hears.
       </p>
     </div>
 
-    <form class="home-newsletter__form" data-home-newsletter-form>
+    <form class="home-newsletter__form" data-home-newsletter-form novalidate>
       <label class="home-newsletter__label" for="home-newsletter-email">Email address</label>
       <div class="home-newsletter__row">
         <input
@@ -22,12 +22,19 @@
           type="email"
           required
           autocomplete="email"
+          inputmode="email"
           placeholder="you@example.com"
           class="home-newsletter__input"
         />
-        <button type="submit" class="home-btn home-btn--solid">Subscribe</button>
+        <button type="submit" class="home-btn home-btn--solid" data-home-newsletter-submit>Notify me</button>
       </div>
-      <p class="home-newsletter__note" data-home-newsletter-note>No spam. Just the Energy.</p>
+      <div class="home-newsletter__trap" aria-hidden="true">
+        <label for="home-newsletter-company">Company</label>
+        <input id="home-newsletter-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <p class="home-newsletter__note" data-home-newsletter-note role="status" aria-live="polite">
+        Only big news. Unsubscribe any time. See our <a href="/privacy">privacy policy</a>.
+      </p>
     </form>
   </div>
 </section>
@@ -124,20 +131,62 @@
     color: var(--color-fg);
   }
 
+  .home-newsletter__note a {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
   .home-newsletter__note.is-success {
     color: var(--color-accent);
+  }
+
+  .home-newsletter__note.is-error {
+    color: var(--color-danger);
+  }
+
+  .home-newsletter__trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
   }
 </style>
 
 <script>
+  import { formToObject, submitForm } from '../../lib/forms';
+
   const form = document.querySelector<HTMLFormElement>('[data-home-newsletter-form]');
   const note = document.querySelector<HTMLElement>('[data-home-newsletter-note]');
+  const button = document.querySelector<HTMLButtonElement>('[data-home-newsletter-submit]');
+  const email = document.querySelector<HTMLInputElement>('#home-newsletter-email');
 
-  form?.addEventListener('submit', (event) => {
-    event.preventDefault();
+  const setNote = (message: string, state: 'success' | 'error') => {
     if (!note) return;
-    note.textContent = 'Thanks. Follow us on socials while we confirm your spot.';
-    note.classList.add('is-success');
-    form.reset();
+    note.textContent = message;
+    note.classList.toggle('is-success', state === 'success');
+    note.classList.toggle('is-error', state === 'error');
+  };
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!email?.checkValidity()) {
+      setNote('Please enter a valid email address.', 'error');
+      email?.focus();
+      return;
+    }
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Sending...';
+    }
+    const result = await submitForm('subscribe', formToObject(form));
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Notify me';
+    }
+
+    setNote(result.message, result.ok ? 'success' : 'error');
+    if (result.ok) form.reset();
   });
 </script>

@@ -17,8 +17,8 @@
   Header always set Cross-Origin-Opener-Policy "same-origin"
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 
-  # CSP tuned for Astro + Google Fonts + Sanity CDN images + common embed players
-  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self' https:; frame-ancestors 'self'; object-src 'none'; img-src 'self' data: blob: https:; media-src 'self' https: blob:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https:; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://open.spotify.com https://embed.music.apple.com;"
+  # CSP tuned for Astro + Google Fonts + Sanity CDN images + embed players + optional GA4 / Google Ads / Meta Pixel
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self' https:; frame-ancestors 'self'; object-src 'none'; img-src 'self' data: blob: https:; media-src 'self' https: blob:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net; connect-src 'self' https:; frame-src 'self' https://www.googletagmanager.com https://www.youtube.com https://www.youtube-nocookie.com https://open.spotify.com https://embed.music.apple.com;"
 </IfModule>
 
 # Cache static assets aggressively; HTML stays short-lived for CMS rebuilds

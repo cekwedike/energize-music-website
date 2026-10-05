@@ -9,15 +9,18 @@ interface Props {
   title: string;
   description: string;
   blocks: PortableTextBlock[];
+  /** ISO date (YYYY-MM-DD) the current wording took effect. */
+  effectiveDate: string;
   eyebrow?: string;
   breadcrumbs?: BreadcrumbItem[];
 }
 
-const { title, description, blocks, eyebrow = 'Legal', breadcrumbs } = Astro.props;
-const updated = new Date().toLocaleDateString('en-US', {
+const { title, description, blocks, effectiveDate, eyebrow = 'Legal', breadcrumbs } = Astro.props;
+const updated = new Date(`${effectiveDate}T12:00:00Z`).toLocaleDateString('en-GB', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
+  timeZone: 'UTC',
 });
 ---
 

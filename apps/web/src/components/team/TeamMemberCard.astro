@@ -1,5 +1,6 @@
 ---
 import type { TeamMember } from '@energize/shared';
+import { imageAlt } from '../../lib/seo/site';
 import { urlForImage } from '../../lib/sanity/client';
 import { firstSentence } from '../../lib/team/firstSentence';
 
@@ -36,7 +37,7 @@ const socialLinks = [
       photoUrl ? (
         <img
           src={photoUrl}
-          alt={member.photo?.alt ?? member.name}
+          alt={imageAlt(member.photo?.alt, `${member.name}, ${member.role} at Energize Music`)}
           width="640"
           height="720"
           loading="lazy"

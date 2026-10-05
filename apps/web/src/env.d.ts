@@ -47,7 +47,14 @@ declare module '*.css' {}
 
 interface ImportMetaEnv {
   readonly PUBLIC_SITE_URL?: string;
-  readonly PUBLIC_FORM_ENDPOINT?: string;
+  readonly PUBLIC_FORMS_API_BASE?: string;
+  readonly PUBLIC_GOOGLE_SITE_VERIFICATION?: string;
+  readonly PUBLIC_BING_SITE_VERIFICATION?: string;
+  readonly PUBLIC_GA4_ID?: string;
+  readonly PUBLIC_GOOGLE_ADS_ID?: string;
+  readonly PUBLIC_GOOGLE_ADS_SIGNUP_LABEL?: string;
+  readonly PUBLIC_GOOGLE_ADS_LEAD_LABEL?: string;
+  readonly PUBLIC_META_PIXEL_ID?: string;
   readonly PUBLIC_HERO_VIDEO_URL?: string;
   readonly PUBLIC_HERO_VIDEO_POSTER?: string;
   readonly PUBLIC_SANITY_PROJECT_ID?: string;

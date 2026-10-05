@@ -1,0 +1,61 @@
+---
+/**
+ * Optional analytics and ad tags, driven by env vars. Nothing renders until an id is set.
+ *   PUBLIC_GA4_ID          Google Analytics 4 measurement id (G-XXXXXXX)
+ *   PUBLIC_GOOGLE_ADS_ID   Google Ads tag id (AW-XXXXXXXXX)
+ *   PUBLIC_META_PIXEL_ID   Meta (Facebook / Instagram) Pixel id
+ * Tags load after the page is idle so they never slow the first paint.
+ */
+const ga4Id = import.meta.env.PUBLIC_GA4_ID?.trim() || '';
+const adsId = import.meta.env.PUBLIC_GOOGLE_ADS_ID?.trim() || '';
+const pixelId = import.meta.env.PUBLIC_META_PIXEL_ID?.trim() || '';
+const gtagIds = [ga4Id, adsId].filter(Boolean);
+const enabled = gtagIds.length > 0 || Boolean(pixelId);
+---
+
+{
+  enabled && (
+    <script is:inline define:vars={{ gtagIds, pixelId }}>
+      (function () {
+        function boot() {
+          if (gtagIds.length) {
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = function () {
+              window.dataLayer.push(arguments);
+            };
+            window.gtag('js', new Date());
+            gtagIds.forEach(function (id) {
+              window.gtag('config', id);
+            });
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gtagIds[0]);
+            document.head.appendChild(s);
+          }
+          if (pixelId) {
+            var n = (window.fbq = function () {
+              n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+            });
+            if (!window._fbq) window._fbq = n;
+            n.push = n;
+            n.loaded = true;
+            n.version = '2.0';
+            n.queue = [];
+            var f = document.createElement('script');
+            f.async = true;
+            f.src = 'https://connect.facebook.net/en_US/fbevents.js';
+            document.head.appendChild(f);
+            window.fbq('init', pixelId);
+            window.fbq('track', 'PageView');
+          }
+        }
+        function schedule() {
+          if ('requestIdleCallback' in window) window.requestIdleCallback(boot, { timeout: 2500 });
+          else window.setTimeout(boot, 1200);
+        }
+        if (document.readyState === 'complete') schedule();
+        else window.addEventListener('load', schedule, { once: true });
+      })();
+    </script>
+  )
+}

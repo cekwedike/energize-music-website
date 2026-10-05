@@ -7,9 +7,8 @@ import ArtistExploreMore from '../../components/artists/ArtistExploreMore.astro'
 import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient, urlForImage } from '../../lib/sanity/client';
 import { enrichReleases } from '../../lib/metadata/enrichReleases';
-import { crumbs, organizationId } from '../../lib/seo/schema';
+import { crumbs } from '../../lib/seo/schema';
 import { absoluteUrl } from '../../lib/seo/site';
-import { excerptCompleteSentences } from '../../lib/artists/rosterUtils';
 import {
   artistSlugsQuery,
   artistBySlugQuery,
@@ -47,18 +46,51 @@ const photoUrl = urlForImage(artist.photo).width(1200).height(630).fit('crop').a
 const pageUrl = absoluteUrl(`/artists/${artist.slug}`);
 const pageId = `${pageUrl}#artist`;
 
-const genreLabel = artist.genres?.[0] ?? 'Afro-Gospel';
-const pageTitle = `${artist.name} | Afro-Gospel Artist | Energize Music`;
-const description = excerptCompleteSentences(
-  artist.tagline?.trim()
-    ? `${artist.name} is an Energize Music artist (${genreLabel}). ${artist.tagline}. ${artist.bio}`
-    : `${artist.name} is an Energize Music artist known for ${genreLabel}. ${artist.bio}`,
-  155,
-);
+const genreLabel = (artist.genres?.[0] ?? 'Afro-gospel').replace(/^Afro-Gospel$/i, 'Afro-gospel');
+const pageTitle = `${artist.name}: Songs, Albums and Bio | Energize Music`;
+
+/**
+ * Builds a search snippet from whole sentences only (never cut mid-word).
+ * Tries "lead + bio sentences" and "bio sentences only", keeping the richer one that fits.
+ */
+function buildDescription(): string {
+  const limit = 155;
+  const lead = `${artist!.name} is ${/^[aeiou]/i.test(genreLabel) ? 'an' : 'a'} ${genreLabel} artiste on Energize Music.`;
+  const sentences = (artist!.bio ?? '').replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+(?=\s|$)/g)?.map((s) => s.trim()) ?? [];
+  const cta = 'Stream the music and read the bio.';
+
+  const fill = (start: string[]): string => {
+    const parts = [...start];
+    for (const sentence of sentences) {
+      if ([...parts, sentence].join(' ').length > limit) break;
+      parts.push(sentence);
+    }
+    if ([...parts, cta].join(' ').length <= limit) parts.push(cta);
+    return parts.join(' ');
+  };
+
+  const withLead = fill([lead]);
+  const bioOnly = fill([]);
+  const bioNamesArtist = bioOnly.includes(artist!.name);
+  return bioNamesArtist && bioOnly.length > withLead.length ? bioOnly : withLead;
+}
+const description = buildDescription();
 
 const sameAs = Object.values(artist.streaming ?? {}).filter(
   (value): value is string => typeof value === 'string' && value.length > 0,
 );
+
+function releaseRefs(key: 'album' | 'track', releases: Release[]) {
+  if (releases.length === 0) return {};
+  return {
+    [key]: releases.map((release) => ({
+      '@type': key === 'album' ? 'MusicAlbum' : 'MusicRecording',
+      '@id': absoluteUrl(`/releases/${release.slug}#release`),
+      name: release.title,
+      url: absoluteUrl(`/releases/${release.slug}`),
+    })),
+  };
+}
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -70,8 +102,8 @@ const jsonLd = {
   url: pageUrl,
   genre: artist.genres?.length ? artist.genres : ['Afro-gospel', 'Soul fusion'],
   sameAs,
-  memberOf: { '@id': organizationId() },
-  recordLabel: { '@id': organizationId() },
+  ...releaseRefs('album', discography.filter((release) => release.type !== 'single')),
+  ...releaseRefs('track', discography.filter((release) => release.type === 'single')),
 };
 ---
 
@@ -80,8 +112,8 @@ const jsonLd = {
   description={description}
   ogImage={photoUrl}
   ogType="profile"
-  keywords={[artist.name, 'Energize Music', 'Afro-gospel', ...(artist.genres ?? [])]}
-  breadcrumbs={crumbs({ name: 'Artists', path: '/artists' }, { name: artist.name, path: `/artists/${artist.slug}` })}
+  keywords={[artist.name, `${artist.name} songs`, `${artist.name} albums`, 'Energize Music', 'Afro-gospel', ...(artist.genres ?? [])]}
+  breadcrumbs={crumbs({ name: 'Artistes', path: '/artists' }, { name: artist.name, path: `/artists/${artist.slug}` })}
   headerVariant="overlay"
 >
   <JsonLd data={jsonLd} />

@@ -5,7 +5,7 @@ import ReleaseDetail from '../../components/releases/ReleaseDetail.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { enrichRelease } from '../../lib/metadata/enrichReleases';
 import { crumbs, organizationId } from '../../lib/seo/schema';
-import { absoluteUrl } from '../../lib/seo/site';
+import { absoluteUrl, listNames } from '../../lib/seo/site';
 import { allReleasesQuery, releaseBySlugQuery, type Release } from '@energize/shared';
 
 /** Build one static page per published release slug. Dev can still resolve new slugs after publish. */
@@ -74,20 +74,33 @@ const jsonLd = {
     : {}),
 };
 
-const seoDescription =
-  artists.length > 0
-    ? `${enriched.displayTitle} by ${artists.map((a) => a.name).join(', ')}. ${releaseTypeLabel} on Energize Music.`
-    : `${enriched.displayTitle}: ${releaseTypeLabel} on Energize Music.`;
+const byline = listNames(artists.length > 0 ? artists.map((a) => a.name) : enriched.artistNames);
+const year = new Date(release.releaseDate).getUTCFullYear();
+const platforms = [
+  release.links?.spotify && 'Spotify',
+  release.links?.appleMusic && 'Apple Music',
+  release.links?.youtube && 'YouTube',
+].filter(Boolean) as string[];
+const typeWord = releaseTypeLabel === 'EP' ? 'EP' : releaseTypeLabel.toLowerCase();
+
+const seoTitle = byline ? `${enriched.displayTitle} by ${byline}` : enriched.displayTitle;
+const seoDescription = [
+  `Listen to ${enriched.displayTitle}, the ${year} Afro-gospel ${typeWord}${byline ? ` by ${byline}` : ''} on Energize Music.`,
+  platforms.length > 0 ? `Stream on ${listNames(platforms)}.` : '',
+]
+  .filter(Boolean)
+  .join(' ');
 ---
 
 <BaseLayout
-  title={enriched.displayTitle}
+  title={seoTitle}
   description={seoDescription}
   ogImage={enriched.coverUrl}
   ogType={release.type === 'single' ? 'music.song' : 'music.album'}
   keywords={[
     enriched.displayTitle,
     ...artists.map((artist) => artist.name),
+    ...artists.map((artist) => `${enriched.displayTitle} ${artist.name}`),
     releaseTypeLabel,
     'Energize Music',
     'Afro-gospel',

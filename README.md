@@ -30,7 +30,8 @@ cp apps/web/.env.example apps/web/.env   # if present; otherwise create env vars
 | `PUBLIC_SANITY_DATASET` | Usually `production` |
 | `PUBLIC_SANITY_API_VERSION` | e.g. `2024-01-01` |
 | `PUBLIC_SITE_URL` | Canonical site URL |
-| `PUBLIC_FORM_ENDPOINT` | Contact form endpoint (optional until wired) |
+| `PUBLIC_FORMS_API_BASE` | Optional. Host of the `/api` form endpoints when the site is not served from Vercel |
+| `BREVO_*`, `CONTACT_TO_EMAIL` | Brevo email list and contact form (Vercel env only). See `docs/FORMS.md` |
 | `SANITY_READ_TOKEN` | Optional token for private datasets |
 
 ## Scripts

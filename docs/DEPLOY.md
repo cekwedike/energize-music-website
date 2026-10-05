@@ -35,7 +35,8 @@ Repo → Settings → Secrets and variables → Actions:
 |--------|----------|---------|
 | `PUBLIC_SANITY_PROJECT_ID` | Yes | Sanity project id |
 | `SANITY_READ_TOKEN` | Optional | Private dataset / draft access (public dataset usually fine without it) |
-| `FORM_ENDPOINT` | Optional | Contact form |
+| `PUBLIC_FORMS_API_BASE` | Optional | Only for Hostinger builds: the Vercel host that serves `/api` |
+| `PUBLIC_GA4_ID`, `PUBLIC_GOOGLE_SITE_VERIFICATION` | Optional | Analytics and Search Console |
 | `VERCEL_DEPLOY_HOOK_URL` | Optional | Triggers a Vercel rebuild |
 | `FTP_SERVER` | Optional | Hostinger FTP host |
 | `FTP_USERNAME` | Optional | Hostinger FTP user |
@@ -100,7 +101,8 @@ Config lives in `apps/web/vercel.json` (and a root fallback `vercel.json`).
    - `PUBLIC_SANITY_DATASET` = `production`
    - `PUBLIC_SANITY_API_VERSION` = `2024-01-01`
    - `PUBLIC_SITE_URL` = `https://energize-music.com`
-   - `PUBLIC_FORM_ENDPOINT` (optional)
+   - Brevo form variables (`BREVO_API_KEY`, list IDs, sender, `CONTACT_TO_EMAIL`): see `docs/FORMS.md`
+   - Optional SEO / ads IDs (`PUBLIC_GA4_ID`, `PUBLIC_GOOGLE_SITE_VERIFICATION`, ...): see `docs/FORMS.md`
    Names are case-sensitive. After saving, trigger a **new** deploy (Redeploy).
 5. Sanity Manage → CORS → add your `*.vercel.app` origin
 6. Redeploy and share the preview URL
@@ -112,6 +114,8 @@ If the build log shows `sanity build` / `@energize/studio`, Root Directory is st
 ## Hostinger (production static)
 
 Upload contents of `apps/web/dist/` to `public_html`, or use the FTP secrets above so Actions uploads after each Sanity rebuild.
+
+Hostinger serves static files only, so the `/api` form endpoints must stay on Vercel. Build with `PUBLIC_FORMS_API_BASE` set to the Vercel host and add the Hostinger origin to `FORMS_ALLOWED_ORIGINS` on Vercel (see `docs/FORMS.md`).
 
 ### Manual
 

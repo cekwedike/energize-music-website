@@ -3,30 +3,28 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/ui/PageHero.astro';
 import { contactIntents } from '@energize/shared';
 import { crumbs } from '../lib/seo/schema';
-import { CONTACT_EMAIL } from '../lib/nav';
 
 const intentLabels: Record<(typeof contactIntents)[number], string> = {
-  'a&r': 'A&R',
-  press: 'Press',
-  partnership: 'Partnership',
-  booking: 'Booking',
-  general: 'General',
+  booking: 'Booking an artiste',
+  press: 'Press and interviews',
+  partnership: 'Partnerships and sponsorship',
+  'a&r': 'Music submission (A&R)',
+  general: 'Something else',
 };
-
-const formEndpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
-const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20with%20Energize%20Music` : '#contact-form';
+// Booking first: it is the most common reason people write in.
+const intentOrder = ['booking', 'press', 'partnership', 'a&r', 'general'] as const satisfies readonly (typeof contactIntents)[number][];
 ---
 
 <BaseLayout
-  title="Contact Energize Music"
-  description="Get in touch with Energize Music for bookings, press, artist submissions, or general inquiries."
-  keywords={['contact Energize Music', 'booking', 'press', 'A&R']}
+  title="Contact Energize Music | Bookings, Press and Partnerships"
+  description="Contact Energize Music to book an artiste, request an interview, propose a partnership, or submit your music to the Lagos Afro-gospel label."
+  keywords={['contact Energize Music', 'book gospel artiste Nigeria', 'Afro-gospel label contact', 'music submission']}
   breadcrumbs={crumbs({ name: 'Contact', path: '/contact' })}
 >
   <PageHero
     size="slim"
     title="Contact Energize Music"
-    description="Tell us what you're reaching out about and we'll route it to the right team."
+    description="Pick a topic, leave a short message, and it goes straight to the right person on the team. We reply by email."
   />
 
   <section class="mx-auto max-w-2xl px-5 pb-16 pt-10 sm:px-6 sm:pb-24 sm:pt-12">
@@ -34,7 +32,7 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
       id="contact-form"
       class="scroll-reveal space-y-5"
       style="--reveal-delay: 80ms"
-      data-endpoint-configured={formEndpoint ? 'true' : 'false'}
+      novalidate
     >
       <div>
         <label for="name" class="block text-sm font-medium text-fg">Name</label>
@@ -43,6 +41,8 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
           name="name"
           type="text"
           required
+          autocomplete="name"
+          maxlength="200"
           class="mt-1.5 w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
         />
       </div>
@@ -54,18 +54,20 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
           name="email"
           type="email"
           required
+          autocomplete="email"
+          inputmode="email"
           class="mt-1.5 w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
         />
       </div>
 
       <div>
-        <label for="intent" class="block text-sm font-medium text-fg">I'm reaching out about</label>
+        <label for="intent" class="block text-sm font-medium text-fg">What is it about?</label>
         <select
           id="intent"
           name="intent"
           class="mt-1.5 w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
         >
-          {contactIntents.map((intent) => (
+          {intentOrder.map((intent) => (
             <option value={intent}>{intentLabels[intent]}</option>
           ))}
         </select>
@@ -78,57 +80,79 @@ const workWithUsHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=Work%20w
           name="message"
           rows={5}
           required
+          minlength="10"
+          maxlength="5000"
           class="mt-1.5 w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 text-base text-fg focus-visible:border-[var(--color-accent)] sm:py-2.5 sm:text-sm"
         />
       </div>
 
       <!-- Honeypot: hidden from real users, bots that fill it are rejected. -->
-      <div class="hidden" aria-hidden="true">
+      <div class="absolute -left-[10000px] h-px w-px overflow-hidden" aria-hidden="true">
         <label for="company">Company</label>
         <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
       </div>
 
       <button
         type="submit"
-        class="inline-flex min-h-11 items-center rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-on-accent)] transition hover:bg-[var(--color-accent)]/90"
+        id="contact-form-submit"
+        class="inline-flex min-h-11 items-center rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-on-accent)] transition hover:bg-[var(--color-accent)]/90 disabled:cursor-wait disabled:opacity-70"
       >
         Send message
       </button>
 
-      <p id="contact-form-status" class="text-sm text-fg" role="status"></p>
-    </form>
+      <p id="contact-form-status" class="text-sm text-fg" role="status" aria-live="polite"></p>
 
-    <p class="mt-10 text-sm text-fg">
-      Want to work with us? <a href={workWithUsHref} class="font-semibold underline underline-offset-4">Email us.</a>
-    </p>
+      <p class="text-xs text-[var(--color-muted)]">
+        We only use your details to reply to you. See our <a href="/privacy" class="underline underline-offset-4">privacy policy</a>.
+      </p>
+    </form>
   </section>
 </BaseLayout>
 
 <script>
-  (function () {
-    const form = document.getElementById('contact-form') as HTMLFormElement | null;
-    const status = document.getElementById('contact-form-status');
-    const intentSelect = document.getElementById('intent') as HTMLSelectElement | null;
+  import { formToObject, submitForm } from '../lib/forms';
 
-    const params = new URLSearchParams(window.location.search);
-    const requestedIntent = params.get('intent');
-    if (requestedIntent && intentSelect) {
-      const match = Array.from(intentSelect.options).find((opt) => opt.value === requestedIntent);
-      if (match) intentSelect.value = requestedIntent;
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const status = document.getElementById('contact-form-status');
+  const submit = document.getElementById('contact-form-submit') as HTMLButtonElement | null;
+  const intentSelect = document.getElementById('intent') as HTMLSelectElement | null;
+
+  const requestedIntent = new URLSearchParams(window.location.search).get('intent');
+  if (requestedIntent && intentSelect) {
+    const match = Array.from(intentSelect.options).find((opt) => opt.value === requestedIntent);
+    if (match) intentSelect.value = requestedIntent;
+  }
+
+  const setStatus = (message: string, isError: boolean) => {
+    if (!status) return;
+    status.textContent = message;
+    status.style.color = isError ? 'var(--color-danger)' : 'var(--color-accent)';
+  };
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const invalid = Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[required], textarea[required]')).find(
+      (field) => !field.checkValidity(),
+    );
+    if (invalid) {
+      const label = form.querySelector(`label[for="${invalid.id}"]`)?.textContent?.trim().toLowerCase() ?? 'this field';
+      setStatus(invalid.id === 'message' ? 'Please add a little more detail to your message.' : `Please check your ${label}.`, true);
+      invalid.focus();
+      return;
     }
 
-    form?.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const company = (form.elements.namedItem('company') as HTMLInputElement | null)?.value;
-      if (company) return;
+    if (submit) {
+      submit.disabled = true;
+      submit.textContent = 'Sending...';
+    }
+    const result = await submitForm('contact', formToObject(form));
+    if (submit) {
+      submit.disabled = false;
+      submit.textContent = 'Send message';
+    }
 
-      if (form.dataset.endpointConfigured !== 'true') {
-        if (status) {
-          status.textContent =
-            'Thanks - the contact form is not wired to a delivery provider yet. Please email us directly in the meantime.';
-        }
-        return;
-      }
-    });
-  })();
+    setStatus(result.message, !result.ok);
+    if (result.ok) form.reset();
+  });
 </script>

@@ -1,5 +1,6 @@
 ---
 import type { EnrichedRelease, ReleaseType } from '@energize/shared';
+import { imageAlt } from '../../lib/seo/site';
 
 interface Props {
   release: EnrichedRelease;
@@ -35,7 +36,7 @@ const listenUrl = release.externalUrl;
           src={coverUrl}
           width="480"
           height="480"
-          alt={release.cover?.alt ?? release.displayTitle}
+          alt={imageAlt(release.cover?.alt, `${release.displayTitle} cover art`)}
           loading="lazy"
           referrerpolicy="no-referrer"
           decoding="async"

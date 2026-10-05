@@ -13,6 +13,6 @@
       "astro/jsx-dev-runtime": ["./node_modules/astro/jsx-runtime.d.ts"]
     }
   },
-  "include": [".astro/types.d.ts", "src/**/*", "tests/**/*"],
+  "include": [".astro/types.d.ts", "src/**/*", "api/**/*", "tests/**/*"],
   "exclude": ["dist"]
 }

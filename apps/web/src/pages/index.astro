@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/home/Hero.astro';
+import HomeBelief from '../components/home/HomeBelief.astro';
 import HomeMusic from '../components/home/HomeMusic.astro';
 import HomeArtists from '../components/home/HomeArtists.astro';
 import HomeInitiatives from '../components/home/HomeInitiatives.astro';
@@ -14,6 +15,7 @@ import {
   type Release,
 } from '@energize/shared';
 import { HERO_VIDEO_POSTER } from '../lib/hero-video';
+import { listNames } from '../lib/seo/site';
 import '../styles/home.css';
 
 let artists: ArtistCard[] = [];
@@ -32,18 +34,22 @@ try {
 const releases = await Promise.all(
   homeReleases.map((release) => enrichRelease(release, { coverSize: 480 })),
 );
+
+const rosterNames = listNames(artists.map((artist) => artist.name));
+const description = rosterNames
+  ? `Energize Music is a Lagos-based Afro-gospel and soul-fusion record label, home to ${rosterNames}. Stream new releases and meet the artistes.`
+  : 'Energize Music is a Lagos-based Afro-gospel and soul-fusion record label. Stream new releases and meet the artistes.';
 ---
 
 <BaseLayout
   title="Energize Music | Afro-Gospel Record Label from Lagos"
-  description="Energize Music is a Lagos-based Afro-gospel and soul-fusion label home to Greatman Takit, TY Bello, and Ellie Scotte. Hear the roster and the story."
+  description={description}
   keywords={[
     'Afro-gospel record label',
     'Nigerian gospel music label',
+    'gospel record label in Lagos',
     'Energize Music',
-    'Greatman Takit',
-    'TY Bello',
-    'Ellie Scotte',
+    ...artists.map((artist) => artist.name),
   ]}
   headerVariant="overlay"
 >
@@ -51,6 +57,7 @@ const releases = await Promise.all(
   <div data-home-page data-hero-ready="false">
     <Hero />
     <div data-home-below class="home-below">
+      <HomeBelief />
       <HomeMusic releases={releases} />
       <HomeArtists artists={artists} />
       <HomeInitiatives />

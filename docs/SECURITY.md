@@ -6,7 +6,7 @@ Never commit `.env` files. Use GitHub Actions secrets for CI:
 
 - `PUBLIC_SANITY_PROJECT_ID`
 - `SANITY_READ_TOKEN` (optional; build currently uses the public Sanity API)
-- `FORM_ENDPOINT` / `PUBLIC_FORM_ENDPOINT`
+- `BREVO_API_KEY` (Vercel env only; used by `apps/web/api/*`, never shipped to the browser)
 - `VERCEL_DEPLOY_HOOK_URL` (optional; Sanity-triggered Vercel rebuild)
 - Hostinger FTP for auto-deploy: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`
 

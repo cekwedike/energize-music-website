@@ -1,4 +1,5 @@
 ---
+import { imageAlt } from '../../lib/seo/site';
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
 import {
@@ -21,7 +22,8 @@ const { event, shareUrl } = Astro.props;
 const coverUrl = getEventCoverUrl(event.cover, 1800, 1200);
 const sharePreviewUrl =
   getEventCoverUrl(event.shareImage, 720, 405) || getEventCoverUrl(event.cover, 720, 405);
-const ctaHref = event.ticketUrl || '/contact?intent=general';
+// No ticket link yet: send people to the email list so they hear when sales open.
+const ctaHref = event.ticketUrl || '/#first-to-know';
 const ctaLabel = event.ctaLabel || 'Get tickets';
 const highlights = event.highlights ?? [];
 const lineup = event.lineup ?? [];
@@ -77,7 +79,7 @@ const shareLinks = [
         coverUrl && (
           <img
             src={coverUrl}
-            alt={event.cover?.alt ?? event.title}
+            alt={imageAlt(event.cover?.alt, `${event.title} poster`)}
             class="media-frame event-detail__photo"
             width="1800"
             height="1200"
@@ -108,7 +110,7 @@ const shareLinks = [
           )
         }
         <div class="event-detail__share-meta">
-          <p class="event-detail__share-label">Share this night</p>
+          <p class="event-detail__share-label">Share this event</p>
           <p class="event-detail__share-title">{event.title}</p>
           {
             event.summary ? (
@@ -300,8 +302,8 @@ const shareLinks = [
 
   <section class="event-detail__footer-cta" aria-labelledby="event-footer-cta-title">
     <div class="event-detail__footer-inner">
-      <p class="event-detail__footer-eyebrow">Stay in the signal</p>
-      <h2 id="event-footer-cta-title" class="font-display">Ready for the stage?</h2>
+      <p class="event-detail__footer-eyebrow">{event.ticketUrl ? 'See you there' : "Don't miss it"}</p>
+      <h2 id="event-footer-cta-title" class="font-display">{event.ticketUrl ? 'Get your tickets' : 'Be first in line for tickets'}</h2>
       <div class="event-detail__actions">
         <a href={ctaHref} class="event-detail__cta event-detail__cta--primary">{ctaLabel}</a>
       </div>

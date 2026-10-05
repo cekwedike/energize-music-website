@@ -1,22 +1,16 @@
 ---
 import LegalPage from '../components/legal/LegalPage.astro';
-import { sanityClient } from '../lib/sanity/client';
-import { privacyFallbackBlocks } from '../lib/legal/fallbackContent';
-import { resolveLegalBlocks } from '../lib/legal/resolveLegalBlocks';
-import { pageBySlugQuery, type Page } from '@energize/shared';
+import { privacyBlocks, PRIVACY_EFFECTIVE_DATE } from '../lib/legal/fallbackContent';
 import { crumbs } from '../lib/seo/schema';
 
-const page = await sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'privacy' });
-const blocks = resolveLegalBlocks(page, privacyFallbackBlocks);
-const title = page?.title?.trim() || 'Privacy Policy';
-const description =
-  'How Energize Music collects, uses, and protects your information on energize-music.com and related services.';
+// Legal wording is versioned in code so every change is reviewable in git history.
 ---
 
 <LegalPage
-  title={title}
-  description={description}
-  blocks={blocks}
+  title="Privacy Policy"
+  description="How Energize Music collects, uses, and protects your information, including email sign-ups, contact messages, and analytics."
+  blocks={privacyBlocks}
+  effectiveDate={PRIVACY_EFFECTIVE_DATE}
   eyebrow="Privacy"
   breadcrumbs={crumbs({ name: 'Privacy Policy', path: '/privacy' })}
 />

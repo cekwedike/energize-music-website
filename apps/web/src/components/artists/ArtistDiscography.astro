@@ -1,5 +1,6 @@
 ---
 import type { EnrichedRelease } from '@energize/shared';
+import { imageAlt } from '../../lib/seo/site';
 import EditorialSectionLink from '../ui/EditorialSectionLink.astro';
 
 interface Props {
@@ -61,7 +62,7 @@ const sorted = [...releases].sort(
                           src={release.coverUrl}
                           width="480"
                           height="480"
-                          alt={release.cover?.alt ?? release.displayTitle}
+                          alt={imageAlt(release.cover?.alt, `${release.displayTitle} cover art`)}
                           loading="lazy"
                           decoding="async"
                           class="discography__cover"

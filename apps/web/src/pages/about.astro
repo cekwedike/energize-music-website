@@ -27,12 +27,12 @@ const pageTitle = aboutPage?.title ?? legacyPage?.title ?? 'About Energize Music
 
 <BaseLayout
   title="About Energize Music | Our Story, Mission, and Team"
-  description="Meet the team behind Energize Music: founder Dr. Foy, a Lagos label built on faith, culture, and music that travels beyond Nigeria."
-  keywords={['Afro-gospel label mission', 'Energize Music team', 'Dr. Foy', 'Lagos']}
+  description="The story, mission, and team behind Energize Music, the Lagos Afro-gospel record label founded by Tochukwu 'Dr. Foy' Macfoy."
+  keywords={['about Energize Music', 'Afro-gospel record label Lagos', 'Energize Music team', 'Dr. Foy', 'Tochukwu Macfoy']}
   breadcrumbs={crumbs({ name: 'About', path: '/about' })}
 >
   <AboutHero title={pageTitle} />
-  <AboutStory aboutPage={aboutPage} legacyPage={legacyPage} />
+  <AboutStory />
   <AboutValues />
   <AboutTeam team={team} aboutPage={aboutPage} />
   <AboutCta />

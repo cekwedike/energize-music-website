@@ -31,7 +31,7 @@ export function lineupDisplayName(
     case 'surprise':
       return 'Surprise Reveal';
     default:
-      return name?.trim() || 'Artist';
+      return name?.trim() || 'Artiste';
   }
 }
 
@@ -72,19 +72,19 @@ export function formatEventStatus(status: EventStatus): string {
 export function formatEventType(eventType?: EventType): string {
   switch (eventType) {
     case 'virtual':
-      return 'Virtual';
+      return 'Online';
     case 'hybrid':
       return 'Hybrid';
     case 'physical':
     default:
-      return 'Physical';
+      return 'In person';
   }
 }
 
 /** Normalize empty / TBA location copy so it never reads like a conflicting status. */
 export function formatEventLocation(location?: string): string {
   const value = location?.trim();
-  if (!value) return 'Venue TBA';
+  if (!value) return 'Venue to be announced';
 
   const normalized = value.toLowerCase();
   if (
@@ -92,9 +92,10 @@ export function formatEventLocation(location?: string): string {
     normalized === 'tbd' ||
     normalized === 'to be announced' ||
     normalized === 'to be decided' ||
-    normalized === 'coming soon'
+    normalized === 'coming soon' ||
+    normalized === 'venue tba'
   ) {
-    return 'Venue TBA';
+    return 'Venue to be announced';
   }
 
   return value;

@@ -123,6 +123,25 @@ function initInitiatives(root: ParentNode) {
   );
 }
 
+function initBelief(root: ParentNode) {
+  const section = root.querySelector<HTMLElement>('[data-home-belief]');
+  const words = section?.querySelectorAll<HTMLElement>('[data-home-word]');
+  if (!section || !words?.length) return;
+
+  gsap.fromTo(
+    words,
+    { autoAlpha: 0, y: 28 },
+    {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.55,
+      stagger: 0.04,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: section, start: 'top 76%', once: true },
+    },
+  );
+}
+
 function initNewsletter(root: ParentNode) {
   const section = root.querySelector<HTMLElement>('[data-home-newsletter]');
   const form = section?.querySelector<HTMLElement>('[data-home-newsletter-form]');
@@ -261,6 +280,7 @@ export async function initHomePage(): Promise<void> {
 
   homeMotionCtx = gsap.context(() => {
     revealBasics(root);
+    initBelief(root);
     initArtistRunway(root, mobile);
     initReleaseStage(root, reduced);
     initInitiatives(root);

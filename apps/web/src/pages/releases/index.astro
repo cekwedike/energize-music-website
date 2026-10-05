@@ -13,10 +13,12 @@ import {
   type ReleasesPage,
 } from '@energize/shared';
 import { crumbs } from '../../lib/seo/schema';
-import { absoluteUrl } from '../../lib/seo/site';
+import { absoluteUrl, listNames } from '../../lib/seo/site';
 
 const rawReleases = await sanityClient.fetch<Release[]>(allReleasesQuery);
 const releases = await enrichReleases(rawReleases);
+const releaseArtists = [...new Set(releases.flatMap((release) => release.artistNames))];
+const byline = listNames(releaseArtists);
 
 const releasesPage = await sanityClient.fetch<ReleasesPage | null>(releasesPageQuery);
 
@@ -45,9 +47,9 @@ const itemList =
 ---
 
 <BaseLayout
-  title="Music Releases | Energize Music"
-  description="Stream the latest Afro-gospel and soul-fusion releases from Energize Music artists, including Greatman Takit, TY Bello, and Ellie Scotte."
-  keywords={['new Afro-gospel music', 'Energize Music releases', 'Greatman Takit', 'TY Bello']}
+  title="New Afro-Gospel Music and Releases | Energize Music"
+  description={`Stream the latest Afro-gospel and soul-fusion singles, EPs, and albums from Energize Music${byline ? `, including ${byline}` : ''}.`}
+  keywords={['new Afro-gospel music', 'new Nigerian gospel songs', 'Energize Music releases', ...releaseArtists]}
   breadcrumbs={crumbs({ name: 'Releases', path: '/releases' })}
 >
   {itemList && <JsonLd data={itemList} />}

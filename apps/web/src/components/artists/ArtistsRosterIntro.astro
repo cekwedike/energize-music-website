@@ -1,18 +1,18 @@
 ---
-/** Subtle three-column intro row above the first roster card. */
+/** Subtle three-column intro row above the first roster card. The first cell is the page H1. */
 ---
 
-<div class="roster-intro" aria-hidden="true">
+<div class="roster-intro">
+  <h1 class="roster-intro__cell">
+    <span>Energize Music artistes</span>
+    <span>Afro-gospel &amp; soul-fusion from Lagos</span>
+  </h1>
   <p class="roster-intro__cell">
-    <span>Afro-gospel &amp; soul-fusion</span>
-    <span>voices on the Energize roster</span>
-  </p>
-  <p class="roster-intro__cell">
-    <span>High-quality, uplifting music</span>
+    <span>Uplifting, family-friendly music</span>
   </p>
   <p class="roster-intro__cell roster-intro__cell--right">
     <span class="roster-intro__marker" aria-hidden="true">•</span>
-    Artist Section
+    The roster
   </p>
 </div>
 
@@ -32,6 +32,7 @@
     gap: 0.2rem;
     margin: 0;
     padding: clamp(1rem, 2.5vh, 1.35rem) clamp(1.25rem, 4vw, 2.5rem);
+    font-family: var(--font-body);
     font-size: 0.625rem;
     font-weight: 600;
     line-height: 1.55;

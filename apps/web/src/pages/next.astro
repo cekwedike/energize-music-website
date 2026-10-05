@@ -35,42 +35,42 @@ const heroImages = [
 ];
 
 const journey = [
-  { number: '01', title: 'Submissions', period: 'May', body: 'Artists across Africa enter with a performance video and artist profile.' },
+  { number: '01', title: 'Submissions', period: 'May', body: 'Singers and rappers across Africa enter with a performance video and an artiste profile.' },
   { number: '02', title: 'Showcase', period: 'June', body: 'Top 50 are revealed. Public voting narrows the field to 20.' },
   { number: '03', title: 'Finalists', period: 'July', body: 'Community votes crown the final 10 for the album.' },
   { number: '04', title: 'Album', period: 'Jul-Aug', body: 'Finalists record the ENERGIZE Afrogospel Album.' },
-  { number: '05', title: 'Block Parties', period: 'Sep', body: 'Community nights across participating nations.' },
-  { number: '06', title: 'Launch Concert', period: 'Oct', body: 'Pan-African concert launches the album and the artists.' },
+  { number: '05', title: 'Block Parties', period: 'Sep', body: 'Community nights across the participating countries.' },
+  { number: '06', title: 'Launch Concert', period: 'Oct', body: 'A pan-African concert launches the album and the finalists.' },
 ];
 
 const steps = [
-  { num: '01', title: 'Create your artist profile' },
+  { num: '01', title: 'Create your artiste profile' },
   { num: '02', title: 'Drop your performance video link' },
-  { num: '03', title: 'Add your artist details' },
+  { num: '03', title: 'Add your artiste details' },
   { num: '04', title: 'Submit and wait for results' },
 ];
 
 const faqs = [
   {
     q: 'Who can enter?',
-    a: 'NEXT is open to Afrogospel singers and rappers across Africa. You do not need to be based in Nigeria.',
+    a: 'NEXT is open to Afro-gospel singers and rappers across Africa. You do not need to live in Nigeria.',
   },
   {
     q: 'Do I need an original song?',
-    a: 'No. A video of you performing a rendition works. Originals are welcome, but not required.',
+    a: 'No. A video of you performing a cover works. Original songs are welcome, but not required.',
   },
   {
     q: 'How do I submit?',
     a: submissionsOpen
-      ? 'Use the Submit button on this page. Fill in your artist details and drop your links.'
+      ? 'Use the Submit button on this page. Fill in your artiste details and add your links.'
       : 'Submissions for this season are closed. Follow Energize Music for the next open window.',
   },
   {
     q: 'How does voting work?',
-    a: 'We select the top 50. Public voting then narrows to 20, then to the final 10. Anyone can vote, including the diaspora.',
+    a: 'We select the top 50. Public voting then narrows the field to 20, and then to the final 10. Anyone can vote, including Africans in the diaspora.',
   },
   {
-    q: 'What do top 10 artists get?',
+    q: 'What do the top 10 artistes get?',
     a: 'A place on the ENERGIZE Afrogospel Album and a performance at the pan-African launch concert.',
   },
 ];
@@ -79,10 +79,10 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
 ---
 
 <BaseLayout
-  title="NEXT: Afrogospel Talent Competition | Energize Music"
-  description="NEXT is Energize Music's pan-African Afrogospel competition. Ten finalists win a spot on an album and a stage at the launch concert."
+  title="NEXT Afro-Gospel Talent Competition | Energize Music"
+  description="NEXT is Energize Music's pan-African Afro-gospel talent competition. Ten finalists earn a place on a label album and the launch concert stage."
   ogImage="/next/takit.webp"
-  keywords={['Afrogospel talent competition', 'Christian music competition Africa', 'NEXT Energize Music']}
+  keywords={['Afro-gospel talent competition', 'gospel singing competition Nigeria', 'Christian music competition Africa', 'NEXT Energize Music']}
   breadcrumbs={crumbs({ name: 'NEXT', path: '/next' })}
   headerVariant="overlay"
 >
@@ -114,7 +114,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
       </h1>
 
       <p class="next-reveal next-hero__lead" style="--reveal-delay: 260ms">
-        Ten finalists earn a place on the ENERGIZE Afrogospel Album and a set at the pan-African launch concert. Season path runs from submissions in May through the October launch.
+        Ten finalists earn a place on the ENERGIZE Afrogospel Album and a set at the pan-African launch concert. Each season runs from submissions in May to the album launch in October.
       </p>
 
       {
@@ -184,7 +184,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
           <div class="next-scroll-reveal relative min-h-[240px] overflow-hidden rounded-2xl sm:min-h-full">
             <img
               src="/next/korale.jpg"
-              alt="Afrogospel artist performing on stage"
+              alt="Afro-gospel artiste performing on stage at NEXT"
               loading="lazy"
               class="absolute inset-0 h-full w-full object-cover object-top"
             />
@@ -241,7 +241,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
       </div>
       <p class="mt-4 text-sm text-fg">by Energize Music</p>
       <p class="mx-auto mt-4 max-w-md text-sm leading-relaxed text-fg">
-        Entrants also join the Kingdom Creatives Academy ecosystem for long-term growth beyond the season.
+        Every entrant also joins the Kingdom Creatives Academy network, with support that lasts beyond the season.
       </p>
       {
         submissionsOpen ? (

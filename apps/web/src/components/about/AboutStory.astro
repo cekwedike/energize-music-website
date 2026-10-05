@@ -1,27 +1,14 @@
 ---
-import PortableText from '../portable/PortableText.astro';
-import type { AboutPage, Page } from '@energize/shared';
-
-interface Props {
-  aboutPage: AboutPage | null;
-  legacyPage: Page | null;
-}
-
-const { aboutPage, legacyPage } = Astro.props;
-
-// Only the opening paragraph from Sanity is shown, so the page stays short.
-const introBlocks = aboutPage?.intro?.length ? aboutPage.intro : legacyPage?.blocks ?? [];
-const firstParagraph = introBlocks.find(
-  (block) => block._type === 'block' && (!('style' in block) || block.style === 'normal'),
-);
+const story =
+  'Energize Music is an Afro-gospel and soul-fusion record label based in Lagos, Nigeria, and part of Same Energy Global. We make high-quality, uplifting music for the whole family, built on the belief that music can connect people and reach audiences everywhere.';
 
 const quote =
-  'Music can carry hope without losing its edge. From Lagos, we create Afro-gospel and soul-fusion sound that is uplifting, family-friendly, and made to travel.';
+  'Through releases, live shows, NEXT, and Energize Kids, our work rests on one conviction: music can inspire positive change.';
 
 const howWeWork = [
-  { title: 'Sign', body: 'We find and develop artists who blend African rhythm with gospel truth.' },
-  { title: 'Release', body: 'We ship high-quality, family-friendly music made to travel beyond Nigeria.' },
-  { title: 'Build', body: 'From Lagos, we run NEXT, Energize Kids, and Energize Fest.' },
+  { title: 'Sign', body: 'We find and develop artistes who blend African rhythm with gospel truth.' },
+  { title: 'Release', body: 'We put out high-quality, family-friendly music made to travel beyond Nigeria.' },
+  { title: 'Build', body: 'We grow the scene through NEXT, Energize Kids, and Energize Fest.' },
 ];
 ---
 
@@ -30,15 +17,7 @@ const howWeWork = [
     <div class="scroll-reveal">
       <p class="text-xs font-semibold uppercase tracking-[0.35em] text-[var(--color-accent)]">Our story</p>
       <div class="about-story-copy mt-5 text-lead text-fg">
-        {
-          firstParagraph ? (
-            <PortableText value={[firstParagraph]} />
-          ) : (
-            <p>
-              Energize Music is an Afro-gospel and soul-fusion record label in Lagos, Nigeria, part of Same Energy Global. We make high-quality, family-friendly, uplifting music.
-            </p>
-          )
-        }
+        <p>{story}</p>
       </div>
       <blockquote class="about-story-quote mt-10">
         <p>{quote}</p>

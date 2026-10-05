@@ -39,5 +39,7 @@ jobs:
           PUBLIC_SANITY_DATASET: production
           PUBLIC_SANITY_API_VERSION: '2024-01-01'
           PUBLIC_SITE_URL: https://energize-music.com
-          PUBLIC_FORM_ENDPOINT: ${{ secrets.FORM_ENDPOINT }}
+          PUBLIC_FORMS_API_BASE: ${{ secrets.PUBLIC_FORMS_API_BASE }}
+          PUBLIC_GA4_ID: ${{ secrets.PUBLIC_GA4_ID }}
+          PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ secrets.PUBLIC_GOOGLE_SITE_VERIFICATION }}
           SANITY_READ_TOKEN: ${{ secrets.SANITY_READ_TOKEN }}

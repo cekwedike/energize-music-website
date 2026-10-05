@@ -1,5 +1,6 @@
 ---
 import type { EnrichedRelease, ReleaseType } from '@energize/shared';
+import { imageAlt } from '../../lib/seo/site';
 
 interface Props {
   releases: EnrichedRelease[];
@@ -46,7 +47,7 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
       releases.map((release, index) => {
         const releaseTypeLabel = typeLabel[release.type];
         const coverUrl = release.coverUrl;
-        const coverAlt = release.cover?.alt ?? release.displayTitle;
+        const coverAlt = imageAlt(release.cover?.alt, `${release.displayTitle} cover art`);
         const artistLine =
           release.artistNames.length > 0 ? release.artistNames.join(', ') : 'Energize Music';
         const releaseYear = new Date(release.releaseDate).getFullYear();

@@ -43,6 +43,12 @@ export function buildOrganizationSchema(): JsonLd {
       '@type': 'Place',
       name: 'Lagos, Nigeria',
     },
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Lagos',
+      addressRegion: 'Lagos',
+      addressCountry: 'NG',
+    },
     founder: {
       '@type': 'Person',
       name: 'Tochukwu "Dr. Foy" Macfoy',
@@ -53,12 +59,12 @@ export function buildOrganizationSchema(): JsonLd {
       name: 'Same Energy Global',
     },
     areaServed: 'Worldwide',
-    knowsAbout: [...SITE_GENRES, 'Record label', 'Artist development', 'Live events'],
+    knowsAbout: [...SITE_GENRES, 'Record label', 'Artiste development', 'Gospel music', 'Live events'],
     sameAs: getOrganizationSameAs(),
     contactPoint: [
       {
         '@type': 'ContactPoint',
-        contactType: 'customer support',
+        contactType: 'bookings and press',
         url: absoluteUrl('/contact'),
         availableLanguage: ['English'],
       },
