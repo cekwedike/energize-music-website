@@ -1,132 +1,209 @@
 ---
 import type { EnrichedRelease } from '@energize/shared';
-import { releaseYear, spotifyEmbedUrl } from '../../lib/releases/spotify';
-import HomeReleases from './HomeReleases.astro';
+import ArtistStreamingLinks from '../artists/ArtistStreamingLinks.astro';
+import { releaseYear } from '../../lib/releases/spotify';
+import { imageAlt } from '../../lib/seo/site';
 
 interface Props {
-  /** Featured first, then newest. The first one is the latest-release feature, the rest fill the row. */
+  /** Live spotlights in their Studio order, or just the newest release when none are live. */
   releases: EnrichedRelease[];
+  /** True when the releases come from Studio > Release Spotlights. */
+  isSpotlight: boolean;
 }
 
-const [lead, ...more] = Astro.props.releases;
-
-const spotifyUrl = lead?.links?.spotify;
-const embedUrl = spotifyEmbedUrl(spotifyUrl);
-const year = releaseYear(lead?.releaseDate);
+const { isSpotlight } = Astro.props;
+const releases: EnrichedRelease[] = Astro.props.releases;
+const isCarousel = releases.length > 1;
+const typeLabel: Record<EnrichedRelease['type'], string> = { single: 'Single', ep: 'EP', album: 'Album', compilation: 'Compilation' };
+const carouselAttrs = isCarousel
+  ? { 'data-carousel': '', role: 'region', 'aria-roledescription': 'carousel', 'aria-label': 'Spotlight releases' }
+  : {};
 ---
 
 {
-  lead && (
+  releases.length > 0 && (
     <section class="home-releases" id="music" data-home-releases aria-labelledby="home-music-title">
       <div class="home-releases__inner">
         <div class="home-releases__head">
           <div data-home-reveal>
-            <p class="home-kicker">Latest release</p>
-            <h2 id="home-music-title" class="home-title">Fresh From<br />the Energize Corner</h2>
+            <p class="home-kicker">{isSpotlight ? 'In the Spotlight' : 'Latest Release'}</p>
+            <h2 id="home-music-title" class="home-title">
+              Fresh From
+              <br />
+              the Energize Corner
+            </h2>
           </div>
           <a href="/releases" class="home-link" data-home-reveal data-home-reveal-delay="70">
             <span class="home-link__line" aria-hidden="true"></span>
-            All releases
+            All Releases
           </a>
         </div>
 
-        <div class="home-releases__stage">
-          <a href={`/releases/${lead.slug}`} class="home-releases__cover" data-home-release-cover>
-            {lead.coverUrl ? (
-              <img
-                src={lead.coverUrl}
-                alt={`${lead.displayTitle || lead.title} cover art`}
-                width="480"
-                height="480"
-                loading="lazy"
-                decoding="async"
-                fetchpriority="low"
-                referrerpolicy="no-referrer"
-                sizes="(max-width: 768px) 80vw, 520px"
-              />
-            ) : (
-              <div class="home-releases__cover-fallback" aria-hidden="true"></div>
-            )}
-          </a>
-
-          <div class="home-releases__copy" data-home-release-copy>
-            <p class="home-releases__type">
-              {lead.type}
-              {year && (
-                <>
-                  <span aria-hidden="true"> / </span>
-                  <time datetime={lead.releaseDate}>{year}</time>
-                </>
-              )}
-            </p>
-            <h3 class="home-releases__name">
-              <a href={`/releases/${lead.slug}`}>{lead.displayTitle || lead.title}</a>
-            </h3>
-            {lead.artistNames.length > 0 && (
-              <p class="home-releases__artists">{lead.artistNames.join(' · ')}</p>
-            )}
-
-            {embedUrl && spotifyUrl && (
-              <div class="home-releases__player" data-spotify-slot data-lenis-prevent>
+        <div class="home-releases__slides" {...carouselAttrs}>
+          {releases.map((release, index) => {
+            const title = release.displayTitle || release.title;
+            const year = releaseYear(release.releaseDate);
+            const streaming = {
+              spotify: release.links?.spotify,
+              appleMusic: release.links?.appleMusic,
+              youtube: release.links?.youtube,
+            };
+            const hasStreaming = Boolean(streaming.spotify || streaming.appleMusic || streaming.youtube);
+            const slideAttrs = isCarousel
+              ? {
+                  role: 'group',
+                  'aria-roledescription': 'slide',
+                  'aria-label': `${index + 1} of ${releases.length}: ${title}`,
+                  ...(index > 0 ? { inert: true } : {}),
+                }
+              : {};
+            return (
+              <div class:list={['home-releases__stage', index === 0 && 'is-active']} data-slide {...slideAttrs}>
                 <a
-                  href={spotifyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="home-releases__player-load"
-                  data-spotify-embed={embedUrl}
-                  data-spotify-title={`${lead.displayTitle || lead.title} on Spotify`}
+                  href={`/releases/${release.slug}`}
+                  class="home-releases__cover"
+                  tabindex="-1"
+                  aria-hidden="true"
+                  {...(index === 0 ? { 'data-home-release-cover': '' } : {})}
                 >
-                  <span class="home-releases__player-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                  </span>
-                  <span>
-                    <span class="home-releases__player-label">Play on this page</span>
-                    <span class="home-releases__player-hint">Tap to load the Spotify player</span>
-                  </span>
+                  {release.coverUrl ? (
+                    <img
+                      src={release.coverUrl}
+                      alt={imageAlt(release.cover?.alt, `${title} cover art`)}
+                      width="640"
+                      height="640"
+                      loading="lazy"
+                      decoding="async"
+                      referrerpolicy="no-referrer"
+                      sizes="(max-width: 768px) 80vw, 520px"
+                    />
+                  ) : (
+                    <div class="home-releases__cover-fallback" />
+                  )}
                 </a>
-              </div>
-            )}
 
-            {!embedUrl && lead.externalUrl && (
-              <div class="home-releases__actions">
-                <a
-                  href={lead.externalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="home-btn home-btn--solid"
-                >
-                  Listen Now
-                </a>
+                <div class="home-releases__copy" {...(index === 0 ? { 'data-home-release-copy': '' } : {})}>
+                  <p class="home-releases__type">
+                    {typeLabel[release.type]}
+                    {year && (
+                      <>
+                        <span aria-hidden="true"> / </span>
+                        <time datetime={release.releaseDate}>{year}</time>
+                      </>
+                    )}
+                  </p>
+                  <h3 class="home-releases__name">
+                    <a href={`/releases/${release.slug}`}>{title}</a>
+                  </h3>
+                  {release.artistNames.length > 0 && (
+                    <p class="home-releases__artists">{release.artistNames.join(' · ')}</p>
+                  )}
+                  <div class="home-releases__actions">
+                    {hasStreaming ? (
+                      <ArtistStreamingLinks streaming={streaming} artistName={title} layout="stack" />
+                    ) : (
+                      release.externalUrl && (
+                        <a href={release.externalUrl} target="_blank" rel="noopener noreferrer" class="home-btn home-btn--solid">
+                          Listen Now
+                        </a>
+                      )
+                    )}
+                    <a href={`/releases/${release.slug}`} class="home-releases__view">
+                      View Release
+                    </a>
+                  </div>
+                </div>
               </div>
-            )}
+            );
+          })}
+        </div>
+
+        {isCarousel && (
+          <div class="home-releases__controls" data-carousel-controls>
+            <button type="button" class="home-releases__arrow" data-carousel-prev aria-label="Previous spotlight">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+            <div class="home-releases__dots">
+              {releases.map((release, index) => (
+                <button
+                  type="button"
+                  class="home-releases__dot"
+                  data-carousel-dot={index}
+                  aria-label={`Show ${release.displayTitle || release.title}`}
+                  aria-current={index === 0 ? 'true' : 'false'}
+                />
+              ))}
+            </div>
+            <button type="button" class="home-releases__arrow" data-carousel-next aria-label="Next spotlight">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
           </div>
-        </div>
+        )}
       </div>
-
-      <HomeReleases releases={more} />
     </section>
   )
 }
 
 <script>
-  // The Spotify iframe is heavy, so it only loads after the visitor asks for it.
-  document.querySelectorAll<HTMLAnchorElement>('[data-spotify-embed]').forEach((trigger) => {
-    trigger.addEventListener('click', (event) => {
-      const src = trigger.dataset.spotifyEmbed;
-      const slot = trigger.closest('[data-spotify-slot]');
-      if (!src || !slot) return;
-      event.preventDefault();
-      const iframe = document.createElement('iframe');
-      iframe.src = src;
-      iframe.title = trigger.dataset.spotifyTitle ?? 'Spotify player';
-      iframe.width = '100%';
-      iframe.height = '152';
-      iframe.loading = 'lazy';
-      iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-      iframe.className = 'home-releases__player-frame';
-      slot.replaceChildren(iframe);
-    });
-  });
+  // Spotlight carousel: only rendered when more than one spotlight is live.
+  const track = document.querySelector<HTMLElement>('[data-home-releases] [data-carousel]');
+  const controls = document.querySelector<HTMLElement>('[data-carousel-controls]');
+
+  if (track && controls) {
+    const slides = Array.from(track.querySelectorAll<HTMLElement>('[data-slide]'));
+    const dots = Array.from(controls.querySelectorAll<HTMLButtonElement>('[data-carousel-dot]'));
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const INTERVAL_MS = 7000;
+    let current = 0;
+    let timer = 0;
+    let paused = false;
+
+    const show = (next: number) => {
+      current = (next + slides.length) % slides.length;
+      slides.forEach((slide, i) => {
+        const active = i === current;
+        slide.classList.toggle('is-active', active);
+        slide.toggleAttribute('inert', !active);
+      });
+      dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === current)));
+    };
+
+    const schedule = () => {
+      window.clearTimeout(timer);
+      if (reduced || paused || document.hidden) return;
+      timer = window.setTimeout(() => {
+        show(current + 1);
+        schedule();
+      }, INTERVAL_MS);
+    };
+
+    const go = (next: number) => {
+      show(next);
+      schedule();
+    };
+
+    controls.querySelector('[data-carousel-prev]')?.addEventListener('click', () => go(current - 1));
+    controls.querySelector('[data-carousel-next]')?.addEventListener('click', () => go(current + 1));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => go(i)));
+
+    // Pause while the visitor is reading or using it, and in background tabs.
+    const section = track.closest<HTMLElement>('[data-home-releases]');
+    const pause = (value: boolean) => {
+      paused = value;
+      schedule();
+    };
+    section?.addEventListener('pointerenter', () => pause(true));
+    section?.addEventListener('pointerleave', () => pause(false));
+    section?.addEventListener('focusin', () => pause(true));
+    section?.addEventListener('focusout', () => pause(false));
+    document.addEventListener('visibilitychange', schedule);
+
+    schedule();
+  }
 </script>
 
 <style>
@@ -168,10 +245,16 @@ const year = releaseYear(lead?.releaseDate);
     }
   }
 
+  /* Slides share one grid cell, so several spotlights cross-fade without the layout jumping. */
+  .home-releases__slides {
+    display: grid;
+    margin-top: 2.5rem;
+  }
+
   .home-releases__stage {
+    grid-area: 1 / 1;
     display: grid;
     gap: 2rem;
-    margin-top: 2.5rem;
     align-items: center;
   }
 
@@ -182,10 +265,22 @@ const year = releaseYear(lead?.releaseDate);
     }
   }
 
+  .home-releases__slides[data-carousel] > .home-releases__stage {
+    transition:
+      opacity 0.6s ease,
+      visibility 0.6s ease;
+  }
+
+  .home-releases__slides[data-carousel] > .home-releases__stage:not(.is-active) {
+    opacity: 0;
+    visibility: hidden;
+  }
+
   .home-releases__cover {
     position: relative;
     display: block;
     aspect-ratio: 1;
+    width: 100%;
     max-width: 34rem;
     margin-inline: auto;
     overflow: hidden;
@@ -239,73 +334,89 @@ const year = releaseYear(lead?.releaseDate);
     color: var(--color-fg);
   }
 
-  .home-releases__player {
-    margin-top: 1.75rem;
-    max-width: 30rem;
-  }
-
-  .home-releases__player-load {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    min-height: 4.5rem;
-    padding: 0.85rem 1.1rem;
-    border: 1px solid var(--color-line);
-    background: var(--color-surface);
-    color: var(--color-fg);
-    text-decoration: none;
-    transition:
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
-  }
-
-  .home-releases__player-load:hover,
-  .home-releases__player-load:focus-visible {
-    border-color: var(--color-accent);
-    box-shadow: 0 10px 30px color-mix(in srgb, var(--color-accent) 10%, transparent);
-  }
-
-  .home-releases__player-icon {
-    display: inline-flex;
-    flex-shrink: 0;
-    width: 2.75rem;
-    height: 2.75rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--color-accent);
-    color: var(--color-on-accent);
-  }
-
-  .home-releases__player-icon svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    margin-left: 2px;
-  }
-
-  .home-releases__player-label {
-    display: block;
-    font-weight: 600;
-    font-size: 0.95rem;
-  }
-
-  .home-releases__player-hint {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--color-muted);
-  }
-
-  .home-releases__player :global(.home-releases__player-frame) {
-    display: block;
-    border: 0;
-    border-radius: 12px;
-  }
-
   .home-releases__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    align-items: center;
+    gap: 1rem 1.5rem;
     margin-top: 1.85rem;
   }
 
+  .home-releases__view {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-fg);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.4em;
+  }
+
+  .home-releases__view:hover {
+    color: var(--color-accent);
+  }
+
+  .home-releases__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2.25rem;
+  }
+
+  .home-releases__arrow {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-fg);
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .home-releases__arrow:hover,
+  .home-releases__arrow:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .home-releases__arrow svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .home-releases__dots {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .home-releases__dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-fg) 22%, transparent);
+    cursor: pointer;
+    transition:
+      width 0.3s ease,
+      background-color 0.3s ease;
+  }
+
+  .home-releases__dot[aria-current='true'] {
+    width: 1.75rem;
+    background: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-releases__slides[data-carousel] > .home-releases__stage {
+      transition: none;
+    }
+  }
 </style>

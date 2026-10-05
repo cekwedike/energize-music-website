@@ -21,7 +21,6 @@ export interface Release {
   artists: Artist[];
   links?: ReleaseLinks;
   sourceUrl?: string;
-  featured?: boolean;
 }
 
 /** Release enriched with build-time link metadata for the frontend. */

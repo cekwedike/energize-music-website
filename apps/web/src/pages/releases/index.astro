@@ -14,6 +14,7 @@ import {
 } from '@energize/shared';
 import { crumbs } from '../../lib/seo/schema';
 import { absoluteUrl, listNames } from '../../lib/seo/site';
+import { activeSpotlights } from '../../lib/releases/spotlights';
 
 const rawReleases = await sanityClient.fetch<Release[]>(allReleasesQuery);
 const releases = await enrichReleases(rawReleases);
@@ -22,13 +23,9 @@ const byline = listNames(releaseArtists);
 
 const releasesPage = await sanityClient.fetch<ReleasesPage | null>(releasesPageQuery);
 
-const configuredSpotlights = releasesPage?.releaseSpotlights?.filter(Boolean) ?? [];
-const spotlightReleases =
-  configuredSpotlights.length > 0
-    ? await Promise.all(
-        configuredSpotlights.map((release: Release) => enrichRelease(release, { coverSize: 800 })),
-      )
-    : [];
+const spotlightReleases = await Promise.all(
+  activeSpotlights(releasesPage).map((release: Release) => enrichRelease(release, { coverSize: 800 })),
+);
 
 const itemList =
   releases.length > 0

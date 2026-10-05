@@ -34,18 +34,16 @@ export const structure: StructureResolver = (S) =>
             .defaultOrdering([{ field: 'releaseDate', direction: 'desc' }]),
         ),
       S.listItem()
-        .title('Spotlight A Release')
+        .title('Release Spotlights')
         .icon(StarIcon)
-        .child(
-          S.document().schemaType('releasesPage').documentId('releasesPage').title('Spotlight A Release'),
-        ),
+        .child(S.document().schemaType('releasesPage').documentId('releasesPage').title('Release Spotlights')),
       S.divider(),
       S.listItem()
         .title('Energize Fest')
         .icon(CalendarIcon)
         .child(
           S.documentTypeList('event')
-            .title('Events')
+            .title('Energize Fest Editions')
             .defaultOrdering([{ field: 'startDate', direction: 'desc' }]),
         ),
       S.listItem()

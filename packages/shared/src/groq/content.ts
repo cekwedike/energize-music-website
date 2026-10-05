@@ -15,5 +15,10 @@ export const allTeamMembersQuery = /* groq */ `*[_type == "teamMember" && define
 
 export const releasesPageQuery = /* groq */ `*[_id == "releasesPage"][0]{
   _id,
+  "spotlights": spotlights[]{
+    startsOn,
+    endsOn,
+    "release": release->${releaseCardFragment}
+  },
   "releaseSpotlights": releaseSpotlights[]->${releaseCardFragment}
 }`;

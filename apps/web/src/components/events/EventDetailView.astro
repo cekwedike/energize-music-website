@@ -1,7 +1,10 @@
 ---
 /**
- * Event page template. Every section is driven by the Sanity "event" document
- * and hides itself when its field is empty.
+ * Energize Fest page template, fed by Sanity "event" documents (one per edition).
+ * - The next upcoming edition fills the hero and the detail sections.
+ * - With no upcoming edition, default Energize Fest content shows instead.
+ * - Editions whose date has passed are listed under Past Events.
+ * Empty fields hide their sections.
  */
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
@@ -14,7 +17,6 @@ import {
   formatEventDateLong,
   formatEventLocation,
   formatEventType,
-  isPastEvent,
   lineupBadgeLabel,
   lineupDisplayName,
 } from '../../lib/events/format';
@@ -22,27 +24,45 @@ import { imageAlt } from '../../lib/seo/site';
 import { titleCase } from '../../lib/text/titleCase';
 
 interface Props {
-  event: EventDetail;
+  /** Next upcoming edition, or null to show the default Fest content. */
+  event: EventDetail | null;
+  /** Editions already held, newest first. */
+  pastEvents: EventDetail[];
   shareUrl: string;
 }
 
-const { event, shareUrl } = Astro.props;
+const { event, pastEvents, shareUrl } = Astro.props;
 
-const coverUrl = getEventCoverUrl(event.cover, 2400, 1500);
-const isPast = isPastEvent(event.startDate, event.endDate);
-const hasTickets = Boolean(event.ticketUrl) && !isPast;
+/** Shown while no upcoming edition is published in Sanity. */
+const DEFAULT_FEST = {
+  title: 'Energize Fest',
+  subtitle: 'The Annual Energize Music Live Showcase',
+  cover: '/initiatives/energize-fest.webp',
+  about:
+    'Energize Fest is the annual live showcase from Energize Music: one night that brings our artistes and special guests together on one stage for fans, families, and church communities.',
+  next: 'Dates, venue, and ticket links for the next edition will be posted here as soon as they are confirmed.',
+};
+
+const title = event?.title ?? DEFAULT_FEST.title;
+const subtitle = event ? event.subtitle : DEFAULT_FEST.subtitle;
+const coverUrl = event ? getEventCoverUrl(event.cover, 2400, 1500) : DEFAULT_FEST.cover;
+const ticketUrl = event?.ticketUrl;
 // No ticket link yet: the main button opens the email sign-up so people hear when sales open.
-const primaryLabel = hasTickets ? event.ctaLabel || 'Get Tickets' : 'Get Ticket Alerts';
+const primaryLabel = ticketUrl ? event?.ctaLabel || 'Get Tickets' : 'Get Ticket Alerts';
 const alertsTitle = 'Get Ticket Alerts';
-const alertsLead = `Be the first to know when ${event.title} tickets go on sale and the lineup is announced.`;
-const secondaryHref = event.secondaryCtaUrl || '/contact?intent=partnership';
-const secondaryLabel = event.secondaryCtaLabel || 'Partner With Us';
+const alertsLead = event
+  ? `Be the first to know when ${event.title} tickets go on sale and the lineup is announced.`
+  : 'Be the first to know when the next Energize Fest date, venue, and tickets are announced.';
+const secondaryHref = event?.secondaryCtaUrl || '/contact?intent=partnership';
+const secondaryLabel = event?.secondaryCtaLabel || 'Partner With Us';
 
-const venue = formatEventLocation(event.location);
-const highlights = (event.highlights ?? []).filter((item) => item?.title && item?.body);
-const lineup = (event.lineup ?? []).filter(Boolean);
-const hasBody = Boolean(event.body?.length);
-const marqueeItems = [event.title, formatEventDate(event.startDate), venue, formatEventType(event.eventType)];
+const venue = formatEventLocation(event?.location);
+const highlights = (event?.highlights ?? []).filter((item) => item?.title && item?.body);
+const lineup = (event?.lineup ?? []).filter(Boolean);
+const body = event?.body?.length ? event.body : null;
+const marqueeItems = event
+  ? [event.title, formatEventDate(event.startDate), venue, formatEventType(event.eventType)]
+  : ['Energize Fest', 'Annual Live Showcase', 'Next Edition Coming Soon', 'Afro-Gospel Live'];
 
 const lineupCards = lineup.map((slot) => {
   const revealed = !slot.revealState || slot.revealState === 'confirmed';
@@ -54,7 +74,20 @@ const lineupCards = lineup.map((slot) => {
     badge: lineupBadgeLabel(slot.revealState),
     href: revealed && slot.artistSlug ? `/artists/${slot.artistSlug}` : undefined,
     photoUrl: getEventCoverUrl(photo, 720, 900),
-    photoAlt: imageAlt(photo?.alt, `${name} at ${event.title}`),
+    photoAlt: imageAlt(photo?.alt, `${name} at ${title}`),
+  };
+});
+
+const pastCards = pastEvents.map((past) => {
+  const year = new Date(past.startDate).getUTCFullYear();
+  return {
+    title: `${past.title} ${year}`,
+    year,
+    date: formatEventDateLong(past.startDate),
+    venue: formatEventLocation(past.location),
+    summary: past.summary,
+    coverUrl: getEventCoverUrl(past.cover, 960, 640),
+    coverAlt: imageAlt(past.cover?.alt, `${past.title} ${year}`),
   };
 });
 ---
@@ -63,15 +96,7 @@ const lineupCards = lineup.map((slot) => {
   <header class="fest-hero theme-dark">
     {
       coverUrl ? (
-        <img
-          src={coverUrl}
-          alt=""
-          class="fest-hero__bg"
-          width="2400"
-          height="1500"
-          fetchpriority="high"
-          decoding="async"
-        />
+        <img src={coverUrl} alt="" class="fest-hero__bg" width="2400" height="1500" fetchpriority="high" decoding="async" />
       ) : (
         <div class="fest-hero__bg fest-hero__bg--empty" />
       )
@@ -84,47 +109,47 @@ const lineupCards = lineup.map((slot) => {
       <div class="fest-hero__grid">
         <div class="fest-reveal">
           <p class="fest-hero__eyebrow">
-            <span class="fest-hero__pill">{isPast ? 'Past Event' : formatEventDate(event.startDate)}</span>
+            <span class="fest-hero__pill">{event ? formatEventDate(event.startDate) : 'Next Edition Coming Soon'}</span>
             Energize Music Presents
           </p>
-          <h1 class="fest-hero__title">{event.title}</h1>
-          {event.subtitle && <p class="fest-hero__subtitle">{titleCase(event.subtitle)}</p>}
-
-          <dl class="fest-hero__facts">
-            <div>
-              <dt>Date</dt>
-              <dd>{formatEventDateLong(event.startDate)}</dd>
-            </div>
-            <div>
-              <dt>Venue</dt>
-              <dd>{venue}</dd>
-            </div>
-            <div>
-              <dt>Format</dt>
-              <dd>{formatEventType(event.eventType)}</dd>
-            </div>
-          </dl>
+          <h1 class="fest-hero__title">{title}</h1>
+          {subtitle && <p class="fest-hero__subtitle">{titleCase(subtitle)}</p>}
 
           {
-            !isPast && (
-              <div class="fest-actions">
-                {hasTickets ? (
-                  <a href={event.ticketUrl} class="fest-btn fest-btn--solid" target="_blank" rel="noopener noreferrer">
-                    {primaryLabel}
-                  </a>
-                ) : (
-                  <button type="button" class="fest-btn fest-btn--solid" data-subscribe-open data-subscribe-title={alertsTitle} data-subscribe-lead={alertsLead}>
-                    {primaryLabel}
-                  </button>
-                )}
-                <a href={secondaryHref} class="fest-btn fest-btn--ghost">{secondaryLabel}</a>
-              </div>
+            event && (
+              <dl class="fest-hero__facts">
+                <div>
+                  <dt>Date</dt>
+                  <dd>{formatEventDateLong(event.startDate)}</dd>
+                </div>
+                <div>
+                  <dt>Venue</dt>
+                  <dd>{venue}</dd>
+                </div>
+                <div>
+                  <dt>Format</dt>
+                  <dd>{formatEventType(event.eventType)}</dd>
+                </div>
+              </dl>
             )
           }
+
+          <div class="fest-actions">
+            {ticketUrl ? (
+              <a href={ticketUrl} class="fest-btn fest-btn--solid" target="_blank" rel="noopener noreferrer">
+                {primaryLabel}
+              </a>
+            ) : (
+              <button type="button" class="fest-btn fest-btn--solid" data-subscribe-open data-subscribe-title={alertsTitle} data-subscribe-lead={alertsLead}>
+                {primaryLabel}
+              </button>
+            )}
+            <a href={secondaryHref} class="fest-btn fest-btn--ghost">{secondaryLabel}</a>
+          </div>
         </div>
 
         {
-          !isPast && (
+          event && (
             <div class="fest-countdown fest-reveal" data-countdown={event.startDate} aria-label="Countdown to the event">
               <p class="fest-countdown__label">Countdown</p>
               <div class="fest-countdown__grid">
@@ -171,7 +196,7 @@ const lineupCards = lineup.map((slot) => {
   }
 
   {
-    (lineupCards.length > 0 || !isPast) && (
+    event && (
       <section class="fest-section fest-section--surface" aria-labelledby="fest-lineup-title">
         <div class="fest-container">
           <div class="fest-head scroll-reveal">
@@ -209,7 +234,7 @@ const lineupCards = lineup.map((slot) => {
                 class="fest-btn fest-btn--solid"
                 data-subscribe-open
                 data-subscribe-title="Hear the Lineup First"
-                data-subscribe-lead={`Get the ${event.title} lineup in your inbox the moment it is announced.`}
+                data-subscribe-lead={`Get the ${title} lineup in your inbox the moment it is announced.`}
               >
                 Notify Me
               </button>
@@ -220,53 +245,77 @@ const lineupCards = lineup.map((slot) => {
     )
   }
 
+  <section class="fest-section" aria-labelledby="fest-story-title">
+    <div class="fest-container fest-story">
+      <div class="fest-story__aside scroll-reveal">
+        <p class="fest-kicker">The Story</p>
+        <h2 id="fest-story-title" class="fest-h2">{event ? 'About the Night' : 'About Energize Fest'}</h2>
+        <div class="fest-story__share">
+          <EventShare title={title} summary={event?.summary ?? DEFAULT_FEST.about} shareUrl={shareUrl} />
+        </div>
+      </div>
+      <div class="fest-story__body scroll-reveal" style="--reveal-delay: 100ms">
+        {event?.summary && <p class="fest-story__lead">{event.summary}</p>}
+        {body && <PortableText value={body} />}
+        {!event && <p class="fest-story__lead">{DEFAULT_FEST.about}</p>}
+        {!event && <p>{DEFAULT_FEST.next}</p>}
+      </div>
+    </div>
+  </section>
+
   {
-    (hasBody || event.summary) && (
-      <section class="fest-section" aria-labelledby="fest-story-title">
-        <div class="fest-container fest-story">
-          <div class="fest-story__aside scroll-reveal">
-            <p class="fest-kicker">The Story</p>
-            <h2 id="fest-story-title" class="fest-h2">About the Night</h2>
-            <div class="fest-story__share">
-              <EventShare title={event.title} summary={event.summary} shareUrl={shareUrl} />
-            </div>
+    pastCards.length > 0 && (
+      <section class="fest-section fest-section--surface" aria-labelledby="fest-past-title">
+        <div class="fest-container">
+          <div class="fest-head scroll-reveal">
+            <p class="fest-kicker">Archive</p>
+            <h2 id="fest-past-title" class="fest-h2">Past Events</h2>
           </div>
-          <div class="fest-story__body scroll-reveal" style="--reveal-delay: 100ms">
-            {event.summary && <p class="fest-story__lead">{event.summary}</p>}
-            {hasBody && <PortableText value={event.body!} />}
-          </div>
+          <ul class="fest-past scroll-reveal-stagger">
+            {pastCards.map((card) => (
+              <li class="fest-past__card">
+                <span class="fest-past__media media-frame">
+                  {card.coverUrl ? (
+                    <img src={card.coverUrl} alt={card.coverAlt} width="960" height="640" loading="lazy" decoding="async" />
+                  ) : (
+                    <span class="fest-past__year" aria-hidden="true">
+                      {card.year}
+                    </span>
+                  )}
+                </span>
+                <p class="fest-past__date">{card.date}</p>
+                <h3 class="fest-past__title">{card.title}</h3>
+                <p class="fest-past__venue">{card.venue}</p>
+                {card.summary && <p class="fest-past__summary">{card.summary}</p>}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     )
   }
 
-  {
-    !isPast && (
-      <section class="fest-cta theme-dark" aria-labelledby="fest-cta-title">
-        {coverUrl && <img src={coverUrl} alt="" class="fest-cta__bg" width="2400" height="1500" loading="lazy" decoding="async" />}
-        <div class="fest-cta__inner scroll-reveal">
-          <p class="fest-kicker">{hasTickets ? 'See You There' : "Don't Miss It"}</p>
-          <h2 id="fest-cta-title" class="fest-cta__title">{hasTickets ? 'Get Your Tickets' : 'Be First in Line for Tickets'}</h2>
-          <p class="fest-cta__meta">
-            {formatEventDateLong(event.startDate)} · {venue}
-          </p>
-          <div class="fest-actions fest-actions--center">
-            {hasTickets ? (
-              <a href={event.ticketUrl} class="fest-btn fest-btn--solid" target="_blank" rel="noopener noreferrer">
-                {primaryLabel}
-              </a>
-            ) : (
-              <button type="button" class="fest-btn fest-btn--solid" data-subscribe-open data-subscribe-title={alertsTitle} data-subscribe-lead={alertsLead}>
-                {primaryLabel}
-              </button>
-            )}
-          </div>
-        </div>
-      </section>
-    )
-  }
+  <section class="fest-cta theme-dark" aria-labelledby="fest-cta-title">
+    {coverUrl && <img src={coverUrl} alt="" class="fest-cta__bg" width="2400" height="1500" loading="lazy" decoding="async" />}
+    <div class="fest-cta__inner scroll-reveal">
+      <p class="fest-kicker">{ticketUrl ? 'See You There' : "Don't Miss It"}</p>
+      <h2 id="fest-cta-title" class="fest-cta__title">{ticketUrl ? 'Get Your Tickets' : 'Be First in Line for Tickets'}</h2>
+      <p class="fest-cta__meta">{event ? `${formatEventDateLong(event.startDate)} · ${venue}` : 'Next edition to be announced'}</p>
+      <div class="fest-actions fest-actions--center">
+        {ticketUrl ? (
+          <a href={ticketUrl} class="fest-btn fest-btn--solid" target="_blank" rel="noopener noreferrer">
+            {primaryLabel}
+          </a>
+        ) : (
+          <button type="button" class="fest-btn fest-btn--solid" data-subscribe-open data-subscribe-title={alertsTitle} data-subscribe-lead={alertsLead}>
+            {primaryLabel}
+          </button>
+        )}
+      </div>
+    </div>
+  </section>
 
-  {!isPast && <SubscribeDialog />}
+  <SubscribeDialog />
 </article>
 
 <script>
@@ -804,6 +853,69 @@ const lineupCards = lineup.map((slot) => {
     font-size: 1.05rem;
     line-height: 1.75;
     color: var(--color-fg);
+  }
+
+  /* ---------- Past events ---------- */
+  .fest-past {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: 2rem 1.5rem;
+    margin: 3rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fest-past__media {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    background: color-mix(in srgb, var(--color-fg) 6%, transparent);
+  }
+
+  .fest-past__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .fest-past__year {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    color: color-mix(in srgb, var(--color-fg) 30%, transparent);
+  }
+
+  .fest-past__date {
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .fest-past__title {
+    margin-top: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+
+  .fest-past__venue {
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+
+  .fest-past__summary {
+    margin-top: 0.75rem;
+    line-height: 1.6;
+    color: var(--color-fg);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   /* ---------- Closing CTA ---------- */

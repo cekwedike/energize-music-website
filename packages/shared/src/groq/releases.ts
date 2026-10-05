@@ -10,8 +10,7 @@ export const releaseCardFragment = /* groq */ `{
   cover${imageFragment},
   "artists": coalesce(artists[]->${artistCardFragment}, [])[defined(_id)],
   links,
-  sourceUrl,
-  featured
+  sourceUrl
 }`;
 
 export const releaseDetailFragment = /* groq */ `{
@@ -28,10 +27,9 @@ export const releaseDetailFragment = /* groq */ `{
 
 export const allReleasesQuery = /* groq */ `*[_type == "release"] | order(releaseDate desc) ${releaseCardFragment}`;
 
-export const featuredReleasesQuery = /* groq */ `*[_type == "release" && featured == true] | order(releaseDate desc) ${releaseCardFragment}`;
 
-/** Homepage latest release and releases row: featured releases first, then the rest, newest first. */
-export const homeReleasesQuery = /* groq */ `*[_type == "release"] | order(coalesce(featured, false) desc, releaseDate desc) [0...12] ${releaseCardFragment}`;
+/** Newest release. The home page shows it when no spotlight is live. */
+export const latestReleaseQuery = /* groq */ `*[_type == "release"] | order(releaseDate desc) [0] ${releaseCardFragment}`;
 
 export const releaseBySlugQuery = /* groq */ `*[_type == "release" && slug.current == $slug][0] ${releaseDetailFragment}`;
 

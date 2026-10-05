@@ -33,7 +33,16 @@ export interface TeamMember {
   order?: number;
 }
 
+/** One entry in Studio > Release Spotlights. Dates are YYYY-MM-DD and both ends are inclusive. */
+export interface ReleaseSpotlight {
+  release: Release | null;
+  startsOn?: string;
+  endsOn?: string;
+}
+
 export interface ReleasesPage {
   _id: string;
+  spotlights?: ReleaseSpotlight[];
+  /** Legacy list of plain references, read until every spotlight has moved to `spotlights`. */
   releaseSpotlights?: Release[];
 }

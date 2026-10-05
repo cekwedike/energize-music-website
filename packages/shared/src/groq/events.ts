@@ -1,6 +1,7 @@
 import { imageFragment } from './fragments';
 
-export const eventBySlugQuery = /* groq */ `*[_type == "event" && slug.current == $slug][0]{
+/** Every published Energize Fest edition, oldest first. The page splits them into upcoming and past. */
+export const festEventsQuery = /* groq */ `*[_type == "event" && defined(startDate)] | order(startDate asc){
   _id,
   title,
   "slug": slug.current,

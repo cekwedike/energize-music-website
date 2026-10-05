@@ -1,7 +1,6 @@
 ---
 import '../../styles/site-header.css';
 import { headerNav, hqLink } from '../../lib/nav';
-import { getInitiatives } from '../../lib/initiatives';
 import Logo from './Logo.astro';
 
 export type HeaderVariant = 'default' | 'ambient' | 'overlay';
@@ -19,10 +18,7 @@ function isActive(href: string) {
   return href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 }
 
-const initiatives = await getInitiatives();
-const navEntries = headerNav
-  .filter((entry) => !(entry.type === 'link' && entry.href === '/' && isHome))
-  .map((entry) => (entry.type === 'dropdown' ? { ...entry, items: initiatives } : entry));
+const navEntries = headerNav.filter((entry) => !(entry.type === 'link' && entry.href === '/' && isHome));
 
 const initiativesEntry = navEntries.find((entry) => entry.type === 'dropdown');
 const isInitiativeActive =

@@ -3,32 +3,27 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import EventDetailView from '../../components/events/EventDetailView.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient } from '../../lib/sanity/client';
-import { eventBySlugQuery, type EventDetail } from '@energize/shared';
+import { festEventsQuery, type EventDetail } from '@energize/shared';
 import { getEventCoverUrl } from '../../lib/events/media';
-import { formatEventLocation, isPastEvent } from '../../lib/events/format';
+import { formatEventLocation } from '../../lib/events/format';
+import { splitFestEvents } from '../../lib/events/fest';
 import { crumbs, organizationId } from '../../lib/seo/schema';
 import { absoluteUrl } from '../../lib/seo/site';
-import { FEST_SLUG } from '../../lib/initiatives';
 
-// Other /events/* paths redirect to Energize HQ (see vercel.json), so only Energize Fest is built.
-// The page only exists when the event is published in Sanity: there is no hardcoded fallback.
-export async function getStaticPaths() {
-  const slug = FEST_SLUG;
-  const event = await sanityClient.fetch<EventDetail | null>(eventBySlugQuery, { slug });
-  return event ? [{ params: { slug }, props: { event } }] : [];
+// Always built. The next upcoming edition from Sanity fills the page; with none, default Fest content shows.
+// Editions whose date has passed move to Past Events.
+let events: EventDetail[] = [];
+try {
+  events = await sanityClient.fetch<EventDetail[]>(festEventsQuery);
+} catch {
+  events = [];
 }
+const { upcoming, past } = splitFestEvents(events);
 
-const { event } = Astro.props as { event: EventDetail };
-
-const shareImage = getEventCoverUrl(event.shareImage, 1200, 630);
-const coverUrl = getEventCoverUrl(event.cover, 1200, 630);
-const ogImage = shareImage || coverUrl || undefined;
-const shareUrl = absoluteUrl(`/events/${event.slug}`);
-const year = new Date(event.startDate).getUTCFullYear();
-const isPast = isPastEvent(event.startDate, event.endDate);
-const hasVenue = formatEventLocation(event.location) !== 'Venue to be announced';
-
-const pageTitle = `${event.title} ${year}: Date, Tickets and Lineup`;
+const shareUrl = absoluteUrl('/events/energize-fest');
+const ogImage = upcoming
+  ? getEventCoverUrl(upcoming.shareImage, 1200, 630) || getEventCoverUrl(upcoming.cover, 1200, 630) || undefined
+  : undefined;
 
 /** Whole sentences from the summary that fit a search snippet. */
 function snippet(text: string | undefined, fallback: string): string {
@@ -41,55 +36,63 @@ function snippet(text: string | undefined, fallback: string): string {
   }
   return out || fallback;
 }
-const pageDescription = snippet(event.summary, `${event.title} ${year}, a live event from Energize Music.`);
 
-const performers = (event.lineup ?? [])
-  .filter((slot) => (!slot.revealState || slot.revealState === 'confirmed') && slot.name?.trim())
-  .map((slot) => ({
-    '@type': 'PerformingGroup',
-    name: slot.name!.trim(),
-    ...(slot.artistSlug ? { url: absoluteUrl(`/artists/${slot.artistSlug}`) } : {}),
-  }));
+const year = upcoming ? new Date(upcoming.startDate).getUTCFullYear() : null;
+const pageTitle = upcoming ? `${upcoming.title} ${year}: Date, Tickets and Lineup` : 'Energize Fest | Annual Afro-Gospel Live Showcase';
+const pageDescription = upcoming
+  ? snippet(upcoming.summary, `${upcoming.title} ${year}, the annual live showcase from Energize Music.`)
+  : 'Energize Fest is the annual live showcase from Energize Music. See past editions and get alerts when the next date and tickets are announced.';
 
-const attendanceMode =
-  event.eventType === 'virtual'
-    ? 'https://schema.org/OnlineEventAttendanceMode'
-    : event.eventType === 'hybrid'
-      ? 'https://schema.org/MixedEventAttendanceMode'
-      : 'https://schema.org/OfflineEventAttendanceMode';
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'MusicEvent',
-  '@id': `${shareUrl}#event`,
-  name: event.title,
-  startDate: event.startDate,
-  endDate: event.endDate || event.startDate,
-  eventStatus: 'https://schema.org/EventScheduled',
-  eventAttendanceMode: attendanceMode,
-  image: ogImage ? [ogImage] : undefined,
-  url: shareUrl,
-  description: event.summary ?? event.title,
-  inLanguage: 'en',
-  location: hasVenue
-    ? { '@type': 'Place', name: event.location, address: { '@type': 'PostalAddress', addressLocality: event.location, addressCountry: 'NG' } }
-    : { '@type': 'Place', name: 'Venue to be announced', address: { '@type': 'PostalAddress', addressCountry: 'NG' } },
-  organizer: { '@id': organizationId() },
-  performer: performers.length > 0 ? performers : undefined,
-  ...(event.ticketUrl && !isPast
-    ? { offers: { '@type': 'Offer', url: event.ticketUrl, availability: 'https://schema.org/InStock' } }
-    : {}),
-};
+const jsonLd = upcoming
+  ? (() => {
+      const hasVenue = formatEventLocation(upcoming.location) !== 'Venue to be announced';
+      const performers = (upcoming.lineup ?? [])
+        .filter((slot) => (!slot.revealState || slot.revealState === 'confirmed') && slot.name?.trim())
+        .map((slot) => ({
+          '@type': 'PerformingGroup',
+          name: slot.name!.trim(),
+          ...(slot.artistSlug ? { url: absoluteUrl(`/artists/${slot.artistSlug}`) } : {}),
+        }));
+      const attendanceMode =
+        upcoming.eventType === 'virtual'
+          ? 'https://schema.org/OnlineEventAttendanceMode'
+          : upcoming.eventType === 'hybrid'
+            ? 'https://schema.org/MixedEventAttendanceMode'
+            : 'https://schema.org/OfflineEventAttendanceMode';
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'MusicEvent',
+        '@id': `${shareUrl}#event`,
+        name: upcoming.title,
+        startDate: upcoming.startDate,
+        endDate: upcoming.endDate || upcoming.startDate,
+        eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: attendanceMode,
+        image: ogImage ? [ogImage] : undefined,
+        url: shareUrl,
+        description: upcoming.summary ?? upcoming.title,
+        inLanguage: 'en',
+        location: hasVenue
+          ? { '@type': 'Place', name: upcoming.location, address: { '@type': 'PostalAddress', addressLocality: upcoming.location, addressCountry: 'NG' } }
+          : { '@type': 'Place', name: 'Venue to be announced', address: { '@type': 'PostalAddress', addressCountry: 'NG' } },
+        organizer: { '@id': organizationId() },
+        performer: performers.length > 0 ? performers : undefined,
+        ...(upcoming.ticketUrl
+          ? { offers: { '@type': 'Offer', url: upcoming.ticketUrl, availability: 'https://schema.org/InStock' } }
+          : {}),
+      };
+    })()
+  : null;
 ---
 
 <BaseLayout
   title={pageTitle}
   description={pageDescription}
   ogImage={ogImage}
-  keywords={[event.title, `${event.title} ${year}`, 'Energize Music', 'gospel concert', 'Afro-gospel live show', event.location].filter(Boolean) as string[]}
-  breadcrumbs={crumbs({ name: event.title, path: `/events/${event.slug}` })}
+  keywords={['Energize Fest', ...(year ? [`Energize Fest ${year}`] : []), 'Energize Music', 'gospel concert', 'Afro-gospel live show']}
+  breadcrumbs={crumbs({ name: 'Energize Fest', path: '/events/energize-fest' })}
   headerVariant="overlay"
 >
-  <JsonLd data={jsonLd} />
-  <EventDetailView event={event} shareUrl={shareUrl} />
+  {jsonLd && <JsonLd data={jsonLd} />}
+  <EventDetailView event={upcoming} pastEvents={past} shareUrl={shareUrl} />
 </BaseLayout>

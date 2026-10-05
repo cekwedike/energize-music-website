@@ -10,29 +10,37 @@ import { sanityClient } from '../lib/sanity/client';
 import { enrichRelease } from '../lib/metadata/enrichReleases';
 import {
   homeArtistsQuery,
-  homeReleasesQuery,
+  latestReleaseQuery,
+  releasesPageQuery,
   type ArtistCard,
   type Release,
+  type ReleasesPage,
 } from '@energize/shared';
 import { HERO_VIDEO_POSTER } from '../lib/hero-video';
 import { listNames } from '../lib/seo/site';
+import { activeSpotlights } from '../lib/releases/spotlights';
 import '../styles/home.css';
 
 let artists: ArtistCard[] = [];
-let homeReleases: Release[] = [];
+let releasesPage: ReleasesPage | null = null;
+let latest: Release | null = null;
 
 try {
-  [artists, homeReleases] = await Promise.all([
+  [artists, releasesPage, latest] = await Promise.all([
     sanityClient.fetch<ArtistCard[]>(homeArtistsQuery),
-    sanityClient.fetch<Release[]>(homeReleasesQuery),
+    sanityClient.fetch<ReleasesPage | null>(releasesPageQuery),
+    sanityClient.fetch<Release | null>(latestReleaseQuery),
   ]);
 } catch {
   artists = [];
-  homeReleases = [];
 }
 
-const releases = await Promise.all(
-  homeReleases.map((release) => enrichRelease(release, { coverSize: 480 })),
+// Live spotlights from Studio, in their arranged order. With none live, show the newest release.
+const spotlights = activeSpotlights(releasesPage);
+const musicReleases = await Promise.all(
+  (spotlights.length > 0 ? spotlights : latest ? [latest] : []).map((release) =>
+    enrichRelease(release, { coverSize: 640 }),
+  ),
 );
 
 const rosterNames = listNames(artists.map((artist) => artist.name));
@@ -58,7 +66,7 @@ const description = rosterNames
     <Hero />
     <div data-home-below class="home-below">
       <HomeBelief />
-      <HomeMusic releases={releases} />
+      <HomeMusic releases={musicReleases} isSpotlight={spotlights.length > 0} />
       <HomeArtists artists={artists} />
       <HomeInitiatives />
       <HomeNewsletter />

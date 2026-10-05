@@ -12,7 +12,7 @@ export default defineType({
   title: 'Event',
   type: 'document',
   description:
-    'Energize Fest lives here (slug "energize-fest", page /events/energize-fest). Every section of the page comes from these fields; empty sections are hidden.',
+    'One entry per Energize Fest edition. The next upcoming edition fills /events/energize-fest; once its date passes it moves to Past Events automatically. With no upcoming edition, the page shows default Energize Fest content.',
   groups: [
     { name: 'basics', title: 'Basics', default: true },
     { name: 'page', title: 'Page Content' },
@@ -32,8 +32,15 @@ export default defineType({
       group: 'basics',
       title: 'Slug',
       type: 'slug',
-      options: { source: 'title' },
+      options: {
+        // Title plus year keeps each edition unique, e.g. "energize-fest-2026".
+        source: (doc) => {
+          const { title, startDate } = doc as { title?: string; startDate?: string };
+          return [title, startDate ? new Date(startDate).getUTCFullYear() : ''].filter(Boolean).join(' ');
+        },
+      },
       validation: (r) => r.required(),
+      description: 'Click Generate. One per edition, e.g. "energize-fest-2026".',
     }),
     defineField({
       name: 'subtitle',

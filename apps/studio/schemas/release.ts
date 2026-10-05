@@ -115,15 +115,6 @@ export default defineType({
         }),
       ],
     }),
-
-    defineField({
-      name: 'featured',
-      title: 'Feature on homepage',
-      type: 'boolean',
-      initialValue: false,
-      description:
-        'Shows this release as the homepage Now Spinning pick (newest featured wins). Toggle off and rebuild the site to remove it. To spotlight a release on /releases, use Spotlight A Release in the sidebar.',
-    }),
   ],
   preview: {
     select: { title: 'title', subtitle: 'type', media: 'cover' },

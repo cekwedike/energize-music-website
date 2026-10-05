@@ -1,11 +1,10 @@
 ---
-import { hqLink, legalNav, primaryNav, socialLinks } from '../../lib/nav';
-import { getInitiatives } from '../../lib/initiatives';
+import { hqLink, initiativesNav, legalNav, primaryNav, socialLinks } from '../../lib/nav';
 import SocialIcon from './SocialIcon.astro';
 import Logo from './Logo.astro';
 import Marquee from './Marquee.astro';
 
-const moreNav = [...(await getInitiatives()).map(({ label, href }) => ({ label, href })), hqLink];
+const moreNav = [...initiativesNav.map(({ label, href }) => ({ label, href })), hqLink];
 const year = new Date().getFullYear();
 ---
 
