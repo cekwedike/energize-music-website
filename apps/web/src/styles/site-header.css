@@ -547,22 +547,31 @@
     pointer-events: auto;
   }
 
+  /* Drops down over the page from under the header bar. Absolute, so opening it never changes the
+     header's height (which would push the page down and shift --header-height). */
   .mobile-nav {
-    position: relative;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     z-index: 36;
     background: var(--color-bg);
     overflow: hidden;
     max-height: 0;
     border-top: 1px solid transparent;
+    box-shadow: 0 18px 40px color-mix(in srgb, var(--color-shadow) 0%, transparent);
     transition:
       max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 0.35s ease;
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
   }
 
   .mobile-nav.is-open {
-    max-height: min(85vh, 720px);
+    max-height: calc(100svh - var(--header-height, 4rem));
     overflow-y: auto;
+    overscroll-behavior: contain;
     border-top-color: var(--color-line);
+    box-shadow: 0 18px 40px color-mix(in srgb, var(--color-shadow) 14%, transparent);
   }
 
   .mobile-nav__list {
