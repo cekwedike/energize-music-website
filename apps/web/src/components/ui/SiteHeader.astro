@@ -303,7 +303,9 @@ const contactEntry = headerNav.find((entry) => entry.type === 'link' && entry.hr
     toggle?.setAttribute('aria-expanded', String(isOpen));
     panel?.toggleAttribute('inert', !isOpen);
     syncToggleLabel(isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
+    // Lock on <html>, not <body>: <html> has overflow-x: clip, so overflow on <body> would make <body> the
+    // scroll container, reset the scroll position to the top, and unstick the header.
+    document.documentElement.style.overflow = isOpen ? 'hidden' : '';
     setScrollLocked(isOpen);
     syncHeaderHeight();
 

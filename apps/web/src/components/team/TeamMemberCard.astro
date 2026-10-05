@@ -21,10 +21,12 @@ const initials = member.name
   .map((part: string) => part.charAt(0).toUpperCase())
   .join('');
 
-// The card shows the first sentence; the full bio from Sanity slides over it on hover, focus, or tap.
+// The card shows the first sentence; "Read Full Bio" opens the full bio from Sanity over the card.
 const bioSentence = firstSentence(member.bio);
 const paragraphs = bioParagraphs(member.bio);
 const hasMore = paragraphs.join(' ').length > (bioSentence?.length ?? 0) + 1;
+
+const panelId = `team-bio-${member._id}`;
 
 const socialLinks = [
   member.social?.linkedin && { label: 'LinkedIn', href: member.social.linkedin },
@@ -33,7 +35,7 @@ const socialLinks = [
 ].filter(Boolean) as { label: string; href: string }[];
 ---
 
-<article class:list={['team-card', hasMore && 'team-card--expandable']} {...(hasMore ? { tabindex: 0, 'data-team-card': '' } : {})}>
+<article class:list={['team-card', hasMore && 'team-card--expandable']} {...(hasMore ? { 'data-team-card': '' } : {})}>
   <div class="media-frame aspect-[4/5]">
     {
       photoUrl ? (
@@ -60,17 +62,28 @@ const socialLinks = [
   <p class="mt-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-accent)]">{member.role}</p>
   {
     bioSentence && (
-      <p class="mt-3 text-sm leading-relaxed text-[var(--color-muted)]" aria-hidden={hasMore ? 'true' : undefined}>
+      <p class="mt-3 text-sm leading-relaxed text-[var(--color-muted)]">
         {bioSentence}
       </p>
     )
   }
-  {hasMore && <p class="team-card__hint" aria-hidden="true">Read Full Bio</p>}
+  {
+    hasMore && (
+      <button type="button" class="team-card__hint" data-team-open aria-expanded="false" aria-controls={panelId}>
+        Read Full Bio
+      </button>
+    )
+  }
 
   {
     hasMore && (
-      <div class="team-card__full" data-lenis-prevent>
-        <p class="font-display text-xl text-fg">{member.name}</p>
+      <div class="team-card__full" id={panelId} role="region" aria-label={`${member.name} full bio`} data-lenis-prevent>
+        <button type="button" class="team-card__close" data-team-close aria-label="Close bio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+          </svg>
+        </button>
+        <p class="team-card__full-name font-display text-xl text-fg">{member.name}</p>
         <p class="mt-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-accent)]">{member.role}</p>
         <div class="team-card__bio">
           {paragraphs.map((paragraph) => (
@@ -102,34 +115,56 @@ const socialLinks = [
 </article>
 
 <script>
-  // Touch screens have no hover: a tap opens the full bio, a tap elsewhere (or on it again) closes it.
-  if (window.matchMedia('(hover: none)').matches) {
-    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-team-card]'));
-    document.addEventListener('click', (event) => {
-      const target = event.target as Element | null;
-      if (target?.closest('a')) return;
-      const tapped = target?.closest<HTMLElement>('[data-team-card]');
-      cards.forEach((card) => {
-        card.classList.toggle('is-open', card === tapped && !card.classList.contains('is-open'));
-      });
+  // "Read Full Bio" opens the panel; the close button, Escape, or a click outside closes it. One open at a time.
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-team-card]'));
+
+  const setOpen = (card: HTMLElement, open: boolean, returnFocus = false) => {
+    card.classList.toggle('is-open', open);
+    const trigger = card.querySelector<HTMLButtonElement>('[data-team-open]');
+    trigger?.setAttribute('aria-expanded', String(open));
+    // Wait a frame so the panel is visible (and focusable) before moving focus into it.
+    if (open) requestAnimationFrame(() => card.querySelector<HTMLButtonElement>('[data-team-close]')?.focus());
+    else if (returnFocus) trigger?.focus();
+  };
+
+  const closeAll = (except?: HTMLElement) =>
+    cards.forEach((card) => card !== except && card.classList.contains('is-open') && setOpen(card, false));
+
+  cards.forEach((card) => {
+    card.querySelector('[data-team-open]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      closeAll(card);
+      setOpen(card, true);
     });
-  }
+    card.querySelector('[data-team-close]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      setOpen(card, false, true);
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    const inside = (event.target as Element | null)?.closest('[data-team-card].is-open');
+    if (!inside) closeAll();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    const open = cards.find((card) => card.classList.contains('is-open'));
+    if (open) setOpen(open, false, true);
+  });
 </script>
 
 <style>
   .team-card--expandable {
     position: relative;
-    cursor: pointer;
-    outline: none;
-  }
-
-  .team-card--expandable:focus-visible {
-    box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent);
-    border-radius: var(--radius-card);
   }
 
   .team-card__hint {
     margin-top: 0.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
     font-size: 0.66rem;
     font-weight: 800;
     letter-spacing: 0.2em;
@@ -138,6 +173,16 @@ const socialLinks = [
     text-decoration: underline;
     text-decoration-color: var(--color-accent);
     text-underline-offset: 0.4em;
+  }
+
+  .team-card__hint:hover,
+  .team-card__hint:focus-visible {
+    color: var(--color-accent);
+  }
+
+  .team-card__hint:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
   }
 
   /* Full bio panel: covers the whole card and scrolls if the bio is long. */
@@ -161,19 +206,46 @@ const socialLinks = [
       visibility 0.3s ease;
   }
 
-  @media (hover: hover) {
-    .team-card--expandable:hover .team-card__full {
-      opacity: 1;
-      visibility: visible;
-      transform: none;
-    }
-  }
-
-  .team-card--expandable:focus-within .team-card__full,
   .team-card--expandable.is-open .team-card__full {
     opacity: 1;
     visibility: visible;
     transform: none;
+    /* Visible at once when opening, so focus can move into the panel straight away. */
+    transition:
+      opacity 0.3s ease,
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s;
+  }
+
+  .team-card__full-name {
+    padding-right: 2.75rem;
+  }
+
+  .team-card__close {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-fg);
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .team-card__close:hover,
+  .team-card__close:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .team-card__close svg {
+    width: 0.9rem;
+    height: 0.9rem;
   }
 
   .team-card__bio {
