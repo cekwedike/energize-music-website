@@ -6,6 +6,9 @@ import {
   HERO_VIDEO_USES_CDN_FALLBACK,
   HERO_VIDEO_WEBM,
 } from '../../lib/hero-video';
+
+const headline = "The Afro-Gospel Label Behind Africa's Biggest Christian Voices";
+const headlineWords = headline.split(' ');
 ---
 
 <section class="hero theme-dark" data-hero style={`--hero-poster: url('${HERO_VIDEO_POSTER}')`}>
@@ -38,8 +41,19 @@ import {
   <div class="hero-veil" aria-hidden="true"></div>
 
   <div id="hero-content" class="hero-content">
-    <h1 class="hero-text-el hero-text-el-heading font-instrument max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-[var(--color-on-dark)] sm:max-w-2xl md:max-w-4xl">
-      The Afro-Gospel Label Behind Africa's Biggest Christian Voices
+    <h1
+      class="hero-headline font-instrument max-w-[min(100%,20rem)] text-[clamp(1.625rem,1.15rem+4.5vw,6.25rem)] leading-[0.95] tracking-tight text-[var(--color-on-dark)] sm:max-w-2xl md:max-w-4xl"
+      aria-label={headline}
+    >
+      {
+        headlineWords.map((word, i) => (
+          <span class="hero-word" aria-hidden="true">
+            <span class="hero-word__inner" style={`--i: ${i}`}>
+              {word}
+            </span>
+          </span>
+        ))
+      }
     </h1>
   </div>
 </section>
@@ -105,22 +119,62 @@ import {
     }
   }
 
-  .hero-text-el {
+  /* Headline: each word rises out of its own mask, staggered, then a soft light sweep passes over once. */
+  .hero-word {
+    display: inline-block;
+    overflow: hidden;
+    /* Room for descenders (g, y) and the apostrophe so the mask never clips them. */
+    padding-block: 0.08em 0.14em;
+    margin-block: -0.08em -0.14em;
+    vertical-align: top;
+  }
+
+  .hero-word:not(:last-child) {
+    margin-right: 0.24em;
+  }
+
+  .hero-word__inner {
+    display: inline-block;
     opacity: 0;
-    transform: translate3d(0, 14px, 0);
-    transition:
-      opacity 0.6s ease,
-      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-    transition-delay: 0.1s;
+    transform: translate3d(0, 110%, 0) rotate(4deg);
+    transform-origin: 0 100%;
+    filter: blur(6px);
+    color: transparent;
+    background: linear-gradient(
+        100deg,
+        var(--color-on-dark) 0%,
+        var(--color-on-dark) 40%,
+        #bcd7ff 50%,
+        var(--color-on-dark) 60%,
+        var(--color-on-dark) 100%
+      )
+      0 0 / 300% 100%;
+    background-position: 100% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
   }
 
-  .hero-text-el-heading {
-    transition-delay: 0.2s;
+  #hero-content.is-visible .hero-word__inner {
+    animation:
+      hero-word-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+      hero-word-sheen 1.4s ease-in-out forwards;
+    animation-delay:
+      calc(0.15s + var(--i) * 0.07s),
+      calc(1.5s + var(--i) * 0.06s);
   }
 
-  #hero-content.is-visible .hero-text-el {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+  @keyframes hero-word-in {
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate(0);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes hero-word-sheen {
+    to {
+      background-position: 0 0;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -129,10 +183,11 @@ import {
       transition: none !important;
     }
 
-    .hero-text-el {
+    .hero-word__inner {
       opacity: 1 !important;
       transform: none !important;
-      transition: none !important;
+      filter: none !important;
+      animation: none !important;
     }
   }
 </style>
@@ -153,8 +208,17 @@ import {
   let readyFired = false;
   let settleTimer = 0;
 
+  // Animate the headline only once its font is in, so words never jump mid-animation (capped wait).
+  const headlineFont =
+    document.fonts && typeof document.fonts.load === 'function'
+      ? Promise.race([
+          document.fonts.load('400 1em "Instrument Serif"'),
+          new Promise((resolve) => window.setTimeout(resolve, 1200)),
+        ]).catch(() => undefined)
+      : Promise.resolve();
+
   const revealHeroCopy = () => {
-    heroContent?.classList.add('is-visible');
+    headlineFont.then(() => heroContent?.classList.add('is-visible'));
   };
 
   const markHeroReady = () => {

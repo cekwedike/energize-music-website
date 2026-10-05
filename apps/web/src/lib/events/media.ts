@@ -1,4 +1,4 @@
-import type { EventCard, SanityImage } from '@energize/shared';
+import type { SanityImage } from '@energize/shared';
 import { urlForImage } from '../sanity/client';
 
 export function getEventCoverUrl(
@@ -17,8 +17,4 @@ export function getEventCoverUrl(
   } catch {
     return cover.asset.url ?? null;
   }
-}
-
-export function getEventCardCover(event: EventCard, width = 900, height = 1100): string | null {
-  return getEventCoverUrl(event.cover, width, height);
 }

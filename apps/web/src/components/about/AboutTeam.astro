@@ -9,9 +9,9 @@ interface Props {
 
 const { team, aboutPage } = Astro.props;
 
-const teamHeading = aboutPage?.teamSectionTitle ?? 'Meet our team';
+const teamHeading = aboutPage?.teamSectionTitle || 'Meet Our Team';
 const teamIntro =
-  aboutPage?.teamSectionIntro ??
+  aboutPage?.teamSectionIntro ||
   'The people behind Energize Music: strategists, creatives, and builders shaping Afro-gospel culture.';
 ---
 

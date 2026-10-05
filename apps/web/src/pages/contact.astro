@@ -97,7 +97,7 @@ const intentOrder = ['booking', 'press', 'partnership', 'a&r', 'general'] as con
         id="contact-form-submit"
         class="inline-flex min-h-11 items-center rounded-full bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-[var(--color-on-accent)] transition hover:bg-[var(--color-accent)]/90 disabled:cursor-wait disabled:opacity-70"
       >
-        Send message
+        Send Message
       </button>
 
       <p id="contact-form-status" class="text-sm text-fg" role="status" aria-live="polite"></p>
@@ -149,7 +149,7 @@ const intentOrder = ['booking', 'press', 'partnership', 'a&r', 'general'] as con
     const result = await submitForm('contact', formToObject(form));
     if (submit) {
       submit.disabled = false;
-      submit.textContent = 'Send message';
+      submit.textContent = 'Send Message';
     }
 
     setStatus(result.message, !result.ok);

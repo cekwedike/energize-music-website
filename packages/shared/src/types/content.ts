@@ -1,57 +1,19 @@
 import type { SanityImage, PortableTextBlock } from './common';
 import type { Release } from './release';
 
-export interface NewsPost {
-  _id: string;
-  title: string;
-  slug: string;
-  date: string;
-  cover: SanityImage;
-  body: PortableTextBlock[];
-  tags?: string[];
-}
-
-export interface NewsPostSummary {
-  _id: string;
-  title: string;
-  slug: string;
-  date: string;
-  cover: SanityImage;
-  tags?: string[];
-  excerpt?: string;
-}
-
-export interface CareerOpening {
-  _id: string;
-  title: string;
-  slug: string;
-  location: string;
-  type: string;
-  description?: PortableTextBlock[];
-  applyUrl: string;
-}
-
-export interface CareerOpeningSummary {
-  _id: string;
-  title: string;
-  slug: string;
-  location: string;
-  type: string;
-  applyUrl: string;
-}
-
+/** Legal pages (Privacy, Terms) edited under "Legal Pages" in Studio. */
 export interface Page {
   _id: string;
   title: string;
   slug: string;
+  effectiveDate?: string;
   blocks: PortableTextBlock[];
 }
 
 export interface AboutPage {
   _id: string;
   title: string;
-  intro?: PortableTextBlock[];
-  teamSectionTitle: string;
+  teamSectionTitle?: string;
   teamSectionIntro?: string;
 }
 
@@ -69,27 +31,6 @@ export interface TeamMember {
   photo?: SanityImage;
   social?: TeamMemberSocial;
   order?: number;
-}
-
-export interface VolunteerInfo {
-  eyebrow?: string;
-  heading: string;
-  intro: string;
-  roleOptionsLabel?: string;
-  roleOptions?: string[];
-  platformsLabel?: string;
-  platforms?: string[];
-  signupUrl?: string;
-  ctaLabel?: string;
-  fallbackCtaLabel?: string;
-  fallbackCtaUrl?: string;
-  secondaryLinkLabel?: string;
-  secondaryLinkUrl?: string;
-}
-
-export interface CareersPageData {
-  openings: CareerOpening[];
-  volunteer: VolunteerInfo | null;
 }
 
 export interface ReleasesPage {

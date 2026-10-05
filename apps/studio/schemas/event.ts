@@ -12,16 +12,24 @@ export default defineType({
   title: 'Event',
   type: 'document',
   description:
-    'Individual concerts, festivals, and live experiences. Each event gets its own page at /events/[slug].',
+    'Energize Fest lives here (slug "energize-fest", page /events/energize-fest). Every section of the page comes from these fields; empty sections are hidden.',
+  groups: [
+    { name: 'basics', title: 'Basics', default: true },
+    { name: 'page', title: 'Page Content' },
+    { name: 'lineup', title: 'Lineup' },
+    { name: 'tickets', title: 'Tickets & Buttons' },
+  ],
   fields: [
     defineField({
       name: 'title',
+      group: 'basics',
       title: 'Title',
       type: 'string',
       validation: (r) => r.required(),
     }),
     defineField({
       name: 'slug',
+      group: 'basics',
       title: 'Slug',
       type: 'slug',
       options: { source: 'title' },
@@ -29,12 +37,14 @@ export default defineType({
     }),
     defineField({
       name: 'subtitle',
+      group: 'basics',
       title: 'Subtitle',
       type: 'string',
-      description: 'Short line under the title, e.g. venue framing.',
+      description: 'Short line under the title, e.g. "The Full Energize Music Roster on One Stage". Shown in Title Case.',
     }),
     defineField({
       name: 'startDate',
+      group: 'basics',
       title: 'Start date',
       type: 'datetime',
       options: {
@@ -46,6 +56,7 @@ export default defineType({
     }),
     defineField({
       name: 'endDate',
+      group: 'basics',
       title: 'End date',
       type: 'datetime',
       options: {
@@ -56,12 +67,13 @@ export default defineType({
     }),
     defineField({
       name: 'eventType',
+      group: 'basics',
       title: 'Event type',
       type: 'string',
       options: {
         list: [
-          { title: 'Physical', value: 'physical' },
-          { title: 'Virtual', value: 'virtual' },
+          { title: 'In person', value: 'physical' },
+          { title: 'Online', value: 'virtual' },
           { title: 'Hybrid', value: 'hybrid' },
         ],
         layout: 'radio',
@@ -72,47 +84,25 @@ export default defineType({
     }),
     defineField({
       name: 'location',
+      group: 'basics',
       title: 'Location',
       type: 'string',
       description:
-        'Venue, city, or stream link label. Leave empty if the venue is still TBA (the site will show “Venue TBA”).',
-    }),
-    defineField({
-      name: 'status',
-      title: 'Listing status',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Upcoming', value: 'upcoming' },
-          { title: 'Confirmed', value: 'announced' },
-          { title: 'Past', value: 'past' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'upcoming',
-      validation: (r) => r.required(),
-      description:
-        'Controls listing placement (upcoming vs archive). Not shown next to venue TBA on the hero.',
-    }),
-    defineField({
-      name: 'featured',
-      title: 'Featured / spotlight candidate',
-      type: 'boolean',
-      initialValue: false,
-      description:
-        'When on, this event can appear in the /events spotlight and on the homepage Live Spotlight. Homepage only shows events with this toggle enabled.',
+        'Venue and city, e.g. "Eko Convention Centre, Lagos". Leave empty while unconfirmed: the site shows "Venue to be announced".',
     }),
     defineField({
       name: 'cover',
+      group: 'basics',
       title: 'Cover / event image',
       type: 'image',
       options: { hotspot: true },
       fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
       validation: (r) => r.required(),
-      description: 'Used on cards, the event hero, and social share previews.',
+      description: 'Full-width hero photo. Use a wide, high-resolution landscape image (at least 2400px).',
     }),
     defineField({
       name: 'shareImage',
+      group: 'page',
       title: 'Social share image',
       type: 'image',
       options: { hotspot: true },
@@ -121,19 +111,23 @@ export default defineType({
     }),
     defineField({
       name: 'summary',
+      group: 'page',
       title: 'Summary',
       type: 'text',
       rows: 3,
-      description: 'Short teaser for cards, SEO, and share text.',
+      description: 'Two or three sentences. Shown at the start of About the Night and used for Google and share previews.',
     }),
     defineField({
       name: 'body',
-      title: 'About the night',
+      group: 'page',
+      title: 'About the Night',
       type: 'array',
-      of: [{ type: 'block' }, { type: 'image' }],
+      of: [{ type: 'block', styles: [{ title: 'Normal', value: 'normal' }], lists: [] }],
+      description: 'Optional extra paragraphs under the summary.',
     }),
     defineField({
       name: 'highlights',
+      group: 'page',
       title: 'Event details',
       type: 'array',
       of: [
@@ -149,10 +143,11 @@ export default defineType({
           },
         },
       ],
-      description: 'Cards under Event details on the individual event page.',
+      description: 'Numbered cards under Event Details (two to four works best). Titles are shown in Title Case.',
     }),
     defineField({
       name: 'lineup',
+      group: 'lineup',
       title: 'Lineup',
       type: 'array',
       of: [
@@ -237,26 +232,33 @@ export default defineType({
     }),
     defineField({
       name: 'ticketUrl',
-      title: 'Ticket or RSVP URL',
+      group: 'tickets',
+      title: 'Ticket link',
       type: 'url',
+      description: 'Leave empty until tickets are on sale. Until then the main button says "Get Ticket Alerts" and opens the email sign-up.',
     }),
     defineField({
       name: 'ctaLabel',
-      title: 'Primary CTA label',
+      group: 'tickets',
+      title: 'Ticket button label',
       type: 'string',
-      initialValue: 'Get tickets',
+      initialValue: 'Get Tickets',
+      description: 'Used once a ticket link is set.',
     }),
     defineField({
       name: 'secondaryCtaLabel',
-      title: 'Secondary CTA label',
+      group: 'tickets',
+      title: 'Second button label',
       type: 'string',
-      initialValue: 'Partner with us',
+      initialValue: 'Partner With Us',
     }),
     defineField({
       name: 'secondaryCtaUrl',
-      title: 'Secondary CTA URL',
+      group: 'tickets',
+      title: 'Second button link',
       type: 'url',
-      description: 'Defaults to the contact page if empty.',
+      validation: (r) => r.uri({ allowRelative: true }),
+      description: 'Defaults to the partnership contact form if empty.',
     }),
   ],
   orderings: [
@@ -281,18 +283,18 @@ export default defineType({
     },
     prepare({ title, startDate, location, eventType, media }) {
       const dateLabel = startDate
-        ? new Date(startDate).toLocaleDateString('en-US', {
+        ? new Date(startDate).toLocaleDateString('en-GB', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
           })
         : 'No date';
       const typeLabel =
-        eventType === 'virtual' ? 'Virtual' : eventType === 'hybrid' ? 'Hybrid' : 'Physical';
+        eventType === 'virtual' ? 'Online' : eventType === 'hybrid' ? 'Hybrid' : 'In person';
 
       return {
         title,
-        subtitle: [dateLabel, location || 'Venue TBA', typeLabel].filter(Boolean).join(' · '),
+        subtitle: [dateLabel, location || 'Venue to be announced', typeLabel].filter(Boolean).join(' · '),
         media,
       };
     },

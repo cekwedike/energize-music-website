@@ -2,10 +2,9 @@ import { defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'page',
-  title: 'Important Pages',
+  title: 'Legal Page',
   type: 'document',
-  description:
-    'Legal and utility pages such as Terms, Privacy, and other slug-based routes. For the main About experience, edit the About Page singleton instead.',
+  description: 'Privacy Policy and Terms of Service. The About page has its own entry in the sidebar.',
   fields: [
     defineField({ name: 'title', title: 'Title', type: 'string', validation: (r) => r.required() }),
     defineField({
@@ -14,7 +13,15 @@ export default defineType({
       type: 'slug',
       options: { source: 'title' },
       validation: (r) => r.required(),
-      description: 'Use "privacy" or "terms" for the legal pages linked in the footer.',
+      description: 'Use "privacy" or "terms". These are the pages linked in the footer.',
+    }),
+    defineField({
+      name: 'effectiveDate',
+      title: 'Effective date',
+      type: 'date',
+      options: { dateFormat: 'D MMMM YYYY' },
+      validation: (r) => r.required(),
+      description: 'Shown as "Effective ..." at the top of the page. Update it whenever the wording changes.',
     }),
     defineField({
       name: 'blocks',
@@ -36,7 +43,7 @@ export default defineType({
         },
         { type: 'image', options: { hotspot: true }, fields: [{ name: 'alt', type: 'string', title: 'Alt text' }] },
       ],
-      description: 'Body copy for template pages such as Privacy and Terms.',
+      description: 'The page text. Use Heading 2 for section titles.',
     }),
   ],
   preview: {

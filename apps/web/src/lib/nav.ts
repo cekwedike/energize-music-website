@@ -47,7 +47,7 @@ export const initiativesNav: InitiativeItem[] = [
     label: 'Energize Fest',
     href: '/events/energize-fest',
     blurb:
-      'The annual live showcase for the full Energize Music roster. Next date: 1 December 2026. Venue to be announced.',
+      'The annual live showcase for the full Energize Music roster. See the date, venue, and how to get tickets.',
     image: '/initiatives/cards/energize-fest.webp',
   },
 ];

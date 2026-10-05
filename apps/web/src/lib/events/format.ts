@@ -1,4 +1,4 @@
-import type { EventStatus, EventType, LineupRevealState } from '@energize/shared';
+import type { EventType, LineupRevealState } from '@energize/shared';
 
 export function formatEventDate(dateIso: string): string {
   return new Date(dateIso)
@@ -6,16 +6,18 @@ export function formatEventDate(dateIso: string): string {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
+      timeZone: 'Africa/Lagos',
     })
     .toUpperCase();
 }
 
 export function formatEventDateLong(dateIso: string): string {
-  return new Date(dateIso).toLocaleDateString('en-US', {
+  return new Date(dateIso).toLocaleDateString('en-GB', {
     weekday: 'long',
-    month: 'long',
     day: 'numeric',
+    month: 'long',
     year: 'numeric',
+    timeZone: 'Africa/Lagos',
   });
 }
 
@@ -42,31 +44,8 @@ export function lineupBadgeLabel(revealState: LineupRevealState | undefined): st
   return null;
 }
 
-export function isPastEvent(status: EventStatus, startDate: string): boolean {
-  if (status === 'past') return true;
-  return new Date(startDate).getTime() < Date.now();
-}
-
-export function isValidEventCard(
-  event: { _id?: string; title?: string; slug?: string; startDate?: string } | null | undefined,
-): boolean {
-  if (!event?._id || !event.title?.trim() || !event.slug?.trim() || !event.startDate) {
-    return false;
-  }
-  return !Number.isNaN(new Date(event.startDate).getTime());
-}
-
-export function formatEventStatus(status: EventStatus): string {
-  switch (status) {
-    case 'upcoming':
-      return 'Upcoming';
-    case 'announced':
-      return 'Confirmed';
-    case 'past':
-      return 'Past';
-    default:
-      return status;
-  }
+export function isPastEvent(startDate: string, endDate?: string): boolean {
+  return new Date(endDate ?? startDate).getTime() < Date.now();
 }
 
 export function formatEventType(eventType?: EventType): string {

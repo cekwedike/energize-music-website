@@ -3,33 +3,28 @@ import {
   CalendarIcon,
   DocumentIcon,
   DocumentTextIcon,
-  HeartIcon,
+  MicrophoneIcon,
   PlayIcon,
   StarIcon,
   UsersIcon,
 } from '@sanity/icons';
 
-/** Document types with custom sidebar entries (hide auto-generated duplicates). */
-const HIDDEN_FROM_NAV = [
-  'aboutPage',
-  'volunteerInfo',
-  'teamMember',
-  'page',
-  'releasesPage',
-  'release',
-  'event',
-  'eventsPage',
-  'nextPage',
-];
-
+/** Every document type the website reads, in the order editors use them. Nothing else is listed. */
 export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
     .items([
       S.listItem()
-        .title('About Page')
-        .icon(DocumentTextIcon)
-        .child(S.document().schemaType('aboutPage').documentId('aboutPage').title('About Page')),
+        .title('Artistes')
+        .icon(MicrophoneIcon)
+        .child(
+          S.documentTypeList('artist')
+            .title('Artistes')
+            .defaultOrdering([
+              { field: 'displayOrder', direction: 'asc' },
+              { field: 'name', direction: 'asc' },
+            ]),
+        ),
       S.listItem()
         .title('Releases')
         .icon(PlayIcon)
@@ -42,50 +37,26 @@ export const structure: StructureResolver = (S) =>
         .title('Spotlight A Release')
         .icon(StarIcon)
         .child(
-          S.document()
-            .schemaType('releasesPage')
-            .documentId('releasesPage')
-            .title('Spotlight A Release'),
+          S.document().schemaType('releasesPage').documentId('releasesPage').title('Spotlight A Release'),
         ),
+      S.divider(),
       S.listItem()
-        .title('Events')
+        .title('Energize Fest')
         .icon(CalendarIcon)
         .child(
-          S.list()
+          S.documentTypeList('event')
             .title('Events')
-            .items([
-              S.listItem()
-                .title('All Events')
-                .icon(CalendarIcon)
-                .child(
-                  S.documentTypeList('event')
-                    .title('All Events')
-                    .defaultOrdering([{ field: 'startDate', direction: 'desc' }]),
-                ),
-              S.listItem()
-                .title('Landing Page')
-                .icon(DocumentTextIcon)
-                .child(
-                  S.document()
-                    .schemaType('eventsPage')
-                    .documentId('eventsPage')
-                    .title('Events Landing Page'),
-                ),
-            ]),
+            .defaultOrdering([{ field: 'startDate', direction: 'desc' }]),
         ),
       S.listItem()
         .title('NEXT Page')
         .icon(StarIcon)
-        .child(
-          S.document()
-            .schemaType('nextPage')
-            .documentId('nextPage')
-            .title('NEXT Page'),
-        ),
+        .child(S.document().schemaType('nextPage').documentId('nextPage').title('NEXT Page')),
+      S.divider(),
       S.listItem()
-        .title('Important Pages')
-        .icon(DocumentIcon)
-        .child(S.documentTypeList('page').title('Important Pages')),
+        .title('About Page')
+        .icon(DocumentTextIcon)
+        .child(S.document().schemaType('aboutPage').documentId('aboutPage').title('About Page')),
       S.listItem()
         .title('Team Members')
         .icon(UsersIcon)
@@ -94,14 +65,8 @@ export const structure: StructureResolver = (S) =>
             .title('Team Members')
             .defaultOrdering([{ field: 'order', direction: 'asc' }]),
         ),
-      S.divider(),
       S.listItem()
-        .title('Volunteer Info')
-        .icon(HeartIcon)
-        .child(S.document().schemaType('volunteerInfo').documentId('volunteerInfo').title('Volunteer Info')),
-      S.divider(),
-      ...S.documentTypeListItems().filter((item) => {
-        const id = item.getId();
-        return id ? !HIDDEN_FROM_NAV.includes(id) : true;
-      }),
+        .title('Legal Pages')
+        .icon(DocumentIcon)
+        .child(S.documentTypeList('page').title('Legal Pages')),
     ]);

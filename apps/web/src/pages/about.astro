@@ -6,23 +6,15 @@ import AboutStory from '../components/about/AboutStory.astro';
 import AboutTeam from '../components/about/AboutTeam.astro';
 import AboutCta from '../components/about/AboutCta.astro';
 import { sanityClient } from '../lib/sanity/client';
-import {
-  aboutPageQuery,
-  pageBySlugQuery,
-  allTeamMembersQuery,
-  type AboutPage,
-  type Page,
-  type TeamMember,
-} from '@energize/shared';
+import { aboutPageQuery, allTeamMembersQuery, type AboutPage, type TeamMember } from '@energize/shared';
 import { crumbs } from '../lib/seo/schema';
 
-const [aboutPage, legacyPage, team] = await Promise.all([
+const [aboutPage, team] = await Promise.all([
   sanityClient.fetch<AboutPage | null>(aboutPageQuery),
-  sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'about' }),
   sanityClient.fetch<TeamMember[]>(allTeamMembersQuery),
 ]);
 
-const pageTitle = aboutPage?.title ?? legacyPage?.title ?? 'About Energize Music';
+const pageTitle = aboutPage?.title ?? 'About Energize Music';
 ---
 
 <BaseLayout

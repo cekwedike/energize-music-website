@@ -1,16 +1,25 @@
 ---
 import LegalPage from '../components/legal/LegalPage.astro';
+import { sanityClient } from '../lib/sanity/client';
 import { termsBlocks, TERMS_EFFECTIVE_DATE } from '../lib/legal/fallbackContent';
+import { pageBySlugQuery, type Page } from '@energize/shared';
 import { crumbs } from '../lib/seo/schema';
 
-// Legal wording is versioned in code so every change is reviewable in git history.
+// Edited in Studio under "Legal Pages". The code copy is only a safety net if Sanity is empty.
+let page: Page | null = null;
+try {
+  page = await sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'terms' });
+} catch {
+  page = null;
+}
+const title = page?.title?.trim() || 'Terms of Service';
 ---
 
 <LegalPage
-  title="Terms of Service"
+  title={title}
   description="The terms for using energize-music.com and other Energize Music websites, content, and digital services."
-  blocks={termsBlocks}
-  effectiveDate={TERMS_EFFECTIVE_DATE}
+  blocks={page?.blocks?.length ? page.blocks : termsBlocks}
+  effectiveDate={page?.effectiveDate || TERMS_EFFECTIVE_DATE}
   eyebrow="Terms"
-  breadcrumbs={crumbs({ name: 'Terms of Service', path: '/terms' })}
+  breadcrumbs={crumbs({ name: title, path: '/terms' })}
 />

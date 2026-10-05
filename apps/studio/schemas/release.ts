@@ -40,7 +40,7 @@ export default defineType({
 
     defineField({
       name: 'artists',
-      title: 'Artists',
+      title: 'Artistes',
       type: 'array',
       of: [{ type: 'reference', to: [{ type: 'artist' }] }],
       validation: (rule) =>
@@ -87,14 +87,14 @@ export default defineType({
               );
 
               if (count >= maxReleasesPerArtist) {
-                return `Each artist can appear on at most ${maxReleasesPerArtist} releases. One selected artist already has ${count}. Retire or reassign an older release before adding another.`;
+                return `Each artiste can appear on at most ${maxReleasesPerArtist} releases. One selected artiste already has ${count}. Retire or reassign an older release before adding another.`;
               }
             }
 
             return true;
           }),
       description:
-        'Link up to 10 artists. Each artist profile shows their 10 most recent releases. The releases page shows up to 20 per artist.',
+        'Link up to 10 artistes. Each artiste profile shows their 10 most recent releases. The releases page shows up to 20 per artiste.',
     }),
     defineField({
       name: 'links',

@@ -2,7 +2,7 @@ import { defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'artist',
-  title: 'Artist',
+  title: 'Artiste',
   type: 'document',
   fields: [
     defineField({ name: 'name', title: 'Name', type: 'string', validation: (r) => r.required() }),
@@ -84,12 +84,6 @@ export default defineType({
     }),
     defineField({ name: 'bio', title: 'Bio', type: 'text', validation: (r) => r.required() }),
     defineField({
-      name: 'quote',
-      title: 'Pull quote',
-      type: 'text',
-      description: 'Optional quote shown on the artist profile page.',
-    }),
-    defineField({
       name: 'streaming',
       title: 'Streaming links',
       type: 'object',
@@ -122,7 +116,7 @@ export default defineType({
       title,
       subtitle:
         displayOrder != null
-          ? `#${displayOrder} · ${subtitle ?? 'artist'}`
+          ? `#${displayOrder} · ${subtitle ?? 'artiste'}`
           : subtitle
             ? `${subtitle} · unnumbered`
             : 'unnumbered',

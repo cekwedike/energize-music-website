@@ -6,8 +6,7 @@ export default defineType({
   title: 'About Page',
   type: 'document',
   icon: DocumentTextIcon,
-  description:
-    'Main About page content: mission, vision, values, and team section intro. Not the same as slug-based pages under Important Pages.',
+  description: 'The About page heading and the team section. Team profiles are edited under Team Members.',
   fields: [
     defineField({
       name: 'title',
@@ -16,14 +15,6 @@ export default defineType({
       initialValue: 'About Energize Music',
       validation: (rule) => rule.required(),
       description: 'Main heading shown at the top of the About page.',
-    }),
-    defineField({
-      name: 'intro',
-      title: 'Introduction',
-      type: 'array',
-      of: [{ type: 'block' }],
-      description:
-        'Mission, vision, values, and other introductory copy. Use headings (H2) to separate sections.',
     }),
     defineField({
       name: 'teamSectionTitle',

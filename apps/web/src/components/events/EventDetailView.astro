@@ -1,7 +1,13 @@
 ---
-import { imageAlt } from '../../lib/seo/site';
+/**
+ * Event page template. Every section is driven by the Sanity "event" document
+ * and hides itself when its field is empty.
+ */
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
+import Marquee from '../ui/Marquee.astro';
+import EventShare from './EventShare.astro';
+import { getEventCoverUrl } from '../../lib/events/media';
 import {
   formatEventDate,
   formatEventDateLong,
@@ -11,7 +17,8 @@ import {
   lineupBadgeLabel,
   lineupDisplayName,
 } from '../../lib/events/format';
-import { getEventCoverUrl } from '../../lib/events/media';
+import { imageAlt } from '../../lib/seo/site';
+import { titleCase } from '../../lib/text/titleCase';
 
 interface Props {
   event: EventDetail;
@@ -19,810 +26,817 @@ interface Props {
 }
 
 const { event, shareUrl } = Astro.props;
-const coverUrl = getEventCoverUrl(event.cover, 1800, 1200);
-const sharePreviewUrl =
-  getEventCoverUrl(event.shareImage, 720, 405) || getEventCoverUrl(event.cover, 720, 405);
-// No ticket link yet: send people to the email list so they hear when sales open.
-const ctaHref = event.ticketUrl || '/#first-to-know';
-const ctaLabel = event.ctaLabel || 'Get tickets';
-const highlights = event.highlights ?? [];
-const lineup = event.lineup ?? [];
 
-const encodedUrl = encodeURIComponent(shareUrl);
-const encodedText = encodeURIComponent(event.summary || event.title);
-const shareLinks = [
-  {
-    label: 'X',
-    icon: 'x',
-    href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
-  },
-  {
-    label: 'Facebook',
-    icon: 'facebook',
-    href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-  },
-  {
-    label: 'LinkedIn',
-    icon: 'linkedin',
-    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-  },
-  {
-    label: 'WhatsApp',
-    icon: 'whatsapp',
-    href: `https://wa.me/?text=${encodeURIComponent(`${event.title} ${shareUrl}`)}`,
-  },
-] as const;
+const coverUrl = getEventCoverUrl(event.cover, 2400, 1500);
+const isPast = isPastEvent(event.startDate, event.endDate);
+const hasTickets = Boolean(event.ticketUrl) && !isPast;
+// No ticket link yet: send people to the email list so they hear when sales open.
+const primaryHref = hasTickets ? event.ticketUrl! : '/#first-to-know';
+const primaryLabel = hasTickets ? event.ctaLabel || 'Get Tickets' : 'Get Ticket Alerts';
+const secondaryHref = event.secondaryCtaUrl || '/contact?intent=partnership';
+const secondaryLabel = event.secondaryCtaLabel || 'Partner With Us';
+
+const venue = formatEventLocation(event.location);
+const highlights = (event.highlights ?? []).filter((item) => item?.title && item?.body);
+const lineup = (event.lineup ?? []).filter(Boolean);
+const hasBody = Boolean(event.body?.length);
+const marqueeItems = [event.title, formatEventDate(event.startDate), venue, formatEventType(event.eventType)];
+
+const lineupCards = lineup.map((slot) => {
+  const revealed = !slot.revealState || slot.revealState === 'confirmed';
+  const photo = revealed ? (slot.photo?.asset ? slot.photo : slot.artistPhoto) : undefined;
+  const name = lineupDisplayName(slot.revealState, slot.name);
+  return {
+    name,
+    role: slot.role ? titleCase(slot.role) : undefined,
+    badge: lineupBadgeLabel(slot.revealState),
+    href: revealed && slot.artistSlug ? `/artists/${slot.artistSlug}` : undefined,
+    photoUrl: getEventCoverUrl(photo, 720, 900),
+    photoAlt: imageAlt(photo?.alt, `${name} at ${event.title}`),
+  };
+});
 ---
 
-<article class="event-detail">
-  <header class="event-detail__hero">
-    <div class="event-detail__hero-inner">
-      <div class="event-detail__hero-copy">
-      <a href="/" class="event-detail__back">← Home</a>
-      <p class="event-detail__date">{formatEventDate(event.startDate)}</p>
-      <h1 class="event-detail__title font-display">{event.title}</h1>
-      {event.subtitle && <p class="event-detail__subtitle">{event.subtitle}</p>}
-      <div class="event-detail__facts">
-        <span>{formatEventDateLong(event.startDate)}</span>
-        <span>{formatEventLocation(event.location)}</span>
-        <span class="event-detail__status">
-          {isPastEvent(event.status, event.startDate)
-            ? 'Past'
-            : formatEventType(event.eventType)}
-        </span>
-      </div>
-      <div class="event-detail__actions">
-        <a href={ctaHref} class="event-detail__cta event-detail__cta--primary">{ctaLabel}</a>
-      </div>
-      </div>
-      {
-        coverUrl && (
-          <img
-            src={coverUrl}
-            alt={imageAlt(event.cover?.alt, `${event.title} poster`)}
-            class="media-frame event-detail__photo"
-            width="1800"
-            height="1200"
-            loading="eager"
-            decoding="async"
-          />
-        )
-      }
-    </div>
-  </header>
+<article class="fest">
+  <header class="fest-hero theme-dark">
+    {
+      coverUrl ? (
+        <img
+          src={coverUrl}
+          alt=""
+          class="fest-hero__bg"
+          width="2400"
+          height="1500"
+          fetchpriority="high"
+          decoding="async"
+        />
+      ) : (
+        <div class="fest-hero__bg fest-hero__bg--empty" />
+      )
+    }
+    <div class="fest-hero__scrim" aria-hidden="true"></div>
 
-  <section class="event-detail__share-band" aria-label="Share this event">
-    <div class="event-detail__share-inner">
-      <div class="event-detail__share-card">
-        {
-          sharePreviewUrl ? (
-            <img
-              src={sharePreviewUrl}
-              alt=""
-              class="event-detail__share-thumb"
-              width="720"
-              height="405"
-              loading="lazy"
-              decoding="async"
-            />
-          ) : (
-            <div class="event-detail__share-thumb event-detail__share-thumb--empty" aria-hidden="true" />
-          )
-        }
-        <div class="event-detail__share-meta">
-          <p class="event-detail__share-label">Share this event</p>
-          <p class="event-detail__share-title">{event.title}</p>
+    <div class="fest-hero__inner">
+      <a href="/" class="fest-hero__back">← Home</a>
+
+      <div class="fest-hero__grid">
+        <div class="fest-reveal">
+          <p class="fest-hero__eyebrow">
+            <span class="fest-hero__pill">{isPast ? 'Past Event' : formatEventDate(event.startDate)}</span>
+            Energize Music Presents
+          </p>
+          <h1 class="fest-hero__title">{event.title}</h1>
+          {event.subtitle && <p class="fest-hero__subtitle">{titleCase(event.subtitle)}</p>}
+
+          <dl class="fest-hero__facts">
+            <div>
+              <dt>Date</dt>
+              <dd>{formatEventDateLong(event.startDate)}</dd>
+            </div>
+            <div>
+              <dt>Venue</dt>
+              <dd>{venue}</dd>
+            </div>
+            <div>
+              <dt>Format</dt>
+              <dd>{formatEventType(event.eventType)}</dd>
+            </div>
+          </dl>
+
           {
-            event.summary ? (
-              <p class="event-detail__share-summary">{event.summary}</p>
-            ) : (
-              <p class="event-detail__share-summary">{formatEventDateLong(event.startDate)}{event.location ? ` · ${event.location}` : ''}</p>
+            !isPast && (
+              <div class="fest-actions">
+                <a
+                  href={primaryHref}
+                  class="fest-btn fest-btn--solid"
+                  {...(hasTickets ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
+                  {primaryLabel}
+                </a>
+                <a href={secondaryHref} class="fest-btn fest-btn--ghost">{secondaryLabel}</a>
+              </div>
             )
           }
         </div>
-      </div>
-      <div class="event-detail__share-row">
-        <p class="event-detail__share-actions-label">Share</p>
-        <ul class="event-detail__share-list">
-          <li>
-            <button
-              type="button"
-              class="event-detail__share-icon"
-              data-copy-link
-              data-copy-url={shareUrl}
-              aria-label="Copy link"
-              title="Copy link"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <path
-                  d="M10 13a5 5 0 0 0 7.54.54l1.92-1.92a5 5 0 0 0-7.07-7.07l-1.1 1.1"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M14 11a5 5 0 0 0-7.54-.54L4.54 12.38a5 5 0 0 0 7.07 7.07l1.1-1.1"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-          </li>
-          {
-            shareLinks.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="event-detail__share-icon"
-                  aria-label={`Share on ${link.label}`}
-                  title={link.label}
-                >
-                  {link.icon === 'x' && (
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        fill="currentColor"
-                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L2.25 2.25h7.09l4.261 5.669L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-                      />
-                    </svg>
-                  )}
-                  {link.icon === 'facebook' && (
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        fill="currentColor"
-                        d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 5.02 3.66 9.18 8.44 9.93v-7.02H7.9v-2.91h2.4V9.84c0-2.37 1.41-3.68 3.57-3.68 1.03 0 2.11.18 2.11.18v2.32h-1.19c-1.17 0-1.54.73-1.54 1.48v1.78h2.62l-.42 2.91h-2.2V22c4.78-.75 8.44-4.91 8.44-9.93z"
-                      />
-                    </svg>
-                  )}
-                  {link.icon === 'linkedin' && (
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        fill="currentColor"
-                        d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4V8.5zM8.5 8.5h3.8v2h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V23h-4v-6.4c0-1.53-.03-3.5-2.13-3.5-2.13 0-2.46 1.66-2.46 3.38V23h-4V8.5z"
-                      />
-                    </svg>
-                  )}
-                  {link.icon === 'whatsapp' && (
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        fill="currentColor"
-                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
-                      />
-                    </svg>
-                  )}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
+
+        {
+          !isPast && (
+            <div class="fest-countdown fest-reveal" data-countdown={event.startDate} aria-label="Countdown to the event">
+              <p class="fest-countdown__label">Countdown</p>
+              <div class="fest-countdown__grid">
+                {['Days', 'Hours', 'Mins', 'Secs'].map((unit) => (
+                  <div class="fest-countdown__cell">
+                    <span class="fest-countdown__value" data-unit={unit.toLowerCase()}>
+                      --
+                    </span>
+                    <span class="fest-countdown__unit">{unit}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        }
       </div>
     </div>
-  </section>
+  </header>
+
+  <Marquee items={marqueeItems} variant="caps" class="fest-marquee" />
 
   {
     highlights.length > 0 && (
-      <section class="event-detail__highlights" aria-labelledby="event-highlights-title">
-        <div class="event-detail__section-inner">
-          <div class="event-detail__section-head">
-            <h2 id="event-highlights-title">Event details</h2>
-            <span aria-hidden="true" />
+      <section class="fest-section" aria-labelledby="fest-details-title">
+        <div class="fest-container">
+          <div class="fest-head scroll-reveal">
+            <p class="fest-kicker">The Night</p>
+            <h2 id="fest-details-title" class="fest-h2">Event Details</h2>
           </div>
-          <ul class="event-detail__highlight-grid">
+          <ol class="fest-details scroll-reveal-stagger">
             {highlights.map((item, index) => (
-              <li class:list={[index === 0 && 'is-accent']}>
-                <strong>{item.title}</strong>
-                <p>{item.body}</p>
+              <li class="fest-detail">
+                <span class="fest-detail__num" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <h3 class="fest-detail__title">{titleCase(item.title)}</h3>
+                <p class="fest-detail__body">{item.body}</p>
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
       </section>
     )
   }
 
   {
-    lineup.length > 0 && (
-      <section class="event-detail__lineup" aria-labelledby="event-lineup-title">
-        <div class="event-detail__section-inner">
-          <div class="event-detail__section-head">
-            <h2 id="event-lineup-title">Lineup</h2>
-            <span aria-hidden="true" />
+    (lineupCards.length > 0 || !isPast) && (
+      <section class="fest-section fest-section--surface" aria-labelledby="fest-lineup-title">
+        <div class="fest-container">
+          <div class="fest-head scroll-reveal">
+            <p class="fest-kicker">On Stage</p>
+            <h2 id="fest-lineup-title" class="fest-h2">The Lineup</h2>
           </div>
-          <ul class="event-detail__lineup-grid">
-            {lineup.map((artist) => {
-              const reveal = artist.revealState || 'confirmed';
-              const label = lineupDisplayName(reveal, artist.name);
-              const badge = lineupBadgeLabel(reveal);
-              const workingTitle =
-                badge && artist.name?.trim() && artist.name.trim() !== label
-                  ? artist.name.trim()
-                  : null;
-              const photoUrl =
-                reveal === 'confirmed' && artist.photo
-                  ? getEventCoverUrl(artist.photo, 400, 400)
-                  : null;
-              const href =
-                reveal === 'confirmed' && artist.artistSlug
-                  ? `/artists/${artist.artistSlug}`
-                  : null;
-
-              const avatar = (
-                <span class:list={['event-detail__avatar', badge && 'event-detail__avatar--tag']}>
-                  {photoUrl ? (
-                    <img src={photoUrl} alt="" width="160" height="160" loading="lazy" />
-                  ) : (
-                    <span>{badge ? badge.slice(0, 1) : label.slice(0, 1)}</span>
-                  )}
-                </span>
-              );
-
-              return (
-                <li>
-                  {href ? (
-                    <a href={href} class="event-detail__artist">
-                      {avatar}
-                      {badge ? <span class="event-detail__badge">{badge}</span> : null}
-                      <span class="event-detail__artist-name">{label}</span>
-                      {workingTitle ? <span class="event-detail__artist-role">{workingTitle}</span> : null}
-                      {artist.role ? <span class="event-detail__artist-role">{artist.role}</span> : null}
-                    </a>
-                  ) : (
-                    <div class="event-detail__artist">
-                      {avatar}
-                      {badge ? <span class="event-detail__badge">{badge}</span> : null}
-                      <span class="event-detail__artist-name">{label}</span>
-                      {workingTitle ? <span class="event-detail__artist-role">{workingTitle}</span> : null}
-                      {artist.role ? <span class="event-detail__artist-role">{artist.role}</span> : null}
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+          {lineupCards.length > 0 ? (
+            <ul class="fest-lineup scroll-reveal-stagger">
+              {lineupCards.map((card) => {
+                const inner = (
+                  <>
+                    <span class="fest-lineup__media media-frame">
+                      {card.photoUrl ? (
+                        <img src={card.photoUrl} alt={card.photoAlt} width="720" height="900" loading="lazy" decoding="async" />
+                      ) : (
+                        <span class="fest-lineup__placeholder" aria-hidden="true">
+                          ?
+                        </span>
+                      )}
+                      {card.badge && <span class="fest-lineup__badge">{card.badge}</span>}
+                    </span>
+                    <span class="fest-lineup__name">{card.name}</span>
+                    {card.role && <span class="fest-lineup__role">{card.role}</span>}
+                  </>
+                );
+                return <li>{card.href ? <a href={card.href} class="fest-lineup__card">{inner}</a> : <div class="fest-lineup__card">{inner}</div>}</li>;
+              })}
+            </ul>
+          ) : (
+            <div class="fest-soon scroll-reveal">
+              <p class="fest-soon__title">Lineup Announcements Coming Soon</p>
+              <p class="fest-soon__body">Join the list and you will hear the names first.</p>
+              <a href="/#first-to-know" class="fest-btn fest-btn--solid">Notify Me</a>
+            </div>
+          )}
         </div>
       </section>
     )
   }
 
   {
-    (event.summary || (event.body && event.body.length > 0)) && (
-      <section class="event-detail__story" aria-labelledby="event-story-title">
-        <div class="event-detail__story-inner">
-          <h2 id="event-story-title" class="font-display">About the night</h2>
-          {event.summary ? <p class="event-detail__summary font-instrument">{event.summary}</p> : null}
-          {event.body && event.body.length > 0 ? (
-            <div class="event-detail__prose">
-              <PortableText value={event.body} />
+    (hasBody || event.summary) && (
+      <section class="fest-section" aria-labelledby="fest-story-title">
+        <div class="fest-container fest-story">
+          <div class="fest-story__aside scroll-reveal">
+            <p class="fest-kicker">The Story</p>
+            <h2 id="fest-story-title" class="fest-h2">About the Night</h2>
+            <div class="fest-story__share">
+              <EventShare title={event.title} summary={event.summary} shareUrl={shareUrl} />
             </div>
-          ) : null}
+          </div>
+          <div class="fest-story__body scroll-reveal" style="--reveal-delay: 100ms">
+            {event.summary && <p class="fest-story__lead">{event.summary}</p>}
+            {hasBody && <PortableText value={event.body!} />}
+          </div>
         </div>
       </section>
     )
   }
 
-  <section class="event-detail__footer-cta" aria-labelledby="event-footer-cta-title">
-    <div class="event-detail__footer-inner">
-      <p class="event-detail__footer-eyebrow">{event.ticketUrl ? 'See you there' : "Don't miss it"}</p>
-      <h2 id="event-footer-cta-title" class="font-display">{event.ticketUrl ? 'Get your tickets' : 'Be first in line for tickets'}</h2>
-      <div class="event-detail__actions">
-        <a href={ctaHref} class="event-detail__cta event-detail__cta--primary">{ctaLabel}</a>
-      </div>
-    </div>
-  </section>
+  {
+    !isPast && (
+      <section class="fest-cta theme-dark" aria-labelledby="fest-cta-title">
+        {coverUrl && <img src={coverUrl} alt="" class="fest-cta__bg" width="2400" height="1500" loading="lazy" decoding="async" />}
+        <div class="fest-cta__inner scroll-reveal">
+          <p class="fest-kicker">{hasTickets ? 'See You There' : "Don't Miss It"}</p>
+          <h2 id="fest-cta-title" class="fest-cta__title">{hasTickets ? 'Get Your Tickets' : 'Be First in Line for Tickets'}</h2>
+          <p class="fest-cta__meta">
+            {formatEventDateLong(event.startDate)} · {venue}
+          </p>
+          <div class="fest-actions fest-actions--center">
+            <a
+              href={primaryHref}
+              class="fest-btn fest-btn--solid"
+              {...(hasTickets ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              {primaryLabel}
+            </a>
+          </div>
+        </div>
+      </section>
+    )
+  }
 </article>
 
 <script>
-  const copyButton = document.querySelector<HTMLButtonElement>('[data-copy-link]');
-  if (copyButton) {
-    const url = copyButton.dataset.copyUrl ?? window.location.href;
-    const idleLabel = 'Copy link';
+  const root = document.querySelector<HTMLElement>('[data-countdown]');
+  const target = root ? new Date(root.dataset.countdown ?? '').getTime() : NaN;
 
-    copyButton.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(url);
-        copyButton.setAttribute('aria-label', 'Link copied');
-        copyButton.setAttribute('title', 'Link copied');
-        copyButton.classList.add('is-copied');
-        window.setTimeout(() => {
-          copyButton.setAttribute('aria-label', idleLabel);
-          copyButton.setAttribute('title', idleLabel);
-          copyButton.classList.remove('is-copied');
-        }, 1800);
-      } catch {
-        copyButton.setAttribute('aria-label', 'Copy failed');
-        copyButton.setAttribute('title', 'Copy failed');
-        window.setTimeout(() => {
-          copyButton.setAttribute('aria-label', idleLabel);
-          copyButton.setAttribute('title', idleLabel);
-        }, 1800);
-      }
-    });
+  if (root && !Number.isNaN(target)) {
+    const cells = {
+      days: root.querySelector<HTMLElement>('[data-unit="days"]'),
+      hours: root.querySelector<HTMLElement>('[data-unit="hours"]'),
+      mins: root.querySelector<HTMLElement>('[data-unit="mins"]'),
+      secs: root.querySelector<HTMLElement>('[data-unit="secs"]'),
+    };
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now());
+      const s = Math.floor(diff / 1000);
+      if (cells.days) cells.days.textContent = String(Math.floor(s / 86400));
+      if (cells.hours) cells.hours.textContent = pad(Math.floor((s % 86400) / 3600));
+      if (cells.mins) cells.mins.textContent = pad(Math.floor((s % 3600) / 60));
+      if (cells.secs) cells.secs.textContent = pad(s % 60);
+      if (diff === 0) window.clearInterval(timer);
+    };
+
+    tick();
+    const timer = window.setInterval(tick, 1000);
   }
+
+  document.querySelectorAll('.fest-reveal').forEach((node) => node.classList.add('is-in'));
 </script>
 
 <style>
-  .event-detail {
+  .fest {
+    position: relative;
+  }
+
+  /* ---------- Hero ---------- */
+  .fest-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: max(100svh, 40rem);
+    margin-top: calc(-1 * var(--header-height, 4rem));
     background: var(--color-bg);
-    color: var(--color-fg);
   }
 
-  .event-detail__hero {
-    border-bottom: 1px solid var(--color-line);
-  }
-
-  .event-detail__hero-inner {
-    display: grid;
-    gap: 2.5rem;
-    align-items: center;
-    width: min(100%, 72rem);
-    margin-inline: auto;
-    padding: 3.5rem 1.25rem 3.5rem;
-  }
-
-  @media (min-width: 640px) {
-    .event-detail__hero-inner {
-      padding: 5rem 1.5rem 4.5rem;
-    }
-  }
-
-  @media (min-width: 900px) {
-    .event-detail__hero-inner {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 4rem;
-    }
-  }
-
-  .event-detail__photo {
+  .fest-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    height: 100%;
     object-fit: cover;
+    transform: scale(1.04);
+    animation: fest-zoom 14s ease-out forwards;
   }
 
-  .event-detail__back {
-    display: inline-flex;
-    margin-bottom: 1.5rem;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-fg);
+  .fest-hero__bg--empty {
+    background: radial-gradient(circle at 70% 30%, color-mix(in srgb, var(--color-accent) 30%, transparent), transparent 60%), var(--color-bg);
   }
 
-  .event-detail__back:hover,
-  .event-detail__back:focus-visible {
-    color: var(--color-accent);
+  @keyframes fest-zoom {
+    to {
+      transform: scale(1);
+    }
   }
 
-  .event-detail__date {
-    margin: 0;
-    font-size: 0.85rem;
-    font-weight: 800;
-    letter-spacing: 0.16em;
-    color: var(--color-accent);
+  .fest-hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--color-scrim) 60%, transparent) 0%, color-mix(in srgb, var(--color-scrim) 25%, transparent) 38%, color-mix(in srgb, var(--color-scrim) 92%, transparent) 100%),
+      linear-gradient(90deg, color-mix(in srgb, var(--color-scrim) 55%, transparent) 0%, transparent 65%);
   }
 
-  .event-detail__title {
-    margin: 0.7rem 0 0;
-    max-width: 12ch;
-    font-size: clamp(2.8rem, 1.5rem + 5vw, 5.5rem);
-    line-height: 0.92;
-    letter-spacing: -0.04em;
-  }
-
-  .event-detail__subtitle {
-    margin: 1rem 0 0;
-    max-width: 28rem;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-fg);
-  }
-
-  .event-detail__facts {
+  .fest-hero__inner {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem 1.25rem;
-    margin-top: 1.35rem;
-    font-size: 0.9rem;
-    color: var(--color-fg);
-  }
-
-  .event-detail__status {
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: var(--color-accent);
-  }
-
-  .event-detail__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 1.75rem;
-  }
-
-  .event-detail__cta {
-    display: inline-flex;
-    min-height: 2.9rem;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.35rem;
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    border: 1px solid transparent;
-    transition:
-      background 160ms ease,
-      color 160ms ease,
-      border-color 160ms ease;
-  }
-
-  .event-detail__cta--primary {
-    background: var(--color-accent);
-    color: var(--color-on-accent);
-  }
-
-  .event-detail__cta--primary:hover,
-  .event-detail__cta--primary:focus-visible {
-    background: var(--color-accent-strong);
-  }
-
-  .event-detail__cta--ghost {
-    border-color: var(--color-line);
-    color: var(--color-fg);
-  }
-
-  .event-detail__cta--ghost:hover,
-  .event-detail__cta--ghost:focus-visible {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-
-  .event-detail__share-band {
-    border-top: 1px solid var(--color-line);
-    background: color-mix(in srgb, var(--color-surface) 90%, transparent);
-  }
-
-  .event-detail__share-inner {
-    width: min(100%, 72rem);
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3rem;
+    width: min(100%, 80rem);
+    min-height: inherit;
     margin-inline: auto;
-    display: grid;
-    gap: 1.25rem;
-    padding: 1.35rem 1.25rem;
+    padding: calc(var(--header-height, 4rem) + 2rem) 1.25rem clamp(2.5rem, 6vh, 4.5rem);
   }
 
   @media (min-width: 640px) {
-    .event-detail__share-inner {
+    .fest-hero__inner {
       padding-inline: 1.5rem;
     }
   }
 
-  @media (min-width: 900px) {
-    .event-detail__share-inner {
+  .fest-hero__back {
+    align-self: flex-start;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-on-dark);
+    opacity: 0.85;
+  }
+
+  .fest-hero__back:hover {
+    opacity: 1;
+  }
+
+  .fest-hero__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: end;
+  }
+
+  @media (min-width: 1024px) {
+    .fest-hero__grid {
       grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
     }
   }
 
-  .event-detail__share-card {
-    display: grid;
-    grid-template-columns: 7.5rem minmax(0, 1fr);
-    gap: 1rem;
-    align-items: center;
-    min-width: 0;
-  }
-
-  .event-detail__share-thumb {
-    width: 7.5rem;
-    height: 4.25rem;
-    object-fit: cover;
-    border: 1px solid var(--color-line);
-    background: var(--color-surface);
-  }
-
-  .event-detail__share-thumb--empty {
-    background: var(--color-surface);
-  }
-
-  .event-detail__share-meta {
-    min-width: 0;
-  }
-
-  .event-detail__share-label {
-    margin: 0;
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-fg);
-  }
-
-  .event-detail__share-title {
-    margin: 0.35rem 0 0;
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  .event-detail__share-summary {
-    margin: 0.35rem 0 0;
-    max-width: 36rem;
-    font-size: 0.85rem;
-    line-height: 1.45;
-    color: var(--color-fg);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .event-detail__share-row {
+  .fest-hero__eyebrow {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.75rem 1rem;
-  }
-
-  .event-detail__share-actions-label {
-    margin: 0;
+    gap: 0.85rem;
     font-size: 0.7rem;
     font-weight: 800;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--color-fg);
+    color: var(--color-on-dark);
   }
 
-  .event-detail__share-list {
+  .fest-hero__pill {
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: var(--color-accent-fill);
+    color: #fff;
+    letter-spacing: 0.18em;
+  }
+
+  .fest-hero__title {
+    margin-top: 1.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 2rem + 9vw, 10rem);
+    font-weight: 500;
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+    color: var(--color-on-dark);
+  }
+
+  .fest-hero__subtitle {
+    margin-top: 1.25rem;
+    max-width: 40rem;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(1.35rem, 1rem + 1.4vw, 2.1rem);
+    font-style: italic;
+    line-height: 1.2;
+    color: var(--color-on-dark);
+  }
+
+  .fest-hero__facts {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 0.55rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    gap: 0.75rem 2.25rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-on-dark) 22%, transparent);
+    max-width: 44rem;
   }
 
-  .event-detail__share-icon {
-    display: grid;
-    place-items: center;
-    width: 2.35rem;
-    height: 2.35rem;
-    padding: 0;
-    color: var(--color-fg);
-    border: 1px solid var(--color-line);
-    background: color-mix(in srgb, var(--color-fg) 3%, transparent);
-    cursor: pointer;
-    transition:
-      color 160ms ease,
-      border-color 160ms ease,
-      background 160ms ease;
-  }
-
-  .event-detail__share-icon svg {
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-
-  .event-detail__share-icon:hover,
-  .event-detail__share-icon:focus-visible,
-  .event-detail__share-icon.is-copied {
+  .fest-hero__facts dt {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
     color: var(--color-accent);
-    border-color: color-mix(in srgb, var(--color-accent) 33%, transparent);
-    background: color-mix(in srgb, var(--color-accent) 4.8%, transparent);
   }
 
-  .event-detail__section-inner,
-  .event-detail__story-inner,
-  .event-detail__footer-inner {
-    width: min(100%, 72rem);
+  .fest-hero__facts dd {
+    margin: 0.3rem 0 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-on-dark);
+  }
+
+  /* ---------- Buttons ---------- */
+  .fest-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .fest-actions--center {
+    justify-content: center;
+  }
+
+  .fest-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0.85rem 1.6rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .fest-btn--solid {
+    background: var(--color-accent-fill);
+    color: #fff;
+  }
+
+  .fest-btn--solid:hover {
+    transform: translateY(-2px);
+    background: var(--color-accent-fill-hover);
+  }
+
+  .fest-btn--ghost {
+    border: 1px solid color-mix(in srgb, var(--color-fg) 45%, transparent);
+    color: var(--color-fg);
+  }
+
+  .fest-btn--ghost:hover {
+    border-color: var(--color-fg);
+  }
+
+  /* ---------- Countdown ---------- */
+  .fest-countdown {
+    padding: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--color-on-dark) 18%, transparent);
+    background: color-mix(in srgb, var(--color-scrim) 45%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .fest-countdown__label {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .fest-countdown__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(3.75rem, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+  }
+
+  .fest-countdown__cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.7rem 0.4rem;
+    border: 1px solid color-mix(in srgb, var(--color-on-dark) 12%, transparent);
+  }
+
+  .fest-countdown__value {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.3rem + 1.5vw, 2.6rem);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    color: var(--color-on-dark);
+  }
+
+  .fest-countdown__unit {
+    margin-top: 0.4rem;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-on-dark) 75%, transparent);
+  }
+
+  .fest-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .fest-reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  .fest-countdown.fest-reveal {
+    transition-delay: 0.2s;
+  }
+
+  .fest :global(.fest-marquee) {
+    border-block: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+
+  /* ---------- Sections ---------- */
+  .fest-section {
+    padding-block: clamp(4.5rem, 3rem + 5vw, 8rem);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .fest-section--surface {
+    background: var(--color-surface);
+  }
+
+  .fest-container {
+    width: min(100%, 80rem);
     margin-inline: auto;
-    padding: 3.25rem 1.25rem;
+    padding-inline: 1.25rem;
   }
 
   @media (min-width: 640px) {
-    .event-detail__section-inner,
-    .event-detail__story-inner,
-    .event-detail__footer-inner {
-      padding: 3.75rem 1.5rem;
+    .fest-container {
+      padding-inline: 1.5rem;
     }
   }
 
-  .event-detail__section-head {
-    display: flex;
+  .fest-kicker {
+    display: inline-flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .event-detail__section-head h2 {
-    margin: 0;
-    flex-shrink: 0;
-    font-size: 0.8rem;
+    gap: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 800;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.32em;
     text-transform: uppercase;
+    color: var(--color-accent);
   }
 
-  .event-detail__section-head span {
-    flex: 1;
+  .fest-kicker::before {
+    content: '';
+    width: 1.5rem;
     height: 1px;
-    background: color-mix(in srgb, var(--color-fg) 14%, transparent);
+    background: currentColor;
   }
 
-  .event-detail__highlights {
-    border-top: 1px solid var(--color-line);
-    background: var(--color-surface);
+  .fest-h2 {
+    margin-top: 0.85rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 4.25rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
   }
 
-  .event-detail__highlight-grid {
+  .fest-details {
     display: grid;
-    gap: 1rem;
-    margin: 0;
+    gap: 1px;
+    margin: 3rem 0 0;
     padding: 0;
     list-style: none;
-  }
-
-  @media (min-width: 900px) {
-    .event-detail__highlight-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .event-detail__highlight-grid li {
-    padding: 1.35rem 1.2rem;
+    background: var(--color-line);
     border: 1px solid var(--color-line);
-    background: color-mix(in srgb, var(--color-fg) 2%, transparent);
-  }
-
-  .event-detail__highlight-grid li.is-accent {
-    border-top: 3px solid var(--color-accent);
-  }
-
-  .event-detail__highlight-grid strong {
-    display: block;
-    font-size: 1.1rem;
-  }
-
-  .event-detail__highlight-grid p {
-    margin: 0.65rem 0 0;
-    color: var(--color-fg);
-    line-height: 1.65;
-  }
-
-  .event-detail__lineup {
-    border-top: 1px solid var(--color-line);
-  }
-
-  .event-detail__lineup-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem 1rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
   }
 
   @media (min-width: 768px) {
-    .event-detail__lineup-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+    .fest-details {
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
     }
   }
 
-  .event-detail__artist {
-    display: grid;
-    justify-items: center;
-    gap: 0.55rem;
-    text-align: center;
-    text-decoration: none;
-    color: inherit;
+  .fest-detail {
+    position: relative;
+    padding: clamp(1.75rem, 1.4rem + 1vw, 2.5rem);
+    background: var(--color-bg);
+    transition: background-color 0.3s ease;
   }
 
-  .event-detail__avatar {
-    display: grid;
-    place-items: center;
-    width: 6.5rem;
-    height: 6.5rem;
-    overflow: hidden;
-    border-radius: 50%;
-    border: 2px solid color-mix(in srgb, var(--color-fg) 14%, transparent);
-    background: var(--color-surface);
+  .fest-detail::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .fest-detail:hover::before {
+    transform: scaleX(1);
+  }
+
+  .fest-detail__num {
     font-family: var(--font-display);
-    font-size: 1.75rem;
+    font-size: 3rem;
+    line-height: 1;
+    color: color-mix(in srgb, var(--color-accent) 70%, transparent);
   }
 
-  .event-detail__avatar--tag {
-    border-color: color-mix(in srgb, var(--color-accent) 27%, transparent);
-    color: var(--color-accent);
+  .fest-detail__title {
+    margin-top: 1.5rem;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
   }
 
-  .event-detail__avatar img {
+  .fest-detail__body {
+    margin-top: 0.75rem;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+
+  /* ---------- Lineup ---------- */
+  .fest-lineup {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: 1.5rem;
+    margin: 3rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fest-lineup__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .fest-lineup__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    background: color-mix(in srgb, var(--color-fg) 5%, transparent);
+  }
+
+  .fest-lineup__media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.6s ease;
   }
 
-  .event-detail__badge {
-    font-size: 0.62rem;
+  a.fest-lineup__card:hover .fest-lineup__media img {
+    transform: scale(1.04);
+  }
+
+  .fest-lineup__placeholder {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    font-family: var(--font-display);
+    font-size: 4rem;
+    color: color-mix(in srgb, var(--color-fg) 25%, transparent);
+  }
+
+  .fest-lineup__badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.35rem 0.6rem;
+    background: var(--color-accent-fill);
+    color: #fff;
+    font-size: 0.6rem;
     font-weight: 800;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .fest-lineup__name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    line-height: 1.1;
+  }
+
+  .fest-lineup__role {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--color-accent);
   }
 
-  .event-detail__artist-name {
-    font-size: 0.95rem;
-    font-weight: 700;
+  .fest-soon {
+    display: grid;
+    justify-items: start;
+    gap: 0.75rem;
+    margin-top: 3rem;
+    padding: clamp(1.75rem, 1.2rem + 2vw, 3rem);
+    border: 1px dashed color-mix(in srgb, var(--color-fg) 22%, transparent);
   }
 
-  .event-detail__artist-role {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-fg);
+  .fest-soon__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2.1rem);
   }
 
-  .event-detail__story {
-    border-top: 1px solid var(--color-line);
-    background: var(--color-surface);
+  .fest-soon__body {
+    color: var(--color-muted);
   }
 
-  .event-detail__story-inner {
-    max-width: 46rem;
+  .fest-soon .fest-btn {
+    margin-top: 0.75rem;
   }
 
-  .event-detail__story h2 {
-    margin: 0;
-    font-size: clamp(1.8rem, 1.4rem + 1.4vw, 2.6rem);
+  /* ---------- Story ---------- */
+  .fest-story {
+    display: grid;
+    gap: 2.5rem;
   }
 
-  .event-detail__summary {
-    margin: 1rem 0 0;
-    font-size: clamp(1.15rem, 1rem + 0.5vw, 1.45rem);
+  @media (min-width: 1024px) {
+    .fest-story {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 5rem;
+    }
+
+    .fest-story__aside {
+      position: sticky;
+      top: calc(var(--header-height, 4rem) + 2rem);
+      align-self: start;
+    }
+  }
+
+  .fest-story__share {
+    margin-top: 2rem;
+  }
+
+  .fest-story__lead {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.25rem);
     font-style: italic;
-    line-height: 1.4;
-    color: var(--color-fg);
+    line-height: 1.3;
   }
 
-  .event-detail__prose {
-    margin-top: 1.5rem;
+  .fest-story__body :global(p:not(.fest-story__lead)) {
+    margin-top: 1.25rem;
     font-size: 1.05rem;
-    line-height: 1.8;
+    line-height: 1.75;
     color: var(--color-fg);
   }
 
-  .event-detail__prose :global(p) {
-    margin: 0 0 1.25rem;
-    color: var(--color-fg) !important;
-  }
-
-  .event-detail__footer-cta {
-    border-top: 1px solid var(--color-line);
+  /* ---------- Closing CTA ---------- */
+  .fest-cta {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(5rem, 3.5rem + 6vw, 9rem) 1.25rem;
     text-align: center;
+    background: var(--color-bg);
   }
 
-  .event-detail__footer-inner {
-    max-width: 40rem;
+  .fest-cta__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.28;
   }
 
-  .event-detail__footer-eyebrow {
-    margin: 0;
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-accent);
+  .fest-cta__inner {
+    width: min(100%, 48rem);
+    margin-inline: auto;
   }
 
-  .event-detail__footer-inner h2 {
-    margin: 0.75rem 0 0;
-    font-size: clamp(2rem, 1.5rem + 1.8vw, 3rem);
+  .fest-cta__title {
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1.6rem + 4vw, 5.5rem);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--color-on-dark);
   }
 
-  .event-detail__footer-inner .event-detail__actions {
-    justify-content: center;
+  .fest-cta__meta {
+    margin-top: 1.25rem;
+    color: var(--color-on-dark);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fest-hero__bg {
+      animation: none;
+      transform: none;
+    }
+
+    .fest-reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
   }
 </style>

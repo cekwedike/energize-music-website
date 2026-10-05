@@ -6,7 +6,7 @@
     <div data-home-reveal>
       <p class="home-kicker">Stay in the loop</p>
       <h2 id="home-newsletter-title" class="home-title">
-        Be the<br />first to know
+        Be the<br />First to Know
       </h2>
       <p class="home-newsletter__lead">
         New releases, artiste news, and show dates from Energize Music, sent to you before anyone else hears.
@@ -26,7 +26,7 @@
           placeholder="you@example.com"
           class="home-newsletter__input"
         />
-        <button type="submit" class="home-btn home-btn--solid" data-home-newsletter-submit>Notify me</button>
+        <button type="submit" class="home-btn home-btn--solid" data-home-newsletter-submit>Notify Me</button>
       </div>
       <div class="home-newsletter__trap" aria-hidden="true">
         <label for="home-newsletter-company">Company</label>
@@ -183,7 +183,7 @@
     const result = await submitForm('subscribe', formToObject(form));
     if (button) {
       button.disabled = false;
-      button.textContent = 'Notify me';
+      button.textContent = 'Notify Me';
     }
 
     setNote(result.message, result.ok ? 'success' : 'error');
