@@ -1,5 +1,6 @@
 ---
 import {
+  HERO_VIDEO_MOBILE,
   HERO_VIDEO_MP4,
   HERO_VIDEO_POSTER,
   HERO_VIDEO_SRC,
@@ -30,7 +31,8 @@ const headlineWords = headline.split(' ');
         <source src={HERO_VIDEO_SRC} />
       ) : (
         <>
-          {/* MP4 first: hardware decode on Windows / Safari. */}
+          {/* Phones get the lighter 720px cut. MP4 first elsewhere: hardware decode on Windows / Safari. */}
+          <source src={HERO_VIDEO_MOBILE} type="video/mp4" media="(max-width: 767px)" />
           <source src={HERO_VIDEO_MP4} type="video/mp4" />
           <source src={HERO_VIDEO_WEBM} type="video/webm" />
         </>
@@ -97,7 +99,10 @@ const headlineWords = headline.split(' ');
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--color-scrim) 55%, transparent) 0%, color-mix(in srgb, var(--color-scrim) 45%, transparent) 42%, color-mix(in srgb, var(--color-scrim) 65%, transparent) 100%);
+    /* Light touch so the footage keeps its colour: darker only behind the headline, under the header, and at the bottom edge. */
+    background:
+      radial-gradient(ellipse 58% 42% at 50% 50%, color-mix(in srgb, var(--color-scrim) 42%, transparent) 0%, transparent 100%),
+      linear-gradient(180deg, color-mix(in srgb, var(--color-scrim) 45%, transparent) 0%, transparent 22%, transparent 70%, color-mix(in srgb, var(--color-scrim) 45%, transparent) 100%);
     pointer-events: none;
   }
 
@@ -117,6 +122,12 @@ const headlineWords = headline.split(' ');
     .hero-content {
       padding-inline: 1.5rem;
     }
+  }
+
+  /* Soft shadow keeps the white headline readable over bright frames. A filter (not text-shadow),
+     because the words are painted with background-clip: text for the light sweep. */
+  .hero-headline {
+    filter: drop-shadow(0 2px 18px color-mix(in srgb, var(--color-scrim) 55%, transparent));
   }
 
   /* Headline: each word rises out of its own mask, staggered, then a soft light sweep passes over once. */

@@ -12,6 +12,9 @@ export const HERO_VIDEO_MP4 = '/video/hero-bg.mp4';
 /** Local VP9 source. */
 export const HERO_VIDEO_WEBM = '/video/hero-bg.webm';
 
+/** Lighter 720px H.264 cut for phones (served via a media query on <source>). */
+export const HERO_VIDEO_MOBILE = '/video/hero-bg-mobile.mp4';
+
 /** @deprecated Prefer HERO_VIDEO_MP4 / HERO_VIDEO_WEBM. Kept for CDN fallback path. */
 export const HERO_VIDEO_LOCAL = HERO_VIDEO_MP4;
 
