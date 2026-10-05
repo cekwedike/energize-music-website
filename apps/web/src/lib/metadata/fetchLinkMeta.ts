@@ -83,7 +83,7 @@ async function fetchOpenGraph(url: string, timeoutMs: number): Promise<LinkMeta 
     fetch(url, {
       headers: {
         Accept: 'text/html',
-        'User-Agent': 'EnergizeMusicBot/1.0 (+https://energize-music.com)',
+        'User-Agent': 'EnergizeMusicBot/1.0 (+https://www.energize-music.com)',
       },
       redirect: 'follow',
     }),

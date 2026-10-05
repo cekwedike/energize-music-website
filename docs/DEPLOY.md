@@ -100,7 +100,7 @@ Config lives in `apps/web/vercel.json` (and a root fallback `vercel.json`).
    - `PUBLIC_SANITY_PROJECT_ID` (from `apps/web/.env`)
    - `PUBLIC_SANITY_DATASET` = `production`
    - `PUBLIC_SANITY_API_VERSION` = `2024-01-01`
-   - `PUBLIC_SITE_URL` = `https://energize-music.com`
+   - `PUBLIC_SITE_URL` = `https://www.energize-music.com`
    - Brevo form variables (`BREVO_API_KEY`, list IDs, sender, `CONTACT_TO_EMAIL`): see `docs/FORMS.md`
    - Optional SEO / ads IDs (`PUBLIC_GA4_ID`, `PUBLIC_GOOGLE_SITE_VERIFICATION`, ...): see `docs/FORMS.md`
    Names are case-sensitive. After saving, trigger a **new** deploy (Redeploy).

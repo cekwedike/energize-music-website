@@ -18,7 +18,7 @@ The endpoints are Vercel functions in `apps/web/api/`. The API key lives only in
 3. **Lists.** Brevo → **Contacts** → **Lists** → create:
    - `Be the first to know`: note its **ID** (the number in the list row / URL).
    - `Website enquiries` (optional): note its ID.
-4. **Double opt-in (optional, recommended).** Brevo → **Templates** → create a template from the "Double opt-in" type and activate it. Note the **template ID**. Create a simple "Thanks, you're confirmed" page URL to send people to (the home page works: `https://energize-music.com/#first-to-know`).
+4. **Double opt-in (optional, recommended).** Brevo → **Templates** → create a template from the "Double opt-in" type and activate it. Note the **template ID**. Create a simple "Thanks, you're confirmed" page URL to send people to (the home page works: `https://www.energize-music.com/#first-to-know`).
 
 ## 2. Add the environment variables in Vercel
 
@@ -33,8 +33,8 @@ Vercel → project → **Settings** → **Environment Variables**. Tick **Produc
 | `BREVO_SENDER_NAME` | No | `Energize Music Website` |
 | `BREVO_CONTACT_LIST_ID` | No | `4` (also saves contact form senders to this list) |
 | `BREVO_DOI_TEMPLATE_ID` | No | `12` (turns on double opt-in for the email list) |
-| `BREVO_DOI_REDIRECT_URL` | With DOI | `https://energize-music.com/#first-to-know` |
-| `FORMS_ALLOWED_ORIGINS` | No | Only if another domain posts to these endpoints, e.g. `https://energize-music.com` when the site is on Hostinger and the API on Vercel |
+| `BREVO_DOI_REDIRECT_URL` | With DOI | `https://www.energize-music.com/#first-to-know` |
+| `FORMS_ALLOWED_ORIGINS` | No | Only if another domain posts to these endpoints, e.g. `https://www.energize-music.com` when the site is on Hostinger and the API on Vercel |
 
 Then **Deployments** → latest → **Redeploy**. Functions read env vars at runtime, so no code change is needed.
 

@@ -29,5 +29,5 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-Sitemap: https://energize-music.com/sitemap-index.xml
-LLMs-Txt: https://energize-music.com/llms.txt
+Sitemap: https://www.energize-music.com/sitemap-index.xml
+LLMs-Txt: https://www.energize-music.com/llms.txt

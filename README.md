@@ -1,6 +1,6 @@
 # Energize Music Website
 
-Marketing site and Sanity Studio for [Energize Music](https://energize-music.com).
+Marketing site and Sanity Studio for [Energize Music](https://www.energize-music.com).
 
 ## Apps
 

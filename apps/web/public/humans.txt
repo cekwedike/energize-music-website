@@ -1,7 +1,7 @@
 /* TEAM */
 Organization: Energize Music
-Site: https://energize-music.com
-Contact: https://energize-music.com/contact
+Site: https://www.energize-music.com
+Contact: https://www.energize-music.com/contact
 
 /* SITE */
 Standards: HTML5, CSS3, Schema.org JSON-LD
