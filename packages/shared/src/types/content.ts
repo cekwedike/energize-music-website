@@ -43,6 +43,4 @@ export interface ReleaseSpotlight {
 export interface ReleasesPage {
   _id: string;
   spotlights?: ReleaseSpotlight[];
-  /** Legacy list of plain references, read until every spotlight has moved to `spotlights`. */
-  releaseSpotlights?: Release[];
 }

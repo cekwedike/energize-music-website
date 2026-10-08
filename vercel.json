@@ -7,12 +7,12 @@
   "redirects": [
     {
       "source": "/blogs",
-      "destination": "/",
+      "destination": "/blog",
       "statusCode": 301
     },
     {
       "source": "/blogs/:path*",
-      "destination": "/",
+      "destination": "/blog/:path*",
       "statusCode": 301
     },
     {

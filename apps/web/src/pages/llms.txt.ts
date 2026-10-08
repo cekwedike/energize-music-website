@@ -49,6 +49,7 @@ Energize Music is a record label and creative house that develops artistes, rele
 - About: ${site}/about
 - Artistes: ${site}/artists
 - Releases: ${site}/releases
+- Blog: ${site}/blog (RSS: ${site}/blog/rss.xml)
 - Contact: ${site}/contact
 - Energize HQ: https://energizehq.netlify.app
 - Privacy: ${site}/privacy

@@ -19,6 +19,5 @@ export const releasesPageQuery = /* groq */ `*[_id == "releasesPage"][0]{
     startsOn,
     endsOn,
     "release": release->${releaseCardFragment}
-  },
-  "releaseSpotlights": releaseSpotlights[]->${releaseCardFragment}
+  }
 }`;

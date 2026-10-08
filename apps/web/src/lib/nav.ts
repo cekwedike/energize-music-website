@@ -13,6 +13,7 @@ export const primaryNav: NavLink[] = [
   { label: 'Artistes', href: '/artists' },
   { label: 'Releases', href: '/releases' },
   { label: 'About', href: '/about' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Contact', href: '/contact' },
 ];
 

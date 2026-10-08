@@ -73,16 +73,6 @@ export default defineType({
         }),
       ],
     }),
-    // Old field: a plain list of releases. Kept read-only until the move to "Spotlights" is live, then removed.
-    defineField({
-      name: 'releaseSpotlights',
-      title: 'Old spotlight list',
-      type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'release' }] }],
-      readOnly: true,
-      hidden: ({ value }) => !value?.length,
-      description: 'Replaced by Spotlights above. Kept only while the website update rolls out.',
-    }),
   ],
   preview: {
     prepare: () => ({ title: 'Release Spotlights' }),

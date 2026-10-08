@@ -11,11 +11,7 @@ export function lagosToday(now = new Date()): string {
  * The site is static, so a daily rebuild (api/rebuild.ts, scheduled in vercel.json) keeps this current.
  */
 export function activeSpotlights(page: ReleasesPage | null | undefined, today = lagosToday()): Release[] {
-  if (page?.spotlights) {
-    return page.spotlights
-      .filter((entry) => entry.release && (!entry.startsOn || entry.startsOn <= today) && (!entry.endsOn || entry.endsOn >= today))
-      .map((entry) => entry.release as Release);
-  }
-  // Legacy shape: a plain list of releases with no dates.
-  return (page?.releaseSpotlights ?? []).filter(Boolean);
+  return (page?.spotlights ?? [])
+    .filter((entry) => entry.release && (!entry.startsOn || entry.startsOn <= today) && (!entry.endsOn || entry.endsOn >= today))
+    .map((entry) => entry.release as Release);
 }

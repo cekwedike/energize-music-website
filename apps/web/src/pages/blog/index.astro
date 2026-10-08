@@ -1,0 +1,232 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import PostCard from '../../components/blog/PostCard.astro';
+import { sanityClient } from '../../lib/sanity/client';
+import { blogCategoriesQuery, blogPostsQuery, type BlogCategory, type PostCard as PostCardData } from '@energize/shared';
+import { pickFeatured } from '../../lib/blog/format';
+import { shareImageUrl } from '../../lib/blog/images';
+import { crumbs, organizationId } from '../../lib/seo/schema';
+import { absoluteUrl } from '../../lib/seo/site';
+import '../../styles/blog.css';
+
+let posts: PostCardData[] = [];
+let categories: BlogCategory[] = [];
+try {
+  [posts, categories] = await Promise.all([
+    sanityClient.fetch<PostCardData[]>(blogPostsQuery),
+    sanityClient.fetch<BlogCategory[]>(blogCategoriesQuery),
+  ]);
+} catch {
+  posts = [];
+  categories = [];
+}
+
+const featured = pickFeatured(posts);
+const rest = posts.filter((post) => post._id !== featured?._id);
+const PAGE_SIZE = 9;
+const totalPages = Math.max(1, Math.ceil(rest.length / PAGE_SIZE));
+
+const title = 'Blog: Stories Behind the Sound';
+const description =
+  'News, studio stories, artiste interviews and the faith behind the music, from the Energize Music family in Lagos.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  '@id': `${absoluteUrl('/blog')}#blog`,
+  name: 'Energize Music Blog',
+  description,
+  url: absoluteUrl('/blog'),
+  inLanguage: 'en',
+  publisher: { '@id': organizationId() },
+  blogPost: posts.slice(0, 20).map((post) => ({
+    '@type': 'BlogPosting',
+    headline: post.title,
+    url: absoluteUrl(`/blog/${post.slug}`),
+    datePublished: post.publishedAt,
+    ...(post.updatedAt ? { dateModified: post.updatedAt } : {}),
+    ...(shareImageUrl(post.mainImage) ? { image: shareImageUrl(post.mainImage) } : {}),
+  })),
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={shareImageUrl(featured?.mainImage)}
+  keywords={['Energize Music blog', 'Afro-gospel news', 'Nigerian gospel music stories', ...categories.map((c) => c.title)]}
+  breadcrumbs={crumbs({ name: 'Blog', path: '/blog' })}
+>
+  <link slot="head" rel="alternate" type="application/rss+xml" title="Energize Music Blog" href="/blog/rss.xml" />
+  <JsonLd data={jsonLd} />
+
+  <div class="blog-index">
+    <header class="blog-masthead">
+      <div class="blog-shell">
+        <p class="blog-kicker blog-rise">The Energize Music Blog</p>
+        <h1 class="blog-masthead__title blog-rise blog-rise--2">
+          Stories Behind <em>the Sound</em>
+        </h1>
+        <p class="blog-masthead__intro blog-rise blog-rise--3">{description}</p>
+      </div>
+    </header>
+
+    {
+      posts.length === 0 ? (
+        <section class="blog-shell blog-empty" aria-labelledby="blog-empty-title">
+          <div class="blog-empty__mark" aria-hidden="true">✦</div>
+          <h2 id="blog-empty-title" class="blog-empty__title">The first stories are on their way</h2>
+          <p class="blog-empty__text">
+            We are writing up news, studio diaries and conversations with our artistes. While you wait, catch up on the
+            music.
+          </p>
+          <p class="blog-empty__actions">
+            <a href="/releases" class="blog-btn blog-btn--primary">Browse releases</a>
+            <a href="/artists" class="blog-btn blog-btn--outline">Meet the artistes</a>
+          </p>
+        </section>
+      ) : (
+        <>
+          {featured && (
+            <section class="blog-shell blog-featured" aria-label="Featured story">
+              <PostCard post={featured} variant="featured" headingLevel="h2" eager />
+            </section>
+          )}
+
+          {rest.length > 0 && (
+            <section class="blog-shell blog-feed" aria-labelledby="blog-feed-title" data-blog-feed data-page-size={PAGE_SIZE}>
+              <div class="blog-feed__head">
+                <h2 id="blog-feed-title" class="blog-feed__title">Latest stories</h2>
+
+                <div class="blog-tools">
+                  {categories.length > 0 && (
+                    <div class="blog-filters" role="group" aria-label="Filter by category">
+                      <button type="button" class="blog-chip" data-filter="" aria-pressed="true">
+                        All
+                      </button>
+                      {categories.map((category) => (
+                        <button
+                          type="button"
+                          class="blog-chip"
+                          data-filter={category.slug}
+                          data-description={category.description ?? ''}
+                          aria-pressed="false"
+                        >
+                          {category.title}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <label class="blog-search">
+                    <span class="sr-only">Search the blog</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <circle cx="11" cy="11" r="7" />
+                      <path d="M20 20l-3.5-3.5" />
+                    </svg>
+                    <input type="search" placeholder="Search stories" autocomplete="off" data-blog-search />
+                  </label>
+                </div>
+              </div>
+
+              <p class="blog-feed__description" data-category-description hidden></p>
+
+              <div class="blog-grid" data-blog-grid>
+                {rest.map((post, index) => (
+                  <PostCard post={post} hidden={index >= PAGE_SIZE} />
+                ))}
+              </div>
+
+              <p class="blog-feed__none" data-blog-none hidden>
+                No stories match that yet. Try another category or search word.
+              </p>
+              <p class="blog-feed__status sr-only" aria-live="polite" data-blog-status></p>
+
+              <nav class="pager" data-blog-pager aria-label="Blog pages" hidden={totalPages <= 1}>
+                {totalPages > 1 && (
+                  <noscript>
+                    <p class="pager__fallback">Turn on JavaScript to browse older stories page by page.</p>
+                  </noscript>
+                )}
+              </nav>
+            </section>
+          )}
+        </>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<script>
+  import { createPager, readPageParam } from '../../lib/ui/pagination';
+
+  function initBlogFeed() {
+    const feed = document.querySelector<HTMLElement>('[data-blog-feed]');
+    if (!feed || feed.dataset.ready === 'true') return;
+    feed.dataset.ready = 'true';
+
+    const pageSize = Number(feed.dataset.pageSize) || 9;
+    const cards = Array.from(feed.querySelectorAll<HTMLElement>('[data-post-card]'));
+    const chips = Array.from(feed.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+    const search = feed.querySelector<HTMLInputElement>('[data-blog-search]');
+    const pagerNav = feed.querySelector<HTMLElement>('[data-blog-pager]');
+    const none = feed.querySelector<HTMLElement>('[data-blog-none]');
+    const status = feed.querySelector<HTMLElement>('[data-blog-status]');
+    const description = feed.querySelector<HTMLElement>('[data-category-description]');
+
+    const params = new URLSearchParams(window.location.search);
+    let category = params.get('category') ?? '';
+    if (!chips.some((chip) => chip.dataset.filter === category)) category = '';
+    let query = '';
+    const pager = pagerNav ? createPager({ nav: pagerNav, pageSize, param: 'page', scrollTarget: feed, label: 'Blog pages' }) : null;
+
+    const render = (page = 1) => {
+      const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+      const matches = cards.filter((card) => {
+        const inCategory = !category || card.dataset.category === category;
+        const haystack = card.dataset.search ?? '';
+        return inCategory && terms.every((term) => haystack.includes(term));
+      });
+
+      if (pager) pager.render(matches, cards, page);
+
+      chips.forEach((chip) => chip.setAttribute('aria-pressed', String(chip.dataset.filter === category)));
+      const activeChip = chips.find((chip) => chip.dataset.filter === category);
+      if (description) {
+        const text = category ? activeChip?.dataset.description ?? '' : '';
+        description.textContent = text;
+        description.hidden = !text;
+      }
+      if (none) none.hidden = matches.length > 0;
+      if (status) status.textContent = `${matches.length} ${matches.length === 1 ? 'story' : 'stories'} found`;
+    };
+
+    const syncUrl = () => {
+      const url = new URL(window.location.href);
+      if (category) url.searchParams.set('category', category);
+      else url.searchParams.delete('category');
+      if (pager && pager.page > 1) url.searchParams.set('page', String(pager.page));
+      else url.searchParams.delete('page');
+      window.history.replaceState(null, '', url);
+    };
+
+    chips.forEach((chip) =>
+      chip.addEventListener('click', () => {
+        category = chip.dataset.filter ?? '';
+        render(1);
+        syncUrl();
+      }),
+    );
+
+    search?.addEventListener('input', () => {
+      query = search.value.trim();
+      render(1);
+      syncUrl();
+    });
+
+    render(readPageParam('page'));
+  }
+
+  initBlogFeed();
+  document.addEventListener('astro:page-load', initBlogFeed);
+</script>

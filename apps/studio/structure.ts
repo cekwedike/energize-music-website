@@ -1,11 +1,14 @@
 import type { StructureResolver } from 'sanity/structure';
 import {
   CalendarIcon,
+  ComposeIcon,
   DocumentIcon,
   DocumentTextIcon,
   MicrophoneIcon,
   PlayIcon,
+  StarFilledIcon,
   StarIcon,
+  TagIcon,
   UsersIcon,
 } from '@sanity/icons';
 
@@ -50,6 +53,59 @@ export const structure: StructureResolver = (S) =>
         .title('NEXT Page')
         .icon(StarIcon)
         .child(S.document().schemaType('nextPage').documentId('nextPage').title('NEXT Page')),
+      S.divider(),
+      S.listItem()
+        .title('Blog')
+        .icon(ComposeIcon)
+        .child(
+          S.list()
+            .title('Blog')
+            .items([
+              S.listItem()
+                .title('All Posts')
+                .icon(ComposeIcon)
+                .child(
+                  S.documentTypeList('post')
+                    .title('All Posts')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }]),
+                ),
+              S.listItem()
+                .title('Featured Posts')
+                .icon(StarFilledIcon)
+                .child(
+                  S.documentTypeList('post')
+                    .title('Featured Posts')
+                    .filter('_type == "post" && featured == true')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }]),
+                ),
+              S.listItem()
+                .title('Posts by Category')
+                .icon(TagIcon)
+                .child(
+                  S.documentTypeList('blogCategory')
+                    .title('Posts by Category')
+                    .child((categoryId) =>
+                      S.documentTypeList('post')
+                        .title('Posts')
+                        .filter('_type == "post" && category._ref == $categoryId')
+                        .params({ categoryId })
+                        .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }]),
+                    ),
+                ),
+              S.divider(),
+              S.listItem()
+                .title('Categories')
+                .icon(TagIcon)
+                .child(
+                  S.documentTypeList('blogCategory')
+                    .title('Categories')
+                    .defaultOrdering([
+                      { field: 'order', direction: 'asc' },
+                      { field: 'title', direction: 'asc' },
+                    ]),
+                ),
+            ]),
+        ),
       S.divider(),
       S.listItem()
         .title('About Page')

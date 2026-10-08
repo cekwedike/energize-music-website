@@ -78,6 +78,8 @@ const lineupCards = lineup.map((slot) => {
   };
 });
 
+/** Past editions shown per page in the archive. */
+const PAST_PAGE_SIZE = 6;
 const pastCards = pastEvents.map((past) => {
   const year = new Date(past.startDate).getUTCFullYear();
   return {
@@ -265,15 +267,15 @@ const pastCards = pastEvents.map((past) => {
 
   {
     pastCards.length > 0 && (
-      <section class="fest-section fest-section--surface" aria-labelledby="fest-past-title">
+      <section class="fest-section fest-section--surface" aria-labelledby="fest-past-title" data-fest-past data-page-size={PAST_PAGE_SIZE}>
         <div class="fest-container">
           <div class="fest-head scroll-reveal">
             <p class="fest-kicker">Archive</p>
             <h2 id="fest-past-title" class="fest-h2">Past Events</h2>
           </div>
           <ul class="fest-past scroll-reveal-stagger">
-            {pastCards.map((card) => (
-              <li class="fest-past__card">
+            {pastCards.map((card, index) => (
+              <li class="fest-past__card" data-fest-past-item hidden={index >= PAST_PAGE_SIZE}>
                 <span class="fest-past__media media-frame">
                   {card.coverUrl ? (
                     <img src={card.coverUrl} alt={card.coverAlt} width="960" height="640" loading="lazy" decoding="async" />
@@ -290,6 +292,7 @@ const pastCards = pastEvents.map((past) => {
               </li>
             ))}
           </ul>
+          {pastCards.length > PAST_PAGE_SIZE && <nav class="pager" data-fest-pager aria-label="Past events pages" />}
         </div>
       </section>
     )
@@ -319,6 +322,28 @@ const pastCards = pastEvents.map((past) => {
 </article>
 
 <script>
+  import { createPager, readPageParam } from '../../lib/ui/pagination';
+
+  const pastSection = document.querySelector<HTMLElement>('[data-fest-past]');
+  const pastNav = pastSection?.querySelector<HTMLElement>('[data-fest-pager]');
+  if (pastSection && pastNav) {
+    const items = Array.from(pastSection.querySelectorAll<HTMLElement>('[data-fest-past-item]'));
+    const pager = createPager({
+      nav: pastNav,
+      pageSize: Number(pastSection.dataset.pageSize) || 6,
+      param: 'past',
+      scrollTarget: pastSection,
+      label: 'Past events pages',
+      // Skip the staggered fade-in on later pages so cards appear at once.
+      onPageChange: (shown) =>
+        shown.forEach((item) => {
+          item.style.setProperty('--reveal-delay', '0ms');
+          item.classList.add('is-visible');
+        }),
+    });
+    pager.render(items, items, readPageParam('past'));
+  }
+
   const root = document.querySelector<HTMLElement>('[data-countdown]');
   const target = root ? new Date(root.dataset.countdown ?? '').getTime() : NaN;
 
@@ -856,6 +881,10 @@ const pastCards = pastEvents.map((past) => {
   }
 
   /* ---------- Past events ---------- */
+  .fest-past__card[hidden] {
+    display: none;
+  }
+
   .fest-past {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));

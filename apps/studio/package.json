@@ -8,7 +8,8 @@
     "deploy": "sanity deploy",
     "lint": "eslint . --config ../../eslint.config.mjs",
     "typecheck": "tsc --noEmit",
-    "migrate:2026-10": "sanity exec scripts/migrate-2026-10-cleanup.ts --with-user-token"
+    "migrate:2026-10": "sanity exec scripts/migrate-2026-10-cleanup.ts --with-user-token",
+    "migrate:spotlights": "sanity exec scripts/remove-old-spotlight-list.ts --with-user-token"
   },
   "dependencies": {
     "@sanity/client": "^7.26.2",

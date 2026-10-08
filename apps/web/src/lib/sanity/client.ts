@@ -58,9 +58,14 @@ export function sanityImageUrl(
 ): string | undefined {
   if (!hasImageAsset(source)) return undefined;
 
-  let image = urlForImage(source);
-  if (options?.width) image = image.width(options.width);
-  if (options?.height) image = image.height(options.height);
-  if (options?.fit) image = image.fit(options.fit);
-  return image.auto('format').url();
+  try {
+    let image = urlForImage(source);
+    if (options?.width) image = image.width(options.width);
+    if (options?.height) image = image.height(options.height);
+    if (options?.fit) image = image.fit(options.fit);
+    return image.auto('format').url();
+  } catch {
+    // A malformed asset reference should drop the image, never fail the build.
+    return undefined;
+  }
 }
