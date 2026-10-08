@@ -54,14 +54,7 @@ const carouselAttrs = isCarousel
       <div class="home-releases__inner">
         <div class="home-releases__head">
           <div data-home-reveal>
-            {isSpotlight ? (
-              <p class="home-kicker home-kicker--live">
-                <span class="home-releases__pulse" aria-hidden="true" />
-                In the Spotlight
-              </p>
-            ) : (
-              <p class="home-kicker">Latest Release</p>
-            )}
+            <p class="home-kicker">{isSpotlight ? 'In the Spotlight' : 'Latest Release'}</p>
             <h2 id="home-music-title" class="home-title">
               Fresh From
               <br />
@@ -123,8 +116,13 @@ const carouselAttrs = isCarousel
                 </div>
 
                 <div class="home-releases__copy" {...(index === 0 ? { 'data-home-release-copy': '' } : {})}>
-                  {note?.badge && <p class="home-releases__badge">{note.badge}</p>}
                   <p class="home-releases__type">
+                    {note?.badge && (
+                      <>
+                        <span class="home-releases__badge">{note.badge}</span>
+                        <span aria-hidden="true"> · </span>
+                      </>
+                    )}
                     {typeLabel[release.type]}
                     {year && (
                       <>
@@ -141,11 +139,8 @@ const carouselAttrs = isCarousel
                   )}
                   {note?.message && <p class="home-releases__message">{note.message}</p>}
                   {smartLink && (
-                    <a href={smartLink} target="_blank" rel="noopener noreferrer" class="home-releases__cta">
-                      {note?.upcoming ? 'Pre-save now' : 'Listen everywhere'}
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
+                    <a href={smartLink} target="_blank" rel="noopener noreferrer" class="home-btn home-btn--solid home-releases__cta">
+                      {note?.upcoming ? 'Pre-save Now' : 'Listen Everywhere'}
                     </a>
                   )}
                   <div class="home-releases__actions">
@@ -574,65 +569,9 @@ const carouselAttrs = isCarousel
     }
   }
 
-  .home-kicker--live {
-    gap: 0.6rem;
-  }
-
-  .home-kicker--live::before {
-    display: none;
-  }
-
-  .home-releases__pulse {
-    position: relative;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: var(--color-accent);
-  }
-
-  .home-releases__pulse::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: var(--color-accent);
-    animation: home-releases-pulse 2s ease-out infinite;
-  }
-
-  @keyframes home-releases-pulse {
-    from {
-      opacity: 0.7;
-      transform: scale(1);
-    }
-    to {
-      opacity: 0;
-      transform: scale(3.2);
-    }
-  }
-
+  /* Badge sits in the meta line as plain type, set in white so it reads ahead of the blue. */
   .home-releases__badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.1rem;
-    padding: 0.4rem 0.85rem;
-    border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
     color: var(--color-fg);
-  }
-
-  .home-releases__badge::before {
-    content: '';
-    width: 0.4rem;
-    height: 0.4rem;
-    border-radius: 50%;
-    background: var(--color-accent);
-    box-shadow: 0 0 10px var(--color-accent);
   }
 
   .home-releases--spotlight .home-releases__name {
@@ -650,32 +589,7 @@ const carouselAttrs = isCarousel
   }
 
   .home-releases__cta {
-    display: inline-flex;
-    min-height: 3rem;
-    align-items: center;
-    gap: 0.6rem;
     margin-top: 1.75rem;
-    padding: 0.8rem 1.6rem;
-    border-radius: 999px;
-    background: var(--color-accent-fill);
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--color-on-accent);
-    text-decoration: none;
-    box-shadow: 0 10px 30px color-mix(in srgb, var(--color-accent-fill) 40%, transparent);
-    transition:
-      background 0.2s ease,
-      transform 0.2s ease;
-  }
-
-  .home-releases__cta:hover {
-    background: var(--color-accent-fill-hover);
-    transform: translateY(-2px);
-  }
-
-  .home-releases__cta svg {
-    width: 1.1rem;
-    height: 1.1rem;
   }
 
   .home-releases--spotlight .home-releases__cta + .home-releases__actions {
@@ -695,10 +609,6 @@ const carouselAttrs = isCarousel
     .home-releases__ambient-img,
     .home-releases__vinyl {
       transition: none;
-    }
-
-    .home-releases__pulse::after {
-      animation: none;
     }
   }
 </style>
