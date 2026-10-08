@@ -18,7 +18,7 @@ import {
 } from '@energize/shared';
 import { HERO_VIDEO_POSTER } from '../lib/hero-video';
 import { listNames } from '../lib/seo/site';
-import { activeSpotlights } from '../lib/releases/spotlights';
+import { activeSpotlightEntries, isUpcoming, spotlightBadgeLabel } from '../lib/releases/spotlights';
 import '../styles/home.css';
 
 let artists: ArtistCard[] = [];
@@ -36,12 +36,18 @@ try {
 }
 
 // Live spotlights from Studio, in their arranged order. With none live, show the newest release.
-const spotlights = activeSpotlights(releasesPage);
+const spotlights = activeSpotlightEntries(releasesPage);
 const musicReleases = await Promise.all(
-  (spotlights.length > 0 ? spotlights : latest ? [latest] : []).map((release) =>
+  (spotlights.length > 0 ? spotlights.map((entry) => entry.release) : latest ? [latest] : []).map((release) =>
     enrichRelease(release, { coverSize: 640 }),
   ),
 );
+// Badge, message and call to action for each spotlight slide, in the same order as musicReleases.
+const spotlightNotes = spotlights.map((entry) => ({
+  badge: spotlightBadgeLabel(entry.badge, entry.release.releaseDate),
+  message: entry.message?.trim() || null,
+  upcoming: isUpcoming(entry.release.releaseDate),
+}));
 
 const rosterNames = listNames(artists.map((artist) => artist.name));
 const description = rosterNames
@@ -66,7 +72,7 @@ const description = rosterNames
     <Hero />
     <div data-home-below class="home-below">
       <HomeBelief />
-      <HomeMusic releases={musicReleases} isSpotlight={spotlights.length > 0} />
+      <HomeMusic releases={musicReleases} isSpotlight={spotlights.length > 0} notes={spotlightNotes} />
       <HomeArtists artists={artists} />
       <HomeInitiatives />
       <HomeNewsletter />

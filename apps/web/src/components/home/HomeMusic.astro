@@ -9,9 +9,13 @@ interface Props {
   releases: EnrichedRelease[];
   /** True when the releases come from Studio > Release Spotlights. */
   isSpotlight: boolean;
+  /** Spotlight extras from Studio, in the same order as `releases`. Ignored for Latest Release. */
+  notes?: Array<{ badge: string | null; message: string | null; upcoming: boolean }>;
 }
 
-const { isSpotlight } = Astro.props;
+// Two designs: a dark, cover-lit stage for hand-picked spotlights, and the plain light layout
+// for the automatic Latest Release fallback.
+const { isSpotlight, notes = [] } = Astro.props;
 const releases: EnrichedRelease[] = Astro.props.releases;
 const isCarousel = releases.length > 1;
 const typeLabel: Record<EnrichedRelease['type'], string> = { single: 'Single', ep: 'EP', album: 'Album', compilation: 'Compilation' };
@@ -22,11 +26,42 @@ const carouselAttrs = isCarousel
 
 {
   releases.length > 0 && (
-    <section class="home-releases" id="music" data-home-releases aria-labelledby="home-music-title">
+    <section
+      class:list={['home-releases', isSpotlight && 'home-releases--spotlight theme-dark']}
+      id="music"
+      data-home-releases
+      aria-labelledby="home-music-title"
+    >
+      {isSpotlight && (
+        <div class="home-releases__ambient" aria-hidden="true">
+          {releases.map((release, index) =>
+            release.coverUrl ? (
+              <img
+                src={release.coverUrl}
+                alt=""
+                class:list={['home-releases__ambient-img', index === 0 && 'is-active']}
+                data-ambient={index}
+                width="640"
+                height="640"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
+              />
+            ) : null,
+          )}
+        </div>
+      )}
       <div class="home-releases__inner">
         <div class="home-releases__head">
           <div data-home-reveal>
-            <p class="home-kicker">{isSpotlight ? 'In the Spotlight' : 'Latest Release'}</p>
+            {isSpotlight ? (
+              <p class="home-kicker home-kicker--live">
+                <span class="home-releases__pulse" aria-hidden="true" />
+                In the Spotlight
+              </p>
+            ) : (
+              <p class="home-kicker">Latest Release</p>
+            )}
             <h2 id="home-music-title" class="home-title">
               Fresh From
               <br />
@@ -49,6 +84,8 @@ const carouselAttrs = isCarousel
               youtube: release.links?.youtube,
             };
             const hasStreaming = Boolean(streaming.spotify || streaming.appleMusic || streaming.youtube);
+            const note = isSpotlight ? notes[index] : undefined;
+            const smartLink = isSpotlight ? release.links?.smartLink : undefined;
             const slideAttrs = isCarousel
               ? {
                   role: 'group',
@@ -59,6 +96,8 @@ const carouselAttrs = isCarousel
               : {};
             return (
               <div class:list={['home-releases__stage', index === 0 && 'is-active']} data-slide {...slideAttrs}>
+                <div class="home-releases__art">
+                {isSpotlight && <span class="home-releases__vinyl" aria-hidden="true" />}
                 <a
                   href={`/releases/${release.slug}`}
                   class="home-releases__cover"
@@ -81,8 +120,10 @@ const carouselAttrs = isCarousel
                     <div class="home-releases__cover-fallback" />
                   )}
                 </a>
+                </div>
 
                 <div class="home-releases__copy" {...(index === 0 ? { 'data-home-release-copy': '' } : {})}>
+                  {note?.badge && <p class="home-releases__badge">{note.badge}</p>}
                   <p class="home-releases__type">
                     {typeLabel[release.type]}
                     {year && (
@@ -97,6 +138,15 @@ const carouselAttrs = isCarousel
                   </h3>
                   {release.artistNames.length > 0 && (
                     <p class="home-releases__artists">{release.artistNames.join(' · ')}</p>
+                  )}
+                  {note?.message && <p class="home-releases__message">{note.message}</p>}
+                  {smartLink && (
+                    <a href={smartLink} target="_blank" rel="noopener noreferrer" class="home-releases__cta">
+                      {note?.upcoming ? 'Pre-save now' : 'Listen everywhere'}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </a>
                   )}
                   <div class="home-releases__actions">
                     {hasStreaming ? (
@@ -170,6 +220,11 @@ const carouselAttrs = isCarousel
         slide.toggleAttribute('inert', !active);
       });
       dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === current)));
+      // The blurred cover glow behind the spotlight follows the active slide.
+      track
+        .closest<HTMLElement>('[data-home-releases]')
+        ?.querySelectorAll<HTMLElement>('[data-ambient]')
+        .forEach((img) => img.classList.toggle('is-active', img.dataset.ambient === String(current)));
     };
 
     const schedule = () => {
@@ -414,9 +469,236 @@ const carouselAttrs = isCarousel
     background: var(--color-accent);
   }
 
+  /* ── Spotlight design (hand-picked in Studio). Latest Release keeps the plain layout above. ── */
+
+  .home-releases__art {
+    position: relative;
+    width: 100%;
+    max-width: 34rem;
+    margin-inline: auto;
+  }
+
+  .home-releases--spotlight {
+    background: var(--color-scrim);
+  }
+
+  .home-releases__ambient {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .home-releases__ambient::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 55%, transparent 0%, color-mix(in srgb, var(--color-scrim) 55%, transparent) 60%),
+      linear-gradient(180deg, var(--color-scrim) 0%, transparent 22%, transparent 78%, var(--color-scrim) 100%);
+  }
+
+  .home-releases__ambient-img {
+    position: absolute;
+    top: 50%;
+    left: 30%;
+    width: 120%;
+    max-width: none;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    filter: blur(90px) saturate(1.5);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.15);
+    transition: opacity 1.2s ease;
+  }
+
+  .home-releases__ambient-img.is-active {
+    opacity: 0.55;
+  }
+
+  .home-releases--spotlight .home-releases__stage {
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .home-releases--spotlight .home-releases__stage {
+      gap: 6rem;
+    }
+  }
+
+  .home-releases--spotlight .home-releases__cover {
+    z-index: 1;
+    box-shadow:
+      0 40px 90px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(250, 250, 248, 0.08);
+  }
+
+  /* A record sliding out from behind the sleeve. */
+  .home-releases__vinyl {
+    position: absolute;
+    top: 4%;
+    left: 4%;
+    z-index: 0;
+    display: none;
+    width: 92%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, var(--color-accent) 0 15%, #0b0b0d 15.5% 17%, transparent 17.5%),
+      repeating-radial-gradient(circle, #151518 0 2px, #0d0d0f 2px 4px);
+    box-shadow:
+      inset 0 0 0 1px rgba(250, 250, 248, 0.06),
+      0 20px 60px rgba(0, 0, 0, 0.5);
+    transform: translateX(16%) rotate(0deg);
+    transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .home-releases__vinyl::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 30deg, transparent 0 20%, rgba(250, 250, 248, 0.08) 25%, transparent 32% 70%, rgba(250, 250, 248, 0.06) 75%, transparent 82%);
+  }
+
+  @media (min-width: 900px) {
+    .home-releases__vinyl {
+      display: block;
+    }
+
+    .home-releases__stage:hover .home-releases__vinyl,
+    .home-releases__stage:focus-within .home-releases__vinyl {
+      transform: translateX(21%) rotate(140deg);
+    }
+  }
+
+  .home-kicker--live {
+    gap: 0.6rem;
+  }
+
+  .home-kicker--live::before {
+    display: none;
+  }
+
+  .home-releases__pulse {
+    position: relative;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  .home-releases__pulse::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--color-accent);
+    animation: home-releases-pulse 2s ease-out infinite;
+  }
+
+  @keyframes home-releases-pulse {
+    from {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(3.2);
+    }
+  }
+
+  .home-releases__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.1rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-fg);
+  }
+
+  .home-releases__badge::before {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 10px var(--color-accent);
+  }
+
+  .home-releases--spotlight .home-releases__name {
+    font-size: clamp(2.75rem, 1.7rem + 4vw, 5.25rem);
+  }
+
+  .home-releases__message {
+    max-width: 30rem;
+    margin-top: 1.1rem;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+    font-style: italic;
+    line-height: 1.35;
+    color: var(--color-muted);
+  }
+
+  .home-releases__cta {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.75rem;
+    padding: 0.8rem 1.6rem;
+    border-radius: 999px;
+    background: var(--color-accent-fill);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-on-accent);
+    text-decoration: none;
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--color-accent-fill) 40%, transparent);
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .home-releases__cta:hover {
+    background: var(--color-accent-fill-hover);
+    transform: translateY(-2px);
+  }
+
+  .home-releases__cta svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .home-releases--spotlight .home-releases__cta + .home-releases__actions {
+    margin-top: 1.25rem;
+  }
+
+  .home-releases--spotlight .home-releases__dot:not([aria-current='true']) {
+    background: rgba(250, 250, 248, 0.25);
+  }
+
+  .home-releases--spotlight .home-releases__arrow {
+    background: transparent;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .home-releases__slides[data-carousel] > .home-releases__stage {
+    .home-releases__slides[data-carousel] > .home-releases__stage,
+    .home-releases__ambient-img,
+    .home-releases__vinyl {
       transition: none;
+    }
+
+    .home-releases__pulse::after {
+      animation: none;
     }
   }
 </style>

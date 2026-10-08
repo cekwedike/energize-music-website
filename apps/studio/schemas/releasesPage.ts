@@ -61,12 +61,39 @@ export default defineType({
                   return endsOn && startsOn && endsOn < startsOn ? '"Show until" must be on or after "Show from".' : true;
                 }),
             }),
+            defineField({
+              name: 'badge',
+              title: 'Badge',
+              type: 'string',
+              initialValue: 'auto',
+              description:
+                'The small label on the home page spotlight. Automatic shows "Coming [date]" before the release date, "New release" for the first 6 weeks, then "Out now".',
+              options: {
+                list: [
+                  { title: 'Automatic', value: 'auto' },
+                  { title: 'Out now', value: 'outNow' },
+                  { title: 'New release', value: 'new' },
+                  { title: 'Coming soon', value: 'comingSoon' },
+                  { title: 'Pre-save now', value: 'presave' },
+                  { title: 'Exclusive', value: 'exclusive' },
+                  { title: 'No badge', value: 'none' },
+                ],
+              },
+            }),
+            defineField({
+              name: 'message',
+              title: 'Spotlight message',
+              type: 'string',
+              description:
+                'Optional. One short line shown on the home page under the artiste name, e.g. "Ten songs of fire and faith, out everywhere now." Keep it under 120 characters.',
+              validation: (rule) => rule.max(120),
+            }),
           ],
           preview: {
-            select: { title: 'release.title', media: 'release.cover', startsOn: 'startsOn', endsOn: 'endsOn' },
-            prepare: ({ title, media, startsOn, endsOn }) => ({
+            select: { title: 'release.title', media: 'release.cover', startsOn: 'startsOn', endsOn: 'endsOn', message: 'message' },
+            prepare: ({ title, media, startsOn, endsOn, message }) => ({
               title: title || 'Choose a release',
-              subtitle: spotlightStatus(startsOn, endsOn),
+              subtitle: [spotlightStatus(startsOn, endsOn), message].filter(Boolean).join(' · '),
               media,
             }),
           },

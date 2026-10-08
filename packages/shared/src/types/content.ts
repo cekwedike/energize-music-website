@@ -38,7 +38,13 @@ export interface ReleaseSpotlight {
   release: Release | null;
   startsOn?: string;
   endsOn?: string;
+  /** Badge on the home spotlight. Missing or "auto" picks one from the release date. */
+  badge?: SpotlightBadge;
+  /** Optional one-line message shown on the home spotlight. */
+  message?: string;
 }
+
+export type SpotlightBadge = 'auto' | 'outNow' | 'new' | 'comingSoon' | 'presave' | 'exclusive' | 'none';
 
 export interface ReleasesPage {
   _id: string;
