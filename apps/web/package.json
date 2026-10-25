@@ -14,7 +14,7 @@
     "test:mobile:ui": "playwright test tests/mobile-responsiveness.spec.ts --ui"
   },
   "dependencies": {
-    "@astrojs/react": "^6.0.2",
+    "@astrojs/react": "^6.0.6",
     "@energize/shared": "workspace:*",
     "@sanity/client": "^6.28.0",
     "@sanity/image-url": "^1.1.0",
