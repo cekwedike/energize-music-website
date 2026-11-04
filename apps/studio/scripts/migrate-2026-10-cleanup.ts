@@ -82,18 +82,18 @@ async function run() {
     plan.push(`${id}: set ${blocks.length} blocks, effectiveDate ${EFFECTIVE_DATE}`);
   }
 
-  // 4. Energize Fest: real details only. Venue, time, and lineup are left for the team to fill in.
+  // 4. Events: real details only. Venue, time, and lineup are left for the team to fill in.
   tx.createIfNotExists({
     _id: FEST_ID,
     _type: 'event',
-    title: 'Energize Fest',
-    slug: { _type: 'slug', current: 'energize-fest' },
-    subtitle: 'The Annual Energize Music Live Showcase',
+    title: 'Events',
+    slug: { _type: 'slug', current: 'events' },
+    subtitle: 'Live Music and Shared Moments',
     startDate: '2026-12-01T17:00:00.000Z',
     eventType: 'physical',
     cover: {
       _type: 'image',
-      alt: 'Performers and crowd at Energize Fest, the annual Energize Music live showcase',
+      alt: 'Performers and crowd at an Energize Music live event',
       asset: { _type: 'reference', _ref: FEST_COVER_ASSET },
     },
     summary:

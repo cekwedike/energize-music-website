@@ -24,7 +24,7 @@ const ROUTES = [
   '/404',
   '/next',
   '/energize-kids',
-  '/events/energize-fest',
+  '/events',
 ] as const;
 
 const ARTIFACT_DIR = path.join(process.cwd(), 'playwright-artifacts', 'mobile-audit');

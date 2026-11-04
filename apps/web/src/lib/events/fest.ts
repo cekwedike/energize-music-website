@@ -2,8 +2,8 @@ import type { EventDetail } from '@energize/shared';
 import { isPastEvent } from './format';
 
 /**
- * Splits Fest editions into the next one coming up and the ones already held.
- * An edition moves to Past Events once its end (or start) time has passed; the daily
+ * Splits events into the next one coming up and the ones already held.
+ * An event moves to Past Events once its end (or start) time has passed; the daily
  * rebuild (api/rebuild.ts) makes that happen without anyone touching Sanity.
  */
 export function splitFestEvents(events: EventDetail[]): { upcoming: EventDetail | null; past: EventDetail[] } {

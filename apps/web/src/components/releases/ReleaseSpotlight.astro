@@ -63,7 +63,6 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
             hidden={index !== 0}
           >
             <div class="release-spotlight__copy">
-              <p class="release-spotlight__eyebrow">Release spotlight</p>
               <h2
                 id={index === 0 ? `${spotlightId}-heading` : undefined}
                 class="release-spotlight__title"
@@ -173,7 +172,7 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
     max-width: min(100%, 14rem);
     padding: 0.4375rem 0.875rem;
     border: 1px solid var(--color-line);
-    border-radius: 9999px;
+    border-radius: 0.25rem;
     background: color-mix(in srgb, var(--color-fg) 3%, transparent);
     font-family: var(--font-body);
     font-size: 0.6875rem;
@@ -217,17 +216,8 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
     }
   }
 
-  .release-spotlight__eyebrow {
-    margin: 0;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
   .release-spotlight__title {
-    margin: 0.75rem 0 0;
+    margin: 0;
     font-family: var(--font-display);
     font-size: clamp(1.75rem, 1.35rem + 2vw, 3.25rem);
     line-height: 0.98;
@@ -263,7 +253,7 @@ const spotlightId = `release-spotlight-${Math.random().toString(36).slice(2, 9)}
     align-items: center;
     justify-content: center;
     padding: 0.625rem 1.125rem;
-    border-radius: 9999px;
+    border-radius: 0.25rem;
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.06em;

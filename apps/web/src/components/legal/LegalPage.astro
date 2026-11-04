@@ -11,11 +11,10 @@ interface Props {
   blocks: PortableTextBlock[];
   /** ISO date (YYYY-MM-DD) the current wording took effect. */
   effectiveDate: string;
-  eyebrow?: string;
   breadcrumbs?: BreadcrumbItem[];
 }
 
-const { title, description, blocks, effectiveDate, eyebrow = 'Legal', breadcrumbs } = Astro.props;
+const { title, description, blocks, effectiveDate, breadcrumbs } = Astro.props;
 const updated = new Date(`${effectiveDate}T12:00:00Z`).toLocaleDateString('en-GB', {
   year: 'numeric',
   month: 'long',
@@ -29,14 +28,13 @@ const updated = new Date(`${effectiveDate}T12:00:00Z`).toLocaleDateString('en-GB
   description={description}
   breadcrumbs={breadcrumbs}
 >
-  <PageHero size="slim" eyebrow={eyebrow} title={title} description={description} />
+  <PageHero size="slim" title={title} description={description} />
 
   <section class="legal-page">
     <div class="legal-page__shell mx-auto max-w-6xl px-5 pb-20 pt-10 sm:px-6 sm:pb-28 sm:pt-14">
       <div class="legal-page__layout">
         <aside class="legal-page__rail" aria-hidden="true">
           <p class="legal-page__rail-label">Energize Music</p>
-          <p class="legal-page__rail-meta">{eyebrow}</p>
         </aside>
 
         <article class="legal-page__article">
@@ -92,14 +90,6 @@ const updated = new Date(`${effectiveDate}T12:00:00Z`).toLocaleDateString('en-GB
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
-  .legal-page__rail-meta {
-    margin: 0.55rem 0 0;
-    font-family: var(--font-display, Georgia, serif);
-    font-size: 1.35rem;
-    line-height: 1.15;
     color: var(--color-accent);
   }
 

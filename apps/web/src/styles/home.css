@@ -18,26 +18,8 @@
   }
 }
 
-.home-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-}
-
-.home-kicker::before {
-  content: '';
-  width: 1.5rem;
-  height: 1px;
-  background: currentColor;
-}
-
 .home-title {
-  margin-top: 0.85rem;
+  margin-top: 0;
   font-family: var(--font-display);
   font-size: clamp(2.35rem, 1.5rem + 3.2vw, 4.5rem);
   font-weight: 500;

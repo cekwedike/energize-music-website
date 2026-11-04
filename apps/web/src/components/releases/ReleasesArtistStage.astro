@@ -56,7 +56,6 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
       </div>
 
       <div class="artist-stage__identity">
-        <p class="artist-stage__eyebrow">Artiste</p>
         <h2 id={`releases-artist-${group.slug}`} class="artist-stage__name">
           <a href={`/artists/${group.slug}`} class="artist-stage__name-link">
             {group.name}
@@ -178,18 +177,8 @@ const tintVariant = index % 2 === 0 ? 'navy' : 'blue';
     padding: 0;
   }
 
-  .artist-stage__eyebrow {
-    margin: 0;
-    font-family: var(--font-body);
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--stage-accent);
-  }
-
   .artist-stage__name {
-    margin: 0.5rem 0 0;
+    margin: 0;
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 2rem + 3.5vw, 4.75rem);
     font-weight: 600;

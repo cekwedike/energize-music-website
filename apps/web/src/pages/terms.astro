@@ -20,6 +20,5 @@ const title = page?.title?.trim() || 'Terms of Service';
   description="The terms for using energize-music.com and other Energize Music websites, content, and digital services."
   blocks={page?.blocks?.length ? page.blocks : termsBlocks}
   effectiveDate={page?.effectiveDate || TERMS_EFFECTIVE_DATE}
-  eyebrow="Terms"
   breadcrumbs={crumbs({ name: title, path: '/terms' })}
 />

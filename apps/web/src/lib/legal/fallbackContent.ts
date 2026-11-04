@@ -41,7 +41,7 @@ export const privacyBlocks: PortableTextBlock[] = [
 export const termsBlocks: PortableTextBlock[] = [
   block('normal', 'These Terms of Service ("Terms") govern your use of energize-music.com and related Energize Music digital properties. By accessing the site, you agree to these Terms.', 't-intro'),
   block('h2', 'Who We Are', 't-h2-1'),
-  block('normal', 'Energize Music Affairs is a music label and creative company. References to "Energize Music", "we", or "us" mean Energize Music Affairs and its affiliated brands, including initiatives such as Energize Kids, NEXT, and Energize Fest where applicable.', 't-b-1'),
+  block('normal', 'Energize Music Affairs is a music label and creative company. References to "Energize Music", "we", or "us" mean Energize Music Affairs and its affiliated brands, including initiatives such as Energize Kids, NEXT, and Events where applicable.', 't-b-1'),
   block('h2', 'Using the Site', 't-h2-2'),
   block('normal', 'You may browse the site for personal, non-commercial use. You agree not to misuse the site, attempt unauthorized access, scrape content at abusive volumes, or interfere with site security or performance.', 't-b-2'),
   block('h2', 'Content and Intellectual Property', 't-h2-3'),

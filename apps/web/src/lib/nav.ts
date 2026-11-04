@@ -45,10 +45,10 @@ export const initiativesNav: InitiativeItem[] = [
     image: '/initiatives/cards/energize-kids.webp',
   },
   {
-    label: 'Energize Fest',
-    href: '/events/energize-fest',
+    label: 'Events',
+    href: '/events',
     blurb:
-      'The annual live showcase for the full Energize Music roster. See the date, venue, and how to get tickets.',
+      'Live shows and shared moments from Energize Music. See upcoming dates, venues, and ticket details.',
     image: '/initiatives/cards/energize-fest.webp',
   },
 ];

@@ -1,6 +1,6 @@
 import { imageFragment } from './fragments';
 
-/** Every published Energize Fest edition, oldest first. The page splits them into upcoming and past. */
+/** Every published event, oldest first. The page splits them into upcoming and past. */
 export const festEventsQuery = /* groq */ `*[_type == "event" && defined(startDate)] | order(startDate asc){
   _id,
   title,

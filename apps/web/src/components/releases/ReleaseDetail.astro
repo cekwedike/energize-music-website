@@ -77,13 +77,13 @@ const primaryListenUrl = release.externalUrl;
       </figure>
 
       <div class="release-detail__copy min-w-0 lg:pt-4">
-        <p class="release-reveal release-reveal-3 text-xs font-bold uppercase tracking-[0.28em] text-[var(--color-accent)]">
-          {releaseTypeLabel} &middot; {releaseDate}
-        </p>
-
-        <h1 class="release-reveal release-reveal-4 mt-4 font-display text-[clamp(2.25rem,1.4rem+3.2vw,4.25rem)] leading-[0.95] tracking-tight text-fg">
+        <h1 class="release-reveal release-reveal-3 font-display text-[clamp(2.25rem,1.4rem+3.2vw,4.25rem)] leading-[0.95] tracking-tight text-fg">
           {release.displayTitle}
         </h1>
+
+        <p class="release-reveal release-reveal-4 mt-4 text-sm font-semibold text-[var(--color-accent)]">
+          {releaseTypeLabel} &middot; {releaseDate}
+        </p>
 
         {
           artists.length > 0 ? (
@@ -110,7 +110,7 @@ const primaryListenUrl = release.externalUrl;
         {
           hasStreaming && (
             <div class="release-reveal release-reveal-6 mt-10 max-w-md">
-              <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-fg">Listen</p>
+              <h2 class="text-base font-semibold text-fg">Listen</h2>
               <div class="mt-4">
                 <ArtistStreamingLinks
                   streaming={streaming}
@@ -129,7 +129,7 @@ const primaryListenUrl = release.externalUrl;
                 href={primaryListenUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center justify-center rounded-full bg-fg px-7 py-3.5 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90"
+                class="inline-flex items-center justify-center rounded-sm bg-fg px-7 py-3.5 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90"
               >
                 Listen Now
               </a>

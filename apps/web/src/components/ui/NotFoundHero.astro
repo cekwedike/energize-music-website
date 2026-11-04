@@ -9,9 +9,6 @@ const navLinks = [
 
 <section class="not-found" aria-labelledby="not-found-heading">
   <div class="not-found__inner">
-    <p class="not-found__eyebrow scroll-reveal">Off the map</p>
-    <div class="not-found__rule scroll-reveal" style="--reveal-delay: 60ms" aria-hidden="true"></div>
-
     <h1 id="not-found-heading" class="not-found__title scroll-reveal" style="--reveal-delay: 120ms">
       This Page <em>Isn't</em> on the Roster
     </h1>
@@ -53,23 +50,8 @@ const navLinks = [
     padding-inline: clamp(1.25rem, 4vw, 1.5rem);
   }
 
-  .not-found__eyebrow {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
-  .not-found__rule {
-    width: 3rem;
-    height: 1px;
-    margin-top: 1rem;
-    background: linear-gradient(90deg, var(--color-accent), transparent);
-  }
-
   .not-found__title {
-    margin-top: clamp(1.25rem, 3vw, 2rem);
+    margin-top: 0;
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 1.8rem + 3vw, 4.5rem);
     line-height: 0.98;

@@ -42,11 +42,11 @@ export const structure: StructureResolver = (S) =>
         .child(S.document().schemaType('releasesPage').documentId('releasesPage').title('Release Spotlights')),
       S.divider(),
       S.listItem()
-        .title('Energize Fest')
+        .title('Events')
         .icon(CalendarIcon)
         .child(
           S.documentTypeList('event')
-            .title('Energize Fest Editions')
+            .title('All Events')
             .defaultOrdering([{ field: 'startDate', direction: 'desc' }]),
         ),
       S.listItem()

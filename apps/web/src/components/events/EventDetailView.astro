@@ -1,9 +1,9 @@
 ---
 /**
- * Energize Fest page template, fed by Sanity "event" documents (one per edition).
- * - The next upcoming edition fills the hero and the detail sections.
- * - With no upcoming edition, default Energize Fest content shows instead.
- * - Editions whose date has passed are listed under Past Events.
+ * Events page template, fed by Sanity "event" documents.
+ * - The next upcoming event fills the hero and the detail sections.
+ * - With no upcoming event, default Events content shows instead.
+ * - Events whose dates have passed are listed under Past Events.
  * Empty fields hide their sections.
  */
 import type { EventDetail } from '@energize/shared';
@@ -24,35 +24,38 @@ import { imageAlt } from '../../lib/seo/site';
 import { titleCase } from '../../lib/text/titleCase';
 
 interface Props {
-  /** Next upcoming edition, or null to show the default Fest content. */
+  /** Next upcoming event, or null to show the default Events content. */
   event: EventDetail | null;
-  /** Editions already held, newest first. */
+  /** Events already held, newest first. */
   pastEvents: EventDetail[];
   shareUrl: string;
 }
 
 const { event, pastEvents, shareUrl } = Astro.props;
 
-/** Shown while no upcoming edition is published in Sanity. */
+const eventName = (value: string) => (value === 'Energize Fest' ? 'Events' : value);
+const eventCopy = (value: string | undefined) => value?.replaceAll('Energize Fest', 'Events');
+
+/** Shown while no upcoming event is published in Sanity. */
 const DEFAULT_FEST = {
-  title: 'Energize Fest',
-  subtitle: 'The Annual Energize Music Live Showcase',
+  title: 'Events',
+  subtitle: 'Live Music and Shared Moments',
   cover: '/initiatives/energize-fest.webp',
   about:
-    'Energize Fest is the annual live showcase from Energize Music: one night that brings our artistes and special guests together on one stage for fans, families, and church communities.',
-  next: 'Dates, venue, and ticket links for the next edition will be posted here as soon as they are confirmed.',
+    'Energize Music events bring our artistes, special guests, and community together for live music and shared moments.',
+  next: 'Dates, venues, and ticket links for upcoming events will be posted here as soon as they are confirmed.',
 };
 
-const title = event?.title ?? DEFAULT_FEST.title;
-const subtitle = event ? event.subtitle : DEFAULT_FEST.subtitle;
+const title = event ? eventName(event.title) : DEFAULT_FEST.title;
+const subtitle = event ? eventCopy(event.subtitle === 'The Annual Energize Music Live Showcase' ? DEFAULT_FEST.subtitle : event.subtitle) : DEFAULT_FEST.subtitle;
 const coverUrl = event ? getEventCoverUrl(event.cover, 2400, 1500) : DEFAULT_FEST.cover;
 const ticketUrl = event?.ticketUrl;
 // No ticket link yet: the main button opens the email sign-up so people hear when sales open.
 const primaryLabel = ticketUrl ? event?.ctaLabel || 'Get Tickets' : 'Get Ticket Alerts';
 const alertsTitle = 'Get Ticket Alerts';
 const alertsLead = event
-  ? `Be the first to know when ${event.title} tickets go on sale and the lineup is announced.`
-  : 'Be the first to know when the next Energize Fest date, venue, and tickets are announced.';
+  ? `Be the first to know when ${title} tickets go on sale and the lineup is announced.`
+  : 'Be the first to know when the next event date, venue, and tickets are announced.';
 const secondaryHref = event?.secondaryCtaUrl || '/contact?intent=partnership';
 const secondaryLabel = event?.secondaryCtaLabel || 'Partner With Us';
 
@@ -61,8 +64,8 @@ const highlights = (event?.highlights ?? []).filter((item) => item?.title && ite
 const lineup = (event?.lineup ?? []).filter(Boolean);
 const body = event?.body?.length ? event.body : null;
 const marqueeItems = event
-  ? [event.title, formatEventDate(event.startDate), venue, formatEventType(event.eventType)]
-  : ['Energize Fest', 'Annual Live Showcase', 'Next Edition Coming Soon', 'Afro-Gospel Live'];
+  ? [title, formatEventDate(event.startDate), venue, formatEventType(event.eventType)]
+  : ['Energize Music Events', 'Live Music', 'New Dates Coming Soon', 'Afro-Gospel Live'];
 
 const lineupCards = lineup.map((slot) => {
   const revealed = !slot.revealState || slot.revealState === 'confirmed';
@@ -83,13 +86,13 @@ const PAST_PAGE_SIZE = 6;
 const pastCards = pastEvents.map((past) => {
   const year = new Date(past.startDate).getUTCFullYear();
   return {
-    title: `${past.title} ${year}`,
+    title: `${eventName(past.title)} ${year}`,
     year,
     date: formatEventDateLong(past.startDate),
     venue: formatEventLocation(past.location),
-    summary: past.summary,
+    summary: eventCopy(past.summary),
     coverUrl: getEventCoverUrl(past.cover, 960, 640),
-    coverAlt: imageAlt(past.cover?.alt, `${past.title} ${year}`),
+    coverAlt: imageAlt(eventCopy(past.cover?.alt), `${eventName(past.title)} ${year}`),
   };
 });
 ---
@@ -110,10 +113,6 @@ const pastCards = pastEvents.map((past) => {
 
       <div class="fest-hero__grid">
         <div class="fest-reveal">
-          <p class="fest-hero__eyebrow">
-            <span class="fest-hero__pill">{event ? formatEventDate(event.startDate) : 'Next Edition Coming Soon'}</span>
-            Energize Music Presents
-          </p>
           <h1 class="fest-hero__title">{title}</h1>
           {subtitle && <p class="fest-hero__subtitle">{titleCase(subtitle)}</p>}
 
@@ -178,7 +177,6 @@ const pastCards = pastEvents.map((past) => {
       <section class="fest-section" aria-labelledby="fest-details-title">
         <div class="fest-container">
           <div class="fest-head scroll-reveal">
-            <p class="fest-kicker">The Night</p>
             <h2 id="fest-details-title" class="fest-h2">Event Details</h2>
           </div>
           <ol class="fest-details scroll-reveal-stagger">
@@ -202,7 +200,6 @@ const pastCards = pastEvents.map((past) => {
       <section class="fest-section fest-section--surface" aria-labelledby="fest-lineup-title">
         <div class="fest-container">
           <div class="fest-head scroll-reveal">
-            <p class="fest-kicker">On Stage</p>
             <h2 id="fest-lineup-title" class="fest-h2">The Lineup</h2>
           </div>
           {lineupCards.length > 0 ? (
@@ -250,14 +247,13 @@ const pastCards = pastEvents.map((past) => {
   <section class="fest-section" aria-labelledby="fest-story-title">
     <div class="fest-container fest-story">
       <div class="fest-story__aside scroll-reveal">
-        <p class="fest-kicker">The Story</p>
-        <h2 id="fest-story-title" class="fest-h2">{event ? 'About the Night' : 'About Energize Fest'}</h2>
+        <h2 id="fest-story-title" class="fest-h2">{event ? 'About the Event' : 'About Our Events'}</h2>
         <div class="fest-story__share">
-          <EventShare title={title} summary={event?.summary ?? DEFAULT_FEST.about} shareUrl={shareUrl} />
+          <EventShare title={title} summary={eventCopy(event?.summary) ?? DEFAULT_FEST.about} shareUrl={shareUrl} />
         </div>
       </div>
       <div class="fest-story__body scroll-reveal" style="--reveal-delay: 100ms">
-        {event?.summary && <p class="fest-story__lead">{event.summary}</p>}
+        {event?.summary && <p class="fest-story__lead">{eventCopy(event.summary)}</p>}
         {body && <PortableText value={body} />}
         {!event && <p class="fest-story__lead">{DEFAULT_FEST.about}</p>}
         {!event && <p>{DEFAULT_FEST.next}</p>}
@@ -270,7 +266,6 @@ const pastCards = pastEvents.map((past) => {
       <section class="fest-section fest-section--surface" aria-labelledby="fest-past-title" data-fest-past data-page-size={PAST_PAGE_SIZE}>
         <div class="fest-container">
           <div class="fest-head scroll-reveal">
-            <p class="fest-kicker">Archive</p>
             <h2 id="fest-past-title" class="fest-h2">Past Events</h2>
           </div>
           <ul class="fest-past scroll-reveal-stagger">
@@ -301,9 +296,8 @@ const pastCards = pastEvents.map((past) => {
   <section class="fest-cta theme-dark" aria-labelledby="fest-cta-title">
     {coverUrl && <img src={coverUrl} alt="" class="fest-cta__bg" width="2400" height="1500" loading="lazy" decoding="async" />}
     <div class="fest-cta__inner scroll-reveal">
-      <p class="fest-kicker">{ticketUrl ? 'See You There' : "Don't Miss It"}</p>
       <h2 id="fest-cta-title" class="fest-cta__title">{ticketUrl ? 'Get Your Tickets' : 'Be First in Line for Tickets'}</h2>
-      <p class="fest-cta__meta">{event ? `${formatEventDateLong(event.startDate)} · ${venue}` : 'Next edition to be announced'}</p>
+      <p class="fest-cta__meta">{event ? `${formatEventDateLong(event.startDate)} · ${venue}` : 'New event dates will be announced soon'}</p>
       <div class="fest-actions fest-actions--center">
         {ticketUrl ? (
           <a href={ticketUrl} class="fest-btn fest-btn--solid" target="_blank" rel="noopener noreferrer">
@@ -461,28 +455,8 @@ const pastCards = pastEvents.map((past) => {
     }
   }
 
-  .fest-hero__eyebrow {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.85rem;
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-on-dark);
-  }
-
-  .fest-hero__pill {
-    padding: 0.45rem 0.8rem;
-    border-radius: 999px;
-    background: var(--color-accent-fill);
-    color: #fff;
-    letter-spacing: 0.18em;
-  }
-
   .fest-hero__title {
-    margin-top: 1.25rem;
+    margin-top: 0;
     font-family: var(--font-display);
     font-size: clamp(3.5rem, 2rem + 9vw, 10rem);
     font-weight: 500;
@@ -663,26 +637,8 @@ const pastCards = pastEvents.map((past) => {
     }
   }
 
-  .fest-kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.7rem;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
-  .fest-kicker::before {
-    content: '';
-    width: 1.5rem;
-    height: 1px;
-    background: currentColor;
-  }
-
   .fest-h2 {
-    margin-top: 0.85rem;
+    margin-top: 0;
     font-family: var(--font-display);
     font-size: clamp(2.25rem, 1.5rem + 3vw, 4.25rem);
     font-weight: 500;
@@ -973,7 +929,7 @@ const pastCards = pastEvents.map((past) => {
   }
 
   .fest-cta__title {
-    margin-top: 1rem;
+    margin-top: 0;
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 1.6rem + 4vw, 5.5rem);
     font-weight: 500;

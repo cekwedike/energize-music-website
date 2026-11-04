@@ -103,7 +103,6 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
     </div>
 
     <div class="next-hero__content">
-      <p class="next-reveal next-hero__eyebrow">Energize Music Presents</p>
 
       <div class="next-reveal next-hero__logo" style="--reveal-delay: 90ms">
         <NextLogo animated={true} />
@@ -156,8 +155,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
   <section id="journey" class="scroll-mt-24 border-t border-[var(--color-line)] bg-[var(--color-surface)]">
     <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
       <div class="next-scroll-reveal mx-auto max-w-2xl text-center">
-        <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-accent)]">The Journey</p>
-        <h2 class="text-h2 mt-3">From Submission to Stage</h2>
+        <h2 class="text-h2">From Submission to Stage</h2>
         <p class="mt-3 text-sm text-fg">May to October 2026</p>
       </div>
       <ol class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -191,8 +189,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
             <div class="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)] via-[var(--color-bg)]/35 to-transparent"></div>
           </div>
           <div class="next-scroll-reveal">
-            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-accent)]">Enter NEXT</p>
-            <h2 class="text-h2 mt-3">Four steps. Free to join.</h2>
+            <h2 class="text-h2">Four steps. Free to join.</h2>
             <ol class="mt-8 space-y-4">
               {steps.map((step) => (
                 <li class="flex gap-4 border-b border-[var(--color-line)] pb-4 last:border-0">
@@ -218,8 +215,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
   <section id="faq" class="scroll-mt-24 border-t border-[var(--color-line)] bg-[var(--color-surface)]">
     <div class="mx-auto max-w-3xl px-5 py-16 sm:px-6 sm:py-20">
       <div class="next-scroll-reveal text-center">
-        <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-accent)]">FAQ</p>
-        <h2 class="text-h2 mt-3">Quick Answers</h2>
+        <h2 class="text-h2">Quick Answers</h2>
       </div>
       <div class="mt-8 space-y-3">
         {
@@ -249,7 +245,7 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
             href={submitUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="button-glow mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-fg px-8 py-3.5 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90"
+            class="button-glow mt-8 inline-flex min-h-12 items-center justify-center rounded-sm bg-fg px-8 py-3.5 text-sm font-semibold text-[var(--color-bg)] transition hover:bg-fg/90"
           >
             {submitLabel}
           </a>
@@ -329,14 +325,6 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
     justify-content: center;
     padding: calc(var(--header-height, 4rem) + 1.5rem) 1.25rem 2.5rem;
     text-align: center;
-  }
-
-  .next-hero__eyebrow {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.38em;
-    text-transform: uppercase;
-    color: var(--color-accent);
   }
 
   .next-hero__logo {

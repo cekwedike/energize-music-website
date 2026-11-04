@@ -7,7 +7,6 @@ export interface PageHeroCta {
 }
 
 interface Props {
-  eyebrow?: string;
   title: string;
   description?: string;
   size?: 'slim' | 'standard';
@@ -15,7 +14,7 @@ interface Props {
   ctas?: PageHeroCta[];
 }
 
-const { eyebrow, title, description, size = 'standard', align = 'left', ctas = [] } = Astro.props;
+const { title, description, size = 'standard', align = 'left', ctas = [] } = Astro.props;
 
 const isSlim = size === 'slim';
 const isCenter = align === 'center';
@@ -33,25 +32,10 @@ const isCenter = align === 'center';
     ]}
   >
     <div class:list={['max-w-4xl', isCenter && 'mx-auto text-center']}>
-      {
-        eyebrow && (
-          <p class="page-hero-reveal page-hero-reveal-1 text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--color-accent)] sm:text-xs sm:tracking-[0.35em]">
-            {eyebrow}
-          </p>
-        )
-      }
-      {
-        eyebrow && (
-          <div
-            class:list={['page-hero-reveal page-hero-reveal-2 mt-3 h-px w-10 bg-[var(--color-accent)] sm:mt-4', isCenter && 'mx-auto']}
-            aria-hidden="true"
-          />
-        )
-      }
       <h1
         class:list={[
           'page-hero-reveal font-display leading-[0.95] tracking-tight text-fg',
-          eyebrow ? 'page-hero-reveal-3 mt-5 sm:mt-6' : 'page-hero-reveal-1',
+          'page-hero-reveal-1',
           isSlim ? 'text-h2 sm:text-h1' : 'text-h1 max-w-3xl',
           isCenter && 'mx-auto',
         ]}
@@ -63,7 +47,7 @@ const isCenter = align === 'center';
           <p
             class:list={[
               'page-hero-reveal text-lead mt-4 text-fg sm:mt-5',
-              eyebrow ? 'page-hero-reveal-4' : 'page-hero-reveal-2',
+              'page-hero-reveal-2',
               isSlim ? 'max-w-2xl' : 'max-w-xl',
               isCenter && 'mx-auto',
             ]}
@@ -78,7 +62,7 @@ const isCenter = align === 'center';
           <div
             class:list={[
               'page-hero-reveal mt-8 flex flex-wrap gap-3 sm:mt-10',
-              eyebrow ? 'page-hero-reveal-5' : 'page-hero-reveal-3',
+              'page-hero-reveal-3',
               isCenter && 'justify-center',
             ]}
           >
@@ -89,7 +73,7 @@ const isCenter = align === 'center';
                   target={cta.external ? '_blank' : undefined}
                   rel={cta.external ? 'noopener noreferrer' : undefined}
                   class:list={[
-                    'inline-flex min-h-11 items-center rounded-full px-5 py-2.5 text-sm font-semibold transition sm:px-6 sm:py-3',
+                    'inline-flex min-h-11 items-center rounded-sm px-5 py-2.5 text-sm font-semibold transition sm:px-6 sm:py-3',
                     cta.variant === 'secondary'
                       ? 'border border-fg/25 text-fg hover:border-fg/45 hover:bg-fg/5'
                       : 'bg-[var(--color-accent)] text-[var(--color-on-accent)] hover:bg-[var(--color-accent)]/90',

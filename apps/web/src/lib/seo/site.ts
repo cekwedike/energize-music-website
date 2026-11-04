@@ -4,7 +4,7 @@ export const SITE_NAME = 'Energize Music';
 export const SITE_LEGAL_NAME = 'Energize Music Affairs';
 export const SITE_TAGLINE = 'The Energy Different';
 export const SITE_DESCRIPTION =
-  'Energize Music is a Lagos-based Afro-gospel and soul-fusion record label, home to Greatman Takit and TY Bello, and the team behind NEXT, Energize Kids, and Energize Fest.';
+  'Energize Music is a Lagos-based Afro-gospel and soul-fusion record label, home to Greatman Takit and TY Bello, and the team behind NEXT, Energize Kids, and live events.';
 /** Landscape JPEG for WhatsApp / social previews (logo.webp is too small / webp-unfriendly). */
 export const SITE_DEFAULT_OG = '/brand/og-energize-music.jpg';
 export const SITE_DEFAULT_OG_WIDTH = 1200;

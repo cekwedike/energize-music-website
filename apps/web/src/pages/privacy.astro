@@ -20,6 +20,5 @@ const title = page?.title?.trim() || 'Privacy Policy';
   description="How Energize Music collects, uses, and protects your information, including email sign-ups, contact messages, and analytics."
   blocks={page?.blocks?.length ? page.blocks : privacyBlocks}
   effectiveDate={page?.effectiveDate || PRIVACY_EFFECTIVE_DATE}
-  eyebrow="Privacy"
   breadcrumbs={crumbs({ name: title, path: '/privacy' })}
 />
