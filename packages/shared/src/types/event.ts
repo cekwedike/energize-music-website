@@ -22,6 +22,7 @@ export interface EventDetail {
   _id: string;
   title: string;
   slug: string;
+  shortSlug?: string;
   subtitle?: string;
   startDate: string;
   endDate?: string;

@@ -31,6 +31,7 @@ if (!detail) {
 }
 
 const pageUrl = absoluteUrl(`/events/${detail.slug}`);
+const shareUrl = detail.shortSlug ? absoluteUrl(`/${detail.shortSlug}`) : pageUrl;
 const ogImage =
   getEventCoverUrl(detail.shareImage, 1200, 630) ||
   getEventCoverUrl(detail.cover, 1200, 630) ||
@@ -96,5 +97,5 @@ const jsonLd = {
   headerVariant="overlay"
 >
   <JsonLd data={jsonLd} />
-  <EventDetailView event={detail} pastEvents={[]} shareUrl={pageUrl} />
+  <EventDetailView event={detail} pastEvents={[]} shareUrl={shareUrl} />
 </BaseLayout>

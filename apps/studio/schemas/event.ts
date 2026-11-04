@@ -7,6 +7,22 @@ const lineupRevealOptions = [
   { title: 'Surprise reveal', value: 'surprise' },
 ] as const;
 
+const reservedShortLinks = new Set([
+  '404',
+  'about',
+  'api',
+  'artists',
+  'blog',
+  'contact',
+  'energize-kids',
+  'events',
+  'llms',
+  'next',
+  'privacy',
+  'releases',
+  'terms',
+]);
+
 export default defineType({
   name: 'event',
   title: 'Event',
@@ -38,6 +54,28 @@ export default defineType({
       validation: (r) => r.required(),
       description:
         'This becomes the page link, such as /events/qol-gospel-rave. Click Generate, then keep it short and do not change it after sharing the link.',
+    }),
+    defineField({
+      name: 'shortSlug',
+      group: 'basics',
+      title: 'Short link',
+      type: 'slug',
+      options: {
+        source: 'title',
+      },
+      description:
+        'The short link used by Copy Link, such as "qol" for energize-music.com/qol. Click Generate, then shorten it before publishing.',
+      validation: (r) =>
+        r.required().custom((value) => {
+          const shortSlug = value?.current;
+          if (!shortSlug) return 'Add a short link';
+          if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(shortSlug)) {
+            return 'Use lowercase letters, numbers, and hyphens only';
+          }
+          if (shortSlug.length > 24) return 'Keep the short link under 25 characters';
+          if (reservedShortLinks.has(shortSlug)) return 'This link is already used by the website';
+          return true;
+        }),
     }),
     defineField({
       name: 'subtitle',

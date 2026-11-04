@@ -4,6 +4,7 @@ const eventDetailProjection = /* groq */ `{
   _id,
   title,
   "slug": slug.current,
+  "shortSlug": shortSlug.current,
   subtitle,
   startDate,
   endDate,
