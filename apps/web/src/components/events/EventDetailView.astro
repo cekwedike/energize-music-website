@@ -1,9 +1,6 @@
 ---
 /**
- * Events page template, fed by Sanity "event" documents.
- * - The next upcoming event fills the hero and the detail sections.
- * - With no upcoming event, default Events content shows instead.
- * - Events whose dates have passed are listed under Past Events.
+ * Event detail template, fed by one Sanity "event" document.
  * Empty fields hide their sections.
  */
 import type { EventDetail } from '@energize/shared';
@@ -24,7 +21,7 @@ import { imageAlt } from '../../lib/seo/site';
 import { titleCase } from '../../lib/text/titleCase';
 
 interface Props {
-  /** Next upcoming event, or null to show the default Events content. */
+  /** The event shown on this detail page. */
   event: EventDetail | null;
   /** Events already held, newest first. */
   pastEvents: EventDetail[];
@@ -33,11 +30,10 @@ interface Props {
 
 const { event, pastEvents, shareUrl } = Astro.props;
 
-const eventName = (value: string) => (value === 'Energize Fest' ? 'Events' : value);
-const eventCopy = (value: string | undefined) => value?.replaceAll('Energize Fest', 'Events');
+const eventCopy = (value: string | undefined) => value;
 
 /** Shown while no upcoming event is published in Sanity. */
-const DEFAULT_FEST = {
+const DEFAULT_EVENT = {
   title: 'Events',
   subtitle: 'Live Music and Shared Moments',
   cover: '/initiatives/energize-fest.webp',
@@ -46,9 +42,9 @@ const DEFAULT_FEST = {
   next: 'Dates, venues, and ticket links for upcoming events will be posted here as soon as they are confirmed.',
 };
 
-const title = event ? eventName(event.title) : DEFAULT_FEST.title;
-const subtitle = event ? eventCopy(event.subtitle === 'The Annual Energize Music Live Showcase' ? DEFAULT_FEST.subtitle : event.subtitle) : DEFAULT_FEST.subtitle;
-const coverUrl = event ? getEventCoverUrl(event.cover, 2400, 1500) : DEFAULT_FEST.cover;
+const title = event ? event.title : DEFAULT_EVENT.title;
+const subtitle = event?.subtitle ?? DEFAULT_EVENT.subtitle;
+const coverUrl = event ? getEventCoverUrl(event.cover, 2400, 1500) : DEFAULT_EVENT.cover;
 const ticketUrl = event?.ticketUrl;
 // No ticket link yet: the main button opens the email sign-up so people hear when sales open.
 const primaryLabel = ticketUrl ? event?.ctaLabel || 'Get Tickets' : 'Get Ticket Alerts';
@@ -86,13 +82,13 @@ const PAST_PAGE_SIZE = 6;
 const pastCards = pastEvents.map((past) => {
   const year = new Date(past.startDate).getUTCFullYear();
   return {
-    title: `${eventName(past.title)} ${year}`,
+    title: `${past.title} ${year}`,
     year,
     date: formatEventDateLong(past.startDate),
     venue: formatEventLocation(past.location),
     summary: eventCopy(past.summary),
     coverUrl: getEventCoverUrl(past.cover, 960, 640),
-    coverAlt: imageAlt(eventCopy(past.cover?.alt), `${eventName(past.title)} ${year}`),
+    coverAlt: imageAlt(past.cover?.alt, `${past.title} ${year}`),
   };
 });
 ---
@@ -109,7 +105,7 @@ const pastCards = pastEvents.map((past) => {
     <div class="fest-hero__scrim" aria-hidden="true"></div>
 
     <div class="fest-hero__inner">
-      <a href="/" class="fest-hero__back">← Home</a>
+      <a href="/events" class="fest-hero__back">← All Events</a>
 
       <div class="fest-hero__grid">
         <div class="fest-reveal">
@@ -249,14 +245,14 @@ const pastCards = pastEvents.map((past) => {
       <div class="fest-story__aside scroll-reveal">
         <h2 id="fest-story-title" class="fest-h2">{event ? 'About the Event' : 'About Our Events'}</h2>
         <div class="fest-story__share">
-          <EventShare title={title} summary={eventCopy(event?.summary) ?? DEFAULT_FEST.about} shareUrl={shareUrl} />
+          <EventShare title={title} summary={eventCopy(event?.summary) ?? DEFAULT_EVENT.about} shareUrl={shareUrl} />
         </div>
       </div>
       <div class="fest-story__body scroll-reveal" style="--reveal-delay: 100ms">
         {event?.summary && <p class="fest-story__lead">{eventCopy(event.summary)}</p>}
         {body && <PortableText value={body} />}
-        {!event && <p class="fest-story__lead">{DEFAULT_FEST.about}</p>}
-        {!event && <p>{DEFAULT_FEST.next}</p>}
+        {!event && <p class="fest-story__lead">{DEFAULT_EVENT.about}</p>}
+        {!event && <p>{DEFAULT_EVENT.next}</p>}
       </div>
     </div>
   </section>

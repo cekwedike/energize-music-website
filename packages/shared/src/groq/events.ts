@@ -1,7 +1,6 @@
 import { imageFragment } from './fragments';
 
-/** Every published event, oldest first. The page splits them into upcoming and past. */
-export const festEventsQuery = /* groq */ `*[_type == "event" && defined(startDate)] | order(startDate asc){
+const eventDetailProjection = /* groq */ `{
   _id,
   title,
   "slug": slug.current,
@@ -28,3 +27,9 @@ export const festEventsQuery = /* groq */ `*[_type == "event" && defined(startDa
   secondaryCtaLabel,
   secondaryCtaUrl
 }`;
+
+/** Every event with a usable public URL, ordered by date. */
+export const eventsQuery = /* groq */ `*[_type == "event" && defined(slug.current) && defined(startDate)] | order(startDate asc) ${eventDetailProjection}`;
+
+/** One event for its public detail page. */
+export const eventBySlugQuery = /* groq */ `*[_type == "event" && slug.current == $slug][0] ${eventDetailProjection}`;

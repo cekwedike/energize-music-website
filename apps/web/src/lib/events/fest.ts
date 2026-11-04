@@ -6,8 +6,8 @@ import { isPastEvent } from './format';
  * An event moves to Past Events once its end (or start) time has passed; the daily
  * rebuild (api/rebuild.ts) makes that happen without anyone touching Sanity.
  */
-export function splitFestEvents(events: EventDetail[]): { upcoming: EventDetail | null; past: EventDetail[] } {
-  const upcoming = events.find((event) => !isPastEvent(event.startDate, event.endDate)) ?? null;
+export function splitEvents(events: EventDetail[]): { upcoming: EventDetail[]; past: EventDetail[] } {
+  const upcoming = events.filter((event) => !isPastEvent(event.startDate, event.endDate));
   const past = events.filter((event) => isPastEvent(event.startDate, event.endDate)).reverse();
   return { upcoming, past };
 }

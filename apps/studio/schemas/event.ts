@@ -12,7 +12,7 @@ export default defineType({
   title: 'Event',
   type: 'document',
   description:
-    'One entry per Energize Fest edition. The next upcoming edition fills /events/energize-fest; once its date passes it moves to Past Events automatically. With no upcoming edition, the page shows default Energize Fest content.',
+    'Create one page for each event. Every published event appears at /events/your-event-slug and can also appear in the Events directory.',
   groups: [
     { name: 'basics', title: 'Basics', default: true },
     { name: 'page', title: 'Page Content' },
@@ -33,21 +33,18 @@ export default defineType({
       title: 'Slug',
       type: 'slug',
       options: {
-        // Title plus year keeps each edition unique, e.g. "energize-fest-2026".
-        source: (doc) => {
-          const { title, startDate } = doc as { title?: string; startDate?: string };
-          return [title, startDate ? new Date(startDate).getUTCFullYear() : ''].filter(Boolean).join(' ');
-        },
+        source: 'title',
       },
       validation: (r) => r.required(),
-      description: 'Click Generate. One per edition, e.g. "energize-fest-2026".',
+      description:
+        'This becomes the page link, such as /events/qol-gospel-rave. Click Generate, then keep it short and do not change it after sharing the link.',
     }),
     defineField({
       name: 'subtitle',
       group: 'basics',
       title: 'Subtitle',
       type: 'string',
-      description: 'Short line under the title, e.g. "The Annual Energize Music Live Showcase". Shown in Title Case.',
+      description: 'A short line under the event title. Shown in title case.',
     }),
     defineField({
       name: 'startDate',
@@ -122,12 +119,12 @@ export default defineType({
       title: 'Summary',
       type: 'text',
       rows: 3,
-      description: 'Two or three sentences. Shown at the start of About the Night and used for Google and share previews.',
+      description: 'Two or three sentences. Shown near the start of the page and used for Google and share previews.',
     }),
     defineField({
       name: 'body',
       group: 'page',
-      title: 'About the Night',
+      title: 'About the event',
       type: 'array',
       of: [{ type: 'block', styles: [{ title: 'Normal', value: 'normal' }], lists: [] }],
       description: 'Optional extra paragraphs under the summary.',

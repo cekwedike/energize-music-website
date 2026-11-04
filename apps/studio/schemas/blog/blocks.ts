@@ -35,7 +35,7 @@ const altField = defineField({
   title: 'Alt text',
   type: 'string',
   description:
-    'Describe the picture for people using screen readers and for Google, e.g. "Greatman Takit singing on stage at Energize Fest". Leave empty only if "Decorative image" is on.',
+    'Describe the picture for people using screen readers and for Google, e.g. "Greatman Takit singing on stage at a live event". Leave empty only if "Decorative image" is on.',
   validation: (rule) =>
     rule.custom((alt, context) => {
       const parent = context.parent as { decorative?: boolean; asset?: unknown } | undefined;

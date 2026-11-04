@@ -1,99 +1,280 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import EventDetailView from '../../components/events/EventDetailView.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
+import PageHero from '../../components/ui/PageHero.astro';
 import { sanityClient } from '../../lib/sanity/client';
-import { festEventsQuery, type EventDetail } from '@energize/shared';
+import { eventsQuery, type EventDetail } from '@energize/shared';
 import { getEventCoverUrl } from '../../lib/events/media';
-import { formatEventLocation } from '../../lib/events/format';
-import { splitFestEvents } from '../../lib/events/fest';
-import { crumbs, organizationId } from '../../lib/seo/schema';
-import { absoluteUrl } from '../../lib/seo/site';
+import { formatEventDateLong, formatEventLocation, formatEventType } from '../../lib/events/format';
+import { splitEvents } from '../../lib/events/fest';
+import { crumbs } from '../../lib/seo/schema';
+import { absoluteUrl, imageAlt } from '../../lib/seo/site';
 
-// Always built. The next upcoming event from Sanity fills the page; with none, default Events content shows.
-// Events whose dates have passed move to Past Events.
 let events: EventDetail[] = [];
 try {
-  events = await sanityClient.fetch<EventDetail[]>(festEventsQuery);
+  events = await sanityClient.fetch<EventDetail[]>(eventsQuery);
 } catch {
   events = [];
 }
-const { upcoming, past } = splitFestEvents(events);
 
-const shareUrl = absoluteUrl('/events');
-const ogImage = upcoming
-  ? getEventCoverUrl(upcoming.shareImage, 1200, 630) || getEventCoverUrl(upcoming.cover, 1200, 630) || undefined
-  : undefined;
+const { upcoming, past } = splitEvents(events);
 
-/** Whole sentences from the summary that fit a search snippet. */
-function snippet(text: string | undefined, fallback: string): string {
-  const sentences = text?.match(/[^.!?]+[.!?]+(?=\s|$)/g)?.map((s) => s.trim()) ?? [];
-  let out = '';
-  for (const sentence of sentences) {
-    const next = out ? `${out} ${sentence}` : sentence;
-    if (next.length > 155) break;
-    out = next;
-  }
-  return out || fallback;
-}
-
-const year = upcoming ? new Date(upcoming.startDate).getUTCFullYear() : null;
-const upcomingTitle = upcoming ? (upcoming.title === 'Energize Fest' ? 'Events' : upcoming.title) : null;
-const pageTitle = upcoming ? `${upcomingTitle} ${year}: Date, Tickets and Lineup` : 'Events | Live Music from Energize Music';
-const pageDescription = upcoming
-  ? snippet(upcoming.summary, `${upcomingTitle} ${year}, a live event from Energize Music.`)
-  : 'Find upcoming Energize Music events, see past shows, and get alerts when new dates and tickets are announced.';
-
-const jsonLd = upcoming
-  ? (() => {
-      const hasVenue = formatEventLocation(upcoming.location) !== 'Venue to be announced';
-      const performers = (upcoming.lineup ?? [])
-        .filter((slot) => (!slot.revealState || slot.revealState === 'confirmed') && slot.name?.trim())
-        .map((slot) => ({
-          '@type': 'PerformingGroup',
-          name: slot.name!.trim(),
-          ...(slot.artistSlug ? { url: absoluteUrl(`/artists/${slot.artistSlug}`) } : {}),
-        }));
-      const attendanceMode =
-        upcoming.eventType === 'virtual'
-          ? 'https://schema.org/OnlineEventAttendanceMode'
-          : upcoming.eventType === 'hybrid'
-            ? 'https://schema.org/MixedEventAttendanceMode'
-            : 'https://schema.org/OfflineEventAttendanceMode';
-      return {
-        '@context': 'https://schema.org',
-        '@type': 'MusicEvent',
-        '@id': `${shareUrl}#event`,
-        name: upcomingTitle,
-        startDate: upcoming.startDate,
-        endDate: upcoming.endDate || upcoming.startDate,
-        eventStatus: 'https://schema.org/EventScheduled',
-        eventAttendanceMode: attendanceMode,
-        image: ogImage ? [ogImage] : undefined,
-        url: shareUrl,
-        description: upcoming.summary?.replaceAll('Energize Fest', 'Events') ?? upcomingTitle,
-        inLanguage: 'en',
-        location: hasVenue
-          ? { '@type': 'Place', name: upcoming.location, address: { '@type': 'PostalAddress', addressLocality: upcoming.location, addressCountry: 'NG' } }
-          : { '@type': 'Place', name: 'Venue to be announced', address: { '@type': 'PostalAddress', addressCountry: 'NG' } },
-        organizer: { '@id': organizationId() },
-        performer: performers.length > 0 ? performers : undefined,
-        ...(upcoming.ticketUrl
-          ? { offers: { '@type': 'Offer', url: upcoming.ticketUrl, availability: 'https://schema.org/InStock' } }
-          : {}),
-      };
-    })()
+const eventList = events.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Energize Music Events',
+      itemListElement: events.map((event, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: absoluteUrl(`/events/${event.slug}`),
+        name: event.title,
+      })),
+    }
   : null;
+
+const card = (event: EventDetail) => ({
+  ...event,
+  href: `/events/${event.slug}`,
+  imageUrl: getEventCoverUrl(event.cover, 1200, 800),
+  imageAlt: imageAlt(event.cover?.alt, `${event.title} event cover`),
+  date: formatEventDateLong(event.startDate),
+  venue: formatEventLocation(event.location),
+  format: formatEventType(event.eventType),
+});
 ---
 
 <BaseLayout
-  title={pageTitle}
-  description={pageDescription}
-  ogImage={ogImage}
-  keywords={['Energize Music events', ...(year ? [`Energize Music events ${year}`] : []), 'gospel concert', 'Afro-gospel live show']}
+  title="Events | Live Music from Energize Music"
+  description="Find upcoming Energize Music events, revisit past shows, and open each event page for dates, venues, lineups, and tickets."
+  keywords={['Energize Music events', 'gospel concerts', 'Afro-gospel live shows']}
   breadcrumbs={crumbs({ name: 'Events', path: '/events' })}
-  headerVariant="overlay"
 >
-  {jsonLd && <JsonLd data={jsonLd} />}
-  <EventDetailView event={upcoming} pastEvents={past} shareUrl={shareUrl} />
+  {eventList && <JsonLd data={eventList} />}
+
+  <PageHero
+    title="Events"
+    description="Find the next live experience, get ticket details, and revisit moments from past events."
+  />
+
+  <main class="events-index">
+    <section class="events-section" aria-labelledby="upcoming-events-title">
+      <div class="events-container">
+        <h2 id="upcoming-events-title">Upcoming Events</h2>
+        {
+          upcoming.length > 0 ? (
+            <ul class="events-grid">
+              {upcoming.map((event) => {
+                const item = card(event);
+                return (
+                  <li>
+                    <a class="event-card" href={item.href}>
+                      <span class="event-card__media">
+                        {item.imageUrl ? (
+                          <img src={item.imageUrl} alt={item.imageAlt} width="1200" height="800" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="event-card__placeholder" aria-hidden="true" />
+                        )}
+                      </span>
+                      <span class="event-card__body">
+                        <span class="event-card__date">{item.date}</span>
+                        <span class="event-card__title">{item.title}</span>
+                        {item.subtitle && <span class="event-card__summary">{item.subtitle}</span>}
+                        <span class="event-card__meta">{item.venue} · {item.format}</span>
+                        <span class="event-card__link">View Event</span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <div class="events-empty">
+              <h3>New Events Coming Soon</h3>
+              <p>Dates, venues, and ticket links will be added here when they are confirmed.</p>
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    {
+      past.length > 0 && (
+        <section class="events-section events-section--surface" aria-labelledby="past-events-title">
+          <div class="events-container">
+            <h2 id="past-events-title">Past Events</h2>
+            <ul class="events-grid">
+              {past.map((event) => {
+                const item = card(event);
+                return (
+                  <li>
+                    <a class="event-card" href={item.href}>
+                      <span class="event-card__media">
+                        {item.imageUrl ? (
+                          <img src={item.imageUrl} alt={item.imageAlt} width="1200" height="800" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="event-card__placeholder" aria-hidden="true" />
+                        )}
+                      </span>
+                      <span class="event-card__body">
+                        <span class="event-card__date">{item.date}</span>
+                        <span class="event-card__title">{item.title}</span>
+                        {item.summary && <span class="event-card__summary">{item.summary}</span>}
+                        <span class="event-card__meta">{item.venue} · {item.format}</span>
+                        <span class="event-card__link">View Event</span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+      )
+    }
+  </main>
 </BaseLayout>
+
+<style>
+  .events-section {
+    padding-block: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+
+  .events-section--surface {
+    background: var(--color-surface);
+  }
+
+  .events-container {
+    width: min(100%, 80rem);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  .events-container h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 4.25rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: 2rem 1.5rem;
+    margin: 3rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .event-card {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    border: 1px solid var(--color-line);
+    background: var(--color-bg);
+    transition: border-color 180ms ease, transform 180ms ease;
+  }
+
+  .event-card:hover {
+    border-color: color-mix(in srgb, var(--color-fg) 45%, transparent);
+    transform: translateY(-3px);
+  }
+
+  .event-card__media {
+    display: block;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-fg) 6%, transparent);
+  }
+
+  .event-card__media img,
+  .event-card__placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 500ms ease;
+  }
+
+  .event-card:hover .event-card__media img {
+    transform: scale(1.025);
+  }
+
+  .event-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+
+  .event-card__date {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .event-card__title {
+    margin-top: 0.65rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.65rem, 1.4rem + 0.8vw, 2.25rem);
+    line-height: 1;
+  }
+
+  .event-card__summary {
+    margin-top: 0.8rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+
+  .event-card__meta {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .event-card__link {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .events-empty {
+    max-width: 42rem;
+    margin-top: 3rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border: 1px solid var(--color-line);
+  }
+
+  .events-empty h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 500;
+  }
+
+  .events-empty p {
+    margin-top: 0.75rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 640px) {
+    .events-container {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .event-card,
+    .event-card__media img {
+      transition: none;
+    }
+  }
+</style>

@@ -26,16 +26,6 @@
       "statusCode": 301
     },
     {
-      "source": "/events/energize-fest",
-      "destination": "/events",
-      "statusCode": 301
-    },
-    {
-      "source": "/events/:path((?!energize-fest/?$).+)",
-      "destination": "https://energizehq.netlify.app/live",
-      "statusCode": 301
-    },
-    {
       "source": "/energize-fest",
       "destination": "/events",
       "statusCode": 301
