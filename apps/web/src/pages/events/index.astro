@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
-import PageHero from '../../components/ui/PageHero.astro';
+import Marquee from '../../components/ui/Marquee.astro';
+import SubscribeDialog from '../../components/forms/SubscribeDialog.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { eventsQuery, type EventDetail } from '@energize/shared';
 import { getEventCoverUrl } from '../../lib/events/media';
@@ -36,244 +37,641 @@ const eventList = events.length
 const card = (event: EventDetail) => ({
   ...event,
   href: `/events/${event.slug}`,
-  imageUrl: getEventCoverUrl(event.cover, 1200, 800),
+  imageUrl: getEventCoverUrl(event.cover, 1600, 1067),
   imageAlt: imageAlt(event.cover?.alt, `${event.title} event cover`),
   date: formatEventDateLong(event.startDate),
   venue: formatEventLocation(event.location),
   format: formatEventType(event.eventType),
 });
+
+const featured = upcoming[0] ? card(upcoming[0]) : null;
+const moreUpcoming = upcoming.slice(1).map(card);
+const pastEvents = past.map(card);
+const marqueeItems = featured
+  ? [featured.title, featured.date, featured.venue, featured.format]
+  : ['Energize Music Events', 'Live Music', 'Shared Moments', 'New Dates Coming Soon'];
 ---
 
 <BaseLayout
   title="Events | Live Music from Energize Music"
   description="Find upcoming Energize Music events, revisit past shows, and open each event page for dates, venues, lineups, and tickets."
+  ogImage={featured?.imageUrl ?? undefined}
   keywords={['Energize Music events', 'gospel concerts', 'Afro-gospel live shows']}
   breadcrumbs={crumbs({ name: 'Events', path: '/events' })}
+  headerVariant="overlay"
 >
   {eventList && <JsonLd data={eventList} />}
 
-  <PageHero
-    title="Events"
-    description="Find the next live experience, get ticket details, and revisit moments from past events."
-  />
-
   <main class="events-index">
-    <section class="events-section" aria-labelledby="upcoming-events-title">
-      <div class="events-container">
-        <h2 id="upcoming-events-title">Upcoming Events</h2>
+    <header class="events-hero theme-dark">
+      {
+        featured?.imageUrl ? (
+          <img
+            class="events-hero__image"
+            src={featured.imageUrl}
+            alt=""
+            width="1600"
+            height="1067"
+            fetchpriority="high"
+            decoding="async"
+          />
+        ) : (
+          <div class="events-hero__fallback" aria-hidden="true"></div>
+        )
+      }
+      <div class="events-hero__scrim" aria-hidden="true"></div>
+
+      <div class="events-hero__inner">
+        <div class="events-hero__intro">
+          <h1>Events</h1>
+          <p>Live music. Shared energy. Nights worth remembering.</p>
+        </div>
+
         {
-          upcoming.length > 0 ? (
-            <ul class="events-grid">
-              {upcoming.map((event) => {
-                const item = card(event);
-                return (
-                  <li>
-                    <a class="event-card" href={item.href}>
-                      <span class="event-card__media">
-                        {item.imageUrl ? (
-                          <img src={item.imageUrl} alt={item.imageAlt} width="1200" height="800" loading="lazy" decoding="async" />
-                        ) : (
-                          <span class="event-card__placeholder" aria-hidden="true" />
-                        )}
-                      </span>
-                      <span class="event-card__body">
-                        <span class="event-card__date">{item.date}</span>
-                        <span class="event-card__title">{item.title}</span>
-                        {item.subtitle && <span class="event-card__summary">{item.subtitle}</span>}
-                        <span class="event-card__meta">{item.venue} · {item.format}</span>
-                        <span class="event-card__link">View Event</span>
-                      </span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
+          featured ? (
+            <div class="events-hero__feature">
+              <div class="events-hero__feature-copy">
+                <h2>{featured.title}</h2>
+                {featured.subtitle && <p>{featured.subtitle}</p>}
+              </div>
+              <dl class="events-hero__facts">
+                <div>
+                  <dt>Date</dt>
+                  <dd>{featured.date}</dd>
+                </div>
+                <div>
+                  <dt>Venue</dt>
+                  <dd>{featured.venue}</dd>
+                </div>
+              </dl>
+              <a class="events-action events-action--light" href={featured.href}>View Event</a>
+            </div>
           ) : (
-            <div class="events-empty">
-              <h3>New Events Coming Soon</h3>
-              <p>Dates, venues, and ticket links will be added here when they are confirmed.</p>
+            <div class="events-hero__feature events-hero__feature--empty">
+              <div class="events-hero__feature-copy">
+                <h2>New events are on the way</h2>
+                <p>Dates, venues, and ticket links will appear here when they are confirmed.</p>
+              </div>
+              <button
+                type="button"
+                class="events-action events-action--light"
+                data-subscribe-open
+                data-subscribe-title="Get Event Updates"
+                data-subscribe-lead="Get new event dates and ticket news in your inbox."
+              >
+                Get Event Updates
+              </button>
             </div>
           )
         }
       </div>
-    </section>
+    </header>
+
+    <Marquee items={marqueeItems} variant="caps" class="events-marquee" />
 
     {
-      past.length > 0 && (
-        <section class="events-section events-section--surface" aria-labelledby="past-events-title">
+      moreUpcoming.length > 0 && (
+        <section class="events-program" aria-labelledby="more-events-title">
           <div class="events-container">
-            <h2 id="past-events-title">Past Events</h2>
-            <ul class="events-grid">
-              {past.map((event) => {
-                const item = card(event);
-                return (
-                  <li>
-                    <a class="event-card" href={item.href}>
-                      <span class="event-card__media">
-                        {item.imageUrl ? (
-                          <img src={item.imageUrl} alt={item.imageAlt} width="1200" height="800" loading="lazy" decoding="async" />
-                        ) : (
-                          <span class="event-card__placeholder" aria-hidden="true" />
-                        )}
-                      </span>
-                      <span class="event-card__body">
-                        <span class="event-card__date">{item.date}</span>
-                        <span class="event-card__title">{item.title}</span>
-                        {item.summary && <span class="event-card__summary">{item.summary}</span>}
-                        <span class="event-card__meta">{item.venue} · {item.format}</span>
-                        <span class="event-card__link">View Event</span>
-                      </span>
-                    </a>
-                  </li>
-                );
-              })}
+            <div class="events-section-head">
+              <h2 id="more-events-title">More Dates</h2>
+              <p>More ways to meet the music live.</p>
+            </div>
+            <ul class="events-program__grid">
+              {moreUpcoming.map((event) => (
+                <li>
+                  <a class="program-card" href={event.href}>
+                    <span class="program-card__media">
+                      {event.imageUrl ? (
+                        <img src={event.imageUrl} alt={event.imageAlt} width="1200" height="800" loading="lazy" decoding="async" />
+                      ) : (
+                        <span class="program-card__placeholder" aria-hidden="true"></span>
+                      )}
+                    </span>
+                    <span class="program-card__body">
+                      <span class="program-card__date">{event.date}</span>
+                      <span class="program-card__title">{event.title}</span>
+                      <span class="program-card__meta">{event.venue} · {event.format}</span>
+                      <span class="program-card__link">View Event</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </section>
       )
     }
+
+    {
+      pastEvents.length > 0 && (
+        <section class="events-archive" aria-labelledby="past-events-title">
+          <div class="events-container">
+            <div class="events-section-head events-section-head--archive">
+              <h2 id="past-events-title">Past Events</h2>
+              <p>The nights that brought us together.</p>
+            </div>
+            <ol class="events-archive__list">
+              {pastEvents.map((event, index) => (
+                <li>
+                  <a class="archive-event" href={event.href}>
+                    <span class="archive-event__number">{String(index + 1).padStart(2, '0')}</span>
+                    <span class="archive-event__media">
+                      {event.imageUrl ? (
+                        <img src={event.imageUrl} alt={event.imageAlt} width="480" height="320" loading="lazy" decoding="async" />
+                      ) : (
+                        <span class="archive-event__placeholder" aria-hidden="true"></span>
+                      )}
+                    </span>
+                    <span class="archive-event__main">
+                      <span class="archive-event__title">{event.title}</span>
+                      <span class="archive-event__meta">{event.date} · {event.venue}</span>
+                    </span>
+                    <span class="archive-event__link">View Event</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      )
+    }
+
+    <section class="events-closing theme-dark" aria-labelledby="events-closing-title">
+      {featured?.imageUrl && <img class="events-closing__image" src={featured.imageUrl} alt="" width="1600" height="1067" loading="lazy" decoding="async" />}
+      <div class="events-closing__scrim" aria-hidden="true"></div>
+      <div class="events-closing__inner">
+        <h2 id="events-closing-title">Be there when it happens.</h2>
+        <p>Get new dates, ticket news, and lineup updates in your inbox.</p>
+        <button
+          type="button"
+          class="events-action events-action--accent"
+          data-subscribe-open
+          data-subscribe-title="Get Event Updates"
+          data-subscribe-lead="Get new event dates and ticket news in your inbox."
+        >
+          Get Event Updates
+        </button>
+      </div>
+    </section>
   </main>
+
+  <SubscribeDialog />
 </BaseLayout>
 
 <style>
-  .events-section {
-    padding-block: clamp(4rem, 3rem + 4vw, 7rem);
+  .events-index {
+    overflow: clip;
   }
 
-  .events-section--surface {
-    background: var(--color-surface);
+  .events-hero {
+    position: relative;
+    isolation: isolate;
+    min-height: max(46rem, 100svh);
+    margin-top: calc(-1 * var(--header-height, 4rem));
+    overflow: hidden;
+    background: #050505;
+  }
+
+  .events-hero__image,
+  .events-hero__fallback {
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    width: 100%;
+    height: 100%;
+  }
+
+  .events-hero__image {
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.025);
+    animation: hero-settle 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .events-hero__fallback {
+    background:
+      radial-gradient(circle at 75% 20%, rgba(31, 91, 255, 0.36), transparent 35%),
+      radial-gradient(circle at 20% 75%, rgba(31, 91, 255, 0.16), transparent 30%),
+      #050505;
+  }
+
+  .events-hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.08) 35%, rgba(0, 0, 0, 0.9) 100%),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, transparent 65%);
+  }
+
+  .events-hero__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: min(100%, 96rem);
+    min-height: max(46rem, 100svh);
+    margin-inline: auto;
+    padding: calc(var(--header-height, 4rem) + clamp(4.5rem, 10vh, 8rem)) 1.25rem clamp(2rem, 5vh, 4rem);
+  }
+
+  .events-hero__intro h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(5.25rem, 4rem + 12vw, 15rem);
+    font-weight: 500;
+    line-height: 0.72;
+    letter-spacing: -0.065em;
+    color: var(--color-on-dark);
+  }
+
+  .events-hero__intro p {
+    max-width: 34rem;
+    margin-top: clamp(1.75rem, 3vw, 3rem);
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(1.35rem, 1rem + 1.4vw, 2.25rem);
+    font-style: italic;
+    line-height: 1.15;
+    color: var(--color-on-dark);
+  }
+
+  .events-hero__feature {
+    display: grid;
+    gap: 1.5rem;
+    align-items: end;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
+  }
+
+  .events-hero__feature-copy h2 {
+    margin: 0;
+    max-width: 54rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 1.7rem + 4vw, 6rem);
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    color: var(--color-on-dark);
+  }
+
+  .events-hero__feature-copy p {
+    max-width: 38rem;
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .events-hero__facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+  }
+
+  .events-hero__facts dt {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6f96ff;
+  }
+
+  .events-hero__facts dd {
+    margin: 0.35rem 0 0;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    color: var(--color-on-dark);
+  }
+
+  .events-action {
+    display: inline-flex;
+    min-height: 3rem;
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 0.125rem;
+    padding: 0.85rem 1.35rem;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+  }
+
+  .events-action:hover {
+    transform: translateY(-2px);
+  }
+
+  .events-action--light {
+    background: #fff;
+    color: #080808;
+  }
+
+  .events-action--light:hover {
+    background: #dfe7ff;
+  }
+
+  .events-action--accent {
+    background: var(--color-accent-fill);
+    color: #fff;
+  }
+
+  .events-action--accent:hover {
+    background: var(--color-accent-fill-hover);
+  }
+
+  .events-index :global(.events-marquee) {
+    border-block: 1px solid var(--color-line);
+    background: var(--color-bg);
   }
 
   .events-container {
-    width: min(100%, 80rem);
+    width: min(100%, 88rem);
     margin-inline: auto;
     padding-inline: 1.25rem;
   }
 
-  .events-container h2 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 1.5rem + 3vw, 4.25rem);
-    font-weight: 500;
-    line-height: 0.98;
-    letter-spacing: -0.035em;
+  .events-program,
+  .events-archive {
+    padding-block: clamp(5rem, 4rem + 5vw, 9rem);
   }
 
-  .events-grid {
+  .events-program {
+    background: var(--color-bg);
+  }
+
+  .events-archive {
+    background: var(--color-surface);
+  }
+
+  .events-section-head {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-    gap: 2rem 1.5rem;
-    margin: 3rem 0 0;
+    gap: 1rem;
+    align-items: end;
+  }
+
+  .events-section-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 2rem + 5vw, 7rem);
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+  }
+
+  .events-section-head p {
+    max-width: 28rem;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .events-program__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 2.5rem 1.5rem;
+    margin: clamp(3rem, 6vw, 5rem) 0 0;
     padding: 0;
     list-style: none;
   }
 
-  .event-card {
+  .program-card {
     display: flex;
     height: 100%;
     flex-direction: column;
-    border: 1px solid var(--color-line);
-    background: var(--color-bg);
-    transition: border-color 180ms ease, transform 180ms ease;
   }
 
-  .event-card:hover {
-    border-color: color-mix(in srgb, var(--color-fg) 45%, transparent);
-    transform: translateY(-3px);
-  }
-
-  .event-card__media {
+  .program-card__media {
     display: block;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 4 / 3;
     overflow: hidden;
-    background: color-mix(in srgb, var(--color-fg) 6%, transparent);
+    background: color-mix(in srgb, var(--color-fg) 7%, transparent);
   }
 
-  .event-card__media img,
-  .event-card__placeholder {
+  .program-card__media img,
+  .program-card__placeholder {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 500ms ease;
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .event-card:hover .event-card__media img {
-    transform: scale(1.025);
+  .program-card:hover .program-card__media img {
+    transform: scale(1.035);
   }
 
-  .event-card__body {
+  .program-card__body {
     display: flex;
     flex: 1;
     flex-direction: column;
-    padding: 1.5rem;
+    padding-top: 1.25rem;
   }
 
-  .event-card__date {
-    font-size: 0.7rem;
+  .program-card__date {
+    font-size: 0.68rem;
     font-weight: 800;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--color-accent);
   }
 
-  .event-card__title {
-    margin-top: 0.65rem;
+  .program-card__title {
+    margin-top: 0.75rem;
     font-family: var(--font-display);
-    font-size: clamp(1.65rem, 1.4rem + 0.8vw, 2.25rem);
+    font-size: clamp(2rem, 1.6rem + 1.4vw, 3rem);
+    line-height: 0.98;
+  }
+
+  .program-card__meta {
+    margin-top: 0.8rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+
+  .program-card__link {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .events-archive__list {
+    margin: clamp(3rem, 6vw, 5rem) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .archive-event {
+    display: grid;
+    grid-template-columns: auto 5rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .archive-event__number {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+  }
+
+  .archive-event__media {
+    display: block;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-fg) 7%, transparent);
+  }
+
+  .archive-event__media img,
+  .archive-event__placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .archive-event__main {
+    min-width: 0;
+  }
+
+  .archive-event__title {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(1.45rem, 1.2rem + 1vw, 2.25rem);
     line-height: 1;
   }
 
-  .event-card__summary {
-    margin-top: 0.8rem;
-    line-height: 1.55;
+  .archive-event__meta {
+    display: block;
+    margin-top: 0.45rem;
+    overflow: hidden;
+    font-size: 0.78rem;
+    line-height: 1.4;
     color: var(--color-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .event-card__meta {
-    margin-top: 1rem;
-    font-size: 0.85rem;
-    color: var(--color-muted);
-  }
-
-  .event-card__link {
-    margin-top: auto;
-    padding-top: 1.5rem;
-    font-size: 0.75rem;
+  .archive-event__link {
+    display: none;
+    font-size: 0.68rem;
     font-weight: 800;
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
-  .events-empty {
-    max-width: 42rem;
-    margin-top: 3rem;
-    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
-    border: 1px solid var(--color-line);
+  .events-closing {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: min(46rem, 82svh);
+    display: grid;
+    place-items: center;
+    padding: clamp(5rem, 4rem + 6vw, 10rem) 1.25rem;
+    text-align: center;
+    background: #050505;
   }
 
-  .events-empty h3 {
+  .events-closing__image,
+  .events-closing__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+  }
+
+  .events-closing__image {
+    object-fit: cover;
+    opacity: 0.28;
+    filter: saturate(0.8);
+  }
+
+  .events-closing__scrim {
+    z-index: -1;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.88));
+  }
+
+  .events-closing__inner {
+    width: min(100%, 60rem);
+  }
+
+  .events-closing h2 {
     margin: 0;
     font-family: var(--font-display);
-    font-size: 1.75rem;
+    font-size: clamp(3.75rem, 2.4rem + 7vw, 9rem);
     font-weight: 500;
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    color: var(--color-on-dark);
   }
 
-  .events-empty p {
-    margin-top: 0.75rem;
+  .events-closing p {
+    max-width: 31rem;
+    margin: 1.5rem auto 0;
+    font-size: 1rem;
     line-height: 1.6;
-    color: var(--color-muted);
+    color: rgba(255, 255, 255, 0.76);
+  }
+
+  .events-closing .events-action {
+    margin-top: 2rem;
+  }
+
+  @keyframes hero-settle {
+    to {
+      transform: scale(1);
+    }
   }
 
   @media (min-width: 640px) {
+    .events-hero__inner,
     .events-container {
-      padding-inline: 1.5rem;
+      padding-inline: 2rem;
+    }
+
+    .events-section-head {
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.45fr);
+    }
+
+    .archive-event {
+      grid-template-columns: 2rem 8rem minmax(0, 1fr) auto;
+      gap: 1.5rem;
+      padding-block: 1.25rem;
+    }
+
+    .archive-event__link {
+      display: block;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .events-hero__feature {
+      grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr) auto;
+      gap: 2.5rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .event-card,
-    .event-card__media img {
+    .events-hero__image {
+      animation: none;
+      transform: none;
+    }
+
+    .events-action,
+    .program-card__media img {
       transition: none;
     }
   }
