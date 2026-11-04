@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
-import Marquee from '../../components/ui/Marquee.astro';
 import SubscribeDialog from '../../components/forms/SubscribeDialog.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { eventsQuery, type EventDetail } from '@energize/shared';
@@ -19,7 +18,6 @@ try {
 }
 
 const { upcoming, past } = splitEvents(events);
-
 const eventList = events.length
   ? {
       '@context': 'https://schema.org',
@@ -47,9 +45,6 @@ const card = (event: EventDetail) => ({
 const featured = upcoming[0] ? card(upcoming[0]) : null;
 const moreUpcoming = upcoming.slice(1).map(card);
 const pastEvents = past.map(card);
-const marqueeItems = featured
-  ? [featured.title, featured.date, featured.venue, featured.format]
-  : ['Energize Music Events', 'Live Music', 'Shared Moments', 'New Dates Coming Soon'];
 ---
 
 <BaseLayout
@@ -58,101 +53,110 @@ const marqueeItems = featured
   ogImage={featured?.imageUrl ?? undefined}
   keywords={['Energize Music events', 'gospel concerts', 'Afro-gospel live shows']}
   breadcrumbs={crumbs({ name: 'Events', path: '/events' })}
-  headerVariant="overlay"
 >
   {eventList && <JsonLd data={eventList} />}
 
-  <main class="events-index">
-    <header class="events-hero theme-dark">
-      {
-        featured?.imageUrl ? (
-          <img
-            class="events-hero__image"
-            src={featured.imageUrl}
-            alt=""
-            width="1600"
-            height="1067"
-            fetchpriority="high"
-            decoding="async"
-          />
-        ) : (
-          <div class="events-hero__fallback" aria-hidden="true"></div>
-        )
-      }
-      <div class="events-hero__scrim" aria-hidden="true"></div>
-
-      <div class="events-hero__inner">
-        <div class="events-hero__intro">
-          <h1>Events</h1>
-          <p>Live music. Shared energy. Nights worth remembering.</p>
+  <main class="events-page">
+    <header class="events-intro">
+      <div class="events-shell events-intro__grid">
+        <h1>Events</h1>
+        <div class="events-intro__copy">
+          <p>Come for the music. Stay for the people, the energy, and the moments you will talk about later.</p>
+          <button
+            type="button"
+            class="text-action"
+            data-subscribe-open
+            data-subscribe-title="Get Event Updates"
+            data-subscribe-lead="Get new event dates and ticket news in your inbox."
+          >
+            Get event updates
+          </button>
         </div>
-
-        {
-          featured ? (
-            <div class="events-hero__feature">
-              <div class="events-hero__feature-copy">
-                <h2>{featured.title}</h2>
-                {featured.subtitle && <p>{featured.subtitle}</p>}
-              </div>
-              <dl class="events-hero__facts">
-                <div>
-                  <dt>Date</dt>
-                  <dd>{featured.date}</dd>
-                </div>
-                <div>
-                  <dt>Venue</dt>
-                  <dd>{featured.venue}</dd>
-                </div>
-              </dl>
-              <a class="events-action events-action--light" href={featured.href}>View Event</a>
-            </div>
-          ) : (
-            <div class="events-hero__feature events-hero__feature--empty">
-              <div class="events-hero__feature-copy">
-                <h2>New events are on the way</h2>
-                <p>Dates, venues, and ticket links will appear here when they are confirmed.</p>
-              </div>
-              <button
-                type="button"
-                class="events-action events-action--light"
-                data-subscribe-open
-                data-subscribe-title="Get Event Updates"
-                data-subscribe-lead="Get new event dates and ticket news in your inbox."
-              >
-                Get Event Updates
-              </button>
-            </div>
-          )
-        }
       </div>
     </header>
 
-    <Marquee items={marqueeItems} variant="caps" class="events-marquee" />
+    <section class="featured-section" aria-labelledby="featured-event-title">
+      <div class="events-shell">
+        {
+          featured ? (
+            <article class="featured-event">
+              <a class="featured-event__media" href={featured.href} aria-label={`View ${featured.title}`}>
+                {featured.imageUrl ? (
+                  <img
+                    src={featured.imageUrl}
+                    alt={featured.imageAlt}
+                    width="1600"
+                    height="1067"
+                    fetchpriority="high"
+                    decoding="async"
+                  />
+                ) : (
+                  <span class="event-image-fallback" aria-hidden="true"></span>
+                )}
+              </a>
+              <div class="featured-event__body">
+                <h2 id="featured-event-title">{featured.title}</h2>
+                {featured.subtitle && <p class="featured-event__subtitle">{featured.subtitle}</p>}
+                <p class="featured-event__date">{featured.date}</p>
+                <dl class="featured-event__details">
+                  <div>
+                    <dt>Place</dt>
+                    <dd>{featured.venue}</dd>
+                  </div>
+                  <div>
+                    <dt>Format</dt>
+                    <dd>{featured.format}</dd>
+                  </div>
+                </dl>
+                <a class="solid-action" href={featured.href}>View event</a>
+              </div>
+            </article>
+          ) : (
+            <article class="featured-event featured-event--empty">
+              <div class="featured-event__graphic" aria-hidden="true"><span>EM</span></div>
+              <div class="featured-event__body">
+                <h2 id="featured-event-title">More nights are coming</h2>
+                <p class="featured-event__subtitle">We are getting the next dates ready. Join the list and hear about them first.</p>
+                <button
+                  type="button"
+                  class="solid-action"
+                  data-subscribe-open
+                  data-subscribe-title="Get Event Updates"
+                  data-subscribe-lead="Get new event dates and ticket news in your inbox."
+                >
+                  Get event updates
+                </button>
+              </div>
+            </article>
+          )
+        }
+      </div>
+    </section>
 
     {
       moreUpcoming.length > 0 && (
-        <section class="events-program" aria-labelledby="more-events-title">
-          <div class="events-container">
-            <div class="events-section-head">
-              <h2 id="more-events-title">More Dates</h2>
-              <p>More ways to meet the music live.</p>
+        <section class="event-list-section" aria-labelledby="upcoming-events-title">
+          <div class="events-shell">
+            <div class="section-heading">
+              <h2 id="upcoming-events-title">Coming Up</h2>
+              <p>More dates to put on your calendar.</p>
             </div>
-            <ul class="events-program__grid">
+            <ul class="event-grid">
               {moreUpcoming.map((event) => (
                 <li>
-                  <a class="program-card" href={event.href}>
-                    <span class="program-card__media">
+                  <a class="event-card" href={event.href}>
+                    <span class="event-card__media">
                       {event.imageUrl ? (
-                        <img src={event.imageUrl} alt={event.imageAlt} width="1200" height="800" loading="lazy" decoding="async" />
+                        <img src={event.imageUrl} alt={event.imageAlt} width="900" height="600" loading="lazy" decoding="async" />
                       ) : (
-                        <span class="program-card__placeholder" aria-hidden="true"></span>
+                        <span class="event-image-fallback" aria-hidden="true"></span>
                       )}
                     </span>
-                    <span class="program-card__body">
-                      <span class="program-card__date">{event.date}</span>
-                      <span class="program-card__title">{event.title}</span>
-                      <span class="program-card__meta">{event.venue} · {event.format}</span>
-                      <span class="program-card__link">View Event</span>
+                    <span class="event-card__body">
+                      <span class="event-card__date">{event.date}</span>
+                      <span class="event-card__title">{event.title}</span>
+                      <span class="event-card__place">{event.venue}</span>
+                      <span class="event-card__action">View event</span>
                     </span>
                   </a>
                 </li>
@@ -165,29 +169,20 @@ const marqueeItems = featured
 
     {
       pastEvents.length > 0 && (
-        <section class="events-archive" aria-labelledby="past-events-title">
-          <div class="events-container">
-            <div class="events-section-head events-section-head--archive">
+        <section class="past-section" aria-labelledby="past-events-title">
+          <div class="events-shell past-section__grid">
+            <div class="section-heading">
               <h2 id="past-events-title">Past Events</h2>
-              <p>The nights that brought us together.</p>
+              <p>Look back at the nights we shared.</p>
             </div>
-            <ol class="events-archive__list">
+            <ol class="past-list">
               {pastEvents.map((event, index) => (
                 <li>
-                  <a class="archive-event" href={event.href}>
-                    <span class="archive-event__number">{String(index + 1).padStart(2, '0')}</span>
-                    <span class="archive-event__media">
-                      {event.imageUrl ? (
-                        <img src={event.imageUrl} alt={event.imageAlt} width="480" height="320" loading="lazy" decoding="async" />
-                      ) : (
-                        <span class="archive-event__placeholder" aria-hidden="true"></span>
-                      )}
-                    </span>
-                    <span class="archive-event__main">
-                      <span class="archive-event__title">{event.title}</span>
-                      <span class="archive-event__meta">{event.date} · {event.venue}</span>
-                    </span>
-                    <span class="archive-event__link">View Event</span>
+                  <a href={event.href}>
+                    <span class="past-list__number">{String(index + 1).padStart(2, '0')}</span>
+                    <span class="past-list__name">{event.title}</span>
+                    <span class="past-list__date">{event.date}</span>
+                    <span class="past-list__action">View event</span>
                   </a>
                 </li>
               ))}
@@ -197,21 +192,22 @@ const marqueeItems = featured
       )
     }
 
-    <section class="events-closing theme-dark" aria-labelledby="events-closing-title">
-      {featured?.imageUrl && <img class="events-closing__image" src={featured.imageUrl} alt="" width="1600" height="1067" loading="lazy" decoding="async" />}
-      <div class="events-closing__scrim" aria-hidden="true"></div>
-      <div class="events-closing__inner">
-        <h2 id="events-closing-title">Be there when it happens.</h2>
-        <p>Get new dates, ticket news, and lineup updates in your inbox.</p>
-        <button
-          type="button"
-          class="events-action events-action--accent"
-          data-subscribe-open
-          data-subscribe-title="Get Event Updates"
-          data-subscribe-lead="Get new event dates and ticket news in your inbox."
-        >
-          Get Event Updates
-        </button>
+    <section class="events-signup" aria-labelledby="events-signup-title">
+      <div class="events-signup__mark" aria-hidden="true">E</div>
+      <div class="events-shell events-signup__grid">
+        <h2 id="events-signup-title">Hear about the next one first.</h2>
+        <div>
+          <p>Get event dates, ticket news, and lineup updates in your inbox.</p>
+          <button
+            type="button"
+            class="solid-action solid-action--dark"
+            data-subscribe-open
+            data-subscribe-title="Get Event Updates"
+            data-subscribe-lead="Get new event dates and ticket news in your inbox."
+          >
+            Join the event list
+          </button>
+        </div>
       </div>
     </section>
   </main>
@@ -220,459 +216,83 @@ const marqueeItems = featured
 </BaseLayout>
 
 <style>
-  .events-index {
-    overflow: clip;
-  }
+  .events-page { overflow: clip; background: #f4f3ef; color: #080808; }
+  .events-shell { width: min(100% - 2.5rem, 90rem); margin-inline: auto; }
 
-  .events-hero {
-    position: relative;
-    isolation: isolate;
-    min-height: max(46rem, 100svh);
-    margin-top: calc(-1 * var(--header-height, 4rem));
-    overflow: hidden;
-    background: #050505;
-  }
+  .events-intro { padding: clamp(5rem, 9vw, 9rem) 0 clamp(3.5rem, 7vw, 6rem); }
+  .events-intro__grid { display: grid; gap: 2rem; align-items: end; }
+  .events-intro h1 { margin: 0; font-family: var(--font-display); font-size: clamp(4.5rem, 11vw, 10rem); font-weight: 500; line-height: .78; letter-spacing: -.065em; }
+  .events-intro__copy { max-width: 34rem; }
+  .events-intro__copy p { margin: 0; font-size: clamp(1.15rem, 1rem + .5vw, 1.5rem); line-height: 1.45; }
+  .text-action { margin-top: 1.5rem; border: 0; border-bottom: 2px solid #080808; border-radius: 0; padding: 0 0 .3rem; background: transparent; color: inherit; font: inherit; font-size: .76rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; cursor: pointer; }
 
-  .events-hero__image,
-  .events-hero__fallback {
-    position: absolute;
-    inset: 0;
-    z-index: -3;
-    width: 100%;
-    height: 100%;
-  }
+  .featured-section { padding-bottom: clamp(5rem, 9vw, 9rem); }
+  .featured-event { display: grid; background: #0a0a0a; color: #fff; }
+  .featured-event__media { display: block; min-height: 21rem; overflow: hidden; background: #161616; }
+  .featured-event__media img, .event-image-fallback { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .featured-event__media img { transition: transform 700ms cubic-bezier(.22, 1, .36, 1); }
+  .featured-event__media:hover img { transform: scale(1.025); }
+  .event-image-fallback { background: linear-gradient(135deg, #173fbd, #07133a 60%, #080808); }
+  .featured-event__body { display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: clamp(2rem, 5vw, 5rem); }
+  .featured-event__date { margin: 1.5rem 0 0; color: #89a6ff; font-size: .82rem; font-weight: 700; line-height: 1.45; }
+  .featured-event h2 { max-width: 12ch; margin: 0; font-family: var(--font-display); font-size: clamp(3rem, 5vw, 5.5rem); font-weight: 500; line-height: .9; letter-spacing: -.045em; }
+  .featured-event__subtitle { max-width: 34rem; margin: 1.25rem 0 0; color: rgba(255,255,255,.72); font-size: 1rem; line-height: 1.6; }
+  .featured-event__details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin: clamp(2rem, 4vw, 3.5rem) 0 0; padding: 1.5rem 0 0; border-top: 1px solid rgba(255,255,255,.2); }
+  .featured-event__details dt { color: #89a6ff; font-size: .66rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .featured-event__details dd { margin: .45rem 0 0; font-size: .9rem; line-height: 1.45; }
+  .solid-action { display: inline-flex; width: fit-content; min-height: 3.25rem; align-items: center; justify-content: center; margin-top: 2rem; border: 1px solid #fff; border-radius: 0; padding: .9rem 1.4rem; background: #fff; color: #080808; font: inherit; font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; transition: background-color 180ms ease, color 180ms ease; }
+  .solid-action:hover { background: transparent; color: #fff; }
+  .featured-event__graphic { display: grid; min-height: 24rem; place-items: center; overflow: hidden; background: #2458ed; }
+  .featured-event__graphic span { font-family: var(--font-display); font-size: clamp(9rem, 30vw, 24rem); line-height: .7; letter-spacing: -.12em; color: #fff; transform: translateX(-.06em); }
 
-  .events-hero__image {
-    object-fit: cover;
-    object-position: center;
-    transform: scale(1.025);
-    animation: hero-settle 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
+  .event-list-section, .past-section { padding: clamp(5rem, 9vw, 9rem) 0; }
+  .event-list-section { background: #fff; }
+  .section-heading h2 { margin: 0; font-family: var(--font-display); font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 500; line-height: .9; letter-spacing: -.045em; }
+  .section-heading p { max-width: 25rem; margin: 1rem 0 0; color: #5e5e5e; line-height: 1.55; }
+  .event-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 3rem 1.5rem; margin: 3.5rem 0 0; padding: 0; list-style: none; }
+  .event-card { display: block; height: 100%; color: inherit; }
+  .event-card__media { display: block; aspect-ratio: 4 / 3; overflow: hidden; background: #ececec; }
+  .event-card__media img, .event-card__media .event-image-fallback { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms cubic-bezier(.22, 1, .36, 1); }
+  .event-card:hover .event-card__media img { transform: scale(1.025); }
+  .event-card__body { display: flex; min-height: 13rem; flex-direction: column; padding-top: 1.25rem; }
+  .event-card__date { color: #2458ed; font-size: .7rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .event-card__title { margin-top: .8rem; font-family: var(--font-display); font-size: 2.2rem; line-height: 1; }
+  .event-card__place { margin-top: .65rem; color: #666; font-size: .88rem; }
+  .event-card__action { width: fit-content; margin-top: auto; padding-top: 1.5rem; border-bottom: 1px solid currentColor; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 
-  .events-hero__fallback {
-    background:
-      radial-gradient(circle at 75% 20%, rgba(31, 91, 255, 0.36), transparent 35%),
-      radial-gradient(circle at 20% 75%, rgba(31, 91, 255, 0.16), transparent 30%),
-      #050505;
-  }
+  .past-section { background: #e9e8e3; }
+  .past-section__grid { display: grid; gap: 3rem; }
+  .past-list { margin: 0; padding: 0; list-style: none; }
+  .past-list li { border-bottom: 1px solid rgba(8,8,8,.2); }
+  .past-list li:first-child { border-top: 1px solid rgba(8,8,8,.2); }
+  .past-list a { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: .75rem 1rem; align-items: center; padding: 1.5rem 0; color: inherit; }
+  .past-list__number, .past-list__date, .past-list__action { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .past-list__number { color: #2458ed; }
+  .past-list__name { font-family: var(--font-display); font-size: clamp(1.65rem, 3vw, 2.5rem); line-height: 1; }
+  .past-list__date { grid-column: 2; color: #5e5e5e; }
+  .past-list__action { display: none; }
 
-  .events-hero__scrim {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.08) 35%, rgba(0, 0, 0, 0.9) 100%),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, transparent 65%);
-  }
+  .events-signup { position: relative; isolation: isolate; overflow: hidden; padding: clamp(5rem, 10vw, 10rem) 0; background: #2458ed; color: #fff; }
+  .events-signup__mark { position: absolute; z-index: -1; right: -.07em; bottom: -.3em; font-family: var(--font-display); font-size: min(48vw, 42rem); line-height: .7; color: rgba(0,0,0,.11); }
+  .events-signup__grid { display: grid; gap: 2.5rem; align-items: end; }
+  .events-signup h2 { max-width: 9ch; margin: 0; font-family: var(--font-display); font-size: clamp(3.6rem, 8vw, 8rem); font-weight: 500; line-height: .84; letter-spacing: -.055em; }
+  .events-signup p { max-width: 28rem; margin: 0; font-size: 1.05rem; line-height: 1.55; }
+  .solid-action--dark { border-color: #080808; background: #080808; color: #fff; }
+  .solid-action--dark:hover { background: transparent; color: #080808; }
 
-  .events-hero__inner {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: min(100%, 96rem);
-    min-height: max(46rem, 100svh);
-    margin-inline: auto;
-    padding: calc(var(--header-height, 4rem) + clamp(4.5rem, 10vh, 8rem)) 1.25rem clamp(2rem, 5vh, 4rem);
-  }
-
-  .events-hero__intro h1 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(5.25rem, 4rem + 12vw, 15rem);
-    font-weight: 500;
-    line-height: 0.72;
-    letter-spacing: -0.065em;
-    color: var(--color-on-dark);
-  }
-
-  .events-hero__intro p {
-    max-width: 34rem;
-    margin-top: clamp(1.75rem, 3vw, 3rem);
-    font-family: 'Instrument Serif', Georgia, serif;
-    font-size: clamp(1.35rem, 1rem + 1.4vw, 2.25rem);
-    font-style: italic;
-    line-height: 1.15;
-    color: var(--color-on-dark);
-  }
-
-  .events-hero__feature {
-    display: grid;
-    gap: 1.5rem;
-    align-items: end;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.28);
-  }
-
-  .events-hero__feature-copy h2 {
-    margin: 0;
-    max-width: 54rem;
-    font-family: var(--font-display);
-    font-size: clamp(2.6rem, 1.7rem + 4vw, 6rem);
-    font-weight: 500;
-    line-height: 0.92;
-    letter-spacing: -0.045em;
-    color: var(--color-on-dark);
-  }
-
-  .events-hero__feature-copy p {
-    max-width: 38rem;
-    margin-top: 0.75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.78);
-  }
-
-  .events-hero__facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    margin: 0;
-  }
-
-  .events-hero__facts dt {
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #6f96ff;
-  }
-
-  .events-hero__facts dd {
-    margin: 0.35rem 0 0;
-    font-size: 0.86rem;
-    line-height: 1.4;
-    color: var(--color-on-dark);
-  }
-
-  .events-action {
-    display: inline-flex;
-    min-height: 3rem;
-    width: fit-content;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    border-radius: 0.125rem;
-    padding: 0.85rem 1.35rem;
-    font: inherit;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
-  }
-
-  .events-action:hover {
-    transform: translateY(-2px);
-  }
-
-  .events-action--light {
-    background: #fff;
-    color: #080808;
-  }
-
-  .events-action--light:hover {
-    background: #dfe7ff;
-  }
-
-  .events-action--accent {
-    background: var(--color-accent-fill);
-    color: #fff;
-  }
-
-  .events-action--accent:hover {
-    background: var(--color-accent-fill-hover);
-  }
-
-  .events-index :global(.events-marquee) {
-    border-block: 1px solid var(--color-line);
-    background: var(--color-bg);
-  }
-
-  .events-container {
-    width: min(100%, 88rem);
-    margin-inline: auto;
-    padding-inline: 1.25rem;
-  }
-
-  .events-program,
-  .events-archive {
-    padding-block: clamp(5rem, 4rem + 5vw, 9rem);
-  }
-
-  .events-program {
-    background: var(--color-bg);
-  }
-
-  .events-archive {
-    background: var(--color-surface);
-  }
-
-  .events-section-head {
-    display: grid;
-    gap: 1rem;
-    align-items: end;
-  }
-
-  .events-section-head h2 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(3rem, 2rem + 5vw, 7rem);
-    font-weight: 500;
-    line-height: 0.9;
-    letter-spacing: -0.05em;
-  }
-
-  .events-section-head p {
-    max-width: 28rem;
-    margin: 0;
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--color-muted);
-  }
-
-  .events-program__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-    gap: 2.5rem 1.5rem;
-    margin: clamp(3rem, 6vw, 5rem) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .program-card {
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-  }
-
-  .program-card__media {
-    display: block;
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
-    background: color-mix(in srgb, var(--color-fg) 7%, transparent);
-  }
-
-  .program-card__media img,
-  .program-card__placeholder {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .program-card:hover .program-card__media img {
-    transform: scale(1.035);
-  }
-
-  .program-card__body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    padding-top: 1.25rem;
-  }
-
-  .program-card__date {
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
-  .program-card__title {
-    margin-top: 0.75rem;
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 1.6rem + 1.4vw, 3rem);
-    line-height: 0.98;
-  }
-
-  .program-card__meta {
-    margin-top: 0.8rem;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: var(--color-muted);
-  }
-
-  .program-card__link {
-    margin-top: auto;
-    padding-top: 1.5rem;
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-  }
-
-  .events-archive__list {
-    margin: clamp(3rem, 6vw, 5rem) 0 0;
-    padding: 0;
-    list-style: none;
-    border-top: 1px solid var(--color-line);
-  }
-
-  .archive-event {
-    display: grid;
-    grid-template-columns: auto 5rem minmax(0, 1fr);
-    gap: 1rem;
-    align-items: center;
-    padding-block: 1rem;
-    border-bottom: 1px solid var(--color-line);
-  }
-
-  .archive-event__number {
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    color: var(--color-accent);
-  }
-
-  .archive-event__media {
-    display: block;
-    aspect-ratio: 3 / 2;
-    overflow: hidden;
-    background: color-mix(in srgb, var(--color-fg) 7%, transparent);
-  }
-
-  .archive-event__media img,
-  .archive-event__placeholder {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .archive-event__main {
-    min-width: 0;
-  }
-
-  .archive-event__title {
-    display: block;
-    font-family: var(--font-display);
-    font-size: clamp(1.45rem, 1.2rem + 1vw, 2.25rem);
-    line-height: 1;
-  }
-
-  .archive-event__meta {
-    display: block;
-    margin-top: 0.45rem;
-    overflow: hidden;
-    font-size: 0.78rem;
-    line-height: 1.4;
-    color: var(--color-muted);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .archive-event__link {
-    display: none;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  .events-closing {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    min-height: min(46rem, 82svh);
-    display: grid;
-    place-items: center;
-    padding: clamp(5rem, 4rem + 6vw, 10rem) 1.25rem;
-    text-align: center;
-    background: #050505;
-  }
-
-  .events-closing__image,
-  .events-closing__scrim {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    width: 100%;
-    height: 100%;
-  }
-
-  .events-closing__image {
-    object-fit: cover;
-    opacity: 0.28;
-    filter: saturate(0.8);
-  }
-
-  .events-closing__scrim {
-    z-index: -1;
-    background: radial-gradient(circle, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.88));
-  }
-
-  .events-closing__inner {
-    width: min(100%, 60rem);
-  }
-
-  .events-closing h2 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(3.75rem, 2.4rem + 7vw, 9rem);
-    font-weight: 500;
-    line-height: 0.86;
-    letter-spacing: -0.055em;
-    color: var(--color-on-dark);
-  }
-
-  .events-closing p {
-    max-width: 31rem;
-    margin: 1.5rem auto 0;
-    font-size: 1rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.76);
-  }
-
-  .events-closing .events-action {
-    margin-top: 2rem;
-  }
-
-  @keyframes hero-settle {
-    to {
-      transform: scale(1);
-    }
-  }
-
-  @media (min-width: 640px) {
-    .events-hero__inner,
-    .events-container {
-      padding-inline: 2rem;
-    }
-
-    .events-section-head {
-      grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.45fr);
-    }
-
-    .archive-event {
-      grid-template-columns: 2rem 8rem minmax(0, 1fr) auto;
-      gap: 1.5rem;
-      padding-block: 1.25rem;
-    }
-
-    .archive-event__link {
-      display: block;
-    }
-  }
-
-  @media (min-width: 900px) {
-    .events-hero__feature {
-      grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr) auto;
-      gap: 2.5rem;
-    }
+  @media (min-width: 760px) {
+    .events-shell { width: min(100% - 4rem, 90rem); }
+    .events-intro__grid { grid-template-columns: minmax(0, 1.45fr) minmax(20rem, .55fr); }
+    .featured-event { grid-template-columns: minmax(0, 1.18fr) minmax(24rem, .82fr); min-height: 40rem; }
+    .featured-event__media { min-height: 100%; }
+    .past-section__grid { grid-template-columns: minmax(16rem, .55fr) minmax(0, 1.45fr); }
+    .past-list a { grid-template-columns: 2rem minmax(0, 1fr) minmax(11rem, auto) auto; gap: 1.5rem; }
+    .past-list__date { grid-column: auto; }
+    .past-list__action { display: block; }
+    .events-signup__grid { grid-template-columns: minmax(0, 1.35fr) minmax(19rem, .65fr); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .events-hero__image {
-      animation: none;
-      transform: none;
-    }
-
-    .events-action,
-    .program-card__media img {
-      transition: none;
-    }
+    .featured-event__media img, .event-card__media img, .solid-action { transition: none; }
   }
 </style>
