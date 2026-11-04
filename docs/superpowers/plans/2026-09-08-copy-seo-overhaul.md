@@ -254,7 +254,7 @@ git commit -m "seo: tighten site defaults, nav blurbs, and organization schema"
 
 ```astro
 <BaseLayout
-  title="Energize Music | Afro-Gospel Record Label from Lagos"
+  title="Energize Music | Afro-Gospel Record Label"
   description="Energize Music is a Lagos-based Afro-gospel and soul-fusion label home to Greatman Takit, TY Bello, and Ellie Scotte. Hear the roster and the story."
   keywords={[
     'Afro-gospel record label',

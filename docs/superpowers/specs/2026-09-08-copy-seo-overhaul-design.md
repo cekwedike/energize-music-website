@@ -68,7 +68,7 @@ Most marketing copy and all static-page meta live in Astro. Sanity holds entity 
 
 **Keywords:** Afro-gospel record label; Nigerian gospel music label  
 
-**Meta title:** Energize Music | Afro-Gospel Record Label from Lagos  
+**Meta title:** Energize Music | Afro-Gospel Record Label  
 **Meta description:** Energize Music is a Lagos-based Afro-gospel and soul-fusion label home to Greatman Takit, TY Bello, and Ellie Scotte. Hear the roster and the story.
 
 **H1:** Replace "Rooted In Lagos. Reaching The World." with a factual claim such as:  
