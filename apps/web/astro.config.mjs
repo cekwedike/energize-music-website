@@ -3,13 +3,35 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
+// Every real page with a one-part URL. Any other one-part URL is an event short link, which redirects
+// and so stays out of the sitemap. Add new top-level pages here.
+const TOP_LEVEL_PAGES = new Set([
+  'about',
+  'artists',
+  'blog',
+  'contact',
+  'energize-kids',
+  'events',
+  'next',
+  'privacy',
+  'releases',
+  'terms',
+]);
+
+function isSitemapPage(page) {
+  const { pathname } = new URL(page);
+  if (pathname.includes('/404') || pathname.startsWith('/events/energize-fest')) return false;
+  const parts = pathname.split('/').filter(Boolean);
+  return parts.length !== 1 || TOP_LEVEL_PAGES.has(parts[0]);
+}
+
 export default defineConfig({
   output: 'static',
   site: process.env.PUBLIC_SITE_URL ?? 'https://www.energize-music.com',
   integrations: [
     react(),
     sitemap({
-      filter: (page) => !page.includes('/404'),
+      filter: isSitemapPage,
       changefreq: 'weekly',
       priority: 0.7,
       serialize(item) {

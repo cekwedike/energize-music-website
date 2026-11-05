@@ -22,7 +22,6 @@ const dotLeft = pagerDotPosition(activeIndex, items.length);
     {
       items.map((item) => {
         const isActive = item.index === activeIndex;
-        const padded = String(item.index + 1).padStart(2, '0');
         return (
           <a
             href={`#artist-${item.slug}`}
@@ -32,7 +31,6 @@ const dotLeft = pagerDotPosition(activeIndex, items.length);
             data-active={isActive ? 'true' : 'false'}
             aria-current={isActive ? 'true' : undefined}
           >
-            <span class="roster-pager__pill-index">{padded}</span>
             <span class="roster-pager__pill-label">{item.shortLabel}</span>
           </a>
         );
@@ -88,12 +86,10 @@ const dotLeft = pagerDotPosition(activeIndex, items.length);
     min-height: 2.15rem;
     padding: 0.3rem 0.75rem;
     border: 1px solid color-mix(in srgb, var(--color-fg) 22%, transparent);
-    border-radius: 9999px;
+    border-radius: 0.25rem;
     background: transparent;
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font-size: 0.875rem;
+    font-weight: 600;
     text-decoration: none;
     color: var(--color-fg);
     transition:
@@ -112,15 +108,6 @@ const dotLeft = pagerDotPosition(activeIndex, items.length);
     border-color: var(--color-fg);
     background: var(--color-fg);
     color: var(--color-bg);
-  }
-
-  .roster-pager__pill-index {
-    font-variant-numeric: tabular-nums;
-    opacity: 0.72;
-  }
-
-  .roster-pager__pill[data-active='true'] .roster-pager__pill-index {
-    opacity: 1;
   }
 
   .roster-pager__pill-label {

@@ -1,74 +1,30 @@
 ---
-/** Subtle three-column intro row above the first roster card. The first cell is the page H1. */
+/** Page title above the first roster card. */
 ---
 
-<div class="roster-intro">
-  <h1 class="roster-intro__cell">
-    <span>Energize Music Artistes</span>
-    <span>Afro-Gospel &amp; Soul-Fusion From Lagos</span>
-  </h1>
-  <p class="roster-intro__cell">
-    <span>Uplifting, family-friendly music</span>
-  </p>
-  <p class="roster-intro__cell roster-intro__cell--right">
-    <span class="roster-intro__marker" aria-hidden="true">•</span>
-    The roster
-  </p>
-</div>
+<header class="roster-intro">
+  <h1>Artistes</h1>
+  <p>Afro-gospel and soul-fusion from Lagos.</p>
+</header>
 
 <style>
   .roster-intro {
-    display: grid;
-    grid-template-columns: 1fr;
-    border-bottom: 1px solid var(--color-line);
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--color-fg) 1.5%, transparent) 0%, transparent 100%),
-      var(--color-bg);
+    padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem);
   }
 
-  .roster-intro__cell {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
+  .roster-intro h1 {
     margin: 0;
-    padding: clamp(1rem, 2.5vh, 1.35rem) clamp(1.25rem, 4vw, 2.5rem);
-    font-family: var(--font-body);
-    font-size: 0.625rem;
-    font-weight: 600;
-    line-height: 1.55;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-fg);
-    border-bottom: 1px solid var(--color-line);
-  }
-
-  .roster-intro__cell:last-child {
-    border-bottom: none;
-  }
-
-  .roster-intro__cell--right {
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.45rem;
-  }
-
-  .roster-intro__marker {
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.025em;
     color: var(--color-fg);
   }
 
-  @media (min-width: 768px) {
-    .roster-intro {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .roster-intro__cell {
-      border-bottom: none;
-      border-right: 1px solid var(--color-line);
-    }
-
-    .roster-intro__cell:last-child {
-      border-right: none;
-    }
+  .roster-intro p {
+    margin: 0.75rem 0 0;
+    font-size: var(--text-lead);
+    color: var(--color-muted);
   }
 </style>

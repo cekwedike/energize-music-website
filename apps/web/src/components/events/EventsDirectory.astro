@@ -1,0 +1,389 @@
+---
+/** The Events page: the next event up front, then later dates, then past events. */
+import type { EventDetail } from '@energize/shared';
+import EventPoster from './EventPoster.astro';
+import SubscribeDialog from '../forms/SubscribeDialog.astro';
+import { formatEventDateLong, formatEventLocation } from '../../lib/events/format';
+import '../../styles/events.css';
+
+interface Props {
+  upcoming: EventDetail[];
+  past: EventDetail[];
+}
+
+const { upcoming, past } = Astro.props;
+
+const view = (event: EventDetail) => ({
+  event,
+  href: `/events/${event.slug}`,
+  date: formatEventDateLong(event.startDate),
+  venue: formatEventLocation(event.location),
+  ticketLabel: event.ctaLabel || 'Get tickets',
+});
+
+const lead = upcoming[0] ? view(upcoming[0]) : null;
+const later = upcoming.slice(1).map(view);
+const pastEvents = past.map(view);
+
+const updates = {
+  'data-subscribe-open': '',
+  'data-subscribe-title': 'Get Event Updates',
+  'data-subscribe-lead': 'Get new event dates and ticket news in your inbox.',
+};
+---
+
+<div class="event-world">
+<div class="ev-hero">
+  <h1 class="ev-hero__word">Events</h1>
+
+  {
+    lead ? (
+      <div class="event-shell ev-hero__stage">
+        <div class="ev-hero__name">
+          <h2>
+            <a href={lead.href}>{lead.event.title}</a>
+          </h2>
+          {lead.event.subtitle && <p class="ev-hero__subtitle">{lead.event.subtitle}</p>}
+        </div>
+
+        <div class="ev-hero__poster">
+          <EventPoster cover={lead.event.cover} title={lead.event.title} href={lead.href} lead />
+        </div>
+
+        <div class="ev-hero__plan">
+          <p class="ev-hero__date">{lead.date}</p>
+          <p class="ev-hero__venue">{lead.venue}</p>
+          <div class="ev-actions">
+            {lead.event.ticketUrl && (
+              <a class="event-btn event-btn--solid" href={lead.event.ticketUrl} target="_blank" rel="noopener noreferrer">
+                {lead.ticketLabel}
+              </a>
+            )}
+            <a class:list={['event-btn', lead.event.ticketUrl ? 'event-btn--ghost' : 'event-btn--solid']} href={lead.href}>
+              View event
+            </a>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div class="event-shell ev-hero__empty">
+        <h2>The next date is on its way.</h2>
+        <button type="button" class="event-btn event-btn--solid" {...updates}>Get event updates</button>
+      </div>
+    )
+  }
+</div>
+
+{
+  later.map((item, index) => (
+    <section class:list={['ev-band', index % 2 === 0 && 'ev-band--flip']}>
+      <div class="event-shell ev-band__grid">
+        <div class="ev-band__poster">
+          <EventPoster cover={item.event.cover} title={item.event.title} href={item.href} />
+        </div>
+        <div class="ev-band__copy">
+          <h2>
+            <a href={item.href}>{item.event.title}</a>
+          </h2>
+          <p class="ev-hero__date">{item.date}</p>
+          <p class="ev-hero__venue">{item.venue}</p>
+          <div class="ev-actions">
+            {item.event.ticketUrl && (
+              <a class="event-btn event-btn--solid" href={item.event.ticketUrl} target="_blank" rel="noopener noreferrer">
+                {item.ticketLabel}
+              </a>
+            )}
+            <a class:list={['event-btn', item.event.ticketUrl ? 'event-btn--ghost' : 'event-btn--solid']} href={item.href}>
+              View event
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  ))
+}
+
+{
+  pastEvents.length > 0 && (
+    <section class="ev-past" aria-labelledby="past-events-title">
+      <div class="event-shell">
+        <h2 id="past-events-title">Past events</h2>
+        <ul class="ev-past__wall">
+          {pastEvents.map((item) => (
+            <li>
+              <EventPoster cover={item.event.cover} title={item.event.title} href={item.href} width={640} />
+              <h3>
+                <a href={item.href}>{item.event.title}</a>
+              </h3>
+              <p>{item.date}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+{
+  (lead || pastEvents.length > 0) && (
+    <section class="ev-close" aria-labelledby="events-close-title">
+      <div class="event-shell ev-close__row">
+        <h2 id="events-close-title">Hear about the next one first.</h2>
+        <button type="button" class="event-btn event-btn--solid" {...updates}>Join the event list</button>
+      </div>
+    </section>
+  )
+}
+
+<SubscribeDialog />
+</div>
+
+<style>
+  /* ---------- First view ---------- */
+  .ev-hero {
+    /* Sized by width and height, so the whole first view fits on wide, short screens too. */
+    --word: min(31.5vw, 44svh);
+    padding-top: clamp(0.75rem, 1.5vw, 1.5rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+    overflow: clip;
+  }
+
+  .ev-hero__word {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--word);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144;
+    line-height: 0.8;
+    letter-spacing: -0.035em;
+    text-align: center;
+    white-space: nowrap;
+    color: var(--color-fg);
+  }
+
+  .ev-hero__stage {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+    margin-top: 1vw;
+  }
+
+  .ev-hero__poster {
+    --poster-w: 100%;
+    --poster-h: 90svh;
+    order: -1;
+    display: grid;
+    justify-items: center;
+  }
+
+  .ev-hero__name h2,
+  .ev-band__copy h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 2rem + 3.4vw, 5rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .ev-hero__name a,
+  .ev-band__copy h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ev-hero__name a:hover,
+  .ev-band__copy h2 a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.1em;
+  }
+
+  .ev-hero__subtitle {
+    margin: 1rem 0 0;
+    max-width: 24rem;
+    font-size: 1.125rem;
+    line-height: 1.45;
+    color: var(--color-muted);
+  }
+
+  .ev-hero__date {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.25rem + 0.8vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .ev-hero__venue {
+    margin: 0.6rem 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    color: var(--color-muted);
+  }
+
+  .ev-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .ev-hero__empty {
+    display: grid;
+    justify-items: center;
+    gap: 2rem;
+    padding-block: clamp(3rem, 6vw, 5rem) clamp(2rem, 4vw, 3rem);
+    text-align: center;
+  }
+
+  .ev-hero__empty h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.75rem + 2.5vw, 4rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+
+  @media (min-width: 1100px) {
+    .ev-hero__stage {
+      margin-top: calc(var(--word) * -0.11);
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: end;
+      gap: clamp(1.5rem, 3vw, 3.5rem);
+    }
+
+    .ev-hero__poster {
+      --poster-w: 50vw;
+      --poster-h: 50svh;
+      order: 0;
+    }
+
+    .ev-hero__name h2 {
+      font-size: clamp(2.75rem, 1rem + 3vw, 5rem);
+    }
+
+    .ev-hero__plan .ev-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  /* ---------- Later dates ---------- */
+  .ev-band {
+    padding-block: clamp(4rem, 8vw, 8rem);
+  }
+
+  .ev-band__copy .ev-hero__date {
+    margin-top: 1.25rem;
+  }
+
+  .ev-band__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .ev-band__poster {
+    --poster-w: 100%;
+    --poster-h: 80svh;
+    display: grid;
+    justify-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .ev-band__grid {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: clamp(3rem, 6vw, 7rem);
+    }
+
+    .ev-band--flip .ev-band__poster {
+      order: 1;
+    }
+  }
+
+  /* ---------- Past events ---------- */
+  .ev-past {
+    padding-block: clamp(4.5rem, 8vw, 8rem);
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  .ev-past h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 2rem + 3.4vw, 5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+
+  .ev-past__wall {
+    columns: 3 17rem;
+    column-gap: 1.5rem;
+    margin: clamp(2.5rem, 4vw, 4rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ev-past__wall li {
+    break-inside: avoid;
+    padding-bottom: 3rem;
+  }
+
+  .ev-past__wall h3 {
+    margin: 1.25rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.625rem;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .ev-past__wall h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ev-past__wall h3 a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.12em;
+  }
+
+  .ev-past__wall p {
+    margin: 0.4rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+  }
+
+  /* ---------- Close ---------- */
+  .ev-close {
+    padding-block: clamp(3.5rem, 7vw, 7rem);
+  }
+
+  .ev-close__row {
+    display: grid;
+    gap: 2rem;
+    justify-items: start;
+  }
+
+  .ev-close h2 {
+    margin: 0;
+    max-width: 14ch;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 1.75rem + 5vw, 7rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+
+  @media (min-width: 900px) {
+    .ev-close__row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+    }
+  }
+</style>

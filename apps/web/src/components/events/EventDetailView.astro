@@ -1,954 +1,506 @@
 ---
 /**
- * Event detail template, fed by one Sanity "event" document.
- * Empty fields hide their sections.
+ * Event page, fed by one Sanity "event" document. Empty fields hide their sections.
+ * Once the event has passed, the countdown and ticket buttons give way to a link back to Events.
  */
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
-import Marquee from '../ui/Marquee.astro';
+import EventPoster from './EventPoster.astro';
 import EventShare from './EventShare.astro';
 import SubscribeDialog from '../forms/SubscribeDialog.astro';
 import { getEventCoverUrl } from '../../lib/events/media';
 import {
-  formatEventDate,
   formatEventDateLong,
   formatEventLocation,
   formatEventType,
-  lineupBadgeLabel,
+  isPastEvent,
   lineupDisplayName,
 } from '../../lib/events/format';
 import { imageAlt } from '../../lib/seo/site';
 import { titleCase } from '../../lib/text/titleCase';
+import '../../styles/events.css';
 
 interface Props {
-  /** The event shown on this detail page. */
-  event: EventDetail | null;
-  /** Events already held, newest first. */
-  pastEvents: EventDetail[];
+  event: EventDetail;
   shareUrl: string;
 }
 
-const { event, pastEvents, shareUrl } = Astro.props;
+const { event, shareUrl } = Astro.props;
 
-const eventCopy = (value: string | undefined) => value;
-
-/** Shown while no upcoming event is published in Sanity. */
-const DEFAULT_EVENT = {
-  title: 'Events',
-  subtitle: 'Live Music and Shared Moments',
-  cover: '/initiatives/energize-fest.webp',
-  about:
-    'Energize Music events bring our artistes, special guests, and community together for live music and shared moments.',
-  next: 'Dates, venues, and ticket links for upcoming events will be posted here as soon as they are confirmed.',
+const { title, ticketUrl } = event;
+const isPast = isPastEvent(event.startDate, event.endDate);
+const primaryLabel = ticketUrl ? event.ctaLabel || 'Get tickets' : 'Get ticket alerts';
+const alerts = {
+  'data-subscribe-open': '',
+  'data-subscribe-title': 'Get Ticket Alerts',
+  'data-subscribe-lead': `Be the first to know when ${title} tickets go on sale and the lineup is announced.`,
 };
+const secondaryHref = event.secondaryCtaUrl || '/contact?intent=partnership';
+const secondaryLabel = event.secondaryCtaLabel || 'Partner with us';
 
-const title = event ? event.title : DEFAULT_EVENT.title;
-const subtitle = event?.subtitle ?? DEFAULT_EVENT.subtitle;
-const coverUrl = event ? getEventCoverUrl(event.cover, 2400, 1500) : DEFAULT_EVENT.cover;
-const ticketUrl = event?.ticketUrl;
-// No ticket link yet: the main button opens the email sign-up so people hear when sales open.
-const primaryLabel = ticketUrl ? event?.ctaLabel || 'Get Tickets' : 'Get Ticket Alerts';
-const alertsTitle = 'Get Ticket Alerts';
-const alertsLead = event
-  ? `Be the first to know when ${title} tickets go on sale and the lineup is announced.`
-  : 'Be the first to know when the next event date, venue, and tickets are announced.';
-const secondaryHref = event?.secondaryCtaUrl || '/contact?intent=partnership';
-const secondaryLabel = event?.secondaryCtaLabel || 'Partner With Us';
-
-const venue = formatEventLocation(event?.location);
-const highlights = (event?.highlights ?? []).filter((item) => item?.title && item?.body);
-const lineup = (event?.lineup ?? []).filter(Boolean);
-const body = event?.body?.length ? event.body : null;
-const marqueeItems = event
-  ? [title, formatEventDate(event.startDate), venue, formatEventType(event.eventType)]
-  : ['Energize Music Events', 'Live Music', 'New Dates Coming Soon', 'Afro-Gospel Live'];
-
-const lineupCards = lineup.map((slot) => {
+const highlights = (event.highlights ?? []).filter((item) => item?.title && item?.body);
+const body = event.body?.length ? event.body : null;
+const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
   const revealed = !slot.revealState || slot.revealState === 'confirmed';
   const photo = revealed ? (slot.photo?.asset ? slot.photo : slot.artistPhoto) : undefined;
   const name = lineupDisplayName(slot.revealState, slot.name);
   return {
     name,
+    // Shown in the tile until there is a photo.
+    standIn: revealed ? name.split(/\s+/).map((word) => word[0]).slice(0, 2).join('') : '?',
     role: slot.role ? titleCase(slot.role) : undefined,
-    badge: lineupBadgeLabel(slot.revealState),
     href: revealed && slot.artistSlug ? `/artists/${slot.artistSlug}` : undefined,
     photoUrl: getEventCoverUrl(photo, 720, 900),
     photoAlt: imageAlt(photo?.alt, `${name} at ${title}`),
   };
 });
-
-/** Past editions shown per page in the archive. */
-const PAST_PAGE_SIZE = 6;
-const pastCards = pastEvents.map((past) => {
-  const year = new Date(past.startDate).getUTCFullYear();
-  return {
-    title: `${past.title} ${year}`,
-    year,
-    date: formatEventDateLong(past.startDate),
-    venue: formatEventLocation(past.location),
-    summary: eventCopy(past.summary),
-    coverUrl: getEventCoverUrl(past.cover, 960, 640),
-    coverAlt: imageAlt(past.cover?.alt, `${past.title} ${year}`),
-  };
-});
 ---
 
-<article class="fest">
-  <header class="fest-hero theme-dark">
-    {
-      coverUrl ? (
-        <img src={coverUrl} alt="" class="fest-hero__bg" width="2400" height="1500" fetchpriority="high" decoding="async" />
-      ) : (
-        <div class="fest-hero__bg fest-hero__bg--empty" />
-      )
-    }
-    <div class="fest-hero__scrim" aria-hidden="true"></div>
+<article class="event-world ev-page">
+  <div class="event-shell">
+    <a href="/events" class="event-textlink ev-page__back">All events</a>
+    <h1 class="ev-page__title">{title}</h1>
+    {event.subtitle && <p class="ev-page__subtitle">{titleCase(event.subtitle)}</p>}
 
-    <div class="fest-hero__inner">
-      <a href="/events" class="fest-hero__back">← All Events</a>
+    <div class="ev-page__grid">
+      <aside class="ev-page__aside">
+        <EventPoster cover={event.cover} title={title} width={900} lead />
 
-      <div class="fest-hero__grid">
-        <div class="fest-reveal">
-          <h1 class="fest-hero__title">{title}</h1>
-          {subtitle && <p class="fest-hero__subtitle">{titleCase(subtitle)}</p>}
+        {
+          isPast ? (
+            <div class="ev-page__actions">
+              <a href="/events" class="event-btn event-btn--solid">See upcoming events</a>
+            </div>
+          ) : (
+            <div class="ev-page__actions">
+              {ticketUrl ? (
+                <a href={ticketUrl} class="event-btn event-btn--solid ev-page__tickets" target="_blank" rel="noopener noreferrer">
+                  {primaryLabel}
+                </a>
+              ) : (
+                <button type="button" class="event-btn event-btn--solid ev-page__tickets" {...alerts}>
+                  {primaryLabel}
+                </button>
+              )}
+              <a href={secondaryHref} class="event-btn event-btn--ghost">{secondaryLabel}</a>
+            </div>
+          )
+        }
 
-          {
-            event && (
-              <dl class="fest-hero__facts">
-                <div>
-                  <dt>Date</dt>
-                  <dd>{formatEventDateLong(event.startDate)}</dd>
-                </div>
-                <div>
-                  <dt>Venue</dt>
-                  <dd>{venue}</dd>
-                </div>
-                <div>
-                  <dt>Format</dt>
-                  <dd>{formatEventType(event.eventType)}</dd>
-                </div>
-              </dl>
-            )
-          }
+        <EventShare title={title} summary={event.summary} shareUrl={shareUrl} />
+      </aside>
 
-          <div class="fest-actions">
-            {ticketUrl ? (
-              <a href={ticketUrl} class="fest-btn fest-btn--solid" target="_blank" rel="noopener noreferrer">
-                {primaryLabel}
-              </a>
-            ) : (
-              <button type="button" class="fest-btn fest-btn--solid" data-subscribe-open data-subscribe-title={alertsTitle} data-subscribe-lead={alertsLead}>
-                {primaryLabel}
-              </button>
-            )}
-            <a href={secondaryHref} class="fest-btn fest-btn--ghost">{secondaryLabel}</a>
-          </div>
+      <div class="ev-page__main">
+        <div class="ev-when">
+          <p class="ev-when__date">{formatEventDateLong(event.startDate)}</p>
+          <p class="ev-when__place">
+            {formatEventLocation(event.location)}<br />
+            {formatEventType(event.eventType)}
+          </p>
         </div>
 
         {
-          event && (
-            <div class="fest-countdown fest-reveal" data-countdown={event.startDate} aria-label="Countdown to the event">
-              <p class="fest-countdown__label">Countdown</p>
-              <div class="fest-countdown__grid">
-                {['Days', 'Hours', 'Mins', 'Secs'].map((unit) => (
-                  <div class="fest-countdown__cell">
-                    <span class="fest-countdown__value" data-unit={unit.toLowerCase()}>
-                      --
-                    </span>
-                    <span class="fest-countdown__unit">{unit}</span>
-                  </div>
-                ))}
-              </div>
+          isPast ? (
+            <p class="ev-ended">This event has ended.</p>
+          ) : (
+            <div class="ev-count" data-countdown={event.startDate} role="timer" aria-label="Time until the event">
+              {['Days', 'Hours', 'Mins', 'Secs'].map((unit) => (
+                <div>
+                  <span class="ev-count__value" data-unit={unit.toLowerCase()}>--</span>
+                  <span class="ev-count__unit">{unit}</span>
+                </div>
+              ))}
             </div>
+          )
+        }
+
+        {
+          (event.summary || body) && (
+            <section class="ev-block" aria-labelledby="event-about-title">
+              <h2 id="event-about-title">About the event</h2>
+              {event.summary && <p class="ev-lead">{event.summary}</p>}
+              {body && (
+                <div class="ev-body">
+                  <PortableText value={body} />
+                </div>
+              )}
+            </section>
+          )
+        }
+
+        {
+          highlights.length > 0 && (
+            <section class="ev-block" aria-labelledby="event-details-title">
+              <h2 id="event-details-title">Event details</h2>
+              <ul class="ev-notes">
+                {highlights.map((item) => (
+                  <li>
+                    <h3>{titleCase(item.title)}</h3>
+                    <p>{item.body}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          lineup.length > 0 ? (
+            <section class="ev-block" aria-labelledby="event-lineup-title">
+              <h2 id="event-lineup-title">The lineup</h2>
+              <ul class="ev-lineup">
+                {lineup.map((slot) => {
+                  const Tag = slot.href ? 'a' : 'div';
+                  return (
+                    <li>
+                      <Tag href={slot.href} class="ev-lineup__slot">
+                        <span class="ev-lineup__photo">
+                          {slot.photoUrl ? (
+                            <img src={slot.photoUrl} alt={slot.photoAlt} width="720" height="900" loading="lazy" decoding="async" />
+                          ) : (
+                            <span class="ev-lineup__stand-in" aria-hidden="true">{slot.standIn}</span>
+                          )}
+                        </span>
+                        <span class="ev-lineup__name">{slot.name}</span>
+                        {slot.role && <span class="ev-lineup__role">{slot.role}</span>}
+                      </Tag>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ) : (
+            !isPast && (
+              <section class="ev-block" aria-labelledby="event-lineup-title">
+                <h2 id="event-lineup-title">The lineup</h2>
+                <p class="ev-lead">Names are coming. Join the list to hear them first.</p>
+                <button
+                  type="button"
+                  class="event-btn event-btn--ghost ev-block__action"
+                  data-subscribe-open
+                  data-subscribe-title="Hear the Lineup First"
+                  data-subscribe-lead={`Get the ${title} lineup in your inbox the moment it is announced.`}
+                >
+                  Get lineup updates
+                </button>
+              </section>
+            )
           )
         }
       </div>
     </div>
-  </header>
-
-  <Marquee items={marqueeItems} variant="caps" class="fest-marquee" />
+  </div>
 
   {
-    highlights.length > 0 && (
-      <section class="fest-section" aria-labelledby="fest-details-title">
-        <div class="fest-container">
-          <div class="fest-head scroll-reveal">
-            <h2 id="fest-details-title" class="fest-h2">Event Details</h2>
-          </div>
-          <ol class="fest-details scroll-reveal-stagger">
-            {highlights.map((item, index) => (
-              <li class="fest-detail">
-                <span class="fest-detail__num" aria-hidden="true">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <h3 class="fest-detail__title">{titleCase(item.title)}</h3>
-                <p class="fest-detail__body">{item.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-    )
-  }
-
-  {
-    event && (
-      <section class="fest-section fest-section--surface" aria-labelledby="fest-lineup-title">
-        <div class="fest-container">
-          <div class="fest-head scroll-reveal">
-            <h2 id="fest-lineup-title" class="fest-h2">The Lineup</h2>
-          </div>
-          {lineupCards.length > 0 ? (
-            <ul class="fest-lineup scroll-reveal-stagger">
-              {lineupCards.map((card) => {
-                const inner = (
-                  <>
-                    <span class="fest-lineup__media media-frame">
-                      {card.photoUrl ? (
-                        <img src={card.photoUrl} alt={card.photoAlt} width="720" height="900" loading="lazy" decoding="async" />
-                      ) : (
-                        <span class="fest-lineup__placeholder" aria-hidden="true">
-                          ?
-                        </span>
-                      )}
-                      {card.badge && <span class="fest-lineup__badge">{card.badge}</span>}
-                    </span>
-                    <span class="fest-lineup__name">{card.name}</span>
-                    {card.role && <span class="fest-lineup__role">{card.role}</span>}
-                  </>
-                );
-                return <li>{card.href ? <a href={card.href} class="fest-lineup__card">{inner}</a> : <div class="fest-lineup__card">{inner}</div>}</li>;
-              })}
-            </ul>
-          ) : (
-            <div class="fest-soon scroll-reveal">
-              <p class="fest-soon__title">Lineup Announcements Coming Soon</p>
-              <p class="fest-soon__body">Join the list and you will hear the names first.</p>
-              <button
-                type="button"
-                class="fest-btn fest-btn--solid"
-                data-subscribe-open
-                data-subscribe-title="Hear the Lineup First"
-                data-subscribe-lead={`Get the ${title} lineup in your inbox the moment it is announced.`}
-              >
-                Notify Me
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
-    )
-  }
-
-  <section class="fest-section" aria-labelledby="fest-story-title">
-    <div class="fest-container fest-story">
-      <div class="fest-story__aside scroll-reveal">
-        <h2 id="fest-story-title" class="fest-h2">{event ? 'About the Event' : 'About Our Events'}</h2>
-        <div class="fest-story__share">
-          <EventShare title={title} summary={eventCopy(event?.summary) ?? DEFAULT_EVENT.about} shareUrl={shareUrl} />
-        </div>
-      </div>
-      <div class="fest-story__body scroll-reveal" style="--reveal-delay: 100ms">
-        {event?.summary && <p class="fest-story__lead">{eventCopy(event.summary)}</p>}
-        {body && <PortableText value={body} />}
-        {!event && <p class="fest-story__lead">{DEFAULT_EVENT.about}</p>}
-        {!event && <p>{DEFAULT_EVENT.next}</p>}
-      </div>
-    </div>
-  </section>
-
-  {
-    pastCards.length > 0 && (
-      <section class="fest-section fest-section--surface" aria-labelledby="fest-past-title" data-fest-past data-page-size={PAST_PAGE_SIZE}>
-        <div class="fest-container">
-          <div class="fest-head scroll-reveal">
-            <h2 id="fest-past-title" class="fest-h2">Past Events</h2>
-          </div>
-          <ul class="fest-past scroll-reveal-stagger">
-            {pastCards.map((card, index) => (
-              <li class="fest-past__card" data-fest-past-item hidden={index >= PAST_PAGE_SIZE}>
-                <span class="fest-past__media media-frame">
-                  {card.coverUrl ? (
-                    <img src={card.coverUrl} alt={card.coverAlt} width="960" height="640" loading="lazy" decoding="async" />
-                  ) : (
-                    <span class="fest-past__year" aria-hidden="true">
-                      {card.year}
-                    </span>
-                  )}
-                </span>
-                <p class="fest-past__date">{card.date}</p>
-                <h3 class="fest-past__title">{card.title}</h3>
-                <p class="fest-past__venue">{card.venue}</p>
-                {card.summary && <p class="fest-past__summary">{card.summary}</p>}
-              </li>
-            ))}
-          </ul>
-          {pastCards.length > PAST_PAGE_SIZE && <nav class="pager" data-fest-pager aria-label="Past events pages" />}
-        </div>
-      </section>
-    )
-  }
-
-  <section class="fest-cta theme-dark" aria-labelledby="fest-cta-title">
-    {coverUrl && <img src={coverUrl} alt="" class="fest-cta__bg" width="2400" height="1500" loading="lazy" decoding="async" />}
-    <div class="fest-cta__inner scroll-reveal">
-      <h2 id="fest-cta-title" class="fest-cta__title">{ticketUrl ? 'Get Your Tickets' : 'Be First in Line for Tickets'}</h2>
-      <p class="fest-cta__meta">{event ? `${formatEventDateLong(event.startDate)} · ${venue}` : 'New event dates will be announced soon'}</p>
-      <div class="fest-actions fest-actions--center">
+    !isPast && (
+      <div class="ev-ticketbar">
         {ticketUrl ? (
-          <a href={ticketUrl} class="fest-btn fest-btn--solid" target="_blank" rel="noopener noreferrer">
+          <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">
             {primaryLabel}
           </a>
         ) : (
-          <button type="button" class="fest-btn fest-btn--solid" data-subscribe-open data-subscribe-title={alertsTitle} data-subscribe-lead={alertsLead}>
+          <button type="button" class="event-btn event-btn--solid" {...alerts}>
             {primaryLabel}
           </button>
         )}
       </div>
-    </div>
-  </section>
+    )
+  }
 
   <SubscribeDialog />
 </article>
 
 <script>
-  import { createPager, readPageParam } from '../../lib/ui/pagination';
-
-  const pastSection = document.querySelector<HTMLElement>('[data-fest-past]');
-  const pastNav = pastSection?.querySelector<HTMLElement>('[data-fest-pager]');
-  if (pastSection && pastNav) {
-    const items = Array.from(pastSection.querySelectorAll<HTMLElement>('[data-fest-past-item]'));
-    const pager = createPager({
-      nav: pastNav,
-      pageSize: Number(pastSection.dataset.pageSize) || 6,
-      param: 'past',
-      scrollTarget: pastSection,
-      label: 'Past events pages',
-      // Skip the staggered fade-in on later pages so cards appear at once.
-      onPageChange: (shown) =>
-        shown.forEach((item) => {
-          item.style.setProperty('--reveal-delay', '0ms');
-          item.classList.add('is-visible');
-        }),
-    });
-    pager.render(items, items, readPageParam('past'));
-  }
-
   const root = document.querySelector<HTMLElement>('[data-countdown]');
   const target = root ? new Date(root.dataset.countdown ?? '').getTime() : NaN;
 
   if (root && !Number.isNaN(target)) {
-    const cells = {
-      days: root.querySelector<HTMLElement>('[data-unit="days"]'),
-      hours: root.querySelector<HTMLElement>('[data-unit="hours"]'),
-      mins: root.querySelector<HTMLElement>('[data-unit="mins"]'),
-      secs: root.querySelector<HTMLElement>('[data-unit="secs"]'),
+    const write = (unit: string, value: string) => {
+      const cell = root.querySelector<HTMLElement>(`[data-unit="${unit}"]`);
+      if (cell) cell.textContent = value;
     };
     const pad = (n: number) => String(n).padStart(2, '0');
 
     const tick = () => {
       const diff = Math.max(0, target - Date.now());
       const s = Math.floor(diff / 1000);
-      if (cells.days) cells.days.textContent = String(Math.floor(s / 86400));
-      if (cells.hours) cells.hours.textContent = pad(Math.floor((s % 86400) / 3600));
-      if (cells.mins) cells.mins.textContent = pad(Math.floor((s % 3600) / 60));
-      if (cells.secs) cells.secs.textContent = pad(s % 60);
+      write('days', String(Math.floor(s / 86400)));
+      write('hours', pad(Math.floor((s % 86400) / 3600)));
+      write('mins', pad(Math.floor((s % 3600) / 60)));
+      write('secs', pad(s % 60));
       if (diff === 0) window.clearInterval(timer);
     };
 
-    tick();
     const timer = window.setInterval(tick, 1000);
+    tick();
   }
-
-  document.querySelectorAll('.fest-reveal').forEach((node) => node.classList.add('is-in'));
 </script>
 
 <style>
-  .fest {
+  .ev-page {
     position: relative;
+    padding-top: clamp(1rem, 2vw, 1.75rem);
   }
 
-  /* ---------- Hero ---------- */
-  .fest-hero {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    min-height: max(100svh, 40rem);
-    margin-top: calc(-1 * var(--header-height, 4rem));
-    background: var(--color-bg);
-  }
-
-  .fest-hero__bg {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scale(1.04);
-    animation: fest-zoom 14s ease-out forwards;
-  }
-
-  .fest-hero__bg--empty {
-    background: radial-gradient(circle at 70% 30%, color-mix(in srgb, var(--color-accent) 30%, transparent), transparent 60%), var(--color-bg);
-  }
-
-  @keyframes fest-zoom {
-    to {
-      transform: scale(1);
-    }
-  }
-
-  .fest-hero__scrim {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--color-scrim) 60%, transparent) 0%, color-mix(in srgb, var(--color-scrim) 25%, transparent) 38%, color-mix(in srgb, var(--color-scrim) 92%, transparent) 100%),
-      linear-gradient(90deg, color-mix(in srgb, var(--color-scrim) 55%, transparent) 0%, transparent 65%);
-  }
-
-  .fest-hero__inner {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 3rem;
-    width: min(100%, 80rem);
-    min-height: inherit;
-    margin-inline: auto;
-    padding: calc(var(--header-height, 4rem) + 2rem) 1.25rem clamp(2.5rem, 6vh, 4.5rem);
-  }
-
-  @media (min-width: 640px) {
-    .fest-hero__inner {
-      padding-inline: 1.5rem;
-    }
-  }
-
-  .fest-hero__back {
-    align-self: flex-start;
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-on-dark);
-    opacity: 0.85;
-  }
-
-  .fest-hero__back:hover {
-    opacity: 1;
-  }
-
-  .fest-hero__grid {
-    display: grid;
-    gap: 2.5rem;
-    align-items: end;
-  }
-
-  @media (min-width: 1024px) {
-    .fest-hero__grid {
-      grid-template-columns: minmax(0, 1fr) auto;
-    }
-  }
-
-  .fest-hero__title {
-    margin-top: 0;
-    font-family: var(--font-display);
-    font-size: clamp(3.5rem, 2rem + 9vw, 10rem);
-    font-weight: 500;
-    line-height: 0.88;
-    letter-spacing: -0.045em;
-    color: var(--color-on-dark);
-  }
-
-  .fest-hero__subtitle {
-    margin-top: 1.25rem;
-    max-width: 40rem;
-    font-family: 'Instrument Serif', Georgia, serif;
-    font-size: clamp(1.35rem, 1rem + 1.4vw, 2.1rem);
-    font-style: italic;
-    line-height: 1.2;
-    color: var(--color-on-dark);
-  }
-
-  .fest-hero__facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem 2.25rem;
-    margin-top: 2rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid color-mix(in srgb, var(--color-on-dark) 22%, transparent);
-    max-width: 44rem;
-  }
-
-  .fest-hero__facts dt {
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
-  .fest-hero__facts dd {
-    margin: 0.3rem 0 0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--color-on-dark);
-  }
-
-  /* ---------- Buttons ---------- */
-  .fest-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 2rem;
-  }
-
-  .fest-actions--center {
-    justify-content: center;
-  }
-
-  .fest-btn {
-    border: 0;
-    cursor: pointer;
-    font-family: inherit;
+  .ev-page__back {
     display: inline-flex;
+    min-height: 2.75rem;
     align-items: center;
-    justify-content: center;
-    min-height: 3rem;
-    padding: 0.85rem 1.6rem;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    font-size: 0.9375rem;
   }
 
-  .fest-btn--solid {
-    background: var(--color-accent-fill);
-    color: #fff;
-  }
-
-  .fest-btn--solid:hover {
-    transform: translateY(-2px);
-    background: var(--color-accent-fill-hover);
-  }
-
-  .fest-btn--ghost {
-    border: 1px solid color-mix(in srgb, var(--color-fg) 45%, transparent);
+  .ev-page__title {
+    margin: 0.5rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(3.25rem, 1.5rem + 7.2vw, 10rem);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
     color: var(--color-fg);
   }
 
-  .fest-btn--ghost:hover {
-    border-color: var(--color-fg);
+  .ev-page__subtitle {
+    margin: 1.25rem 0 0;
+    max-width: 40rem;
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);
+    line-height: 1.35;
   }
 
-  /* ---------- Countdown ---------- */
-  .fest-countdown {
-    padding: 1.25rem;
-    border: 1px solid color-mix(in srgb, var(--color-on-dark) 18%, transparent);
-    background: color-mix(in srgb, var(--color-scrim) 45%, transparent);
-    backdrop-filter: blur(10px);
-  }
-
-  .fest-countdown__label {
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
-  .fest-countdown__grid {
+  .ev-page__grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(3.75rem, 1fr));
-    gap: 0.5rem;
-    margin-top: 0.85rem;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    margin-top: clamp(2rem, 4vw, 3.5rem);
+    padding-bottom: clamp(4rem, 8vw, 8rem);
   }
 
-  .fest-countdown__cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0.7rem 0.4rem;
-    border: 1px solid color-mix(in srgb, var(--color-on-dark) 12%, transparent);
-  }
-
-  .fest-countdown__value {
-    font-family: var(--font-display);
-    font-size: clamp(1.75rem, 1.3rem + 1.5vw, 2.6rem);
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    color: var(--color-on-dark);
-  }
-
-  .fest-countdown__unit {
-    margin-top: 0.4rem;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--color-on-dark) 75%, transparent);
-  }
-
-  .fest-reveal {
-    opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .fest-reveal.is-in {
-    opacity: 1;
-    transform: none;
-  }
-
-  .fest-countdown.fest-reveal {
-    transition-delay: 0.2s;
-  }
-
-  .fest :global(.fest-marquee) {
-    border-block: 1px solid var(--color-line);
-    background: var(--color-surface);
-  }
-
-  /* ---------- Sections ---------- */
-  .fest-section {
-    padding-block: clamp(4.5rem, 3rem + 5vw, 8rem);
-    border-bottom: 1px solid var(--color-line);
-  }
-
-  .fest-section--surface {
-    background: var(--color-surface);
-  }
-
-  .fest-container {
-    width: min(100%, 80rem);
-    margin-inline: auto;
-    padding-inline: 1.25rem;
-  }
-
-  @media (min-width: 640px) {
-    .fest-container {
-      padding-inline: 1.5rem;
-    }
-  }
-
-  .fest-h2 {
-    margin-top: 0;
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 1.5rem + 3vw, 4.25rem);
-    font-weight: 500;
-    line-height: 0.98;
-    letter-spacing: -0.035em;
-  }
-
-  .fest-details {
+  .ev-page__aside {
+    --poster-w: 100%;
+    --poster-h: 80svh;
     display: grid;
-    gap: 1px;
-    margin: 3rem 0 0;
-    padding: 0;
-    list-style: none;
-    background: var(--color-line);
-    border: 1px solid var(--color-line);
-  }
-
-  @media (min-width: 768px) {
-    .fest-details {
-      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    }
-  }
-
-  .fest-detail {
-    position: relative;
-    padding: clamp(1.75rem, 1.4rem + 1vw, 2.5rem);
-    background: var(--color-bg);
-    transition: background-color 0.3s ease;
-  }
-
-  .fest-detail::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto;
-    height: 2px;
-    background: var(--color-accent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s ease;
-  }
-
-  .fest-detail:hover::before {
-    transform: scaleX(1);
-  }
-
-  .fest-detail__num {
-    font-family: var(--font-display);
-    font-size: 3rem;
-    line-height: 1;
-    color: color-mix(in srgb, var(--color-accent) 70%, transparent);
-  }
-
-  .fest-detail__title {
-    margin-top: 1.5rem;
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-  }
-
-  .fest-detail__body {
-    margin-top: 0.75rem;
-    line-height: 1.65;
-    color: var(--color-muted);
-  }
-
-  /* ---------- Lineup ---------- */
-  .fest-lineup {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
-    gap: 1.5rem;
-    margin: 3rem 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .fest-lineup__card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .fest-lineup__media {
-    position: relative;
-    display: block;
-    aspect-ratio: 4 / 5;
-    overflow: hidden;
-    margin-bottom: 0.75rem;
-    background: color-mix(in srgb, var(--color-fg) 5%, transparent);
-  }
-
-  .fest-lineup__media img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s ease;
-  }
-
-  a.fest-lineup__card:hover .fest-lineup__media img {
-    transform: scale(1.04);
-  }
-
-  .fest-lineup__placeholder {
-    display: grid;
-    place-items: center;
-    height: 100%;
-    font-family: var(--font-display);
-    font-size: 4rem;
-    color: color-mix(in srgb, var(--color-fg) 25%, transparent);
-  }
-
-  .fest-lineup__badge {
-    position: absolute;
-    top: 0.75rem;
-    left: 0.75rem;
-    padding: 0.35rem 0.6rem;
-    background: var(--color-accent-fill);
-    color: #fff;
-    font-size: 0.6rem;
-    font-weight: 800;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-  }
-
-  .fest-lineup__name {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    line-height: 1.1;
-  }
-
-  .fest-lineup__role {
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
-  .fest-soon {
-    display: grid;
+    gap: 1.75rem;
     justify-items: start;
+    min-width: 0;
+  }
+
+  .ev-page__actions {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
     gap: 0.75rem;
-    margin-top: 3rem;
-    padding: clamp(1.75rem, 1.2rem + 2vw, 3rem);
-    border: 1px dashed color-mix(in srgb, var(--color-fg) 22%, transparent);
+    width: 100%;
   }
 
-  .fest-soon__title {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 1.2rem + 1vw, 2.1rem);
+  .ev-page__actions .event-btn {
+    flex: 1 1 12rem;
   }
 
-  .fest-soon__body {
-    color: var(--color-muted);
-  }
-
-  .fest-soon .fest-btn {
-    margin-top: 0.75rem;
-  }
-
-  /* ---------- Story ---------- */
-  .fest-story {
-    display: grid;
-    gap: 2.5rem;
-  }
-
-  @media (min-width: 1024px) {
-    .fest-story {
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-      gap: 5rem;
-    }
-
-    .fest-story__aside {
-      position: sticky;
-      top: calc(var(--header-height, 4rem) + 2rem);
-      align-self: start;
-    }
-  }
-
-  .fest-story__share {
-    margin-top: 2rem;
-  }
-
-  .fest-story__lead {
-    font-family: 'Instrument Serif', Georgia, serif;
-    font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.25rem);
-    font-style: italic;
-    line-height: 1.3;
-  }
-
-  .fest-story__body :global(p:not(.fest-story__lead)) {
-    margin-top: 1.25rem;
-    font-size: 1.05rem;
-    line-height: 1.75;
-    color: var(--color-fg);
-  }
-
-  /* ---------- Past events ---------- */
-  .fest-past__card[hidden] {
+  /* On phones the ticket button lives in the bar at the bottom of the screen. */
+  .ev-page__tickets {
     display: none;
   }
 
-  .fest-past {
+  .ev-page__main {
+    min-width: 0;
+    max-width: 44rem;
+  }
+
+  .ev-when__date {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .ev-when__place {
+    margin: 1rem 0 0;
+    font-size: 1.125rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+
+  .ev-ended {
+    margin: 2rem 0 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .ev-count {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
-    gap: 2rem 1.5rem;
-    margin: 3rem 0 0;
+    grid-template-columns: repeat(4, minmax(0, max-content));
+    gap: clamp(1.25rem, 3.5vw, 3rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  .ev-count__value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1.75rem + 3.5vw, 5rem);
+    font-variant-numeric: tabular-nums lining-nums;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .ev-count__unit {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+  }
+
+  .ev-block {
+    margin-top: clamp(3.5rem, 7vw, 6rem);
+  }
+
+  .ev-block h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.75rem + 2vw, 3.5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+
+  .ev-lead {
+    margin: 1.25rem 0 0;
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+    line-height: 1.45;
+  }
+
+  .ev-body {
+    margin-top: 1.25rem;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+
+  .ev-body :global(p) {
+    margin: 0 0 1rem;
+    color: inherit;
+  }
+
+  .ev-block__action {
+    margin-top: 1.75rem;
+  }
+
+  .ev-notes {
+    display: grid;
+    gap: 2rem;
+    margin: 2rem 0 0;
     padding: 0;
     list-style: none;
   }
 
-  .fest-past__media {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 3 / 2;
-    overflow: hidden;
-    margin-bottom: 1rem;
-    background: color-mix(in srgb, var(--color-fg) 6%, transparent);
-  }
-
-  .fest-past__media img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .fest-past__year {
+  .ev-notes h3 {
+    margin: 0;
     font-family: var(--font-display);
-    font-size: 3.5rem;
-    color: color-mix(in srgb, var(--color-fg) 30%, transparent);
-  }
-
-  .fest-past__date {
-    font-size: 0.66rem;
-    font-weight: 800;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-  }
-
-  .fest-past__title {
-    margin-top: 0.5rem;
-    font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.625rem;
     font-weight: 500;
-    line-height: 1.1;
+    line-height: 1.15;
   }
 
-  .fest-past__venue {
-    margin-top: 0.35rem;
-    font-size: 0.9rem;
+  .ev-notes p {
+    margin: 0.5rem 0 0;
+    line-height: 1.6;
     color: var(--color-muted);
   }
 
-  .fest-past__summary {
-    margin-top: 0.75rem;
-    line-height: 1.6;
-    color: var(--color-fg);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  .ev-lineup {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+    gap: 2rem 1.25rem;
+    margin: 2rem 0 0;
+    padding: 0;
+    list-style: none;
   }
 
-  /* ---------- Closing CTA ---------- */
-  .fest-cta {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    padding: clamp(5rem, 3.5rem + 6vw, 9rem) 1.25rem;
-    text-align: center;
-    background: var(--color-bg);
+  .ev-lineup__slot {
+    display: block;
+    color: inherit;
+    text-decoration: none;
   }
 
-  .fest-cta__bg {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
+  .ev-lineup__photo {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--color-fg) 6%, transparent);
+  }
+
+  .ev-lineup__photo img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.28;
   }
 
-  .fest-cta__inner {
-    width: min(100%, 48rem);
-    margin-inline: auto;
-  }
-
-  .fest-cta__title {
-    margin-top: 0;
+  .ev-lineup__stand-in {
+    display: grid;
+    height: 100%;
+    place-items: center;
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 1.6rem + 4vw, 5.5rem);
-    font-weight: 500;
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    color: var(--color-on-dark);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: var(--color-muted);
   }
 
-  .fest-cta__meta {
-    margin-top: 1.25rem;
-    color: var(--color-on-dark);
+  .ev-lineup__name {
+    display: block;
+    margin-top: 0.85rem;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1.1;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .fest-hero__bg {
-      animation: none;
-      transform: none;
+  a.ev-lineup__slot:hover .ev-lineup__name {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.12em;
+  }
+
+  .ev-lineup__role {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+  }
+
+  /* Tickets stay in reach on phones while the poster's own button scrolls away. */
+  .ev-ticketbar {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: grid;
+    padding: 0.75rem 1.25rem;
+    background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  @media (min-width: 1024px) {
+    .ev-page__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(3rem, 6vw, 7rem);
     }
 
-    .fest-reveal {
-      opacity: 1;
-      transform: none;
-      transition: none;
+    .ev-page__tickets {
+      display: inline-flex;
+    }
+
+    .ev-page__main {
+      order: -1;
+    }
+
+    .ev-page__aside {
+      --poster-h: 56svh;
+      position: sticky;
+      top: calc(var(--header-height, 4rem) + 1.5rem);
+      align-self: start;
+    }
+
+    .ev-ticketbar {
+      display: none;
     }
   }
 </style>

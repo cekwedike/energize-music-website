@@ -12,6 +12,7 @@ export const CONTACT_EMAIL = '';
 export const primaryNav: NavLink[] = [
   { label: 'Artistes', href: '/artists' },
   { label: 'Releases', href: '/releases' },
+  { label: 'Events', href: '/events' },
   { label: 'About', href: '/about' },
   { label: 'Blog', href: '/blog' },
   { label: 'Contact', href: '/contact' },
@@ -29,6 +30,7 @@ export interface InitiativeItem extends NavLink {
   image: string;
 }
 
+// Used by the home page cards. The footer lists these too, apart from Events.
 export const initiativesNav: InitiativeItem[] = [
   {
     label: 'NEXT',
@@ -53,17 +55,13 @@ export const initiativesNav: InitiativeItem[] = [
   },
 ];
 
-export type HeaderNavEntry =
-  | ({ type: 'link' } & NavLink)
-  | { type: 'dropdown'; label: string; items: InitiativeItem[] };
-
 // Drives SiteHeader. Contact renders as the CTA button, Energize HQ as a small text link after it.
-export const headerNav: HeaderNavEntry[] = [
-  { type: 'link', label: 'Artistes', href: '/artists' },
-  { type: 'link', label: 'Releases', href: '/releases' },
-  { type: 'dropdown', label: 'Initiatives', items: initiativesNav },
-  { type: 'link', label: 'About', href: '/about' },
-  { type: 'link', label: 'Contact', href: '/contact' },
+export const headerNav: NavLink[] = [
+  { label: 'Artistes', href: '/artists' },
+  { label: 'Releases', href: '/releases' },
+  { label: 'Events', href: '/events' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export interface SocialLink {

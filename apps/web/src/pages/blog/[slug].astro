@@ -344,7 +344,6 @@ const typeLabel: Record<Release['type'], string> = { single: 'Single', ep: 'EP',
     (relatedReleases.length > 0 || (post.relatedArtists ?? []).length > 0) && (
       <section class="post-related" aria-labelledby="post-related-title">
         <div class="blog-shell">
-          <p class="blog-kicker">From this story</p>
           <h2 id="post-related-title" class="post-related__title">
             Listen and explore
           </h2>
@@ -356,11 +355,11 @@ const typeLabel: Record<Release['type'], string> = { single: 'Single', ep: 'EP',
                 ) : (
                   <span class="related-tile__media related-tile__media--empty" aria-hidden="true" />
                 )}
-                <span class="related-tile__kicker">
-                  {typeLabel[release.type]} / {new Date(release.releaseDate).getUTCFullYear()}
-                </span>
                 <span class="related-tile__title">{release.displayTitle}</span>
                 <span class="related-tile__sub">{release.artistNames.join(', ') || 'Energize Music'}</span>
+                <span class="related-tile__sub">
+                  {typeLabel[release.type]}, {new Date(release.releaseDate).getUTCFullYear()}
+                </span>
               </a>
             ))}
             {(post.relatedArtists ?? []).map((artist) => {
@@ -372,7 +371,6 @@ const typeLabel: Record<Release['type'], string> = { single: 'Single', ep: 'EP',
                   ) : (
                     <span class="related-tile__media related-tile__media--empty" aria-hidden="true" />
                   )}
-                  <span class="related-tile__kicker">Artiste</span>
                   <span class="related-tile__title">{artist.name}</span>
                   {artist.tagline && <span class="related-tile__sub">{artist.tagline}</span>}
                 </a>
@@ -390,7 +388,6 @@ const typeLabel: Record<Release['type'], string> = { single: 'Single', ep: 'EP',
         <div class="blog-shell">
           <div class="post-next__head">
             <div>
-              <p class="blog-kicker">Keep reading</p>
               <h2 id="post-next-title" class="post-related__title">
                 More stories
               </h2>

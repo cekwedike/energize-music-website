@@ -4,7 +4,10 @@ import SocialIcon from './SocialIcon.astro';
 import Logo from './Logo.astro';
 import Marquee from './Marquee.astro';
 
-const moreNav = [...initiativesNav.map(({ label, href }) => ({ label, href })), hqLink];
+const moreNav = [
+  ...initiativesNav.filter(({ href }) => href !== '/events').map(({ label, href }) => ({ label, href })),
+  hqLink,
+];
 const year = new Date().getFullYear();
 ---
 
@@ -181,7 +184,7 @@ const year = new Date().getFullYear();
     width: 2.75rem;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 0.25rem;
     border: 1px solid var(--color-line);
     color: var(--color-fg);
     background: color-mix(in srgb, var(--color-fg) 2%, transparent);
@@ -239,11 +242,9 @@ const year = new Date().getFullYear();
   }
 
   .site-footer__nav-label {
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-accent);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-fg);
   }
 
   .site-footer__nav-list {
@@ -343,10 +344,8 @@ const year = new Date().getFullYear();
   }
 
   .site-footer__legal-link {
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--color-fg);
     text-decoration: none;
   }
@@ -401,10 +400,8 @@ const year = new Date().getFullYear();
 
   .site-footer__copyright-secondary {
     font-family: var(--font-body);
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     line-height: 1.5;
     color: var(--color-fg);
   }

@@ -1,7 +1,14 @@
 ---
+/**
+ * Event short links, such as /qol. The site is static, so this is a small page that forwards at once.
+ * It carries the event's title and image because WhatsApp, X and others read this page for the link
+ * preview and do not follow the forward.
+ */
 import type { GetStaticPaths } from 'astro';
 import { sanityClient } from '../lib/sanity/client';
 import { eventsQuery, type EventDetail } from '@energize/shared';
+import { getEventCoverUrl, getEventShareImageUrl } from '../lib/events/media';
+import { absoluteUrl } from '../lib/seo/site';
 
 export const getStaticPaths = (async () => {
   const events = await sanityClient.fetch<EventDetail[]>(eventsQuery);
@@ -10,13 +17,43 @@ export const getStaticPaths = (async () => {
     .filter((event) => event.shortSlug)
     .map((event) => ({
       params: { shortSlug: event.shortSlug! },
-      props: { destination: `/events/${event.slug}` },
+      props: { event },
     }));
 }) satisfies GetStaticPaths;
 
 interface Props {
-  destination: string;
+  event: EventDetail;
 }
 
-return Astro.redirect(Astro.props.destination, 301);
+const { event } = Astro.props;
+const destination = `/events/${event.slug}`;
+const canonical = absoluteUrl(destination);
+const title = `${event.title} | Energize Music Events`;
+const description = event.summary ?? event.subtitle ?? `Event details and tickets for ${event.title}.`;
+const image = getEventCoverUrl(event.shareImage, 1200, 630) || getEventShareImageUrl(event.cover);
 ---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{title}</title>
+    <meta http-equiv="refresh" content={`0;url=${destination}`} />
+    <meta name="robots" content="noindex" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Energize Music" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {image && <meta property="og:image" content={image} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {image && <meta name="twitter:image" content={image} />}
+  </head>
+  <body>
+    <a href={destination}>Go to {event.title}</a>
+  </body>
+</html>

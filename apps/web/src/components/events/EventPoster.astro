@@ -1,0 +1,169 @@
+---
+/**
+ * The event poster, always whole. On a mouse it tilts and catches a foil sheen under the pointer.
+ * Without a poster it falls back to the event title, so an event can go live before its art is ready.
+ */
+import type { SanityImage } from '@energize/shared';
+import { getEventPosterRatio, getEventPosterUrl } from '../../lib/events/media';
+import { imageAlt } from '../../lib/seo/site';
+
+interface Props {
+  cover?: SanityImage;
+  title: string;
+  href?: string;
+  /** Rendered width of the poster, in CSS pixels at its largest. */
+  width?: number;
+  /** Load first and rise into place. For the main poster on a page only. */
+  lead?: boolean;
+}
+
+const { cover, title, href, width = 1200, lead = false } = Astro.props;
+const src = getEventPosterUrl(cover, width * 2);
+const ratio = getEventPosterRatio(cover);
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  class:list={['ev-poster', lead && 'ev-poster--lead']}
+  href={href}
+  aria-label={href ? `View ${title}` : undefined}
+  style={`--ratio: ${ratio.toFixed(4)}`}
+  data-event-poster
+>
+  <span class="ev-poster__face">
+    {
+      src ? (
+        <img
+          src={src}
+          alt={imageAlt(cover?.alt, `${title} event poster`)}
+          width={width}
+          height={Math.round(width / ratio)}
+          decoding="async"
+          {...(lead ? { fetchpriority: 'high' } : { loading: 'lazy' })}
+        />
+      ) : (
+        <span class="ev-poster__blank">{title}</span>
+      )
+    }
+    <span class="ev-poster__foil" aria-hidden="true"></span>
+  </span>
+</Tag>
+
+<script>
+  const canTilt =
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (canTilt) {
+    document.querySelectorAll<HTMLElement>('[data-event-poster]').forEach((poster) => {
+      let frame = 0;
+
+      poster.addEventListener('pointermove', (event) => {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          const box = poster.getBoundingClientRect();
+          const x = (event.clientX - box.left) / box.width;
+          const y = (event.clientY - box.top) / box.height;
+          poster.style.setProperty('--tilt-x', `${((0.5 - y) * 9).toFixed(2)}deg`);
+          poster.style.setProperty('--tilt-y', `${((x - 0.5) * 11).toFixed(2)}deg`);
+          poster.style.setProperty('--foil-x', `${(x * 100).toFixed(1)}%`);
+          poster.style.setProperty('--foil-y', `${(y * 100).toFixed(1)}%`);
+          poster.style.setProperty('--foil-sweep', `${((x - 0.5) * 60).toFixed(1)}deg`);
+        });
+      });
+
+      poster.addEventListener('pointerleave', () => {
+        cancelAnimationFrame(frame);
+        poster.style.setProperty('--tilt-x', '0deg');
+        poster.style.setProperty('--tilt-y', '0deg');
+      });
+    });
+  }
+</script>
+
+<style>
+  .ev-poster {
+    display: block;
+    width: min(var(--poster-w, 100%), calc(var(--poster-h, 70svh) * var(--ratio)));
+    max-width: 100%;
+    color: inherit;
+    perspective: 1500px;
+  }
+
+  .ev-poster--lead {
+    animation: ev-poster-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes ev-poster-rise {
+    from {
+      opacity: 0;
+      transform: translateY(2.5rem) scale(0.97);
+    }
+  }
+
+  .ev-poster__face {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: var(--ratio);
+    border-radius: 0.375rem;
+    background: color-mix(in srgb, var(--color-fg) 6%, transparent);
+    box-shadow: 0 1.5rem 3.5rem -1.5rem color-mix(in srgb, var(--color-shadow) 35%, transparent);
+    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ev-poster__face img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .ev-poster__blank {
+    display: grid;
+    height: 100%;
+    place-items: center;
+    padding: 2rem;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.05;
+    text-align: center;
+  }
+
+  .ev-poster__foil {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: color-dodge;
+    background:
+      radial-gradient(circle at var(--foil-x, 50%) var(--foil-y, 50%), rgba(255, 255, 255, 0.32), transparent 42%),
+      linear-gradient(
+        calc(115deg + var(--foil-sweep, 0deg)),
+        transparent 28%,
+        rgba(132, 92, 255, 0.28) 42%,
+        rgba(64, 220, 255, 0.32) 50%,
+        rgba(255, 104, 220, 0.28) 58%,
+        transparent 72%
+      );
+    transition: opacity 0.3s ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ev-poster:hover .ev-poster__foil,
+    .ev-poster:focus-visible .ev-poster__foil {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ev-poster--lead {
+      animation: none;
+    }
+
+    .ev-poster__foil {
+      display: none;
+    }
+  }
+</style>

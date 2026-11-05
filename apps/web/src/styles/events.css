@@ -1,0 +1,73 @@
+/* Shared by the Events directory and event pages. The poster is the only colour on these pages. */
+
+.event-world {
+  /* Links, focus rings, share icons and the sign-up dialog read these tokens: keep them in black here. */
+  --color-accent: var(--color-fg);
+  --color-accent-strong: var(--color-fg);
+  --color-accent-fill: var(--color-fg);
+  --color-accent-fill-hover: #2c2c31;
+}
+
+.event-shell {
+  width: min(100% - 2.5rem, 96rem);
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .event-shell {
+    width: min(100% - 4rem, 96rem);
+  }
+}
+
+.event-btn {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  padding: 0.75rem 1.75rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.event-btn--solid {
+  background: var(--color-fg);
+  color: var(--color-bg);
+}
+
+.event-btn--solid:hover {
+  background: #2c2c31;
+}
+
+.event-btn--ghost {
+  border-color: color-mix(in srgb, var(--color-fg) 35%, transparent);
+  background: transparent;
+  color: var(--color-fg);
+}
+
+.event-btn--ghost:hover {
+  border-color: var(--color-fg);
+  background: color-mix(in srgb, var(--color-fg) 5%, transparent);
+}
+
+.event-textlink {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+}
+
+.event-textlink:hover {
+  color: var(--color-muted);
+}

@@ -5,7 +5,7 @@ import EventDetailView from '../../components/events/EventDetailView.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { eventBySlugQuery, eventsQuery, type EventDetail } from '@energize/shared';
-import { getEventCoverUrl } from '../../lib/events/media';
+import { getEventCoverUrl, getEventShareImageUrl } from '../../lib/events/media';
 import { formatEventLocation } from '../../lib/events/format';
 import { crumbs, organizationId } from '../../lib/seo/schema';
 import { absoluteUrl } from '../../lib/seo/site';
@@ -34,7 +34,7 @@ const pageUrl = absoluteUrl(`/events/${detail.slug}`);
 const shareUrl = detail.shortSlug ? absoluteUrl(`/${detail.shortSlug}`) : pageUrl;
 const ogImage =
   getEventCoverUrl(detail.shareImage, 1200, 630) ||
-  getEventCoverUrl(detail.cover, 1200, 630) ||
+  getEventShareImageUrl(detail.cover) ||
   undefined;
 const locationName = formatEventLocation(detail.location);
 const hasVenue = locationName !== 'Venue to be announced';
@@ -94,8 +94,7 @@ const jsonLd = {
     { name: 'Events', path: '/events' },
     { name: detail.title, path: `/events/${detail.slug}` },
   )}
-  headerVariant="overlay"
 >
   <JsonLd data={jsonLd} />
-  <EventDetailView event={detail} pastEvents={[]} shareUrl={shareUrl} />
+  <EventDetailView event={detail} shareUrl={shareUrl} />
 </BaseLayout>

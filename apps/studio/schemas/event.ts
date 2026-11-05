@@ -13,14 +13,19 @@ const reservedShortLinks = new Set([
   'api',
   'artists',
   'blog',
+  'brand',
   'contact',
   'energize-kids',
   'events',
+  'favicon',
+  'initiatives',
   'llms',
   'next',
   'privacy',
   'releases',
+  'robots',
   'terms',
+  'video',
 ]);
 
 export default defineType({
@@ -140,7 +145,8 @@ export default defineType({
       options: { hotspot: true },
       fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
       validation: (r) => r.required(),
-      description: 'Full-width hero photo. Use a wide, high-resolution landscape image (at least 2400px).',
+      description:
+        'The event poster. It is always shown whole and never cropped. Any shape works. Use at least 1600px on the long side.',
     }),
     defineField({
       name: 'shareImage',
@@ -185,7 +191,7 @@ export default defineType({
           },
         },
       ],
-      description: 'Numbered cards under Event Details (two to four works best). Titles are shown in Title Case.',
+      description: 'Short notes under Event Details (two to four works best). Titles are shown in Title Case.',
     }),
     defineField({
       name: 'lineup',
@@ -336,7 +342,7 @@ export default defineType({
 
       return {
         title,
-        subtitle: [dateLabel, location || 'Venue to be announced', typeLabel].filter(Boolean).join(' · '),
+        subtitle: [dateLabel, location || 'Venue to be announced', typeLabel].filter(Boolean).join(', '),
         media,
       };
     },

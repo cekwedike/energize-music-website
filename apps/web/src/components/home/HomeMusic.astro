@@ -115,24 +115,24 @@ const carouselAttrs = isCarousel
                 </div>
 
                 <div class="home-releases__copy" {...(index === 0 ? { 'data-home-release-copy': '' } : {})}>
+                  <h3 class="home-releases__name">
+                    <a href={`/releases/${release.slug}`}>{title}</a>
+                  </h3>
                   <p class="home-releases__type">
                     {note?.badge && (
                       <>
                         <span class="home-releases__badge">{note.badge}</span>
-                        <span aria-hidden="true"> · </span>
+                        <span aria-hidden="true">, </span>
                       </>
                     )}
                     {typeLabel[release.type]}
                     {year && (
                       <>
-                        <span aria-hidden="true"> / </span>
+                        <span aria-hidden="true">, </span>
                         <time datetime={release.releaseDate}>{year}</time>
                       </>
                     )}
                   </p>
-                  <h3 class="home-releases__name">
-                    <a href={`/releases/${release.slug}`}>{title}</a>
-                  </h3>
                   {release.artistNames.length > 0 && (
                     <p class="home-releases__artists">{release.artistNames.join(' · ')}</p>
                   )}
@@ -351,11 +351,10 @@ const carouselAttrs = isCarousel
   }
 
   .home-releases__type {
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--color-accent);
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-muted);
   }
 
   .home-releases__name {
@@ -420,7 +419,7 @@ const carouselAttrs = isCarousel
     width: 2.75rem;
     height: 2.75rem;
     border: 1px solid var(--color-line);
-    border-radius: 999px;
+    border-radius: 0.25rem;
     background: var(--color-surface);
     color: var(--color-fg);
     cursor: pointer;
@@ -450,7 +449,7 @@ const carouselAttrs = isCarousel
     height: 0.6rem;
     padding: 0;
     border: 0;
-    border-radius: 999px;
+    border-radius: 1px;
     background: color-mix(in srgb, var(--color-fg) 22%, transparent);
     cursor: pointer;
     transition:

@@ -1,5 +1,15 @@
 import { imageFragment } from './fragments';
 
+/** Event posters keep their real size, so the site can show them uncropped. */
+const posterFragment = /* groq */ `{
+  asset->{
+    _id,
+    url,
+    metadata{ dimensions{ width, height } }
+  },
+  alt
+}`;
+
 const eventDetailProjection = /* groq */ `{
   _id,
   title,
@@ -10,7 +20,7 @@ const eventDetailProjection = /* groq */ `{
   endDate,
   eventType,
   location,
-  cover${imageFragment},
+  cover${posterFragment},
   shareImage${imageFragment},
   summary,
   body,
