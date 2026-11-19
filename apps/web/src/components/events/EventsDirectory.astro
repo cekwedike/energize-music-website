@@ -1,13 +1,13 @@
 ---
 /**
- * The Events page. The next event gets its poster with a ticket tucked under it,
- * later dates follow as a stack of tickets, and past posters hang in grey until you point at them.
+ * The Events page, set like a tour poster: every upcoming date as a huge row down the left,
+ * and on wide screens one poster on the right that changes to whichever date you point at.
+ * On phones each date carries its own poster. Past shows follow as a grey strip.
  */
 import type { EventDetail } from '@energize/shared';
 import EventPoster from './EventPoster.astro';
-import EventTicket from './EventTicket.astro';
 import SubscribeDialog from '../forms/SubscribeDialog.astro';
-import { eventDateParts } from '../../lib/events/format';
+import { eventDateParts, formatEventLocation } from '../../lib/events/format';
 import '../../styles/events.css';
 
 interface Props {
@@ -16,8 +16,20 @@ interface Props {
 }
 
 const { upcoming, past } = Astro.props;
-const href = (event: EventDetail) => `/events/${event.slug}`;
-const [lead, ...later] = upcoming;
+
+const dates = upcoming.map((event) => {
+  const venue = formatEventLocation(event.location);
+  const parts = venue.split(',').map((part) => part.trim()).filter(Boolean);
+  return {
+    event,
+    href: `/events/${event.slug}`,
+    date: eventDateParts(event.startDate),
+    city: event.location?.trim() && parts.length > 1 ? parts[parts.length - 1] : null,
+    venue,
+    host: event.host?.trim(),
+    ticketLabel: event.ctaLabel || 'Get tickets',
+  };
+});
 
 const updates = {
   'data-subscribe-open': '',
@@ -26,170 +38,292 @@ const updates = {
 };
 ---
 
-<div class="event-world evx">
-  <header class="event-shell evx-head">
-    <h1>Events</h1>
-    <p>Shows we put on, and shows we back.</p>
-  </header>
+<div class="event-world tour" data-tour>
+  <div class="event-shell tour__grid">
+    <div class="tour__list">
+      <header class="tour__head">
+        <h1>Events</h1>
+        <p>Shows we put on, and shows we back.</p>
+      </header>
 
-  {
-    lead ? (
-      <section class="event-shell evx-lead" aria-label={lead.title}>
-        <div class="evx-lead__poster">
-          <EventPoster cover={lead.cover} title={lead.title} href={href(lead)} width={900} lead />
+      {
+        dates.length > 0 ? (
+          <ol class="tour__dates">
+            {dates.map((item, index) => (
+              <li class:list={['tour__date', index === 0 && 'is-active']} data-tour-row={index}>
+                <p class="tour__when">
+                  <span class="tour__day">{item.date.day}</span>
+                  <span class="tour__month">
+                    {item.date.monthShort}
+                    <span>{item.date.weekday}, {item.date.time}</span>
+                  </span>
+                </p>
+
+                <div class="tour__info">
+                  <h2 class="tour__title">
+                    <a href={item.href}>{item.event.title}</a>
+                  </h2>
+                  {item.city && <p class="tour__city">{item.city}</p>}
+                  <p class="tour__venue">{item.venue}</p>
+                  {item.host && <p class="tour__host">Hosted by {item.host}</p>}
+
+                  <div class="tour__poster-inline">
+                    <EventPoster cover={item.event.cover} title={item.event.title} href={item.href} width={720} />
+                  </div>
+
+                  <div class="tour__actions">
+                    {item.event.ticketUrl && (
+                      <a class="event-btn event-btn--solid" href={item.event.ticketUrl} target="_blank" rel="noopener noreferrer">
+                        {item.ticketLabel}
+                      </a>
+                    )}
+                    <a class="tour__more" href={item.href}>
+                      Event details
+                    </a>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div class="tour__empty">
+            <h2>The next date is on its way.</h2>
+            <button type="button" class="event-btn event-btn--solid" {...updates}>
+              Get event updates
+            </button>
+          </div>
+        )
+      }
+    </div>
+
+    {
+      dates.length > 0 && (
+        <div class="tour__wall" aria-hidden="true">
+          <div class="tour__stack">
+            {dates.map((item, index) => (
+              <div class:list={['tour__flyer', index === 0 && 'is-active']} data-tour-flyer={index}>
+                <EventPoster cover={item.event.cover} title={item.event.title} width={900} lead={index === 0} />
+              </div>
+            ))}
+          </div>
         </div>
-        <EventTicket event={lead} variant="feature" href={href(lead)} tucked />
-      </section>
-    ) : (
-      <section class="event-shell evx-empty">
-        <h2>The next date is on its way.</h2>
-        <button type="button" class="event-btn event-btn--solid" {...updates}>
-          Get event updates
-        </button>
-      </section>
-    )
-  }
+      )
+    }
+  </div>
 
   {
-    later.length > 0 && (
-      <section class="event-shell evx-later" aria-labelledby="evx-later-title">
-        <h2 id="evx-later-title" class="evx-title">More dates</h2>
-        <ul class="evx-later__stack">
-          {later.map((event) => (
-            <li>
-              <EventTicket event={event} variant="row" href={href(event)} heading="h3" />
-            </li>
-          ))}
+    past.length > 0 && (
+      <section class="tour-past" aria-labelledby="tour-past-title">
+        <div class="event-shell">
+          <h2 id="tour-past-title" class="tour-past__title">
+            Past events
+          </h2>
+        </div>
+        <ul class="tour-past__strip">
+          {past.map((event) => {
+            const date = eventDateParts(event.startDate);
+            return (
+              <li>
+                <EventPoster cover={event.cover} title={event.title} href={`/events/${event.slug}`} width={520} />
+                <h3>
+                  <a href={`/events/${event.slug}`}>{event.title}</a>
+                </h3>
+                <p>
+                  {date.month} {date.year}
+                </p>
+              </li>
+            );
+          })}
         </ul>
       </section>
     )
   }
 
-  {
-    past.length > 0 && (
-      <section class="evx-past" aria-labelledby="evx-past-title">
-        <div class="event-shell">
-          <h2 id="evx-past-title" class="evx-title">Past events</h2>
-          <ul class="evx-past__wall">
-            {past.map((event) => {
-              const date = eventDateParts(event.startDate);
-              return (
-                <li>
-                  <EventPoster cover={event.cover} title={event.title} href={href(event)} width={560} />
-                  <h3>
-                    <a href={href(event)}>{event.title}</a>
-                  </h3>
-                  <p>
-                    {date.month} {date.year}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </section>
-    )
-  }
-
-  {
-    (lead || past.length > 0) && (
-      <section class="event-shell evx-close" aria-labelledby="evx-close-title">
-        <h2 id="evx-close-title">Hear about the next one first.</h2>
-        <button type="button" class="event-btn event-btn--solid" {...updates}>
-          Join the event list
-        </button>
-      </section>
-    )
-  }
+  <section class="event-shell tour-close" aria-labelledby="tour-close-title">
+    <h2 id="tour-close-title">Hear about the next one first.</h2>
+    <button type="button" class="event-btn event-btn--solid" {...updates}>
+      Join the event list
+    </button>
+  </section>
 
   <SubscribeDialog />
 </div>
 
+<script>
+  // Wide screens: the poster on the right follows the date you point at or tab to.
+  const tour = document.querySelector<HTMLElement>('[data-tour]');
+  const rows = Array.from(tour?.querySelectorAll<HTMLElement>('[data-tour-row]') ?? []);
+  const flyers = Array.from(tour?.querySelectorAll<HTMLElement>('[data-tour-flyer]') ?? []);
+
+  if (rows.length > 1) {
+    const show = (index: string) => {
+      rows.forEach((row) => row.classList.toggle('is-active', row.dataset.tourRow === index));
+      flyers.forEach((flyer) => flyer.classList.toggle('is-active', flyer.dataset.tourFlyer === index));
+    };
+    rows.forEach((row) => {
+      const index = row.dataset.tourRow ?? '0';
+      row.addEventListener('pointerenter', () => show(index));
+      row.addEventListener('focusin', () => show(index));
+    });
+  }
+</script>
+
 <style>
-  .evx {
+  .tour {
     padding-bottom: clamp(2rem, 4vw, 4rem);
   }
 
-  /* ---------- Heading ---------- */
-  .evx-head {
+  .tour__grid {
     display: grid;
-    gap: 0.75rem;
-    padding-block: clamp(1.5rem, 4vw, 3.5rem) clamp(2rem, 4vw, 3.5rem);
   }
 
-  .evx-head h1 {
+  /* ---------- Heading ---------- */
+  .tour__head {
+    padding-block: clamp(1.5rem, 4vw, 3rem) clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .tour__head h1 {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(3.5rem, 2rem + 6vw, 8rem);
+    font-size: clamp(3.25rem, 2rem + 4vw, 6rem);
     font-weight: 500;
     font-variation-settings: 'opsz' 144;
     line-height: 0.9;
     letter-spacing: -0.04em;
   }
 
-  .evx-head p {
-    margin: 0;
+  .tour__head p {
+    margin: 1rem 0 0;
     font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
     color: var(--color-muted);
   }
 
-  @media (min-width: 900px) {
-    .evx-head {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: end;
-    }
-
-    .evx-head p {
-      padding-bottom: 0.6rem;
-    }
-  }
-
-  /* ---------- The next event: poster with the ticket tucked under its edge ---------- */
-  .evx-lead {
+  /* ---------- The dates ---------- */
+  .tour__dates {
     display: grid;
-    justify-items: center;
+    gap: clamp(4rem, 8vw, 6.5rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .evx-lead__poster {
+  .tour__date {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .tour__when {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    margin: 0;
+  }
+
+  .tour__day {
+    font-family: var(--font-display);
+    font-size: clamp(7rem, 4rem + 14vw, 13rem);
+    font-weight: 400;
+    font-variation-settings: 'opsz' 144;
+    font-variant-numeric: lining-nums;
+    line-height: 0.72;
+    letter-spacing: -0.06em;
+  }
+
+  .tour__month {
+    display: grid;
+    gap: 0.35rem;
+    padding-bottom: 0.2rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+    line-height: 1;
+  }
+
+  .tour__month span {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+  }
+
+  .tour__title {
+    margin: 0;
+    max-width: 18ch;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.5rem + 2.6vw, 4rem);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144;
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .tour__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .tour__title a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 0.05em;
+    text-underline-offset: 0.1em;
+  }
+
+  .tour__city {
+    margin: 1rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
+    line-height: 1.1;
+  }
+
+  .tour__venue {
+    margin: 0.4rem 0 0;
+    color: var(--color-muted);
+  }
+
+  .tour__host {
+    margin: 0.75rem 0 0;
+    font-weight: 600;
+  }
+
+  .tour__poster-inline {
     --poster-w: 100%;
-    --poster-h: 78svh;
-    position: relative;
-    z-index: 1;
-    display: grid;
-    justify-items: center;
-    width: 100%;
+    --poster-h: 75svh;
+    margin-top: 2rem;
   }
 
-  .evx-lead :global(.tk) {
-    width: min(100%, 36rem);
+  .tour__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.75rem;
+    margin-top: 1.75rem;
   }
 
-  @media (min-width: 1024px) {
-    .evx-lead {
-      grid-template-columns: auto minmax(0, 38rem);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .evx-lead__poster {
-      --poster-w: 48vw;
-      --poster-h: 74svh;
-      width: auto;
-    }
-
-    .evx-lead :global(.tk) {
-      width: 100%;
-    }
+  .tour__more {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
   }
 
-  .evx-empty {
+  .tour__more:hover {
+    color: var(--color-muted);
+  }
+
+  .tour__wall {
+    display: none;
+  }
+
+  .tour__empty {
     display: grid;
     justify-items: start;
     gap: 2rem;
-    padding-block: clamp(2rem, 5vw, 4rem);
   }
 
-  .evx-empty h2 {
+  .tour__empty h2 {
     margin: 0;
     max-width: 14ch;
     font-family: var(--font-display);
@@ -199,8 +333,80 @@ const updates = {
     letter-spacing: -0.03em;
   }
 
-  /* ---------- Section titles ---------- */
-  .evx-title {
+  /* ---------- Wide: one poster on the wall, swapped as you move down the dates ---------- */
+  @media (min-width: 1024px) {
+    .tour__grid {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: clamp(3rem, 5vw, 6rem);
+    }
+
+    .tour__date {
+      grid-template-columns: minmax(12rem, auto) minmax(0, 1fr);
+      align-items: start;
+      gap: clamp(1.5rem, 3vw, 3rem);
+      transition: opacity 0.35s ease;
+    }
+
+    .tour__when {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .tour__info {
+      padding-top: 0.5rem;
+    }
+
+    .tour__poster-inline {
+      display: none;
+    }
+
+    .tour__dates:has(.tour__date + .tour__date) .tour__date:not(.is-active) {
+      opacity: 0.3;
+    }
+
+    .tour__wall {
+      display: block;
+    }
+
+    .tour__stack {
+      position: sticky;
+      top: calc(var(--header-height, 4rem) + 1.5rem);
+      display: grid;
+      justify-items: center;
+      padding-top: clamp(1.5rem, 4vw, 3rem);
+    }
+
+    .tour__flyer {
+      --poster-w: 100%;
+      --poster-h: calc(100svh - var(--header-height, 4rem) - 6rem);
+      grid-area: 1 / 1;
+      display: grid;
+      justify-items: center;
+      width: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(1.5rem) rotate(3deg);
+      transition:
+        opacity 0.4s ease,
+        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.4s;
+    }
+
+    .tour__flyer.is-active {
+      opacity: 1;
+      visibility: visible;
+      transform: rotate(-1.5deg);
+    }
+  }
+
+  /* ---------- Past events: a grey strip, colour back under the pointer ---------- */
+  .tour-past {
+    padding-top: clamp(6rem, 12vw, 10rem);
+  }
+
+  .tour-past__title,
+  .tour-close h2 {
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
@@ -210,49 +416,35 @@ const updates = {
     letter-spacing: -0.03em;
   }
 
-  /* ---------- Later dates: a stack of tickets ---------- */
-  .evx-later {
-    padding-top: clamp(5rem, 10vw, 9rem);
-  }
-
-  .evx-later__stack {
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2.25rem);
-    max-width: 64rem;
+  .tour-past__strip {
+    display: flex;
+    gap: clamp(1rem, 2vw, 1.75rem);
     margin: clamp(2rem, 4vw, 3rem) 0 0;
-    padding: 0;
+    padding: 0 max(1.25rem, calc((100vw - 96rem) / 2)) 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
     list-style: none;
   }
 
-  /* ---------- Past events: posters in grey, colour comes back under the pointer ---------- */
-  .evx-past {
-    padding-top: clamp(5rem, 10vw, 9rem);
+  .tour-past__strip li {
+    --poster-w: 100%;
+    --poster-h: 22rem;
+    flex: 0 0 auto;
+    width: min(70vw, 16rem);
+    scroll-snap-align: start;
   }
 
-  .evx-past__wall {
-    columns: 4 14rem;
-    column-gap: clamp(1rem, 2vw, 1.75rem);
-    margin: clamp(2rem, 4vw, 3rem) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .evx-past__wall li {
-    break-inside: avoid;
-    padding-bottom: 2.5rem;
-  }
-
-  .evx-past__wall :global(.ev-poster__face img) {
+  .tour-past__strip :global(.ev-poster__face img) {
     filter: grayscale(1) contrast(1.05);
     transition: filter 0.5s ease;
   }
 
-  .evx-past__wall li:hover :global(.ev-poster__face img),
-  .evx-past__wall li:focus-within :global(.ev-poster__face img) {
+  .tour-past__strip li:hover :global(.ev-poster__face img),
+  .tour-past__strip li:focus-within :global(.ev-poster__face img) {
     filter: none;
   }
 
-  .evx-past__wall h3 {
+  .tour-past__strip h3 {
     margin: 1rem 0 0;
     font-family: var(--font-display);
     font-size: 1.375rem;
@@ -260,45 +452,41 @@ const updates = {
     line-height: 1.1;
   }
 
-  .evx-past__wall h3 a {
+  .tour-past__strip h3 a {
     color: inherit;
     text-decoration: none;
   }
 
-  .evx-past__wall h3 a:hover {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.12em;
-  }
-
-  .evx-past__wall p {
+  .tour-past__strip p {
     margin: 0.3rem 0 0;
     font-size: 0.9375rem;
     color: var(--color-muted);
   }
 
   /* ---------- Close ---------- */
-  .evx-close {
+  .tour-close {
     display: grid;
     justify-items: start;
     gap: 2rem;
-    padding-block: clamp(5rem, 10vw, 9rem) clamp(2rem, 4vw, 4rem);
+    padding-block: clamp(6rem, 12vw, 10rem) clamp(2rem, 4vw, 4rem);
   }
 
-  .evx-close h2 {
-    margin: 0;
+  .tour-close h2 {
     max-width: 14ch;
-    font-family: var(--font-display);
     font-size: clamp(2.75rem, 1.75rem + 5vw, 7rem);
-    font-weight: 500;
-    line-height: 0.98;
-    letter-spacing: -0.03em;
   }
 
   @media (min-width: 900px) {
-    .evx-close {
+    .tour-close {
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: end;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour__flyer,
+    .tour__date {
+      transition: none;
     }
   }
 </style>

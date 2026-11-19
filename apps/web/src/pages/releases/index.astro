@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import JsonLd from '../../components/seo/JsonLd.astro';
 import ReleasesHero from '../../components/releases/ReleasesHero.astro';
-import ReleaseSpotlight from '../../components/releases/ReleaseSpotlight.astro';
+import ReleaseStage from '../../components/releases/ReleaseStage.astro';
 import ReleasesListingSection from '../../components/releases/ReleasesListingSection.astro';
 import { sanityClient } from '../../lib/sanity/client';
 import { enrichReleases, enrichRelease } from '../../lib/metadata/enrichReleases';
@@ -14,7 +14,7 @@ import {
 } from '@energize/shared';
 import { crumbs } from '../../lib/seo/schema';
 import { absoluteUrl, listNames } from '../../lib/seo/site';
-import { activeSpotlights } from '../../lib/releases/spotlights';
+import { activeSpotlightEntries, isUpcoming, spotlightBadgeLabel } from '../../lib/releases/spotlights';
 
 const rawReleases = await sanityClient.fetch<Release[]>(allReleasesQuery);
 const releases = await enrichReleases(rawReleases);
@@ -23,9 +23,15 @@ const byline = listNames(releaseArtists);
 
 const releasesPage = await sanityClient.fetch<ReleasesPage | null>(releasesPageQuery);
 
+const spotlights = activeSpotlightEntries(releasesPage);
 const spotlightReleases = await Promise.all(
-  activeSpotlights(releasesPage).map((release: Release) => enrichRelease(release, { coverSize: 800 })),
+  spotlights.map((entry) => enrichRelease(entry.release, { coverSize: 800 })),
 );
+const spotlightNotes = spotlights.map((entry) => ({
+  badge: spotlightBadgeLabel(entry.badge, entry.release.releaseDate),
+  message: entry.message?.trim() || null,
+  upcoming: isUpcoming(entry.release.releaseDate),
+}));
 
 const itemList =
   releases.length > 0
@@ -52,8 +58,13 @@ const itemList =
   {itemList && <JsonLd data={itemList} />}
   <ReleasesHero releases={releases} totalCount={releases.length} />
 
+  {
+    spotlightReleases.length > 0 && (
+      <ReleaseStage releases={spotlightReleases} notes={spotlightNotes} isSpotlight heading="In the spotlight" />
+    )
+  }
+
   <section class="mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20">
-    {spotlightReleases.length > 0 ? <ReleaseSpotlight releases={spotlightReleases} /> : null}
     <ReleasesListingSection releases={releases} />
   </section>
 </BaseLayout>

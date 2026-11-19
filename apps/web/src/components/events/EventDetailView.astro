@@ -1,17 +1,17 @@
 ---
 /**
- * Event page, fed by one Sanity "event" document. Empty fields hide their sections:
- * no lineup means no lineup section, no second button link means one button.
- * The lineup is set like the bill on a gig poster: the first name is the biggest.
+ * Event page, fed by one Sanity "event" document. The first screen frames the poster with the
+ * viewport: title, date, venue and tickets sit in the four corners around it.
+ * Empty fields hide their sections: no lineup means no lineup, no second link means one button,
+ * and hosted-by events (event.host) never offer Energize ticket alerts.
  */
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
 import EventPoster from './EventPoster.astro';
 import EventShare from './EventShare.astro';
-import EventTicket from './EventTicket.astro';
 import SubscribeDialog from '../forms/SubscribeDialog.astro';
 import { getEventCoverUrl } from '../../lib/events/media';
-import { isPastEvent, lineupDisplayName } from '../../lib/events/format';
+import { eventDateParts, formatEventLocation, formatEventType, isPastEvent, lineupDisplayName } from '../../lib/events/format';
 import { imageAlt } from '../../lib/seo/site';
 import { titleCase } from '../../lib/text/titleCase';
 import '../../styles/events.css';
@@ -24,67 +24,145 @@ interface Props {
 const { event, shareUrl } = Astro.props;
 const { title, ticketUrl } = event;
 const isPast = isPastEvent(event.startDate, event.endDate);
+const date = eventDateParts(event.startDate);
 const host = event.host?.trim();
+const venue = formatEventLocation(event.location);
+const mode = event.eventType && event.eventType !== 'physical' ? formatEventType(event.eventType) : null;
+
 const ticketLabel = event.ctaLabel || 'Get tickets';
 const offerAlerts = !ticketUrl && !host && !isPast;
+const alerts = {
+  'data-subscribe-open': '',
+  'data-subscribe-title': 'Get Ticket Alerts',
+  'data-subscribe-lead': `Hear first when ${title} tickets go on sale.`,
+};
+const secondary =
+  !isPast && event.secondaryCtaUrl
+    ? {
+        href: event.secondaryCtaUrl,
+        label: event.secondaryCtaLabel || 'Learn more',
+        external: /^https?:\/\//.test(event.secondaryCtaUrl),
+      }
+    : null;
 
 const highlights = (event.highlights ?? []).filter((item) => item?.title && item?.body);
 const body = event.body?.length ? event.body : null;
-const lineup = (event.lineup ?? []).filter(Boolean).map((slot, index) => {
+const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
   const revealed = !slot.revealState || slot.revealState === 'confirmed';
   const photo = revealed ? (slot.photo?.asset ? slot.photo : slot.artistPhoto) : undefined;
   const name = lineupDisplayName(slot.revealState, slot.name);
   return {
     name,
-    tier: index === 0 ? 1 : index < 3 ? 2 : 3,
     role: slot.role ? titleCase(slot.role) : undefined,
     href: revealed && slot.artistSlug ? `/artists/${slot.artistSlug}` : undefined,
-    photoUrl: getEventCoverUrl(photo, 480, 600),
+    photoUrl: getEventCoverUrl(photo, 720, 900),
     photoAlt: imageAlt(photo?.alt, `${name} at ${title}`),
   };
 });
 ---
 
-<article class="event-world evd">
-  <div class="event-shell">
-    <a href="/events" class="event-textlink evd__back">All events</a>
-
-    <header class="evd-head">
+<article class="event-world evp">
+  {/* First screen: the poster framed by its details */}
+  <div class="event-shell evp-frame">
+    <div class="evp-frame__title">
+      <a href="/events" class="event-textlink evp__back">All events</a>
       <h1>{title}</h1>
       {event.subtitle && <p>{titleCase(event.subtitle)}</p>}
-    </header>
+    </div>
 
-    <div class="evd-stage">
-      <div class="evd-stage__poster">
-        <EventPoster cover={event.cover} title={title} width={900} lead />
-      </div>
-      <div class="evd-stage__side">
-        <EventTicket event={event} variant="page" tucked />
-        <EventShare title={title} summary={event.summary} shareUrl={shareUrl} />
+    <div class="evp-frame__poster">
+      <EventPoster cover={event.cover} title={title} width={1000} lead />
+    </div>
+
+    <p class="evp-frame__when">
+      <span class="evp-frame__big">
+        {date.weekday} {date.day} {date.month}
+      </span>
+      <span>
+        {date.time}, {date.year}
+      </span>
+    </p>
+
+    <div class="evp-frame__where">
+      <p class="evp-frame__big">{venue}</p>
+      {mode && <p>{mode}</p>}
+      {host && <p class="evp-frame__host">Hosted by {host}</p>}
+    </div>
+
+    <div class="evp-frame__go">
+      {
+        isPast ? (
+          <p class="evp-frame__big">This event has ended.</p>
+        ) : (
+          <div class="evp-count" data-countdown={event.startDate} role="timer" aria-label="Time until the event">
+            {['Days', 'Hrs', 'Min', 'Sec'].map((unit) => (
+              <span class="evp-count__cell">
+                <span class="evp-count__value" data-unit={unit.toLowerCase()}>
+                  --
+                </span>
+                <span class="evp-count__unit">{unit}</span>
+              </span>
+            ))}
+          </div>
+        )
+      }
+
+      <div class="evp-frame__actions">
+        {
+          isPast ? (
+            <a href="/events" class="event-btn event-btn--solid">
+              Upcoming events
+            </a>
+          ) : ticketUrl ? (
+            <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">
+              {ticketLabel}
+            </a>
+          ) : (
+            offerAlerts && (
+              <button type="button" class="event-btn event-btn--solid" {...alerts}>
+                Get ticket alerts
+              </button>
+            )
+          )
+        }
+        {
+          secondary && (
+            <a
+              href={secondary.href}
+              class="event-btn event-btn--ghost"
+              {...(secondary.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              {secondary.label}
+            </a>
+          )
+        }
       </div>
     </div>
   </div>
 
+  {/* About: the summary as a pull quote */}
   {
     (event.summary || body) && (
-      <section class="event-shell evd-about" aria-labelledby="evd-about-title">
-        <h2 id="evd-about-title" class="evd-title">About</h2>
-        <div class="evd-about__text">
-          {event.summary && <p class="evd-about__lead">{event.summary}</p>}
-          {body && (
-            <div class="evd-about__body">
-              <PortableText value={body} />
-            </div>
-          )}
-        </div>
+      <section class="event-shell evp-about" aria-labelledby="evp-about-title">
+        <h2 id="evp-about-title" class="sr-only">
+          About the event
+        </h2>
+        {event.summary && <p class="evp-about__lead">{event.summary}</p>}
+        {body && (
+          <div class="evp-about__body">
+            <PortableText value={body} />
+          </div>
+        )}
       </section>
     )
   }
 
   {
     highlights.length > 0 && (
-      <section class="event-shell evd-notes" aria-labelledby="evd-notes-title">
-        <h2 id="evd-notes-title" class="evd-title">Good to know</h2>
+      <section class="event-shell evp-notes" aria-labelledby="evp-notes-title">
+        <h2 id="evp-notes-title" class="evp-title">
+          Good to know
+        </h2>
         <ul>
           {highlights.map((item) => (
             <li>
@@ -97,56 +175,72 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot, index) => {
     )
   }
 
+  {/* Lineup: photos, or the name set in a black tile */}
   {
     lineup.length > 0 && (
-      <section class="evd-bill" aria-labelledby="evd-bill-title" data-bill>
-        <div class="event-shell">
-          <h2 id="evd-bill-title" class="evd-title evd-bill__title">On the bill</h2>
-          <ul class="evd-bill__names">
-            {lineup.map((slot) => {
-              const Tag = slot.href ? 'a' : 'span';
-              return (
-                <li class={`evd-bill__item evd-bill__item--t${slot.tier}`} data-photo={slot.photoUrl ?? undefined}>
-                  <Tag href={slot.href} class="evd-bill__link">
-                    {slot.photoUrl && (
-                      <img
-                        class="evd-bill__thumb"
-                        src={slot.photoUrl}
-                        alt={slot.photoAlt}
-                        width="480"
-                        height="600"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    )}
-                    <span class="evd-bill__name">{slot.name}</span>
-                    {slot.role && <span class="evd-bill__role">{slot.role}</span>}
-                  </Tag>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-        <img class="evd-bill__float" alt="" aria-hidden="true" data-bill-float />
+      <section class="event-shell evp-lineup" aria-labelledby="evp-lineup-title">
+        <h2 id="evp-lineup-title" class="evp-title">
+          Lineup
+        </h2>
+        <ul>
+          {lineup.map((slot, index) => {
+            const Tag = slot.href ? 'a' : 'div';
+            return (
+              <li class:list={[index === 0 && 'evp-lineup__lead']}>
+                <Tag href={slot.href} class="evp-lineup__slot">
+                  {slot.photoUrl ? (
+                    <span class="evp-lineup__tile">
+                      <img src={slot.photoUrl} alt={slot.photoAlt} width="720" height="900" loading="lazy" decoding="async" />
+                    </span>
+                  ) : (
+                    <span class="evp-lineup__tile evp-lineup__tile--type" aria-hidden="true">
+                      <span>{slot.name}</span>
+                    </span>
+                  )}
+                  <span class="evp-lineup__name">{slot.name}</span>
+                  {slot.role && <span class="evp-lineup__role">{slot.role}</span>}
+                </Tag>
+              </li>
+            );
+          })}
+        </ul>
       </section>
     )
   }
 
+  {/* Close: tickets in type you cannot miss */}
+  <section class="event-shell evp-close" aria-label="Tickets and sharing">
+    {
+      !isPast && ticketUrl && (
+        <a href={ticketUrl} class="evp-close__tickets" target="_blank" rel="noopener noreferrer">
+          {ticketLabel}
+        </a>
+      )
+    }
+    {
+      !isPast && offerAlerts && (
+        <button type="button" class="evp-close__tickets" {...alerts}>
+          Get ticket alerts
+        </button>
+      )
+    }
+    <p class="evp-close__line">
+      {date.weekday} {date.day} {date.month}, {date.time}. {venue}.
+    </p>
+    <div class="evp-close__share">
+      <EventShare title={title} summary={event.summary} shareUrl={shareUrl} />
+    </div>
+  </section>
+
   {
     !isPast && (ticketUrl || offerAlerts) && (
-      <div class="evd-bar">
+      <div class="evp-bar">
         {ticketUrl ? (
           <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">
             {ticketLabel}
           </a>
         ) : (
-          <button
-            type="button"
-            class="event-btn event-btn--solid"
-            data-subscribe-open
-            data-subscribe-title="Get Ticket Alerts"
-            data-subscribe-lead={`Hear first when ${title} tickets go on sale.`}
-          >
+          <button type="button" class="event-btn event-btn--solid" {...alerts}>
             Get ticket alerts
           </button>
         )}
@@ -158,50 +252,54 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot, index) => {
 </article>
 
 <script>
-  // On a mouse, the lineup photo follows the pointer over each name.
-  const bill = document.querySelector<HTMLElement>('[data-bill]');
-  const float = bill?.querySelector<HTMLImageElement>('[data-bill-float]');
-  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const root = document.querySelector<HTMLElement>('[data-countdown]');
+  const target = root ? new Date(root.dataset.countdown ?? '').getTime() : NaN;
 
-  if (bill && float && canHover) {
-    let frame = 0;
-    bill.querySelectorAll<HTMLElement>('[data-photo]').forEach((item) => {
-      item.addEventListener('pointerenter', () => {
-        float.src = item.dataset.photo ?? '';
-        float.classList.add('is-on');
-      });
-      item.addEventListener('pointerleave', () => float.classList.remove('is-on'));
-    });
-    bill.addEventListener('pointermove', (event) => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const box = bill.getBoundingClientRect();
-        float.style.setProperty('--x', `${event.clientX - box.left}px`);
-        float.style.setProperty('--y', `${event.clientY - box.top}px`);
-      });
-    });
+  if (root && !Number.isNaN(target)) {
+    const write = (unit: string, value: string) => {
+      const cell = root.querySelector<HTMLElement>(`[data-unit="${unit}"]`);
+      if (cell) cell.textContent = value;
+    };
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now());
+      const s = Math.floor(diff / 1000);
+      write('days', String(Math.floor(s / 86400)));
+      write('hrs', pad(Math.floor((s % 86400) / 3600)));
+      write('min', pad(Math.floor((s % 3600) / 60)));
+      write('sec', pad(s % 60));
+      if (diff === 0) window.clearInterval(timer);
+    };
+
+    const timer = window.setInterval(tick, 1000);
+    tick();
   }
 </script>
 
 <style>
-  .evd {
+  .evp {
     position: relative;
-    padding-top: clamp(1rem, 2vw, 1.75rem);
   }
 
-  .evd__back {
+  .evp__back {
     display: inline-flex;
     min-height: 2.75rem;
     align-items: center;
     font-size: 0.9375rem;
   }
 
-  /* ---------- Title ---------- */
-  .evd-head h1 {
-    margin: 0.5rem 0 0;
-    max-width: 18ch;
+  /* ---------- The frame ---------- */
+  .evp-frame {
+    display: grid;
+    gap: 2rem;
+    padding-block: clamp(1rem, 2vw, 1.5rem) clamp(2rem, 4vw, 3rem);
+  }
+
+  .evp-frame__title h1 {
+    margin: 0.75rem 0 0;
     font-family: var(--font-display);
-    font-size: clamp(3rem, 1.25rem + 7vw, 9rem);
+    font-size: clamp(2.75rem, 1.5rem + 5vw, 4.25rem);
     font-weight: 500;
     font-variation-settings: 'opsz' 144;
     line-height: 0.92;
@@ -209,62 +307,136 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot, index) => {
     text-wrap: balance;
   }
 
-  .evd-head p {
-    margin: 1.25rem 0 0;
-    max-width: 38rem;
-    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);
-    line-height: 1.35;
+  .evp-frame__title p {
+    margin: 1rem 0 0;
+    max-width: 26rem;
+    font-size: 1.0625rem;
+    line-height: 1.45;
     color: var(--color-muted);
   }
 
-  /* ---------- Poster with the ticket tucked under it ---------- */
-  .evd-stage {
-    display: grid;
-    justify-items: center;
-    margin-top: clamp(2.5rem, 5vw, 4.5rem);
-  }
-
-  .evd-stage__poster {
+  .evp-frame__poster {
     --poster-w: 100%;
-    --poster-h: 80svh;
-    position: relative;
-    z-index: 1;
+    --poster-h: 85svh;
     display: grid;
     justify-items: center;
-    width: 100%;
   }
 
-  .evd-stage__side {
+  .evp-frame__when,
+  .evp-frame__where p,
+  .evp-frame__go {
+    margin: 0;
+  }
+
+  .evp-frame__when {
     display: grid;
-    gap: 1.75rem;
-    width: min(100%, 36rem);
-    min-width: 0;
+    gap: 0.35rem;
+    color: var(--color-muted);
   }
 
-  @media (min-width: 1024px) {
-    .evd-stage {
-      grid-template-columns: auto minmax(0, 38rem);
-      justify-content: start;
-      align-items: center;
+  .evp-frame__big {
+    font-family: var(--font-display);
+    font-size: clamp(1.625rem, 1.3rem + 1vw, 2.25rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: var(--color-fg);
+  }
+
+  .evp-frame__where {
+    display: grid;
+    gap: 0.35rem;
+    color: var(--color-muted);
+  }
+
+  .evp-frame__host {
+    margin-top: 0.4rem !important;
+    color: var(--color-fg);
+    font-weight: 600;
+  }
+
+  .evp-count {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  .evp-count__cell {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .evp-count__value {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 2rem + 1.5vw, 3.5rem);
+    font-variant-numeric: tabular-nums lining-nums;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+  }
+
+  .evp-count__unit {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  .evp-frame__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  /* Wide: title top left, date top right, venue bottom left, tickets bottom right, poster in the middle. */
+  @media (min-width: 1100px) {
+    .evp-frame {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 2rem clamp(2rem, 4vw, 4.5rem);
+      min-height: calc(100svh - var(--header-height, 4.5rem));
     }
 
-    .evd-stage__poster {
-      --poster-w: 46vw;
-      --poster-h: 76svh;
-      width: auto;
+    .evp-frame__poster {
+      --poster-w: 40vw;
+      --poster-h: calc(100svh - var(--header-height, 4.5rem) - 5rem);
+      grid-column: 2;
+      grid-row: 1 / 4;
+      align-self: center;
     }
 
-    .evd-stage__side {
-      width: 100%;
+    .evp-frame__title {
+      grid-column: 1;
+      grid-row: 1;
     }
 
-    .evd-stage__side :global(.event-share) {
-      padding-left: 0.5rem;
+    .evp-frame__when {
+      grid-column: 3;
+      grid-row: 1;
+      justify-items: end;
+      align-self: start;
+      padding-top: 3.5rem;
+      text-align: right;
+    }
+
+    .evp-frame__where {
+      grid-column: 1;
+      grid-row: 3;
+      align-self: end;
+    }
+
+    .evp-frame__go {
+      grid-column: 3;
+      grid-row: 3;
+      display: grid;
+      justify-items: end;
+      align-self: end;
+      text-align: right;
+    }
+
+    .evp-frame__actions {
+      justify-content: flex-end;
     }
   }
 
   /* ---------- Section titles ---------- */
-  .evd-title {
+  .evp-title {
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
@@ -275,50 +447,48 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot, index) => {
   }
 
   /* ---------- About ---------- */
-  .evd-about {
-    display: grid;
-    gap: 1.5rem;
+  .evp-about {
     padding-top: clamp(5rem, 10vw, 9rem);
   }
 
-  .evd-about__text {
-    max-width: 44rem;
-  }
-
-  .evd-about__lead {
+  .evp-about__lead {
     margin: 0;
+    max-width: 28ch;
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
-    line-height: 1.25;
-    letter-spacing: -0.01em;
+    font-size: clamp(2rem, 1.25rem + 3vw, 4rem);
+    font-weight: 400;
+    font-variation-settings: 'opsz' 144;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-wrap: pretty;
   }
 
-  .evd-about__body {
-    margin-top: 1.75rem;
+  .evp-about__body {
     max-width: 38rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
     font-size: 1.0625rem;
     line-height: 1.75;
     color: var(--color-muted);
   }
 
-  .evd-about__body :global(p) {
+  .evp-about__body :global(p) {
     margin: 0 0 1rem;
     color: inherit;
   }
 
-  @media (min-width: 900px) {
-    .evd-about {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr);
-      gap: clamp(2rem, 5vw, 6rem);
+  @media (min-width: 1100px) {
+    .evp-about__body {
+      margin-left: auto;
+      margin-right: 8%;
     }
   }
 
   /* ---------- Good to know ---------- */
-  .evd-notes {
+  .evp-notes {
     padding-top: clamp(5rem, 10vw, 9rem);
   }
 
-  .evd-notes ul {
+  .evp-notes ul {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
     gap: 2.5rem clamp(2rem, 4vw, 4rem);
@@ -327,7 +497,7 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot, index) => {
     list-style: none;
   }
 
-  .evd-notes h3 {
+  .evp-notes h3 {
     margin: 0;
     font-family: var(--font-display);
     font-size: 1.625rem;
@@ -335,152 +505,168 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot, index) => {
     line-height: 1.15;
   }
 
-  .evd-notes p {
+  .evp-notes p {
     margin: 0.6rem 0 0;
     max-width: 34ch;
     line-height: 1.6;
     color: var(--color-muted);
   }
 
-  /* ---------- On the bill ---------- */
-  .evd-bill {
-    position: relative;
-    padding-block: clamp(5rem, 10vw, 9rem) clamp(4rem, 8vw, 7rem);
-    text-align: center;
+  /* ---------- Lineup ---------- */
+  .evp-lineup {
+    padding-top: clamp(5rem, 10vw, 9rem);
   }
 
-  .evd-bill__title {
-    font-size: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
-  }
-
-  .evd-bill__names {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: baseline;
-    gap: clamp(1.5rem, 3vw, 2.5rem) clamp(1.75rem, 4vw, 4rem);
-    max-width: 80rem;
-    margin: clamp(2rem, 4vw, 3rem) auto 0;
+  .evp-lineup ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 1rem;
+    margin: clamp(2rem, 4vw, 3rem) 0 0;
     padding: 0;
     list-style: none;
   }
 
-  .evd-bill__item--t1 {
-    flex-basis: 100%;
+  @media (min-width: 700px) {
+    .evp-lineup ul {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 2.5rem 1.25rem;
+    }
+
+    .evp-lineup__lead {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
   }
 
-  .evd-bill__link {
-    display: inline-grid;
-    justify-items: center;
+  .evp-lineup__slot {
+    display: grid;
+    height: 100%;
+    grid-template-rows: 1fr auto auto;
     color: inherit;
     text-decoration: none;
   }
 
-  .evd-bill__name {
+  .evp-lineup__tile {
+    display: block;
+    min-height: 0;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    border-radius: 0.25rem;
+    background: var(--color-fg);
+  }
+
+  .evp-lineup__lead .evp-lineup__tile {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 20rem;
+  }
+
+  .evp-lineup__tile img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  a.evp-lineup__slot:hover .evp-lineup__tile img {
+    transform: scale(1.04);
+  }
+
+  .evp-lineup__tile--type {
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    color: var(--color-bg);
+    text-align: center;
+  }
+
+  .evp-lineup__tile--type span {
     font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1rem + 2.5vw, 3rem);
     font-weight: 500;
     font-variation-settings: 'opsz' 144;
     line-height: 0.95;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.03em;
     text-wrap: balance;
   }
 
-  .evd-bill__item--t1 .evd-bill__name {
-    font-size: clamp(3.5rem, 1.5rem + 9vw, 11rem);
+  .evp-lineup__name {
+    margin-top: 0.85rem;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1.1;
   }
 
-  .evd-bill__item--t2 .evd-bill__name {
-    font-size: clamp(2.25rem, 1.25rem + 4.5vw, 5.5rem);
+  .evp-lineup__lead .evp-lineup__name {
+    font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
   }
 
-  .evd-bill__item--t3 .evd-bill__name {
-    font-size: clamp(1.75rem, 1.25rem + 2.2vw, 3.25rem);
-  }
-
-  a.evd-bill__link:hover .evd-bill__name,
-  a.evd-bill__link:focus-visible .evd-bill__name {
+  a.evp-lineup__slot:hover .evp-lineup__name {
     text-decoration: underline;
-    text-decoration-thickness: 0.05em;
+    text-decoration-thickness: 1px;
     text-underline-offset: 0.12em;
   }
 
-  .evd-bill__role {
-    margin-top: 0.6rem;
+  .evp-lineup__role {
+    margin-top: 0.3rem;
     font-size: 0.9375rem;
     color: var(--color-muted);
   }
 
-  /* Touch screens show each photo above its name. */
-  .evd-bill__thumb {
-    width: 4.5rem;
-    height: 5.625rem;
-    margin-bottom: 0.85rem;
-    border-radius: 0.25rem;
-    object-fit: cover;
+  /* ---------- Close ---------- */
+  .evp-close {
+    padding-block: clamp(6rem, 12vw, 10rem) clamp(3rem, 6vw, 5rem);
   }
 
-  .evd-bill__item--t1 .evd-bill__thumb {
-    width: 7rem;
-    height: 8.75rem;
+  .evp-close__tickets {
+    display: inline-block;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-fg);
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 1rem + 12vw, 13rem);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144;
+    line-height: 0.88;
+    letter-spacing: -0.05em;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
   }
 
-  .evd-bill__float {
-    display: none;
+  .evp-close__tickets:hover,
+  .evp-close__tickets:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 0.04em;
+    text-underline-offset: 0.08em;
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .evd-bill__thumb {
-      display: none;
-    }
-
-    .evd-bill__float {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: -1;
-      display: block;
-      width: clamp(12rem, 18vw, 17rem);
-      aspect-ratio: 4 / 5;
-      border-radius: 0.25rem;
-      object-fit: cover;
-      opacity: 0;
-      pointer-events: none;
-      transform: translate(calc(var(--x, 0px) - 50%), calc(var(--y, 0px) - 50%)) rotate(-3deg) scale(0.92);
-      transition:
-        opacity 0.25s ease,
-        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .evd-bill__float.is-on {
-      opacity: 1;
-      transform: translate(calc(var(--x, 0px) - 50%), calc(var(--y, 0px) - 50%)) rotate(-3deg) scale(1);
-    }
-
-    .evd-bill {
-      isolation: isolate;
-    }
+  .evp-close__line {
+    margin: 1.5rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+    line-height: 1.3;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .evd-bill__float {
-      transition: opacity 0.2s ease;
-    }
+  .evp-close__share {
+    margin-top: 2rem;
   }
 
   /* ---------- Phones: tickets stay in reach ---------- */
-  .evd-bar {
+  .evp-bar {
     position: sticky;
     bottom: 0;
     z-index: 5;
     display: grid;
-    margin-top: 2rem;
     padding: 0.75rem 1.25rem;
     background: color-mix(in srgb, var(--color-bg) 90%, transparent);
     backdrop-filter: blur(10px);
   }
 
-  @media (min-width: 1024px) {
-    .evd-bar {
+  @media (min-width: 1100px) {
+    .evp-bar {
       display: none;
     }
   }

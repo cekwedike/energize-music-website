@@ -98,8 +98,12 @@ export default defineType({
         dateFormat: 'MMMM D, YYYY',
         timeFormat: 'h:mm A',
         timeStep: 15,
+        // Times are Lagos time on every editor's computer, matching the website.
+        displayTimeZone: 'Africa/Lagos',
+        allowTimeZoneSwitch: false,
       },
       validation: (r) => r.required(),
+      description: 'Lagos time.',
     }),
     defineField({
       name: 'endDate',
@@ -110,6 +114,9 @@ export default defineType({
         dateFormat: 'MMMM D, YYYY',
         timeFormat: 'h:mm A',
         timeStep: 15,
+        // Times are Lagos time on every editor's computer, matching the website.
+        displayTimeZone: 'Africa/Lagos',
+        allowTimeZoneSwitch: false,
       },
     }),
     defineField({
