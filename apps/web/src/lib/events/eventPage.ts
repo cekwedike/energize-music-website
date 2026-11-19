@@ -5,8 +5,45 @@
  */
 import { getLenis } from '../smoothScroll';
 
+type Platform = 'apple' | 'android' | 'other';
+
+function detectPlatform(): Platform {
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod|Macintosh|Mac OS X/i.test(ua)) return 'apple';
+  if (/Android/i.test(ua)) return 'android';
+  return 'other';
+}
+
+/**
+ * The calendar links follow the device. Apple devices open the calendar file in Apple Calendar,
+ * Android goes straight to Google Calendar, and other computers get Google first with the file
+ * for Outlook and the rest. Without JavaScript both plain links stay.
+ */
+function initCalendarLinks(root: HTMLElement) {
+  const tools = root.querySelector<HTMLElement>('[data-ev-calendar]');
+  const file = tools?.querySelector<HTMLAnchorElement>('[data-cal="file"]');
+  const google = tools?.querySelector<HTMLAnchorElement>('[data-cal="google"]');
+  if (!tools || !file || !google) return;
+
+  const platform = detectPlatform();
+  if (platform === 'apple') {
+    // Safari hands a calendar file to Apple Calendar only when it is not forced to download.
+    file.removeAttribute('download');
+    file.textContent = 'Add to Apple Calendar';
+    google.textContent = 'Google Calendar';
+  } else if (platform === 'android') {
+    google.textContent = 'Add to Google Calendar';
+    file.remove();
+  } else {
+    google.textContent = 'Add to Google Calendar';
+    file.textContent = 'Outlook or other calendar';
+    tools.prepend(google);
+  }
+}
+
 export function initEventPage(root: HTMLElement | null) {
   if (!root) return;
+  initCalendarLinks(root);
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 

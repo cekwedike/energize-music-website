@@ -76,9 +76,9 @@ const secondary = !isPast && event.secondaryCtaUrl ? {
       </div>
 
       {!isPast && (
-        <p class="evh__tools">
-          <a href={`/events/${event.slug}.ics`} download={`${event.slug}.ics`}>Add to calendar</a>
-          <a href={googleCalendarUrl(event, pageUrl)} target="_blank" rel="noopener noreferrer">Google Calendar</a>
+        <p class="evh__tools" data-ev-calendar>
+          <a href={`/events/${event.slug}.ics`} download={`${event.slug}.ics`} data-cal="file">Add to calendar</a>
+          <a href={googleCalendarUrl(event, pageUrl)} target="_blank" rel="noopener noreferrer" data-cal="google">Google Calendar</a>
           {directions && <a href={directions} target="_blank" rel="noopener noreferrer">Get directions</a>}
         </p>
       )}

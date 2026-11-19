@@ -98,11 +98,13 @@ const shareLinks = [
       try {
         await navigator.clipboard.writeText(url);
         copyText.textContent = 'Link copied';
+        copyButton.classList.add('is-copied');
       } catch {
         copyText.textContent = 'Could not copy. Copy it from the address bar.';
       }
       reset = window.setTimeout(() => {
         copyText.textContent = idleText;
+        copyButton.classList.remove('is-copied');
       }, 2200);
     });
   }
@@ -121,21 +123,23 @@ const shareLinks = [
     min-height: 2.75rem;
     align-items: center;
     gap: 0.6rem;
-    border: 0;
-    padding: 0;
-    background: transparent;
+    border: 1px solid var(--color-line);
+    border-radius: 0.25rem;
+    padding: 0 1.1rem;
+    background: var(--color-surface);
     color: var(--color-fg);
     font: inherit;
     font-size: 0.9375rem;
     font-weight: 600;
     text-align: left;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.3em;
     cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
   }
 
-  .event-share__copy:hover {
+  .event-share__copy:hover,
+  .event-share__copy:focus-visible,
+  .event-share__copy.is-copied {
+    border-color: var(--color-accent);
     color: var(--color-accent);
   }
 
