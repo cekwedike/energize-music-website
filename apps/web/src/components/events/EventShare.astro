@@ -19,20 +19,22 @@ const shareLinks = [
 ---
 
 <div class="event-share">
-  <button type="button" class="event-share__copy" data-copy-link data-copy-url={shareUrl}>
+  <button
+    type="button"
+    class="event-share__copy"
+    data-copy-link
+    data-copy-url={shareUrl}
+    data-share-title={title}
+    data-share-text={summary || title}
+    aria-label={`Share ${displayUrl}`}
+  >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-      <path
-        d="M10 13a5 5 0 0 0 7.54.54l1.92-1.92a5 5 0 0 0-7.07-7.07l-1.1 1.1"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path
-        d="M14 11a5 5 0 0 0-7.54-.54L4.54 12.38a5 5 0 0 0 7.07 7.07l1.1-1.1"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" stroke-linecap="round" />
     </svg>
-    <span data-copy-text aria-live="polite">Copy {displayUrl}</span>
+    <span data-copy-text aria-live="polite">Share</span>
   </button>
   <ul class="event-share__list">
     {
@@ -93,8 +95,19 @@ const shareLinks = [
     const idleText = copyText.textContent ?? '';
     let reset = 0;
 
+    // Phones and tablets get the device's own share sheet; computers copy the link.
+    const nativeShare = typeof navigator.share === 'function' && window.matchMedia('(pointer: coarse)').matches;
+
     copyButton.addEventListener('click', async () => {
       window.clearTimeout(reset);
+      if (nativeShare) {
+        try {
+          await navigator.share({ title: copyButton.dataset.shareTitle, text: copyButton.dataset.shareText, url });
+          return;
+        } catch (error) {
+          if ((error as DOMException).name === 'AbortError') return;
+        }
+      }
       try {
         await navigator.clipboard.writeText(url);
         copyText.textContent = 'Link copied';

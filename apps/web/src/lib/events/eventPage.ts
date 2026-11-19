@@ -142,17 +142,26 @@ export function initEventPage(root: HTMLElement | null) {
     });
   }
 
-  /* ---------- Close: the ticket button leans toward the pointer ---------- */
+  /* ---------- Close: the ticket button leans slightly toward a nearby pointer ---------- */
   const magnet = root.querySelector<HTMLElement>('[data-ev-magnet]');
   if (fine && close && magnet) {
-    close.addEventListener('pointermove', (event) => {
-      const box = magnet.getBoundingClientRect();
-      magnet.style.setProperty('--mx', `${((event.clientX - (box.left + box.width / 2)) * 0.12).toFixed(1)}px`);
-      magnet.style.setProperty('--my', `${((event.clientY - (box.top + box.height / 2)) * 0.18).toFixed(1)}px`);
-    });
-    close.addEventListener('pointerleave', () => {
+    /** The pointer has to come within this many pixels of the button, and it moves at most MAX_SHIFT. */
+    const REACH = 140;
+    const MAX_SHIFT = 5;
+    const settle = () => {
       magnet.style.setProperty('--mx', '0px');
       magnet.style.setProperty('--my', '0px');
+    };
+    close.addEventListener('pointermove', (event) => {
+      const box = magnet.getBoundingClientRect();
+      const dx = event.clientX - (box.left + box.width / 2);
+      const dy = event.clientY - (box.top + box.height / 2);
+      const near = Math.abs(dx) < box.width / 2 + REACH && Math.abs(dy) < box.height / 2 + REACH;
+      if (!near) return settle();
+      const shift = (d: number) => Math.max(-MAX_SHIFT, Math.min(MAX_SHIFT, d * 0.06)).toFixed(1);
+      magnet.style.setProperty('--mx', `${shift(dx)}px`);
+      magnet.style.setProperty('--my', `${shift(dy)}px`);
     });
+    close.addEventListener('pointerleave', settle);
   }
 }
