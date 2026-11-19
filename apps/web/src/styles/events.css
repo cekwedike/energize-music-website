@@ -1,73 +1,183 @@
-/* Shared by the Events directory and event pages. The poster is the only colour on these pages. */
-
 .event-world {
-  /* Links, focus rings, share icons and the sign-up dialog read these tokens: keep them in black here. */
-  --color-accent: var(--color-fg);
-  --color-accent-strong: var(--color-fg);
-  --color-accent-fill: var(--color-fg);
-  --color-accent-fill-hover: #2c2c31;
+  --event-blue: var(--color-accent);
+  --event-ink: var(--color-fg);
+  --event-paper: var(--color-bg);
+  overflow: clip;
 }
 
 .event-shell {
-  width: min(100% - 2.5rem, 96rem);
+  width: min(100% - 2.5rem, 92rem);
   margin-inline: auto;
-}
-
-@media (min-width: 768px) {
-  .event-shell {
-    width: min(100% - 4rem, 96rem);
-  }
 }
 
 .event-btn {
   display: inline-flex;
-  min-height: 3.25rem;
+  min-height: 3.5rem;
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  border-radius: 0.25rem;
-  padding: 0.75rem 1.75rem;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.2;
+  border-radius: 0.125rem;
+  padding: 0.85rem 1.6rem;
+  font: 700 0.95rem/1.2 var(--font-body);
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
+  transition: transform 180ms ease, background-color 180ms ease, color 180ms ease;
 }
 
-.event-btn--solid {
-  background: var(--color-fg);
-  color: var(--color-bg);
-}
-
-.event-btn--solid:hover {
-  background: #2c2c31;
-}
-
-.event-btn--ghost {
-  border-color: color-mix(in srgb, var(--color-fg) 35%, transparent);
-  background: transparent;
-  color: var(--color-fg);
-}
-
-.event-btn--ghost:hover {
-  border-color: var(--color-fg);
-  background: color-mix(in srgb, var(--color-fg) 5%, transparent);
-}
+.event-btn:hover { transform: translateY(-2px); }
+.event-btn--solid { background: var(--event-blue); color: var(--color-on-accent); }
+.event-btn--solid:hover { background: var(--color-accent-strong); }
+.event-btn--ghost { border-color: currentColor; background: transparent; color: var(--event-ink); }
+.event-btn--ghost:hover { background: var(--event-ink); color: var(--event-paper); }
 
 .event-textlink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
   color: inherit;
-  font-weight: 600;
-  text-decoration: underline;
+  font-weight: 700;
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.3em;
+  text-underline-offset: 0.35em;
 }
 
-.event-textlink:hover {
-  color: var(--color-muted);
+/* Directory */
+.events-intro {
+  display: grid;
+  gap: 1.25rem;
+  padding-block: clamp(3rem, 7vw, 7rem) clamp(4rem, 8vw, 8rem);
+}
+
+.events-intro h1 {
+  margin: 0;
+  font: 500 clamp(5rem, 18vw, 17rem)/0.68 var(--font-display);
+  letter-spacing: -0.075em;
+}
+
+.events-intro p {
+  max-width: 28rem;
+  margin: 0;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+}
+
+.event-feature {
+  display: grid;
+  align-items: center;
+  gap: clamp(3rem, 7vw, 8rem);
+  padding-bottom: clamp(7rem, 14vw, 14rem);
+}
+
+.event-feature__art {
+  position: relative;
+  min-height: min(130vw, 42rem);
+}
+
+.event-feature__poster {
+  --poster-w: min(72vw, 30rem);
+  --poster-h: 70svh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: min(72vw, 30rem);
+  transform: translate(-44%, -50%) rotate(2.5deg);
+}
+
+.event-feature__date {
+  position: absolute;
+  top: 48%;
+  left: -0.06em;
+  color: var(--event-blue);
+  font: 700 clamp(15rem, 60vw, 34rem)/0.6 var(--font-display);
+  letter-spacing: -0.1em;
+  transform: translateY(-50%);
+}
+
+.event-feature__month {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  margin: 0;
+  font: 600 clamp(2.5rem, 10vw, 5rem)/0.8 var(--font-display);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.event-feature__month span { color: var(--color-muted); font-size: 0.34em; }
+
+.event-feature__copy h2 {
+  max-width: 10ch;
+  margin: 1.5rem 0 0;
+  font: 500 clamp(3.5rem, 9vw, 7.5rem)/0.86 var(--font-display);
+  letter-spacing: -0.06em;
+}
+
+.event-feature__copy h2 a { color: inherit; text-decoration: none; }
+.event-feature__copy h2 a:hover { color: var(--event-blue); }
+.event-feature__when { margin: 0; font-weight: 700; line-height: 1.45; }
+.event-feature__summary { max-width: 34rem; margin: 1.5rem 0 0; font-size: 1.15rem; }
+.event-feature__place { margin: 1.5rem 0 0; font-size: 1.05rem; color: var(--color-muted); }
+.event-feature__host { margin: 0.35rem 0 0; font-weight: 700; }
+.event-feature__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.75rem; margin-top: 2.25rem; }
+
+.events-more { padding-bottom: clamp(7rem, 14vw, 14rem); }
+.events-more h2, .events-past h2, .events-signup h2 {
+  margin: 0;
+  font: 500 clamp(2.8rem, 7vw, 6rem)/0.9 var(--font-display);
+  letter-spacing: -0.05em;
+}
+.events-more ol { margin: 3rem 0 0; padding: 0; list-style: none; }
+.events-more__link {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding-block: 1.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+.events-more__link:hover .events-more__name { color: var(--event-blue); }
+.events-more__date { font: 600 3.2rem/0.7 var(--font-display); }
+.events-more__date small { display: block; margin-top: 0.5rem; font: 700 0.8rem/1 var(--font-body); text-transform: uppercase; }
+.events-more__name { font: 500 clamp(1.8rem, 4vw, 3.5rem)/1 var(--font-display); transition: color 180ms ease; }
+.events-more__place, .events-more__open { grid-column: 2; color: var(--color-muted); }
+.events-more__open { font-weight: 700; text-decoration: underline; text-underline-offset: 0.3em; }
+
+.events-past { padding-block: clamp(6rem, 12vw, 11rem); background: var(--event-ink); color: var(--event-paper); }
+.events-past__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem 2rem; }
+.events-past__head p { margin: 0; color: color-mix(in srgb, var(--event-paper) 68%, transparent); }
+.events-past__rail { display: flex; gap: 1.5rem; margin: 3rem 0 0; padding: 0 max(1.25rem, calc((100vw - 92rem) / 2)) 1rem; overflow-x: auto; list-style: none; scroll-snap-type: x mandatory; }
+.events-past__rail li { --poster-w: 100%; --poster-h: 24rem; flex: 0 0 min(72vw, 18rem); scroll-snap-align: start; }
+.events-past__rail h3 { margin: 1rem 0 0; font: 500 1.5rem/1.05 var(--font-display); }
+.events-past__rail h3 a { color: inherit; text-decoration: none; }
+.events-past__rail p { margin: 0.4rem 0 0; color: color-mix(in srgb, var(--event-paper) 62%, transparent); }
+
+.events-empty { padding-bottom: clamp(7rem, 15vw, 14rem); }
+.events-empty h2 { max-width: 11ch; margin: 0; font: 500 clamp(3rem, 9vw, 7rem)/0.9 var(--font-display); letter-spacing: -0.05em; }
+.events-empty p { max-width: 28rem; margin: 1.5rem 0 2rem; }
+.events-signup { display: grid; gap: 1.5rem; padding-block: clamp(7rem, 14vw, 14rem); }
+.events-signup h2 { max-width: 11ch; }
+.events-signup p { max-width: 30rem; margin: 0; font-size: 1.1rem; }
+.events-signup .event-btn { justify-self: start; }
+
+@media (min-width: 840px) {
+  .event-shell { width: min(100% - 5rem, 92rem); }
+  .events-intro { grid-template-columns: minmax(0, 1fr) 23rem; align-items: end; }
+  .events-intro p { padding-bottom: 0.75rem; }
+  .event-feature { grid-template-columns: minmax(0, 1.08fr) minmax(22rem, 0.92fr); min-height: 125svh; align-items: start; }
+  .event-feature__art { position: sticky; top: calc(var(--header-height, 4.5rem) + 1rem); min-height: min(70vw, 52rem); }
+  .event-feature__copy { align-self: center; padding-block: 30svh; }
+  .event-feature__poster { --poster-w: min(34vw, 34rem); width: min(34vw, 34rem); transform: translate(-42%, -50%) rotate(2.5deg); }
+  .event-feature__date { font-size: clamp(22rem, 40vw, 40rem); }
+  .event-feature__copy { position: relative; z-index: 4; }
+  .events-more__link { grid-template-columns: 7rem minmax(18rem, 1fr) minmax(12rem, 0.55fr) auto; gap: 2rem; }
+  .events-more__place, .events-more__open { grid-column: auto; }
+  .events-signup { grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.4fr); align-items: end; }
+  .events-signup p { grid-column: 1; }
+  .events-signup .event-btn { grid-column: 2; grid-row: 1 / span 2; justify-self: end; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-btn { transition: none; }
 }

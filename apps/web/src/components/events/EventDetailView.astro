@@ -1,15 +1,4 @@
 ---
-/**
- * Event page, fed by one Sanity "event" document.
- *
- * Wide screens tell it as one scroll: the poster starts centred over the moving title, then glides
- * to the left and stays pinned while the details, countdown and story arrive beside it.
- * The lineup keeps one height however long it is: the first act is featured, the rest run in moving
- * rows, and the full list opens on request. A ticket dock rides along once the first screen is gone.
- *
- * Empty fields hide their sections; hosted-by events (event.host) never offer Energize ticket alerts;
- * the second button only appears when Sanity gives it a link. Reduced motion holds everything still.
- */
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
 import EventPoster from './EventPoster.astro';
@@ -34,28 +23,21 @@ const date = eventDateParts(event.startDate);
 const host = event.host?.trim();
 const venue = formatEventLocation(event.location);
 const mode = event.eventType && event.eventType !== 'physical' ? formatEventType(event.eventType) : null;
-
 const ticketLabel = event.ctaLabel || 'Get tickets';
 const offerAlerts = !ticketUrl && !host && !isPast;
 const hasAction = !isPast && Boolean(ticketUrl || offerAlerts);
 const alerts = {
   'data-subscribe-open': '',
-  'data-subscribe-title': 'Get Ticket Alerts',
+  'data-subscribe-title': 'Get ticket alerts',
   'data-subscribe-lead': `Hear first when ${title} tickets go on sale.`,
 };
-const secondary =
-  !isPast && event.secondaryCtaUrl
-    ? {
-        href: event.secondaryCtaUrl,
-        label: event.secondaryCtaLabel || 'Learn more',
-        external: /^https?:\/\//.test(event.secondaryCtaUrl),
-      }
-    : null;
-
+const secondary = !isPast && event.secondaryCtaUrl ? {
+  href: event.secondaryCtaUrl,
+  label: event.secondaryCtaLabel || 'Learn more',
+  external: /^https?:\/\//.test(event.secondaryCtaUrl),
+} : null;
 const highlights = (event.highlights ?? []).filter((item) => item?.title && item?.body);
 const body = event.body?.length ? event.body : null;
-const summaryWords = event.summary?.trim().split(/\s+/) ?? [];
-
 const acts = (event.lineup ?? []).filter(Boolean).map((slot) => {
   const revealed = !slot.revealState || slot.revealState === 'confirmed';
   const photo = revealed ? (slot.photo?.asset ? slot.photo : slot.artistPhoto) : undefined;
@@ -64,322 +46,149 @@ const acts = (event.lineup ?? []).filter(Boolean).map((slot) => {
     name,
     role: slot.role ? titleCase(slot.role) : undefined,
     href: revealed && slot.artistSlug ? `/artists/${slot.artistSlug}` : undefined,
-    photoUrl: getEventCoverUrl(photo, 600, 750),
-    thumbUrl: getEventCoverUrl(photo, 160, 200),
+    photoUrl: getEventCoverUrl(photo, 560, 700),
     photoAlt: imageAlt(photo?.alt, `${name} at ${title}`),
   };
 });
-
-// Up to six acts read as a list. Beyond that the first is featured and the rest run in rows,
-// so the section keeps the same height whether there are seven acts or forty.
-const MAX_LIST = 6;
-const useRows = acts.length > MAX_LIST;
-const [leadAct, ...restActs] = acts;
-const rowCount = restActs.length > 12 ? 3 : 2;
-const rows = Array.from({ length: rowCount }, (_, r) => {
-  const row = restActs.filter((_, i) => i % rowCount === r);
-  // Each copy of a row must be wider than the screen, so short rows repeat.
-  return Array.from({ length: Math.ceil(8 / row.length) }, () => row).flat();
-});
-
-// Enough copies of the title that each moving line is always wider than the screen.
-const titleRun = Array.from({ length: Math.max(3, Math.ceil(48 / title.length)) }, () => title);
+const lineupRowCount = acts.length > 14 ? 3 : 2;
+const lineupRows = Array.from({ length: lineupRowCount }, (_, rowIndex) =>
+  acts.filter((_, actIndex) => actIndex % lineupRowCount === rowIndex),
+);
 const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, ${date.time}`;
 ---
 
-<article class="event-world ev" data-ev>
-  {/* ---------- Stage: poster glides from centre to a pinned column ---------- */}
-  <section class="ev-stage" data-ev-stage aria-labelledby="ev-title">
-    <div class="ev-stage__type" aria-hidden="true" data-ev-type>
-      {
-        ['a', 'b'].map((row) => (
-          <div class:list={['ev-run', `ev-run--${row}`]} data-ev-run>
-            <div class="ev-run__track">
-              {[0, 1].map(() => (
-                <span class="ev-run__copy">
-                  {titleRun.map((word) => (
-                    <span class="ev-run__word">{word}</span>
-                  ))}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))
-      }
-    </div>
+<article class="event-world event-detail" data-ev>
+  <header class="event-hero">
+    <div class="event-shell event-hero__grid">
+      <div class="event-hero__copy">
+        <a href="/events" class="event-hero__back">All events</a>
+        <h1>{title}</h1>
+        {event.subtitle && <p class="event-hero__subtitle">{titleCase(event.subtitle)}</p>}
 
-    <div class="event-shell ev-stage__grid">
-      <div class="ev-stage__left">
-        <div class="ev-stage__pin">
-          <div class="ev-stage__glide" data-ev-glide>
-            <div class="ev-stage__lean" data-ev-tilt>
-              <EventPoster cover={event.cover} title={title} width={1000} lead />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="ev-stage__right">
-        <div class="ev-stage__spacer" aria-hidden="true"></div>
-
-        <header class="ev-head">
-          <h1 id="ev-title">{title}</h1>
-          {event.subtitle && <p class="ev-head__sub">{titleCase(event.subtitle)}</p>}
-        </header>
-
-        <div class="ev-facts">
-          <p class="ev-facts__when">
-            {date.weekday} {date.day} {date.month} {date.year}
-            <span>{date.time}</span>
-          </p>
-          <p class="ev-facts__where">
-            {venue}
-            {mode && <span>{mode}</span>}
-          </p>
-          {host && <p class="ev-facts__host">Hosted by {host}</p>}
+        <div class="event-hero__facts">
+          <p><strong>{date.weekday}, {date.month} {date.day}</strong><span>{date.year} at {date.time}</span></p>
+          <p><strong>{venue}</strong>{mode && <span>{mode}</span>}</p>
+          {host && <p><strong>Hosted by {host}</strong></p>}
         </div>
 
-        {
-          isPast ? (
-            <p class="ev-clock">This one has happened.</p>
-          ) : (
-            <p class="ev-clock" data-countdown={event.startDate} role="timer" aria-label="Time until the event">
-              <span class="ev-clock__num" data-unit="days">0</span>
-              <span class="ev-clock__word" data-days-word>
-                days
-              </span>
-              <span class="ev-clock__num" data-unit="hrs">00</span>
-              <span class="ev-clock__sep">:</span>
-              <span class="ev-clock__num" data-unit="min">00</span>
-              <span class="ev-clock__sep">:</span>
-              <span class="ev-clock__num" data-unit="sec">00</span>
-            </p>
-          )
-        }
-
-        <div class="ev-actions">
-          {
-            isPast ? (
-              <a href="/events" class="event-btn event-btn--solid">
-                Upcoming events
-              </a>
-            ) : ticketUrl ? (
-              <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">
-                {ticketLabel}
-              </a>
-            ) : (
-              offerAlerts && (
-                <button type="button" class="event-btn event-btn--solid" {...alerts}>
-                  Get ticket alerts
-                </button>
-              )
-            )
-          }
-          {
-            secondary && (
-              <a
-                href={secondary.href}
-                class="event-btn event-btn--ghost"
-                {...(secondary.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-              >
-                {secondary.label}
-              </a>
-            )
-          }
-        </div>
-
-        {
-          (summaryWords.length > 0 || body) && (
-            <section class="ev-about" aria-labelledby="ev-about-title">
-              <h2 id="ev-about-title" class="sr-only">
-                About the event
-              </h2>
-              {summaryWords.length > 0 && (
-                <p class="ev-about__lead" data-ev-words>
-                  {summaryWords.map((word) => (
-                    <span class="ev-about__word">{word} </span>
-                  ))}
-                </p>
-              )}
-              {body && (
-                <div class="ev-about__body">
-                  <PortableText value={body} />
-                </div>
-              )}
-            </section>
-          )
-        }
-
-        {
-          highlights.length > 0 && (
-            <section class="ev-notes" aria-labelledby="ev-notes-title">
-              <h2 id="ev-notes-title" class="ev-subtitle">
-                Good to know
-              </h2>
-              <ul>
-                {highlights.map((item) => (
-                  <li>
-                    <h3>{titleCase(item.title)}</h3>
-                    <p>{item.body}</p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )
-        }
-      </div>
-    </div>
-
-    <div class="event-shell ev-stage__bar" data-ev-bar>
-      <p>{shortDate}</p>
-      <p>{venue}</p>
-    </div>
-  </section>
-
-  {/* ---------- Lineup: one height at any size ---------- */}
-  {
-    acts.length > 0 && (
-      <section class:list={['ev-lineup', useRows && 'ev-lineup--rows']} aria-labelledby="ev-lineup-title" data-ev-lineup>
-        <div class="event-shell ev-lineup__head">
-          <h2 id="ev-lineup-title" class="ev-subtitle">
-            Lineup
-          </h2>
-          {useRows && (
-            <button type="button" class="ev-lineup__all" aria-expanded="false" aria-controls="ev-lineup-full" data-ev-all>
-              See all {acts.length}
-            </button>
+        <div class="event-actions ev-actions">
+          {isPast ? (
+            <a href="/events" class="event-btn event-btn--solid">See upcoming events</a>
+          ) : ticketUrl ? (
+            <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">{ticketLabel}</a>
+          ) : offerAlerts ? (
+            <button type="button" class="event-btn event-btn--solid" {...alerts}>Get ticket alerts</button>
+          ) : null}
+          {secondary && (
+            <a href={secondary.href} class="event-btn event-btn--ghost" {...(secondary.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+              {secondary.label}
+            </a>
           )}
         </div>
-
-        {!useRows ? (
-          <ul class="event-shell ev-list">
-            {acts.map((act) => {
-              const Tag = act.href ? 'a' : 'div';
-              return (
-                <li class="ev-list__item" data-ev-act data-photo={act.photoUrl ?? undefined}>
-                  <Tag href={act.href} class="ev-list__row">
-                    {act.thumbUrl && <img class="ev-list__thumb" src={act.thumbUrl} alt="" width="160" height="200" loading="lazy" decoding="async" />}
-                    <span class="ev-list__name">{act.name}</span>
-                    {act.role && <span class="ev-list__role">{act.role}</span>}
-                  </Tag>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <>
-            <div class="event-shell ev-feature">
-              {leadAct.photoUrl && (
-                <img class="ev-feature__photo" src={leadAct.photoUrl} alt={leadAct.photoAlt} width="600" height="750" loading="lazy" decoding="async" />
-              )}
-              <div class="ev-feature__copy">
-                {leadAct.href ? (
-                  <a href={leadAct.href} class="ev-feature__name">
-                    {leadAct.name}
-                  </a>
-                ) : (
-                  <p class="ev-feature__name">{leadAct.name}</p>
-                )}
-                {leadAct.role && <p class="ev-feature__role">{leadAct.role}</p>}
-              </div>
-            </div>
-
-            <div class="ev-rows" aria-hidden="true">
-              {rows.map((row, r) => (
-                <div class:list={['ev-row', r % 2 === 1 && 'ev-row--back']} style={`--dur: ${Math.max(24, row.length * 6)}s`}>
-                  <div class="ev-row__track">
-                    {[0, 1].map((copy) => (
-                      <ul class:list={['ev-row__copy', copy === 1 && 'ev-row__copy--echo']}>
-                        {row.map((act) => {
-                          const Tag = act.href ? 'a' : 'span';
-                          return (
-                            <li class="ev-row__item" data-ev-act data-photo={act.photoUrl ?? undefined}>
-                              <Tag href={act.href} class="ev-row__link" tabindex={act.href ? -1 : undefined}>
-                                {act.thumbUrl && <img class="ev-row__thumb" src={act.thumbUrl} alt="" width="160" height="200" loading="lazy" decoding="async" />}
-                                <span class="ev-row__name">{act.name}</span>
-                              </Tag>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Always there for screen readers; shown on screen when asked for. */}
-            <div class="event-shell ev-full sr-only" id="ev-lineup-full" data-ev-full>
-              <ul>
-                {acts.map((act) => (
-                  <li>
-                    {act.href ? <a href={act.href}>{act.name}</a> : <span>{act.name}</span>}
-                    {act.role && <small>{act.role}</small>}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
-
-        <img class="ev-float" alt="" aria-hidden="true" data-ev-float />
-      </section>
-    )
-  }
-
-  {/* ---------- Close: tickets in type that leans toward you ---------- */}
-  <section class="event-shell ev-close" aria-label="Tickets and sharing" data-ev-close>
-    {
-      !isPast && ticketUrl && (
-        <a href={ticketUrl} class="ev-close__go" target="_blank" rel="noopener noreferrer" data-ev-magnet>
-          {ticketLabel}
-        </a>
-      )
-    }
-    {
-      !isPast && offerAlerts && (
-        <button type="button" class="ev-close__go" data-ev-magnet {...alerts}>
-          Get ticket alerts
-        </button>
-      )
-    }
-    <p class="ev-close__line">
-      {title}. {date.weekday} {date.day} {date.month}, {date.time}. {venue}.
-    </p>
-    <div class="ev-close__share">
-      <EventShare title={title} summary={event.summary} shareUrl={shareUrl} />
-      <a href="/events" class="event-textlink">
-        All events
-      </a>
-    </div>
-  </section>
-
-  {/* ---------- Dock: tickets ride along after the first screen ---------- */}
-  {
-    hasAction && (
-      <div class="ev-dock" data-ev-dock>
-        <p class="ev-dock__text">
-          <strong>{title}</strong>
-          <span>{shortDate}</span>
-        </p>
-        {ticketUrl ? (
-          <a href={ticketUrl} class="event-btn event-btn--solid ev-dock__btn" target="_blank" rel="noopener noreferrer">
-            {ticketLabel}
-          </a>
-        ) : (
-          <button type="button" class="event-btn event-btn--solid ev-dock__btn" {...alerts}>
-            Get ticket alerts
-          </button>
-        )}
       </div>
-    )
-  }
+
+      <div class="event-hero__art">
+        <span class="event-hero__day" aria-hidden="true">{date.day}</span>
+        <div class="event-hero__poster"><EventPoster cover={event.cover} title={title} width={1100} lead /></div>
+        <p class="event-hero__month" aria-hidden="true">{date.monthShort}</p>
+      </div>
+    </div>
+
+    {!isPast && (
+      <div class="event-shell event-countdown">
+        <p>Doors open in</p>
+        <p class="ev-clock" data-countdown={event.startDate} role="timer" aria-label="Time until the event">
+          <span><strong data-unit="days">0</strong><small data-days-word>days</small></span>
+          <span><strong data-unit="hrs">00</strong><small>hours</small></span>
+          <span><strong data-unit="min">00</strong><small>minutes</small></span>
+          <span><strong data-unit="sec">00</strong><small>seconds</small></span>
+        </p>
+      </div>
+    )}
+  </header>
+
+  {(event.summary || body) && (
+    <section class="event-shell event-story" aria-labelledby="event-story-title">
+      <h2 id="event-story-title">The night</h2>
+      <div>
+        {event.summary && <p class="event-story__lead">{event.summary}</p>}
+        {body && <div class="event-story__body"><PortableText value={body} /></div>}
+      </div>
+    </section>
+  )}
+
+  {acts.length > 0 && (
+    <section class="event-lineup" aria-labelledby="event-lineup-title">
+      <div class="event-shell">
+        <div class="event-lineup__head">
+          <h2 id="event-lineup-title">Lineup</h2>
+          <p>{acts.length} artists. One night.</p>
+        </div>
+      </div>
+
+      <div class="event-lineup__stage" aria-hidden="true">
+        {lineupRows.map((row, rowIndex) => (
+          <div class:list={['event-lineup__track', rowIndex % 2 === 1 && 'event-lineup__track--reverse']} style={`--lineup-speed: ${Math.max(24, row.length * 7)}s`}>
+            {[0, 1].map(() => (
+              <div class="event-lineup__run">
+                {row.map((act) => (
+                  <span class="event-lineup__marquee-name">{act.name}</span>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <details class="event-shell event-lineup__full">
+        <summary>See every artist</summary>
+        <ul>
+          {acts.map((act) => (
+            <li>
+              {act.href ? <a href={act.href}>{act.name}</a> : <span>{act.name}</span>}
+              {act.role && <small>{act.role}</small>}
+            </li>
+          ))}
+        </ul>
+      </details>
+    </section>
+  )}
+
+  {highlights.length > 0 && (
+    <section class="event-shell event-notes" aria-labelledby="event-notes-title">
+      <h2 id="event-notes-title">Good to know</h2>
+      <ul>{highlights.map((item) => <li><h3>{titleCase(item.title)}</h3><p>{item.body}</p></li>)}</ul>
+    </section>
+  )}
+
+  <footer class="event-shell event-finale" data-ev-close>
+    <div>
+      <p>{date.weekday}, {date.month} {date.day} at {date.time}</p>
+      <h2>{isPast ? 'Find your next night out.' : 'Meet us there.'}</h2>
+    </div>
+    <div class="event-finale__actions">
+      {!isPast && ticketUrl && <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">{ticketLabel}</a>}
+      {!isPast && offerAlerts && <button type="button" class="event-btn event-btn--solid" {...alerts}>Get ticket alerts</button>}
+      {isPast && <a href="/events" class="event-btn event-btn--solid">See upcoming events</a>}
+      <EventShare title={title} summary={event.summary} shareUrl={shareUrl} />
+    </div>
+  </footer>
+
+  {hasAction && (
+    <div class="ev-dock" data-ev-dock>
+      <p class="ev-dock__text"><strong>{title}</strong><span>{shortDate}</span></p>
+      {ticketUrl ? (
+        <a href={ticketUrl} class="event-btn event-btn--solid ev-dock__btn" target="_blank" rel="noopener noreferrer">{ticketLabel}</a>
+      ) : (
+        <button type="button" class="event-btn event-btn--solid ev-dock__btn" {...alerts}>Get ticket alerts</button>
+      )}
+    </div>
+  )}
 
   <SubscribeDialog />
 </article>
 
 <script>
   import { initEventPage } from '../../lib/events/eventPage';
-
   initEventPage(document.querySelector<HTMLElement>('[data-ev]'));
 </script>
