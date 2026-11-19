@@ -1,21 +1,17 @@
 ---
 /**
- * Event page, fed by one Sanity "event" document. Empty fields hide their sections.
- * Once the event has passed, the countdown and ticket buttons give way to a link back to Events.
+ * Event page, fed by one Sanity "event" document. Empty fields hide their sections:
+ * no lineup means no lineup section, no second button link means one button.
+ * The lineup is set like the bill on a gig poster: the first name is the biggest.
  */
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
 import EventPoster from './EventPoster.astro';
 import EventShare from './EventShare.astro';
+import EventTicket from './EventTicket.astro';
 import SubscribeDialog from '../forms/SubscribeDialog.astro';
 import { getEventCoverUrl } from '../../lib/events/media';
-import {
-  formatEventDateLong,
-  formatEventLocation,
-  formatEventType,
-  isPastEvent,
-  lineupDisplayName,
-} from '../../lib/events/format';
+import { isPastEvent, lineupDisplayName } from '../../lib/events/format';
 import { imageAlt } from '../../lib/seo/site';
 import { titleCase } from '../../lib/text/titleCase';
 import '../../styles/events.css';
@@ -26,181 +22,132 @@ interface Props {
 }
 
 const { event, shareUrl } = Astro.props;
-
 const { title, ticketUrl } = event;
 const isPast = isPastEvent(event.startDate, event.endDate);
-const primaryLabel = ticketUrl ? event.ctaLabel || 'Get tickets' : 'Get ticket alerts';
-const alerts = {
-  'data-subscribe-open': '',
-  'data-subscribe-title': 'Get Ticket Alerts',
-  'data-subscribe-lead': `Be the first to know when ${title} tickets go on sale and the lineup is announced.`,
-};
-const secondaryHref = event.secondaryCtaUrl || '/contact?intent=partnership';
-const secondaryLabel = event.secondaryCtaLabel || 'Partner with us';
+const host = event.host?.trim();
+const ticketLabel = event.ctaLabel || 'Get tickets';
+const offerAlerts = !ticketUrl && !host && !isPast;
 
 const highlights = (event.highlights ?? []).filter((item) => item?.title && item?.body);
 const body = event.body?.length ? event.body : null;
-const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
+const lineup = (event.lineup ?? []).filter(Boolean).map((slot, index) => {
   const revealed = !slot.revealState || slot.revealState === 'confirmed';
   const photo = revealed ? (slot.photo?.asset ? slot.photo : slot.artistPhoto) : undefined;
   const name = lineupDisplayName(slot.revealState, slot.name);
   return {
     name,
-    // Shown in the tile until there is a photo.
-    standIn: revealed ? name.split(/\s+/).map((word) => word[0]).slice(0, 2).join('') : '?',
+    tier: index === 0 ? 1 : index < 3 ? 2 : 3,
     role: slot.role ? titleCase(slot.role) : undefined,
     href: revealed && slot.artistSlug ? `/artists/${slot.artistSlug}` : undefined,
-    photoUrl: getEventCoverUrl(photo, 720, 900),
+    photoUrl: getEventCoverUrl(photo, 480, 600),
     photoAlt: imageAlt(photo?.alt, `${name} at ${title}`),
   };
 });
 ---
 
-<article class="event-world ev-page">
+<article class="event-world evd">
   <div class="event-shell">
-    <a href="/events" class="event-textlink ev-page__back">All events</a>
-    <h1 class="ev-page__title">{title}</h1>
-    {event.subtitle && <p class="ev-page__subtitle">{titleCase(event.subtitle)}</p>}
+    <a href="/events" class="event-textlink evd__back">All events</a>
 
-    <div class="ev-page__grid">
-      <aside class="ev-page__aside">
+    <header class="evd-head">
+      <h1>{title}</h1>
+      {event.subtitle && <p>{titleCase(event.subtitle)}</p>}
+    </header>
+
+    <div class="evd-stage">
+      <div class="evd-stage__poster">
         <EventPoster cover={event.cover} title={title} width={900} lead />
-
-        {
-          isPast ? (
-            <div class="ev-page__actions">
-              <a href="/events" class="event-btn event-btn--solid">See upcoming events</a>
-            </div>
-          ) : (
-            <div class="ev-page__actions">
-              {ticketUrl ? (
-                <a href={ticketUrl} class="event-btn event-btn--solid ev-page__tickets" target="_blank" rel="noopener noreferrer">
-                  {primaryLabel}
-                </a>
-              ) : (
-                <button type="button" class="event-btn event-btn--solid ev-page__tickets" {...alerts}>
-                  {primaryLabel}
-                </button>
-              )}
-              <a href={secondaryHref} class="event-btn event-btn--ghost">{secondaryLabel}</a>
-            </div>
-          )
-        }
-
+      </div>
+      <div class="evd-stage__side">
+        <EventTicket event={event} variant="page" tucked />
         <EventShare title={title} summary={event.summary} shareUrl={shareUrl} />
-      </aside>
-
-      <div class="ev-page__main">
-        <div class="ev-when">
-          <p class="ev-when__date">{formatEventDateLong(event.startDate)}</p>
-          <p class="ev-when__place">
-            {formatEventLocation(event.location)}<br />
-            {formatEventType(event.eventType)}
-          </p>
-        </div>
-
-        {
-          isPast ? (
-            <p class="ev-ended">This event has ended.</p>
-          ) : (
-            <div class="ev-count" data-countdown={event.startDate} role="timer" aria-label="Time until the event">
-              {['Days', 'Hours', 'Mins', 'Secs'].map((unit) => (
-                <div>
-                  <span class="ev-count__value" data-unit={unit.toLowerCase()}>--</span>
-                  <span class="ev-count__unit">{unit}</span>
-                </div>
-              ))}
-            </div>
-          )
-        }
-
-        {
-          (event.summary || body) && (
-            <section class="ev-block" aria-labelledby="event-about-title">
-              <h2 id="event-about-title">About the event</h2>
-              {event.summary && <p class="ev-lead">{event.summary}</p>}
-              {body && (
-                <div class="ev-body">
-                  <PortableText value={body} />
-                </div>
-              )}
-            </section>
-          )
-        }
-
-        {
-          highlights.length > 0 && (
-            <section class="ev-block" aria-labelledby="event-details-title">
-              <h2 id="event-details-title">Event details</h2>
-              <ul class="ev-notes">
-                {highlights.map((item) => (
-                  <li>
-                    <h3>{titleCase(item.title)}</h3>
-                    <p>{item.body}</p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )
-        }
-
-        {
-          lineup.length > 0 ? (
-            <section class="ev-block" aria-labelledby="event-lineup-title">
-              <h2 id="event-lineup-title">The lineup</h2>
-              <ul class="ev-lineup">
-                {lineup.map((slot) => {
-                  const Tag = slot.href ? 'a' : 'div';
-                  return (
-                    <li>
-                      <Tag href={slot.href} class="ev-lineup__slot">
-                        <span class="ev-lineup__photo">
-                          {slot.photoUrl ? (
-                            <img src={slot.photoUrl} alt={slot.photoAlt} width="720" height="900" loading="lazy" decoding="async" />
-                          ) : (
-                            <span class="ev-lineup__stand-in" aria-hidden="true">{slot.standIn}</span>
-                          )}
-                        </span>
-                        <span class="ev-lineup__name">{slot.name}</span>
-                        {slot.role && <span class="ev-lineup__role">{slot.role}</span>}
-                      </Tag>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ) : (
-            !isPast && (
-              <section class="ev-block" aria-labelledby="event-lineup-title">
-                <h2 id="event-lineup-title">The lineup</h2>
-                <p class="ev-lead">Names are coming. Join the list to hear them first.</p>
-                <button
-                  type="button"
-                  class="event-btn event-btn--ghost ev-block__action"
-                  data-subscribe-open
-                  data-subscribe-title="Hear the Lineup First"
-                  data-subscribe-lead={`Get the ${title} lineup in your inbox the moment it is announced.`}
-                >
-                  Get lineup updates
-                </button>
-              </section>
-            )
-          )
-        }
       </div>
     </div>
   </div>
 
   {
-    !isPast && (
-      <div class="ev-ticketbar">
+    (event.summary || body) && (
+      <section class="event-shell evd-about" aria-labelledby="evd-about-title">
+        <h2 id="evd-about-title" class="evd-title">About</h2>
+        <div class="evd-about__text">
+          {event.summary && <p class="evd-about__lead">{event.summary}</p>}
+          {body && (
+            <div class="evd-about__body">
+              <PortableText value={body} />
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    highlights.length > 0 && (
+      <section class="event-shell evd-notes" aria-labelledby="evd-notes-title">
+        <h2 id="evd-notes-title" class="evd-title">Good to know</h2>
+        <ul>
+          {highlights.map((item) => (
+            <li>
+              <h3>{titleCase(item.title)}</h3>
+              <p>{item.body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    lineup.length > 0 && (
+      <section class="evd-bill" aria-labelledby="evd-bill-title" data-bill>
+        <div class="event-shell">
+          <h2 id="evd-bill-title" class="evd-title evd-bill__title">On the bill</h2>
+          <ul class="evd-bill__names">
+            {lineup.map((slot) => {
+              const Tag = slot.href ? 'a' : 'span';
+              return (
+                <li class={`evd-bill__item evd-bill__item--t${slot.tier}`} data-photo={slot.photoUrl ?? undefined}>
+                  <Tag href={slot.href} class="evd-bill__link">
+                    {slot.photoUrl && (
+                      <img
+                        class="evd-bill__thumb"
+                        src={slot.photoUrl}
+                        alt={slot.photoAlt}
+                        width="480"
+                        height="600"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                    <span class="evd-bill__name">{slot.name}</span>
+                    {slot.role && <span class="evd-bill__role">{slot.role}</span>}
+                  </Tag>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <img class="evd-bill__float" alt="" aria-hidden="true" data-bill-float />
+      </section>
+    )
+  }
+
+  {
+    !isPast && (ticketUrl || offerAlerts) && (
+      <div class="evd-bar">
         {ticketUrl ? (
           <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">
-            {primaryLabel}
+            {ticketLabel}
           </a>
         ) : (
-          <button type="button" class="event-btn event-btn--solid" {...alerts}>
-            {primaryLabel}
+          <button
+            type="button"
+            class="event-btn event-btn--solid"
+            data-subscribe-open
+            data-subscribe-title="Get Ticket Alerts"
+            data-subscribe-lead={`Hear first when ${title} tickets go on sale.`}
+          >
+            Get ticket alerts
           </button>
         )}
       </div>
@@ -211,189 +158,176 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
 </article>
 
 <script>
-  const root = document.querySelector<HTMLElement>('[data-countdown]');
-  const target = root ? new Date(root.dataset.countdown ?? '').getTime() : NaN;
+  // On a mouse, the lineup photo follows the pointer over each name.
+  const bill = document.querySelector<HTMLElement>('[data-bill]');
+  const float = bill?.querySelector<HTMLImageElement>('[data-bill-float]');
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  if (root && !Number.isNaN(target)) {
-    const write = (unit: string, value: string) => {
-      const cell = root.querySelector<HTMLElement>(`[data-unit="${unit}"]`);
-      if (cell) cell.textContent = value;
-    };
-    const pad = (n: number) => String(n).padStart(2, '0');
-
-    const tick = () => {
-      const diff = Math.max(0, target - Date.now());
-      const s = Math.floor(diff / 1000);
-      write('days', String(Math.floor(s / 86400)));
-      write('hours', pad(Math.floor((s % 86400) / 3600)));
-      write('mins', pad(Math.floor((s % 3600) / 60)));
-      write('secs', pad(s % 60));
-      if (diff === 0) window.clearInterval(timer);
-    };
-
-    const timer = window.setInterval(tick, 1000);
-    tick();
+  if (bill && float && canHover) {
+    let frame = 0;
+    bill.querySelectorAll<HTMLElement>('[data-photo]').forEach((item) => {
+      item.addEventListener('pointerenter', () => {
+        float.src = item.dataset.photo ?? '';
+        float.classList.add('is-on');
+      });
+      item.addEventListener('pointerleave', () => float.classList.remove('is-on'));
+    });
+    bill.addEventListener('pointermove', (event) => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const box = bill.getBoundingClientRect();
+        float.style.setProperty('--x', `${event.clientX - box.left}px`);
+        float.style.setProperty('--y', `${event.clientY - box.top}px`);
+      });
+    });
   }
 </script>
 
 <style>
-  .ev-page {
+  .evd {
     position: relative;
     padding-top: clamp(1rem, 2vw, 1.75rem);
   }
 
-  .ev-page__back {
+  .evd__back {
     display: inline-flex;
     min-height: 2.75rem;
     align-items: center;
     font-size: 0.9375rem;
   }
 
-  .ev-page__title {
+  /* ---------- Title ---------- */
+  .evd-head h1 {
     margin: 0.5rem 0 0;
+    max-width: 18ch;
     font-family: var(--font-display);
-    font-size: clamp(3.25rem, 1.5rem + 7.2vw, 10rem);
+    font-size: clamp(3rem, 1.25rem + 7vw, 9rem);
     font-weight: 500;
     font-variation-settings: 'opsz' 144;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
+    line-height: 0.92;
+    letter-spacing: -0.035em;
     text-wrap: balance;
-    color: var(--color-fg);
   }
 
-  .ev-page__subtitle {
+  .evd-head p {
     margin: 1.25rem 0 0;
-    max-width: 40rem;
+    max-width: 38rem;
     font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);
     line-height: 1.35;
+    color: var(--color-muted);
   }
 
-  .ev-page__grid {
+  /* ---------- Poster with the ticket tucked under it ---------- */
+  .evd-stage {
     display: grid;
-    gap: clamp(2.5rem, 5vw, 4rem);
-    margin-top: clamp(2rem, 4vw, 3.5rem);
-    padding-bottom: clamp(4rem, 8vw, 8rem);
+    justify-items: center;
+    margin-top: clamp(2.5rem, 5vw, 4.5rem);
   }
 
-  .ev-page__aside {
+  .evd-stage__poster {
     --poster-w: 100%;
     --poster-h: 80svh;
-    display: grid;
-    gap: 1.75rem;
-    justify-items: start;
-    min-width: 0;
-  }
-
-  .ev-page__actions {
     position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
     width: 100%;
   }
 
-  .ev-page__actions .event-btn {
-    flex: 1 1 12rem;
-  }
-
-  /* On phones the ticket button lives in the bar at the bottom of the screen. */
-  .ev-page__tickets {
-    display: none;
-  }
-
-  .ev-page__main {
+  .evd-stage__side {
+    display: grid;
+    gap: 1.75rem;
+    width: min(100%, 36rem);
     min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .evd-stage {
+      grid-template-columns: auto minmax(0, 38rem);
+      justify-content: start;
+      align-items: center;
+    }
+
+    .evd-stage__poster {
+      --poster-w: 46vw;
+      --poster-h: 76svh;
+      width: auto;
+    }
+
+    .evd-stage__side {
+      width: 100%;
+    }
+
+    .evd-stage__side :global(.event-share) {
+      padding-left: 0.5rem;
+    }
+  }
+
+  /* ---------- Section titles ---------- */
+  .evd-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  /* ---------- About ---------- */
+  .evd-about {
+    display: grid;
+    gap: 1.5rem;
+    padding-top: clamp(5rem, 10vw, 9rem);
+  }
+
+  .evd-about__text {
     max-width: 44rem;
   }
 
-  .ev-when__date {
+  .evd-about__lead {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(2rem, 1.5rem + 2vw, 3.5rem);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
   }
 
-  .ev-when__place {
-    margin: 1rem 0 0;
-    font-size: 1.125rem;
-    line-height: 1.5;
-    color: var(--color-muted);
-  }
-
-  .ev-ended {
-    margin: 2rem 0 0;
-    font-size: 1.125rem;
-    font-weight: 600;
-  }
-
-  .ev-count {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, max-content));
-    gap: clamp(1.25rem, 3.5vw, 3rem);
-    margin-top: clamp(2rem, 4vw, 3rem);
-  }
-
-  .ev-count__value {
-    display: block;
-    font-family: var(--font-display);
-    font-size: clamp(2.5rem, 1.75rem + 3.5vw, 5rem);
-    font-variant-numeric: tabular-nums lining-nums;
-    line-height: 1;
-    letter-spacing: -0.02em;
-  }
-
-  .ev-count__unit {
-    display: block;
-    margin-top: 0.4rem;
-    font-size: 0.9375rem;
-    color: var(--color-muted);
-  }
-
-  .ev-block {
-    margin-top: clamp(3.5rem, 7vw, 6rem);
-  }
-
-  .ev-block h2 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 1.75rem + 2vw, 3.5rem);
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.025em;
-  }
-
-  .ev-lead {
-    margin: 1.25rem 0 0;
-    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
-    line-height: 1.45;
-  }
-
-  .ev-body {
-    margin-top: 1.25rem;
+  .evd-about__body {
+    margin-top: 1.75rem;
+    max-width: 38rem;
     font-size: 1.0625rem;
-    line-height: 1.7;
+    line-height: 1.75;
     color: var(--color-muted);
   }
 
-  .ev-body :global(p) {
+  .evd-about__body :global(p) {
     margin: 0 0 1rem;
     color: inherit;
   }
 
-  .ev-block__action {
-    margin-top: 1.75rem;
+  @media (min-width: 900px) {
+    .evd-about {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr);
+      gap: clamp(2rem, 5vw, 6rem);
+    }
   }
 
-  .ev-notes {
+  /* ---------- Good to know ---------- */
+  .evd-notes {
+    padding-top: clamp(5rem, 10vw, 9rem);
+  }
+
+  .evd-notes ul {
     display: grid;
-    gap: 2rem;
-    margin: 2rem 0 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: 2.5rem clamp(2rem, 4vw, 4rem);
+    margin: clamp(2rem, 4vw, 3rem) 0 0;
     padding: 0;
     list-style: none;
   }
 
-  .ev-notes h3 {
+  .evd-notes h3 {
     margin: 0;
     font-family: var(--font-display);
     font-size: 1.625rem;
@@ -401,105 +335,152 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
     line-height: 1.15;
   }
 
-  .ev-notes p {
-    margin: 0.5rem 0 0;
+  .evd-notes p {
+    margin: 0.6rem 0 0;
+    max-width: 34ch;
     line-height: 1.6;
     color: var(--color-muted);
   }
 
-  .ev-lineup {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
-    gap: 2rem 1.25rem;
-    margin: 2rem 0 0;
+  /* ---------- On the bill ---------- */
+  .evd-bill {
+    position: relative;
+    padding-block: clamp(5rem, 10vw, 9rem) clamp(4rem, 8vw, 7rem);
+    text-align: center;
+  }
+
+  .evd-bill__title {
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
+  }
+
+  .evd-bill__names {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: clamp(1.5rem, 3vw, 2.5rem) clamp(1.75rem, 4vw, 4rem);
+    max-width: 80rem;
+    margin: clamp(2rem, 4vw, 3rem) auto 0;
     padding: 0;
     list-style: none;
   }
 
-  .ev-lineup__slot {
-    display: block;
+  .evd-bill__item--t1 {
+    flex-basis: 100%;
+  }
+
+  .evd-bill__link {
+    display: inline-grid;
+    justify-items: center;
     color: inherit;
     text-decoration: none;
   }
 
-  .ev-lineup__photo {
-    display: block;
-    overflow: hidden;
-    aspect-ratio: 4 / 5;
-    border-radius: 0.25rem;
-    background: color-mix(in srgb, var(--color-fg) 6%, transparent);
-  }
-
-  .ev-lineup__photo img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .ev-lineup__stand-in {
-    display: grid;
-    height: 100%;
-    place-items: center;
+  .evd-bill__name {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    color: var(--color-muted);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
   }
 
-  .ev-lineup__name {
-    display: block;
-    margin-top: 0.85rem;
-    font-family: var(--font-display);
-    font-size: 1.375rem;
-    line-height: 1.1;
+  .evd-bill__item--t1 .evd-bill__name {
+    font-size: clamp(3.5rem, 1.5rem + 9vw, 11rem);
   }
 
-  a.ev-lineup__slot:hover .ev-lineup__name {
+  .evd-bill__item--t2 .evd-bill__name {
+    font-size: clamp(2.25rem, 1.25rem + 4.5vw, 5.5rem);
+  }
+
+  .evd-bill__item--t3 .evd-bill__name {
+    font-size: clamp(1.75rem, 1.25rem + 2.2vw, 3.25rem);
+  }
+
+  a.evd-bill__link:hover .evd-bill__name,
+  a.evd-bill__link:focus-visible .evd-bill__name {
     text-decoration: underline;
-    text-decoration-thickness: 1px;
+    text-decoration-thickness: 0.05em;
     text-underline-offset: 0.12em;
   }
 
-  .ev-lineup__role {
-    display: block;
-    margin-top: 0.3rem;
+  .evd-bill__role {
+    margin-top: 0.6rem;
     font-size: 0.9375rem;
     color: var(--color-muted);
   }
 
-  /* Tickets stay in reach on phones while the poster's own button scrolls away. */
-  .ev-ticketbar {
+  /* Touch screens show each photo above its name. */
+  .evd-bill__thumb {
+    width: 4.5rem;
+    height: 5.625rem;
+    margin-bottom: 0.85rem;
+    border-radius: 0.25rem;
+    object-fit: cover;
+  }
+
+  .evd-bill__item--t1 .evd-bill__thumb {
+    width: 7rem;
+    height: 8.75rem;
+  }
+
+  .evd-bill__float {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .evd-bill__thumb {
+      display: none;
+    }
+
+    .evd-bill__float {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      display: block;
+      width: clamp(12rem, 18vw, 17rem);
+      aspect-ratio: 4 / 5;
+      border-radius: 0.25rem;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(calc(var(--x, 0px) - 50%), calc(var(--y, 0px) - 50%)) rotate(-3deg) scale(0.92);
+      transition:
+        opacity 0.25s ease,
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .evd-bill__float.is-on {
+      opacity: 1;
+      transform: translate(calc(var(--x, 0px) - 50%), calc(var(--y, 0px) - 50%)) rotate(-3deg) scale(1);
+    }
+
+    .evd-bill {
+      isolation: isolate;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .evd-bill__float {
+      transition: opacity 0.2s ease;
+    }
+  }
+
+  /* ---------- Phones: tickets stay in reach ---------- */
+  .evd-bar {
     position: sticky;
     bottom: 0;
     z-index: 5;
     display: grid;
+    margin-top: 2rem;
     padding: 0.75rem 1.25rem;
     background: color-mix(in srgb, var(--color-bg) 90%, transparent);
     backdrop-filter: blur(10px);
   }
 
   @media (min-width: 1024px) {
-    .ev-page__grid {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: clamp(3rem, 6vw, 7rem);
-    }
-
-    .ev-page__tickets {
-      display: inline-flex;
-    }
-
-    .ev-page__main {
-      order: -1;
-    }
-
-    .ev-page__aside {
-      --poster-h: 56svh;
-      position: sticky;
-      top: calc(var(--header-height, 4rem) + 1.5rem);
-      align-self: start;
-    }
-
-    .ev-ticketbar {
+    .evd-bar {
       display: none;
     }
   }

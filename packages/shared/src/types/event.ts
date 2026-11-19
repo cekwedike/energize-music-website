@@ -28,6 +28,8 @@ export interface EventDetail {
   endDate?: string;
   eventType?: EventType;
   location?: string;
+  /** Set when another organiser is putting on the event. Empty means Energize Music. */
+  host?: string;
   cover?: SanityImage;
   shareImage?: SanityImage;
   summary?: string;

@@ -71,7 +71,9 @@ const jsonLd = {
         address: { '@type': 'PostalAddress', addressLocality: detail.location },
       }
     : { '@type': 'Place', name: locationName },
-  organizer: { '@id': organizationId() },
+  organizer: detail.host?.trim()
+    ? { '@type': 'Organization', name: detail.host.trim() }
+    : { '@id': organizationId() },
   performer: performers.length > 0 ? performers : undefined,
   ...(detail.ticketUrl
     ? {

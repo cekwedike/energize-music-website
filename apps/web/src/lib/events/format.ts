@@ -79,3 +79,23 @@ export function formatEventLocation(location?: string): string {
 
   return value;
 }
+
+const LAGOS = 'Africa/Lagos';
+
+/** The parts a ticket prints: "11", "December", "2026", "Friday", "4 PM". */
+export function eventDateParts(dateIso: string) {
+  const date = new Date(dateIso);
+  const part = (options: Intl.DateTimeFormatOptions) =>
+    date.toLocaleString('en-GB', { ...options, timeZone: LAGOS });
+  const time = date
+    .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: LAGOS })
+    .replace(':00', '');
+  return {
+    day: part({ day: 'numeric' }),
+    month: part({ month: 'long' }),
+    monthShort: part({ month: 'short' }),
+    year: part({ year: 'numeric' }),
+    weekday: part({ weekday: 'long' }),
+    time,
+  };
+}

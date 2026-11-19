@@ -20,6 +20,7 @@ const eventDetailProjection = /* groq */ `{
   endDate,
   eventType,
   location,
+  host,
   cover${posterFragment},
   shareImage${imageFragment},
   summary,

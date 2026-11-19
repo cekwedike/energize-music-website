@@ -130,6 +130,14 @@ export default defineType({
       description: 'Where the event happens: in person, online, or both.',
     }),
     defineField({
+      name: 'host',
+      group: 'basics',
+      title: 'Hosted by',
+      type: 'string',
+      description:
+        'Fill this in when someone else is putting on the event, e.g. "Gospel After Hours". Leave empty for Energize Music events. Hosted-by events skip the Energize ticket alerts.',
+    }),
+    defineField({
       name: 'location',
       group: 'basics',
       title: 'Location',
@@ -298,7 +306,7 @@ export default defineType({
       group: 'tickets',
       title: 'Second button label',
       type: 'string',
-      initialValue: 'Partner With Us',
+      description: 'Only shown when the second button has a link.',
     }),
     defineField({
       name: 'secondaryCtaUrl',
@@ -306,7 +314,7 @@ export default defineType({
       title: 'Second button link',
       type: 'url',
       validation: (r) => r.uri({ allowRelative: true }),
-      description: 'Defaults to the partnership contact form if empty.',
+      description: 'Optional. Leave empty and the event has one button only. Use /contact?intent=partnership for a partner button.',
     }),
   ],
   orderings: [
