@@ -1,7 +1,6 @@
 ---
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
-import EventPoster from './EventPoster.astro';
 import EventShare from './EventShare.astro';
 import SubscribeDialog from '../forms/SubscribeDialog.astro';
 import { getEventCoverUrl } from '../../lib/events/media';
@@ -54,6 +53,7 @@ const lineupRowCount = acts.length > 14 ? 3 : 2;
 const lineupRows = Array.from({ length: lineupRowCount }, (_, rowIndex) =>
   acts.filter((_, actIndex) => actIndex % lineupRowCount === rowIndex),
 );
+const posterSrc = getEventCoverUrl(event.cover, 1600, 2000);
 const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, ${date.time}`;
 ---
 
@@ -88,9 +88,21 @@ const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, $
       </div>
 
       <div class="event-hero__art">
-        <span class="event-hero__day" aria-hidden="true">{date.day}</span>
-        <div class="event-hero__poster"><EventPoster cover={event.cover} title={title} width={1100} lead /></div>
-        <p class="event-hero__month" aria-hidden="true">{date.monthShort}</p>
+        <div class="event-hero-mosaic" data-event-hero-mosaic>
+          {posterSrc ? (
+            <>
+              <span class="event-hero-mosaic__slice event-hero-mosaic__slice--one"><img src={posterSrc} alt="" /></span>
+              <span class="event-hero-mosaic__slice event-hero-mosaic__slice--two"><img src={posterSrc} alt="" /></span>
+              <span class="event-hero-mosaic__slice event-hero-mosaic__slice--three"><img src={posterSrc} alt="" /></span>
+              <span class="event-hero-mosaic__slice event-hero-mosaic__slice--four"><img src={posterSrc} alt="" /></span>
+              <img class="event-hero-mosaic__whole" src={posterSrc} alt={imageAlt(event.cover?.alt, `${title} event poster`)} />
+            </>
+          ) : (
+            <span class="event-hero-mosaic__blank">{title}</span>
+          )}
+          <span class="event-hero-mosaic__day" aria-hidden="true">{date.day}</span>
+          <span class="event-hero-mosaic__month" aria-hidden="true">{date.monthShort}</span>
+        </div>
       </div>
     </div>
 
@@ -126,13 +138,23 @@ const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, $
         </div>
       </div>
 
-      <div class="event-lineup__stage" aria-hidden="true">
+      <div class:list={['event-lineup__stage', acts.length <= 10 && 'event-lineup__stage--single']}>
         {lineupRows.map((row, rowIndex) => (
           <div class:list={['event-lineup__track', rowIndex % 2 === 1 && 'event-lineup__track--reverse']} style={`--lineup-speed: ${Math.max(24, row.length * 7)}s`}>
-            {[0, 1].map(() => (
-              <div class="event-lineup__run">
+            {[0, 1].map((copyIndex) => (
+              <div class="event-lineup__run" aria-hidden={copyIndex === 1 ? 'true' : undefined}>
                 {row.map((act) => (
-                  <span class="event-lineup__marquee-name">{act.name}</span>
+                  <article class:list={['event-lineup__card', !act.photoUrl && 'event-lineup__card--missing']}>
+                    {act.photoUrl ? (
+                      <img src={act.photoUrl} alt={copyIndex === 0 ? act.photoAlt : ''} width="560" height="700" loading="lazy" decoding="async" />
+                    ) : (
+                      <span class="event-lineup__missing" aria-hidden="true">Photo coming soon</span>
+                    )}
+                    <div class="event-lineup__card-copy">
+                      <h3>{act.name}</h3>
+                      {act.role && <p>{act.role}</p>}
+                    </div>
+                  </article>
                 ))}
               </div>
             ))}
@@ -191,4 +213,17 @@ const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, $
 <script>
   import { initEventPage } from '../../lib/events/eventPage';
   initEventPage(document.querySelector<HTMLElement>('[data-ev]'));
+
+  const mosaic = document.querySelector<HTMLElement>('[data-event-hero-mosaic]');
+  if (mosaic && window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    mosaic.addEventListener('pointermove', (event) => {
+      const bounds = mosaic.getBoundingClientRect();
+      mosaic.style.setProperty('--hero-x', `${((event.clientX - bounds.left) / bounds.width - 0.5).toFixed(3)}`);
+      mosaic.style.setProperty('--hero-y', `${((event.clientY - bounds.top) / bounds.height - 0.5).toFixed(3)}`);
+    });
+    mosaic.addEventListener('pointerleave', () => {
+      mosaic.style.setProperty('--hero-x', '0');
+      mosaic.style.setProperty('--hero-y', '0');
+    });
+  }
 </script>

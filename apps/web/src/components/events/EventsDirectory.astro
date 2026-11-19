@@ -3,6 +3,7 @@ import type { EventDetail } from '@energize/shared';
 import EventPoster from './EventPoster.astro';
 import SubscribeDialog from '../forms/SubscribeDialog.astro';
 import { eventDateParts, formatEventLocation } from '../../lib/events/format';
+import { getEventPosterUrl } from '../../lib/events/media';
 import '../../styles/events.css';
 
 interface Props {
@@ -22,6 +23,7 @@ const getEvent = (event: EventDetail) => ({
 });
 
 const leadEvent = lead ? getEvent(lead) : null;
+const leadPoster = lead ? getEventPosterUrl(lead.cover, 1600) : null;
 const moreEvents = moreUpcoming.map(getEvent);
 const updates = {
   'data-subscribe-open': '',
@@ -40,15 +42,21 @@ const updates = {
     leadEvent ? (
       <article class="event-shell event-feature">
         <div class="event-feature__art">
-          <span class="event-feature__date" aria-hidden="true">
-            {leadEvent.date.day}
-          </span>
-          <div class="event-feature__poster">
-            <EventPoster cover={leadEvent.event.cover} title={leadEvent.event.title} href={leadEvent.href} width={1000} lead />
-          </div>
-          <p class="event-feature__month">
-            {leadEvent.date.monthShort}<span>{leadEvent.date.year}</span>
-          </p>
+          <a class="event-mosaic" href={leadEvent.href} aria-label={`View ${leadEvent.event.title}`} data-event-mosaic>
+            {leadPoster ? (
+              <>
+                <span class="event-mosaic__tile event-mosaic__tile--one"><img src={leadPoster} alt="" /></span>
+                <span class="event-mosaic__tile event-mosaic__tile--two"><img src={leadPoster} alt="" /></span>
+                <span class="event-mosaic__tile event-mosaic__tile--three"><img src={leadPoster} alt="" /></span>
+                <span class="event-mosaic__tile event-mosaic__tile--four"><img src={leadPoster} alt="" /></span>
+                <span class="event-mosaic__tile event-mosaic__tile--five"><img src={leadPoster} alt="" /></span>
+              </>
+            ) : (
+              <span class="event-mosaic__blank">{leadEvent.event.title}</span>
+            )}
+            <span class="event-mosaic__date" aria-hidden="true">{leadEvent.date.day}</span>
+            <span class="event-mosaic__month" aria-hidden="true">{leadEvent.date.monthShort}</span>
+          </a>
         </div>
 
         <div class="event-feature__copy">
@@ -130,3 +138,21 @@ const updates = {
 
   <SubscribeDialog />
 </main>
+
+<script>
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (finePointer && !reducedMotion) {
+    document.querySelectorAll<HTMLElement>('[data-event-mosaic]').forEach((mosaic) => {
+      mosaic.addEventListener('pointermove', (event) => {
+        const bounds = mosaic.getBoundingClientRect();
+        mosaic.style.setProperty('--mosaic-x', `${((event.clientX - bounds.left) / bounds.width - 0.5).toFixed(3)}`);
+        mosaic.style.setProperty('--mosaic-y', `${((event.clientY - bounds.top) / bounds.height - 0.5).toFixed(3)}`);
+      });
+      mosaic.addEventListener('pointerleave', () => {
+        mosaic.style.setProperty('--mosaic-x', '0');
+        mosaic.style.setProperty('--mosaic-y', '0');
+      });
+    });
+  }
+</script>

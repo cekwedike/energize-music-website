@@ -1,0 +1,223 @@
+- generic [active] [ref=f4e1]:
+  - link "Skip to content" [ref=f4e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f4e3]:
+    - generic [ref=f4e4]:
+      - link "Energize Music" [ref=f4e5] [cursor=pointer]:
+        - /url: /
+      - generic [ref=f4e69]:
+        - navigation "Primary" [ref=f4e71]:
+          - list [ref=f4e72]:
+            - listitem [ref=f4e73]:
+              - link "Artistes" [ref=f4e74] [cursor=pointer]:
+                - /url: /artists
+            - listitem [ref=f4e75]:
+              - link "Releases" [ref=f4e76] [cursor=pointer]:
+                - /url: /releases
+            - listitem [ref=f4e77]:
+              - link "Events" [ref=f4e78] [cursor=pointer]:
+                - /url: /events
+            - listitem [ref=f4e79]:
+              - link "About" [ref=f4e80] [cursor=pointer]:
+                - /url: /about
+        - link "Contact" [ref=f4e81] [cursor=pointer]:
+          - /url: /contact
+        - link "Energize HQ" [ref=f4e82] [cursor=pointer]:
+          - /url: https://energizehq.netlify.app
+  - main [ref=f4e83]:
+    - article [ref=f4e84]:
+      - generic [ref=f4e85]:
+        - generic [ref=f4e86]:
+          - generic [ref=f4e87]:
+            - link "All events" [ref=f4e88] [cursor=pointer]:
+              - /url: /events
+            - 'heading "QOL: The Gospel Rave" [level=1] [ref=f4e89]'
+            - generic [ref=f4e90]:
+              - paragraph [ref=f4e91]:
+                - strong [ref=f4e92]: Friday, December 11
+                - generic [ref=f4e93]: 2026 at 4 PM
+              - paragraph [ref=f4e94]:
+                - strong [ref=f4e95]: The Solution Arena, Onipanu, Lagos
+            - generic [ref=f4e96]:
+              - link "Get Tickets" [ref=f4e97] [cursor=pointer]:
+                - /url: https://app.klese.social/e/qol-the-rave-concert-2
+              - link "Partner With Us" [ref=f4e98] [cursor=pointer]:
+                - /url: https://ig.me/m/oyeoreoluwa
+          - generic [ref=f4e100]:
+            - 'img "QOL: The Gospel Rave event poster" [ref=f4e105]'
+            - generic [aria-hidden]: "11"
+            - generic [aria-hidden]: Dec
+        - generic [ref=f4e106]:
+          - paragraph [ref=f4e107]: Doors open in
+          - timer "Time until the event" [ref=f4e108]:
+            - generic [ref=f4e109]:
+              - strong [ref=f4e110]:
+                - generic [ref=f4e111]: "2"
+                - generic [ref=f4e112]: "1"
+              - generic [ref=f4e113]: days
+            - generic [ref=f4e114]:
+              - strong [ref=f4e115]:
+                - generic [ref=f4e116]: "2"
+                - generic [ref=f4e117]: "2"
+              - generic [ref=f4e118]: hours
+            - generic [ref=f4e119]:
+              - strong [ref=f4e120]:
+                - generic [ref=f4e121]: "2"
+                - generic [ref=f4e122]: "3"
+              - generic [ref=f4e123]: minutes
+            - generic [ref=f4e124]:
+              - strong [ref=f4e125]:
+                - generic [ref=f4e126]: "1"
+                - generic [ref=f4e127]: "4"
+              - generic [ref=f4e128]: seconds
+      - region [ref=f4e129]:
+        - heading "The night" [level=2] [ref=f4e130]
+        - generic [ref=f4e131]:
+          - paragraph [ref=f4e132]: Get ready for the ultimate gospel rave concert. We are bringing your favorite Afro gospel artists to the stage for a night of pure energy. Join us to dance, praise, and celebrate.
+          - generic [ref=f4e134]:
+            - paragraph [ref=f4e135]: Get ready for an unforgettable time at QOL The Gospel Rave 2026. Energize Music is bringing you the ultimate praise party loaded with the best Afro gospel beats.
+            - paragraph [ref=f4e136]: Mark your calendar for Friday, December 11th. The music starts at exactly 4 PM.
+      - region [ref=f4e137]:
+        - generic [ref=f4e139]:
+          - heading "Lineup" [level=2] [ref=f4e140]
+          - paragraph [ref=f4e141]: 6 artists. One night.
+        - generic [aria-hidden] [ref=f4e142]:
+          - generic [ref=f4e143]:
+            - generic [ref=f4e144]:
+              - generic [ref=f4e145]: DJ Classix
+              - generic [ref=f4e146]: DJ Horphuray
+              - generic [ref=f4e147]: DJ Toni
+            - generic [ref=f4e148]:
+              - generic [ref=f4e149]: DJ Classix
+              - generic [ref=f4e150]: DJ Horphuray
+              - generic [ref=f4e151]: DJ Toni
+          - generic [ref=f4e152]:
+            - generic [ref=f4e153]:
+              - generic [ref=f4e154]: Kris Beatz
+              - generic [ref=f4e155]: DJ Sammie
+              - generic [ref=f4e156]: DJ Tall
+            - generic [ref=f4e157]:
+              - generic [ref=f4e158]: Kris Beatz
+              - generic [ref=f4e159]: DJ Sammie
+              - generic [ref=f4e160]: DJ Tall
+        - group [ref=f4e161]:
+          - generic "See every artist" [ref=f4e162] [cursor=pointer]
+      - generic [ref=f4e163]:
+        - generic [ref=f4e164]:
+          - paragraph [ref=f4e165]: Friday, December 11 at 4 PM
+          - heading "Meet us there." [level=2] [ref=f4e166]
+        - generic [ref=f4e167]:
+          - link "Get Tickets" [ref=f4e168] [cursor=pointer]:
+            - /url: https://app.klese.social/e/qol-the-rave-concert-2
+          - generic [ref=f4e169]:
+            - button "Copy energize-music.com/qol" [ref=f4e170] [cursor=pointer]
+            - list [ref=f4e175]:
+              - listitem [ref=f4e176]:
+                - link "Share on X" [ref=f4e177] [cursor=pointer]:
+                  - /url: https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.energize-music.com%2Fqol&text=Get%20ready%20for%20the%20ultimate%20gospel%20rave%20concert.%20We%20are%20bringing%20your%20favorite%20Afro%20gospel%20artists%20to%20the%20stage%20for%20a%20night%20of%20pure%20energy.%20Join%20us%20to%20dance%2C%20praise%2C%20and%20celebrate.
+              - listitem [ref=f4e180]:
+                - link "Share on Facebook" [ref=f4e181] [cursor=pointer]:
+                  - /url: https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.energize-music.com%2Fqol
+              - listitem [ref=f4e184]:
+                - link "Share on LinkedIn" [ref=f4e185] [cursor=pointer]:
+                  - /url: https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.energize-music.com%2Fqol
+              - listitem [ref=f4e188]:
+                - link "Share on WhatsApp" [ref=f4e189] [cursor=pointer]:
+                  - /url: https://wa.me/?text=QOL%3A%20The%20Gospel%20Rave%20https%3A%2F%2Fwww.energize-music.com%2Fqol
+  - contentinfo [ref=f4e192]:
+    - generic [ref=f4e194]:
+      - generic [ref=f4e195]:
+        - generic [ref=f4e196]: The Energy Different
+        - generic [ref=f4e198]: The Energy Different
+        - generic [ref=f4e200]: The Energy Different
+        - generic [ref=f4e202]: The Energy Different
+        - generic [ref=f4e204]: The Energy Different
+        - generic [ref=f4e206]: The Energy Different
+        - generic [ref=f4e208]: The Energy Different
+        - generic [ref=f4e210]: The Energy Different
+        - generic [ref=f4e212]: The Energy Different
+        - generic [ref=f4e214]: The Energy Different
+        - generic [ref=f4e216]: The Energy Different
+        - generic [ref=f4e218]: The Energy Different
+        - generic [ref=f4e220]: The Energy Different
+      - generic [ref=f4e222]:
+        - generic [ref=f4e223]: The Energy Different
+        - generic [ref=f4e225]: The Energy Different
+        - generic [ref=f4e227]: The Energy Different
+        - generic [ref=f4e229]: The Energy Different
+        - generic [ref=f4e231]: The Energy Different
+        - generic [ref=f4e233]: The Energy Different
+        - generic [ref=f4e235]: The Energy Different
+        - generic [ref=f4e237]: The Energy Different
+        - generic [ref=f4e239]: The Energy Different
+        - generic [ref=f4e241]: The Energy Different
+        - generic [ref=f4e243]: The Energy Different
+        - generic [ref=f4e245]: The Energy Different
+        - generic [ref=f4e247]: The Energy Different
+    - generic [ref=f4e249]:
+      - generic [ref=f4e250]:
+        - generic [ref=f4e251]:
+          - link "Energize Music" [ref=f4e252] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=f4e316]: The Energy Different
+          - list "Social media" [ref=f4e317]:
+            - listitem [ref=f4e318]:
+              - link "Spotify" [ref=f4e319] [cursor=pointer]:
+                - /url: https://open.spotify.com/artist/5dAPl80cZ4v2sTePGMbP2E?si=5FXGMXScQCmWhfsDNfj8kw
+            - listitem [ref=f4e323]:
+              - link "YouTube" [ref=f4e324] [cursor=pointer]:
+                - /url: https://www.youtube.com/@Energize_HQ?sub_confirmation=1
+            - listitem [ref=f4e328]:
+              - link "Instagram" [ref=f4e329] [cursor=pointer]:
+                - /url: https://www.instagram.com/energize_music/
+            - listitem [ref=f4e334]:
+              - link "TikTok" [ref=f4e335] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@energizecentral
+        - generic [ref=f4e340]:
+          - navigation "Explore" [ref=f4e341]:
+            - paragraph [ref=f4e342]: Explore
+            - list [ref=f4e343]:
+              - listitem [ref=f4e344]:
+                - link "Artistes" [ref=f4e345] [cursor=pointer]:
+                  - /url: /artists
+              - listitem [ref=f4e347]:
+                - link "Releases" [ref=f4e348] [cursor=pointer]:
+                  - /url: /releases
+              - listitem [ref=f4e350]:
+                - link "Events" [ref=f4e351] [cursor=pointer]:
+                  - /url: /events
+              - listitem [ref=f4e353]:
+                - link "About" [ref=f4e354] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=f4e356]:
+                - link "Blog" [ref=f4e357] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=f4e359]:
+                - link "Contact" [ref=f4e360] [cursor=pointer]:
+                  - /url: /contact
+          - navigation "Initiatives" [ref=f4e362]:
+            - paragraph [ref=f4e363]: Initiatives
+            - list [ref=f4e364]:
+              - listitem [ref=f4e365]:
+                - link "NEXT" [ref=f4e366] [cursor=pointer]:
+                  - /url: /next
+              - listitem [ref=f4e368]:
+                - link "Energize Kids" [ref=f4e369] [cursor=pointer]:
+                  - /url: /energize-kids
+              - listitem [ref=f4e371]:
+                - link "Energize HQ" [ref=f4e372] [cursor=pointer]:
+                  - /url: https://energizehq.netlify.app
+      - generic [ref=f4e374]:
+        - paragraph [ref=f4e375]:
+          - generic [ref=f4e376]:
+            - generic [aria-hidden] [ref=f4e377]: ©
+            - generic [ref=f4e378]: "2026"
+            - generic [ref=f4e379]: Energize Music
+          - generic [ref=f4e380]: All rights reserved.
+        - list "Legal" [ref=f4e381]:
+          - listitem [ref=f4e382]:
+            - link "Privacy" [ref=f4e383] [cursor=pointer]:
+              - /url: /privacy
+          - listitem [ref=f4e384]:
+            - link "Terms" [ref=f4e385] [cursor=pointer]:
+              - /url: /terms
