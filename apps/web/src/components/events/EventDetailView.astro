@@ -1,9 +1,11 @@
 ---
 /**
- * Event page, fed by one Sanity "event" document. The first screen frames the poster with the
- * viewport: title, date, venue and tickets sit in the four corners around it.
- * Empty fields hide their sections: no lineup means no lineup, no second link means one button,
- * and hosted-by events (event.host) never offer Energize ticket alerts.
+ * Event page, fed by one Sanity "event" document. The idea is sound: the page gets louder as you move.
+ * The title runs behind the poster in two moving lines that speed up and thicken as you scroll,
+ * the poster leans toward the pointer, the countdown rolls over every second, the summary lights up
+ * word by word, and the lineup fills in name by name.
+ * Empty fields hide their sections; hosted-by events (event.host) never offer Energize ticket alerts;
+ * the second button only appears when Sanity gives it a link. Reduced motion holds everything still.
  */
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
@@ -47,6 +49,7 @@ const secondary =
 
 const highlights = (event.highlights ?? []).filter((item) => item?.title && item?.body);
 const body = event.body?.length ? event.body : null;
+const summaryWords = event.summary?.trim().split(/\s+/) ?? [];
 const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
   const revealed = !slot.revealState || slot.revealState === 'confirmed';
   const photo = revealed ? (slot.photo?.asset ? slot.photo : slot.artistPhoto) : undefined;
@@ -55,59 +58,52 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
     name,
     role: slot.role ? titleCase(slot.role) : undefined,
     href: revealed && slot.artistSlug ? `/artists/${slot.artistSlug}` : undefined,
-    photoUrl: getEventCoverUrl(photo, 720, 900),
+    photoUrl: getEventCoverUrl(photo, 600, 750),
     photoAlt: imageAlt(photo?.alt, `${name} at ${title}`),
   };
 });
+
+// Enough copies of the title that each moving line is always wider than the screen.
+const titleRun = Array.from({ length: Math.max(3, Math.ceil(48 / title.length)) }, () => title);
 ---
 
-<article class="event-world evp">
-  {/* First screen: the poster framed by its details */}
-  <div class="event-shell evp-frame">
-    <div class="evp-frame__title">
-      <a href="/events" class="event-textlink evp__back">All events</a>
-      <h1>{title}</h1>
-      {event.subtitle && <p>{titleCase(event.subtitle)}</p>}
+<article class="event-world ev" data-ev>
+  {/* Hero: the title moves behind the poster */}
+  <section class="ev-hero" data-ev-hero aria-labelledby="ev-title">
+    <h1 id="ev-title" class="sr-only">{title}</h1>
+
+    <div class="ev-hero__type" aria-hidden="true">
+      {
+        ['a', 'b'].map((row) => (
+          <div class:list={['ev-run', `ev-run--${row}`]} data-ev-run>
+            <div class="ev-run__track">
+              {[0, 1].map(() => (
+                <span class="ev-run__copy">
+                  {titleRun.map((word) => (
+                    <span class="ev-run__word">{word}</span>
+                  ))}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))
+      }
     </div>
 
-    <div class="evp-frame__poster">
+    <div class="ev-hero__poster" data-ev-tilt>
       <EventPoster cover={event.cover} title={title} width={1000} lead />
     </div>
 
-    <p class="evp-frame__when">
-      <span class="evp-frame__big">
-        {date.weekday} {date.day} {date.month}
-      </span>
-      <span>
-        {date.time}, {date.year}
-      </span>
-    </p>
-
-    <div class="evp-frame__where">
-      <p class="evp-frame__big">{venue}</p>
-      {mode && <p>{mode}</p>}
-      {host && <p class="evp-frame__host">Hosted by {host}</p>}
-    </div>
-
-    <div class="evp-frame__go">
-      {
-        isPast ? (
-          <p class="evp-frame__big">This event has ended.</p>
-        ) : (
-          <div class="evp-count" data-countdown={event.startDate} role="timer" aria-label="Time until the event">
-            {['Days', 'Hrs', 'Min', 'Sec'].map((unit) => (
-              <span class="evp-count__cell">
-                <span class="evp-count__value" data-unit={unit.toLowerCase()}>
-                  --
-                </span>
-                <span class="evp-count__unit">{unit}</span>
-              </span>
-            ))}
-          </div>
-        )
-      }
-
-      <div class="evp-frame__actions">
+    <div class="event-shell ev-hero__facts">
+      <p class="ev-hero__when">
+        {date.weekday} {date.day} {date.month}, {date.time}
+      </p>
+      <p class="ev-hero__where">
+        {venue}
+        {mode && <span>, {mode}</span>}
+        {host && <span class="ev-hero__host">Hosted by {host}</span>}
+      </p>
+      <div class="ev-hero__actions">
         {
           isPast ? (
             <a href="/events" class="event-btn event-btn--solid">
@@ -138,18 +134,44 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
         }
       </div>
     </div>
-  </div>
+  </section>
 
-  {/* About: the summary as a pull quote */}
+  {/* The clock: a sentence whose digits roll over */}
+  <section class="event-shell ev-clock" aria-label="Time until the event">
+    {
+      isPast ? (
+        <p class="ev-clock__line">This one has happened.</p>
+      ) : (
+        <p class="ev-clock__line" data-countdown={event.startDate} role="timer">
+          <span class="ev-clock__num" data-unit="days">0</span>
+          <span class="ev-clock__word" data-days-word>
+            days
+          </span>
+          <span class="ev-clock__time">
+            <span class="ev-clock__num" data-unit="hrs">00</span>:<span class="ev-clock__num" data-unit="min">00</span>:<span class="ev-clock__num" data-unit="sec">00</span>
+          </span>
+          <span class="ev-clock__word">to go</span>
+        </p>
+      )
+    }
+  </section>
+
+  {/* About: the summary lights up as you read */}
   {
-    (event.summary || body) && (
-      <section class="event-shell evp-about" aria-labelledby="evp-about-title">
-        <h2 id="evp-about-title" class="sr-only">
+    (summaryWords.length > 0 || body) && (
+      <section class="event-shell ev-about" aria-labelledby="ev-about-title">
+        <h2 id="ev-about-title" class="sr-only">
           About the event
         </h2>
-        {event.summary && <p class="evp-about__lead">{event.summary}</p>}
+        {summaryWords.length > 0 && (
+          <p class="ev-about__lead" data-ev-words>
+            {summaryWords.map((word) => (
+              <span class="ev-about__word">{word} </span>
+            ))}
+          </p>
+        )}
         {body && (
-          <div class="evp-about__body">
+          <div class="ev-about__body">
             <PortableText value={body} />
           </div>
         )}
@@ -159,8 +181,8 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
 
   {
     highlights.length > 0 && (
-      <section class="event-shell evp-notes" aria-labelledby="evp-notes-title">
-        <h2 id="evp-notes-title" class="evp-title">
+      <section class="event-shell ev-notes" aria-labelledby="ev-notes-title">
+        <h2 id="ev-notes-title" class="ev-title">
           Good to know
         </h2>
         <ul>
@@ -175,66 +197,66 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
     )
   }
 
-  {/* Lineup: photos, or the name set in a black tile */}
+  {/* Lineup: outlined names that fill in, with the photo trailing the pointer */}
   {
     lineup.length > 0 && (
-      <section class="event-shell evp-lineup" aria-labelledby="evp-lineup-title">
-        <h2 id="evp-lineup-title" class="evp-title">
-          Lineup
-        </h2>
-        <ul>
-          {lineup.map((slot, index) => {
-            const Tag = slot.href ? 'a' : 'div';
-            return (
-              <li class:list={[index === 0 && 'evp-lineup__lead']}>
-                <Tag href={slot.href} class="evp-lineup__slot">
-                  {slot.photoUrl ? (
-                    <span class="evp-lineup__tile">
-                      <img src={slot.photoUrl} alt={slot.photoAlt} width="720" height="900" loading="lazy" decoding="async" />
-                    </span>
-                  ) : (
-                    <span class="evp-lineup__tile evp-lineup__tile--type" aria-hidden="true">
-                      <span>{slot.name}</span>
-                    </span>
-                  )}
-                  <span class="evp-lineup__name">{slot.name}</span>
-                  {slot.role && <span class="evp-lineup__role">{slot.role}</span>}
-                </Tag>
-              </li>
-            );
-          })}
-        </ul>
+      <section class="ev-acts" aria-labelledby="ev-acts-title" data-ev-acts>
+        <div class="event-shell">
+          <h2 id="ev-acts-title" class="ev-title">
+            Lineup
+          </h2>
+          <ul class="ev-acts__list">
+            {lineup.map((slot) => {
+              const Tag = slot.href ? 'a' : 'div';
+              return (
+                <li class="ev-act" data-ev-act data-photo={slot.photoUrl ?? undefined}>
+                  <Tag href={slot.href} class="ev-act__row">
+                    {slot.photoUrl && (
+                      <img class="ev-act__thumb" src={slot.photoUrl} alt={slot.photoAlt} width="600" height="750" loading="lazy" decoding="async" />
+                    )}
+                    <span class="ev-act__name">{slot.name}</span>
+                    {slot.role && <span class="ev-act__role">{slot.role}</span>}
+                  </Tag>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <img class="ev-acts__float" alt="" aria-hidden="true" data-ev-float />
       </section>
     )
   }
 
-  {/* Close: tickets in type you cannot miss */}
-  <section class="event-shell evp-close" aria-label="Tickets and sharing">
+  {/* Close: tickets in type that leans toward you */}
+  <section class="event-shell ev-close" aria-label="Tickets and sharing" data-ev-magnet-zone>
     {
       !isPast && ticketUrl && (
-        <a href={ticketUrl} class="evp-close__tickets" target="_blank" rel="noopener noreferrer">
+        <a href={ticketUrl} class="ev-close__go" target="_blank" rel="noopener noreferrer" data-ev-magnet>
           {ticketLabel}
         </a>
       )
     }
     {
       !isPast && offerAlerts && (
-        <button type="button" class="evp-close__tickets" {...alerts}>
+        <button type="button" class="ev-close__go" data-ev-magnet {...alerts}>
           Get ticket alerts
         </button>
       )
     }
-    <p class="evp-close__line">
-      {date.weekday} {date.day} {date.month}, {date.time}. {venue}.
+    <p class="ev-close__line">
+      {title}. {date.weekday} {date.day} {date.month}, {date.time}. {venue}.
     </p>
-    <div class="evp-close__share">
+    <div class="ev-close__share">
       <EventShare title={title} summary={event.summary} shareUrl={shareUrl} />
+      <a href="/events" class="event-textlink ev-close__all">
+        All events
+      </a>
     </div>
   </section>
 
   {
     !isPast && (ticketUrl || offerAlerts) && (
-      <div class="evp-bar">
+      <div class="ev-bar">
         {ticketUrl ? (
           <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">
             {ticketLabel}
@@ -252,243 +274,468 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
 </article>
 
 <script>
-  const root = document.querySelector<HTMLElement>('[data-countdown]');
-  const target = root ? new Date(root.dataset.countdown ?? '').getTime() : NaN;
+  import { getLenis } from '../../lib/smoothScroll';
 
-  if (root && !Number.isNaN(target)) {
+  const root = document.querySelector<HTMLElement>('[data-ev]');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  /* ---------- Countdown: only the digits that change roll over ---------- */
+  const clock = root?.querySelector<HTMLElement>('[data-countdown]');
+  const target = clock ? new Date(clock.dataset.countdown ?? '').getTime() : NaN;
+  if (clock && !Number.isNaN(target)) {
+    const daysWord = clock.querySelector<HTMLElement>('[data-days-word]');
     const write = (unit: string, value: string) => {
-      const cell = root.querySelector<HTMLElement>(`[data-unit="${unit}"]`);
-      if (cell) cell.textContent = value;
+      const cell = clock.querySelector<HTMLElement>(`[data-unit="${unit}"]`);
+      if (!cell || cell.dataset.value === value) return;
+      const before = cell.dataset.value ?? '';
+      cell.dataset.value = value;
+      cell.replaceChildren(
+        ...value.split('').map((char, i) => {
+          const digit = document.createElement('span');
+          digit.className = 'ev-clock__digit';
+          digit.textContent = char;
+          if (!reduced && before && before[i] !== char) digit.classList.add('is-rolling');
+          return digit;
+        }),
+      );
     };
     const pad = (n: number) => String(n).padStart(2, '0');
-
     const tick = () => {
       const diff = Math.max(0, target - Date.now());
       const s = Math.floor(diff / 1000);
-      write('days', String(Math.floor(s / 86400)));
+      const days = Math.floor(s / 86400);
+      write('days', String(days));
+      if (daysWord) daysWord.textContent = days === 1 ? 'day' : 'days';
       write('hrs', pad(Math.floor((s % 86400) / 3600)));
       write('min', pad(Math.floor((s % 3600) / 60)));
       write('sec', pad(s % 60));
       if (diff === 0) window.clearInterval(timer);
     };
-
     const timer = window.setInterval(tick, 1000);
     tick();
+  }
+
+  if (root && !reduced) {
+    /* ---------- Hero: moving title that speeds up and thickens with scroll ---------- */
+    const runs = Array.from(root.querySelectorAll<HTMLElement>('[data-ev-run]'));
+    const hero = root.querySelector<HTMLElement>('[data-ev-hero]');
+    const tilt = root.querySelector<HTMLElement>('[data-ev-tilt]');
+    const offsets = runs.map(() => 0);
+    let boost = 0;
+    let lastY = window.scrollY;
+    let pointer = { x: 0, y: 0 };
+    let lean = { x: 0, y: 0 };
+    let heroOn = true;
+
+    if (hero && 'IntersectionObserver' in window) {
+      new IntersectionObserver(([entry]) => (heroOn = entry.isIntersecting)).observe(hero);
+    }
+
+    if (fine && hero) {
+      hero.addEventListener('pointermove', (event) => {
+        const box = hero.getBoundingClientRect();
+        pointer = { x: (event.clientX - box.left) / box.width - 0.5, y: (event.clientY - box.top) / box.height - 0.5 };
+      });
+      hero.addEventListener('pointerleave', () => (pointer = { x: 0, y: 0 }));
+    }
+
+    let previous = performance.now();
+    const frame = (now: number) => {
+      const dt = Math.min(64, now - previous) / 1000;
+      previous = now;
+
+      const lenis = getLenis();
+      const velocity = lenis ? Math.abs(lenis.velocity) : Math.abs(window.scrollY - lastY) / Math.max(dt, 0.001) / 60;
+      lastY = window.scrollY;
+      boost = lerp(boost, Math.min(velocity / 30, 1), 0.08);
+
+      if (heroOn) {
+        runs.forEach((run, i) => {
+          const copy = run.querySelector<HTMLElement>('.ev-run__copy');
+          const width = copy?.offsetWidth ?? 1;
+          const dir = i === 0 ? -1 : 1;
+          offsets[i] = (offsets[i] + dir * (40 + boost * 520) * dt) % width;
+          const x = dir === -1 ? offsets[i] : offsets[i] - width;
+          run.style.setProperty('--x', `${x.toFixed(1)}px`);
+          run.style.setProperty('--wght', String(Math.round(300 + boost * 600)));
+        });
+
+        if (tilt) {
+          lean = { x: lerp(lean.x, pointer.x, 0.08), y: lerp(lean.y, pointer.y, 0.08) };
+          tilt.style.setProperty('--lean-x', `${(lean.y * -10).toFixed(2)}deg`);
+          tilt.style.setProperty('--lean-y', `${(lean.x * 12).toFixed(2)}deg`);
+          tilt.style.setProperty('--shadow-x', `${(lean.x * -48).toFixed(1)}px`);
+          tilt.style.setProperty('--shadow-y', `${(30 + lean.y * -24).toFixed(1)}px`);
+        }
+      }
+
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+
+    /* ---------- Summary: words light up as they pass the middle of the screen ---------- */
+    const words = Array.from(root.querySelectorAll<HTMLElement>('[data-ev-words] .ev-about__word'));
+    if (words.length) {
+      root.querySelector('[data-ev-words]')?.classList.add('is-live');
+      const light = () => {
+        const line = window.innerHeight * 0.62;
+        words.forEach((word) => word.classList.toggle('is-lit', word.getBoundingClientRect().top < line));
+      };
+      window.addEventListener('scroll', light, { passive: true });
+      light();
+    }
+
+    /* ---------- Lineup: names fill in; on a mouse the photo trails the pointer ---------- */
+    const acts = root.querySelector<HTMLElement>('[data-ev-acts]');
+    const items = Array.from(root.querySelectorAll<HTMLElement>('[data-ev-act]'));
+    const float = root.querySelector<HTMLImageElement>('[data-ev-float]');
+
+    if (acts && fine && float) {
+      let goal = { x: 0, y: 0 };
+      let at = { x: 0, y: 0 };
+      let on = false;
+      items.forEach((item) => {
+        item.addEventListener('pointerenter', () => {
+          items.forEach((other) => other.classList.toggle('is-on', other === item));
+          acts.classList.add('is-hovering');
+          if (item.dataset.photo) {
+            float.src = item.dataset.photo;
+            on = true;
+            float.classList.add('is-on');
+          } else {
+            on = false;
+            float.classList.remove('is-on');
+          }
+        });
+      });
+      acts.addEventListener('pointerleave', () => {
+        on = false;
+        float.classList.remove('is-on');
+        acts.classList.remove('is-hovering');
+        items.forEach((item) => item.classList.remove('is-on'));
+      });
+      acts.addEventListener('pointermove', (event) => {
+        const box = acts.getBoundingClientRect();
+        goal = { x: event.clientX - box.left, y: event.clientY - box.top };
+      });
+      const follow = () => {
+        const vx = goal.x - at.x;
+        at = { x: lerp(at.x, goal.x, 0.14), y: lerp(at.y, goal.y, 0.14) };
+        float.style.setProperty('--fx', `${at.x.toFixed(1)}px`);
+        float.style.setProperty('--fy', `${at.y.toFixed(1)}px`);
+        float.style.setProperty('--fr', `${Math.max(-14, Math.min(14, vx * 0.06)).toFixed(2)}deg`);
+        requestAnimationFrame(follow);
+      };
+      requestAnimationFrame(follow);
+    } else if (items.length && 'IntersectionObserver' in window) {
+      // Touch screens: each name fills in as it crosses the middle of the screen.
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((entry) => entry.target.classList.toggle('is-on', entry.isIntersecting)),
+        { rootMargin: '-42% 0px -42% 0px' },
+      );
+      items.forEach((item) => io.observe(item));
+    }
+
+    /* ---------- Close: the ticket link leans toward the pointer ---------- */
+    const zone = root.querySelector<HTMLElement>('[data-ev-magnet-zone]');
+    const magnet = root.querySelector<HTMLElement>('[data-ev-magnet]');
+    if (fine && zone && magnet) {
+      zone.addEventListener('pointermove', (event) => {
+        const box = magnet.getBoundingClientRect();
+        const dx = event.clientX - (box.left + box.width / 2);
+        const dy = event.clientY - (box.top + box.height / 2);
+        magnet.style.setProperty('--mx', `${(dx * 0.12).toFixed(1)}px`);
+        magnet.style.setProperty('--my', `${(dy * 0.18).toFixed(1)}px`);
+      });
+      zone.addEventListener('pointerleave', () => {
+        magnet.style.setProperty('--mx', '0px');
+        magnet.style.setProperty('--my', '0px');
+      });
+    }
   }
 </script>
 
 <style>
-  .evp {
+  .ev {
     position: relative;
+    overflow-x: clip;
   }
 
-  .evp__back {
-    display: inline-flex;
-    min-height: 2.75rem;
-    align-items: center;
-    font-size: 0.9375rem;
-  }
-
-  /* ---------- The frame ---------- */
-  .evp-frame {
+  /* ---------- Hero ---------- */
+  .ev-hero {
+    position: relative;
+    isolation: isolate;
     display: grid;
-    gap: 2rem;
-    padding-block: clamp(1rem, 2vw, 1.5rem) clamp(2rem, 4vw, 3rem);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-height: calc(100svh - var(--header-height, 4.5rem));
+    padding-top: clamp(1rem, 3vw, 2rem);
   }
 
-  .evp-frame__title h1 {
-    margin: 0.75rem 0 0;
+  /* Film grain: texture, not colour. */
+  .ev-hero::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    z-index: -1;
+    opacity: 0.05;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: ev-grain 0.9s steps(4) infinite;
+  }
+
+  @keyframes ev-grain {
+    25% {
+      transform: translate(-3%, 2%);
+    }
+    50% {
+      transform: translate(2%, -3%);
+    }
+    75% {
+      transform: translate(-2%, -1%);
+    }
+  }
+
+  /* Phones: the moving title runs above the poster. Wide: behind it. */
+  .ev-hero__type {
+    position: relative;
+    z-index: 0;
+    display: grid;
+    gap: 0.5vh;
+    margin-bottom: 1.5rem;
+    pointer-events: none;
+  }
+
+  @media (min-width: 1024px) {
+    .ev-hero__type {
+      position: absolute;
+      inset: 50% 0 auto;
+      margin: 0;
+      transform: translateY(-62%);
+    }
+  }
+
+  .ev-run {
+    --x: 0px;
+    --wght: 400;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .ev-run__track {
+    display: flex;
+    width: max-content;
+    transform: translate3d(var(--x), 0, 0);
+    will-change: transform;
+  }
+
+  .ev-run__copy {
+    display: flex;
+  }
+
+  .ev-run__word {
+    padding-right: 0.35em;
     font-family: var(--font-display);
-    font-size: clamp(2.75rem, 1.5rem + 5vw, 4.25rem);
-    font-weight: 500;
+    font-size: clamp(4rem, 2rem + 13vw, 17rem);
     font-variation-settings: 'opsz' 144;
-    line-height: 0.92;
-    letter-spacing: -0.035em;
-    text-wrap: balance;
+    font-weight: var(--wght);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    color: var(--color-fg);
   }
 
-  .evp-frame__title p {
-    margin: 1rem 0 0;
-    max-width: 26rem;
-    font-size: 1.0625rem;
-    line-height: 1.45;
-    color: var(--color-muted);
+  .ev-run--b .ev-run__word {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--color-fg);
+    font-style: italic;
   }
 
-  .evp-frame__poster {
-    --poster-w: 100%;
-    --poster-h: 85svh;
+  .ev-hero__poster {
+    --poster-w: 82vw;
+    --poster-h: 62svh;
+    --lean-x: 0deg;
+    --lean-y: 0deg;
+    --shadow-x: 0px;
+    --shadow-y: 30px;
+    position: relative;
+    z-index: 1;
     display: grid;
-    justify-items: center;
+    place-items: center;
+    align-self: center;
+    perspective: 1400px;
   }
 
-  .evp-frame__when,
-  .evp-frame__where p,
-  .evp-frame__go {
+  .ev-hero__poster :global(.ev-poster) {
+    transform: rotateX(var(--lean-x)) rotateY(var(--lean-y));
+    transform-style: preserve-3d;
+    filter: drop-shadow(var(--shadow-x) var(--shadow-y) 2.25rem color-mix(in srgb, var(--color-shadow) 28%, transparent));
+  }
+
+  .ev-hero__poster :global(.ev-poster__face) {
+    box-shadow: none;
+  }
+
+  .ev-hero__facts {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: 1rem 2rem;
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .ev-hero__when,
+  .ev-hero__where {
     margin: 0;
-  }
-
-  .evp-frame__when {
-    display: grid;
-    gap: 0.35rem;
-    color: var(--color-muted);
-  }
-
-  .evp-frame__big {
     font-family: var(--font-display);
-    font-size: clamp(1.625rem, 1.3rem + 1vw, 2.25rem);
-    line-height: 1.1;
+    font-size: clamp(1.375rem, 1.15rem + 0.9vw, 2rem);
+    line-height: 1.15;
     letter-spacing: -0.015em;
-    color: var(--color-fg);
   }
 
-  .evp-frame__where {
-    display: grid;
-    gap: 0.35rem;
-    color: var(--color-muted);
-  }
-
-  .evp-frame__host {
-    margin-top: 0.4rem !important;
-    color: var(--color-fg);
+  .ev-hero__host {
+    display: block;
+    margin-top: 0.35rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
     font-weight: 600;
   }
 
-  .evp-count {
-    display: flex;
-    gap: 1.25rem;
-  }
-
-  .evp-count__cell {
-    display: grid;
-    gap: 0.3rem;
-  }
-
-  .evp-count__value {
-    font-family: var(--font-display);
-    font-size: clamp(2.5rem, 2rem + 1.5vw, 3.5rem);
-    font-variant-numeric: tabular-nums lining-nums;
-    line-height: 0.9;
-    letter-spacing: -0.03em;
-  }
-
-  .evp-count__unit {
-    font-size: 0.8125rem;
-    color: var(--color-muted);
-  }
-
-  .evp-frame__actions {
+  .ev-hero__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-top: 1.75rem;
   }
 
-  /* Wide: title top left, date top right, venue bottom left, tickets bottom right, poster in the middle. */
-  @media (min-width: 1100px) {
-    .evp-frame {
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      grid-template-rows: auto minmax(0, 1fr) auto;
-      gap: 2rem clamp(2rem, 4vw, 4.5rem);
-      min-height: calc(100svh - var(--header-height, 4.5rem));
+  @media (min-width: 1024px) {
+    .ev-hero__poster {
+      --poster-w: 50vw;
+      --poster-h: calc(100svh - var(--header-height, 4.5rem) - 11rem);
     }
 
-    .evp-frame__poster {
-      --poster-w: 40vw;
-      --poster-h: calc(100svh - var(--header-height, 4.5rem) - 5rem);
-      grid-column: 2;
-      grid-row: 1 / 4;
-      align-self: center;
+    .ev-hero__facts {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+      align-items: end;
     }
 
-    .evp-frame__title {
-      grid-column: 1;
-      grid-row: 1;
-    }
-
-    .evp-frame__when {
-      grid-column: 3;
-      grid-row: 1;
-      justify-items: end;
-      align-self: start;
-      padding-top: 3.5rem;
-      text-align: right;
-    }
-
-    .evp-frame__where {
-      grid-column: 1;
-      grid-row: 3;
-      align-self: end;
-    }
-
-    .evp-frame__go {
-      grid-column: 3;
-      grid-row: 3;
-      display: grid;
-      justify-items: end;
-      align-self: end;
-      text-align: right;
-    }
-
-    .evp-frame__actions {
+    .ev-hero__actions {
       justify-content: flex-end;
     }
   }
 
-  /* ---------- Section titles ---------- */
-  .evp-title {
+  /* ---------- Clock ---------- */
+  .ev-clock {
+    padding-block: clamp(5rem, 10vw, 9rem) 0;
+  }
+
+  .ev-clock__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.3em;
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
-    font-weight: 500;
+    font-size: clamp(3.5rem, 1rem + 10vw, 12rem);
     font-variation-settings: 'opsz' 144;
-    line-height: 1;
-    letter-spacing: -0.03em;
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+  }
+
+  .ev-clock__num,
+  .ev-clock__time {
+    display: inline-flex;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .ev-clock__num {
+    font-weight: 500;
+  }
+
+  .ev-clock__word {
+    font-size: 0.42em;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    color: var(--color-muted);
+  }
+
+  .ev-clock__line :global(.ev-clock__digit) {
+    display: inline-block;
+  }
+
+  .ev-clock__line :global(.ev-clock__digit.is-rolling) {
+    animation: ev-roll 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes ev-roll {
+    from {
+      opacity: 0;
+      transform: translateY(-0.45em) rotateX(70deg);
+    }
   }
 
   /* ---------- About ---------- */
-  .evp-about {
+  .ev-about {
     padding-top: clamp(5rem, 10vw, 9rem);
   }
 
-  .evp-about__lead {
+  .ev-about__lead {
     margin: 0;
-    max-width: 28ch;
+    max-width: 26ch;
     font-family: var(--font-display);
-    font-size: clamp(2rem, 1.25rem + 3vw, 4rem);
-    font-weight: 400;
+    font-size: clamp(2rem, 1rem + 3.6vw, 4.5rem);
     font-variation-settings: 'opsz' 144;
-    line-height: 1.08;
-    letter-spacing: -0.025em;
-    text-wrap: pretty;
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.03em;
   }
 
-  .evp-about__body {
+  .ev-about__lead.is-live .ev-about__word {
+    opacity: 0.14;
+    transition: opacity 0.5s ease;
+  }
+
+  .ev-about__lead.is-live .ev-about__word.is-lit {
+    opacity: 1;
+  }
+
+  .ev-about__body {
     max-width: 38rem;
-    margin-top: clamp(2rem, 4vw, 3rem);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
     font-size: 1.0625rem;
     line-height: 1.75;
     color: var(--color-muted);
   }
 
-  .evp-about__body :global(p) {
+  .ev-about__body :global(p) {
     margin: 0 0 1rem;
     color: inherit;
   }
 
   @media (min-width: 1100px) {
-    .evp-about__body {
+    .ev-about__body {
       margin-left: auto;
-      margin-right: 8%;
+      margin-right: 6%;
     }
   }
 
+  /* ---------- Section titles ---------- */
+  .ev-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.75rem);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
   /* ---------- Good to know ---------- */
-  .evp-notes {
+  .ev-notes {
     padding-top: clamp(5rem, 10vw, 9rem);
   }
 
-  .evp-notes ul {
+  .ev-notes ul {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
     gap: 2.5rem clamp(2rem, 4vw, 4rem);
@@ -497,7 +744,7 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
     list-style: none;
   }
 
-  .evp-notes h3 {
+  .ev-notes h3 {
     margin: 0;
     font-family: var(--font-display);
     font-size: 1.625rem;
@@ -505,7 +752,7 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
     line-height: 1.15;
   }
 
-  .evp-notes p {
+  .ev-notes p {
     margin: 0.6rem 0 0;
     max-width: 34ch;
     line-height: 1.6;
@@ -513,149 +760,172 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
   }
 
   /* ---------- Lineup ---------- */
-  .evp-lineup {
-    padding-top: clamp(5rem, 10vw, 9rem);
+  .ev-acts {
+    position: relative;
+    isolation: isolate;
+    padding-top: clamp(6rem, 12vw, 10rem);
   }
 
-  .evp-lineup ul {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem 1rem;
-    margin: clamp(2rem, 4vw, 3rem) 0 0;
+  .ev-acts__list {
+    margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
     padding: 0;
     list-style: none;
   }
 
-  @media (min-width: 700px) {
-    .evp-lineup ul {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 2.5rem 1.25rem;
-    }
-
-    .evp-lineup__lead {
-      grid-column: span 2;
-      grid-row: span 2;
-    }
-  }
-
-  .evp-lineup__slot {
+  .ev-act__row {
     display: grid;
-    height: 100%;
-    grid-template-rows: 1fr auto auto;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 1rem;
+    padding-block: 0.15em;
     color: inherit;
     text-decoration: none;
   }
 
-  .evp-lineup__tile {
-    display: block;
-    min-height: 0;
-    overflow: hidden;
-    aspect-ratio: 4 / 5;
-    border-radius: 0.25rem;
-    background: var(--color-fg);
-  }
-
-  .evp-lineup__lead .evp-lineup__tile {
-    aspect-ratio: auto;
-    height: 100%;
-    min-height: 20rem;
-  }
-
-  .evp-lineup__tile img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  a.evp-lineup__slot:hover .evp-lineup__tile img {
-    transform: scale(1.04);
-  }
-
-  .evp-lineup__tile--type {
-    display: grid;
-    place-items: center;
-    padding: 1rem;
-    color: var(--color-bg);
-    text-align: center;
-  }
-
-  .evp-lineup__tile--type span {
+  .ev-act__name {
     font-family: var(--font-display);
-    font-size: clamp(1.75rem, 1rem + 2.5vw, 3rem);
-    font-weight: 500;
+    font-size: clamp(3rem, 1rem + 8vw, 9rem);
     font-variation-settings: 'opsz' 144;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    text-wrap: balance;
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--color-fg);
+    transition:
+      color 0.35s ease,
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      font-weight 0.5s ease;
   }
 
-  .evp-lineup__name {
-    margin-top: 0.85rem;
-    font-family: var(--font-display);
-    font-size: 1.375rem;
-    line-height: 1.1;
+  .ev-act__name,
+  .ev-act__role {
+    grid-column: 2;
   }
 
-  .evp-lineup__lead .evp-lineup__name {
-    font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
-  }
-
-  a.evp-lineup__slot:hover .evp-lineup__name {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.12em;
-  }
-
-  .evp-lineup__role {
-    margin-top: 0.3rem;
-    font-size: 0.9375rem;
+  .ev-act__role {
+    font-size: 1rem;
     color: var(--color-muted);
   }
 
-  /* ---------- Close ---------- */
-  .evp-close {
-    padding-block: clamp(6rem, 12vw, 10rem) clamp(3rem, 6vw, 5rem);
+  .ev-act__thumb {
+    grid-row: span 2;
   }
 
-  .evp-close__tickets {
+  .ev-act.is-on .ev-act__name {
+    color: var(--color-fg);
+    font-weight: 700;
+    transform: translateX(0.12em);
+  }
+
+  .ev-acts.is-hovering .ev-act:not(.is-on) {
+    opacity: 0.35;
+  }
+
+  .ev-act {
+    transition: opacity 0.35s ease;
+  }
+
+  .ev-act__thumb {
+    width: clamp(3.5rem, 12vw, 5rem);
+    height: auto;
+    aspect-ratio: 4 / 5;
+    align-self: center;
+    border-radius: 0.25rem;
+    object-fit: cover;
+  }
+
+  .ev-acts__float {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ev-act__thumb {
+      display: none;
+    }
+
+    .ev-act__row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.25rem 1.5rem;
+    }
+
+    .ev-acts__float {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      display: block;
+      width: clamp(13rem, 19vw, 19rem);
+      aspect-ratio: 4 / 5;
+      border-radius: 0.25rem;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(calc(var(--fx, 0px) - 50%), calc(var(--fy, 0px) - 50%)) rotate(var(--fr, 0deg)) scale(0.85);
+      transition:
+        opacity 0.3s ease,
+        scale 0.4s ease;
+    }
+
+    .ev-acts__float.is-on {
+      opacity: 1;
+      transform: translate(calc(var(--fx, 0px) - 50%), calc(var(--fy, 0px) - 50%)) rotate(var(--fr, 0deg)) scale(1);
+    }
+  }
+
+  /* ---------- Close ---------- */
+  .ev-close {
+    padding-block: clamp(7rem, 14vw, 12rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .ev-close__go {
+    --mx: 0px;
+    --my: 0px;
     display: inline-block;
     padding: 0;
     border: 0;
     background: none;
     color: var(--color-fg);
     font-family: var(--font-display);
-    font-size: clamp(4rem, 1rem + 12vw, 13rem);
-    font-weight: 500;
+    font-size: clamp(4rem, 1rem + 13vw, 15rem);
     font-variation-settings: 'opsz' 144;
-    line-height: 0.88;
-    letter-spacing: -0.05em;
+    font-weight: 500;
+    line-height: 0.86;
+    letter-spacing: -0.055em;
     text-align: left;
     text-decoration: none;
     cursor: pointer;
+    transform: translate(var(--mx), var(--my));
+    transition:
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      font-weight 0.4s ease;
   }
 
-  .evp-close__tickets:hover,
-  .evp-close__tickets:focus-visible {
-    text-decoration: underline;
-    text-decoration-thickness: 0.04em;
-    text-underline-offset: 0.08em;
+  .ev-close__go:hover,
+  .ev-close__go:focus-visible {
+    font-weight: 800;
   }
 
-  .evp-close__line {
-    margin: 1.5rem 0 0;
+  .ev-close__line {
+    max-width: 44rem;
+    margin: 2rem 0 0;
     font-family: var(--font-display);
     font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
     line-height: 1.3;
   }
 
-  .evp-close__share {
-    margin-top: 2rem;
+  .ev-close__share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
   }
 
   /* ---------- Phones: tickets stay in reach ---------- */
-  .evp-bar {
+  .ev-bar {
     position: sticky;
     bottom: 0;
     z-index: 5;
@@ -665,9 +935,26 @@ const lineup = (event.lineup ?? []).filter(Boolean).map((slot) => {
     backdrop-filter: blur(10px);
   }
 
-  @media (min-width: 1100px) {
-    .evp-bar {
+  @media (min-width: 1024px) {
+    .ev-bar {
       display: none;
+    }
+  }
+
+  /* ---------- Reduced motion: still, filled, readable ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .ev-hero::before {
+      animation: none;
+    }
+
+    .ev-act__name {
+      color: var(--color-fg);
+      -webkit-text-stroke: 0;
+      transition: none;
+    }
+
+    .ev-close__go {
+      transition: none;
     }
   }
 </style>

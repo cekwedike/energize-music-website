@@ -25,7 +25,6 @@ const copy = Array.from({ length: repeats }, () => items).flat();
           {copy.map((item, i) => (
             <span class="marquee__item">
               <span class:list={['marquee__word', i % 2 === 1 && 'marquee__word--alt']}>{item}</span>
-              {variant === 'serif' && <span class="marquee__dot" />}
             </span>
           ))}
         </div>
@@ -103,7 +102,7 @@ const copy = Array.from({ length: repeats }, () => items).flat();
 
   .marquee--serif .marquee__item {
     gap: clamp(0.875rem, 0.7rem + 0.8vw, 2rem);
-    padding-inline: clamp(0.875rem, 0.7rem + 0.8vw, 2rem);
+    padding-inline: clamp(1.5rem, 1rem + 1.6vw, 3.5rem);
   }
 
   .marquee--serif .marquee__word {
@@ -112,14 +111,6 @@ const copy = Array.from({ length: repeats }, () => items).flat();
     font-style: italic;
     letter-spacing: 0.04em;
     color: var(--color-fg);
-  }
-
-  .marquee__dot {
-    display: block;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--color-accent);
   }
 
   .marquee--caps {
