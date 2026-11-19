@@ -34,8 +34,11 @@ const updates = {
 
 <main class="event-world events-index">
   <header class="event-shell events-intro">
-    <h1>Events</h1>
-    <p>Shows we put on, and shows we back.</p>
+    <div class="events-intro__title">
+      <p class="events-intro__kicker">Energize Music live</p>
+      <h1>Events</h1>
+    </div>
+    <p>Good music is better in a room full of people. Find the next one.</p>
   </header>
 
   {
@@ -61,12 +64,13 @@ const updates = {
 
         <div class="event-feature__copy">
           <p class="event-feature__when">
-            {leadEvent.date.weekday}, {leadEvent.date.month} {leadEvent.date.day}<br />
-            {leadEvent.date.time}
+            <span class="event-feature__day">{leadEvent.date.day}</span>
+            <span>{leadEvent.date.month} {leadEvent.date.year}</span>
+            <span>{leadEvent.date.weekday} at {leadEvent.date.time}</span>
           </p>
           <h2><a href={leadEvent.href}>{leadEvent.event.title}</a></h2>
           {leadEvent.event.subtitle && <p class="event-feature__summary">{leadEvent.event.subtitle}</p>}
-          <p class="event-feature__place">{leadEvent.venue}</p>
+          <p class="event-feature__place"><span>Venue</span>{leadEvent.venue}</p>
           {leadEvent.event.host && <p class="event-feature__host">Hosted by {leadEvent.event.host}</p>}
           <div class="event-feature__actions">
             {leadEvent.event.ticketUrl && (

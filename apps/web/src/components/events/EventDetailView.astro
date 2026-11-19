@@ -61,13 +61,13 @@ const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, $
   <header class="event-hero">
     <div class="event-shell event-hero__grid">
       <div class="event-hero__copy">
-        <a href="/events" class="event-hero__back">All events</a>
+        <a href="/events" class="event-hero__back"><span aria-hidden="true">←</span> All events</a>
         <h1>{title}</h1>
         {event.subtitle && <p class="event-hero__subtitle">{titleCase(event.subtitle)}</p>}
 
         <div class="event-hero__facts">
           <p><strong>{date.weekday}, {date.month} {date.day}</strong><span>{date.year} at {date.time}</span></p>
-          <p><strong>{venue}</strong>{mode && <span>{mode}</span>}</p>
+          <p><strong>{venue}</strong>{mode && <span>{mode} event</span>}</p>
           {host && <p><strong>Hosted by {host}</strong></p>}
         </div>
 
@@ -89,6 +89,7 @@ const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, $
 
       <div class="event-hero__art">
         <div class="event-hero-mosaic" data-event-hero-mosaic>
+          <span class="event-hero-mosaic__label">{title}</span>
           {posterSrc ? (
             <>
               <span class="event-hero-mosaic__slice event-hero-mosaic__slice--one"><img src={posterSrc} alt="" /></span>
@@ -108,7 +109,7 @@ const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, $
 
     {!isPast && (
       <div class="event-shell event-countdown">
-        <p>Doors open in</p>
+        <p>Until the room opens</p>
         <p class="ev-clock" data-countdown={event.startDate} role="timer" aria-label="Time until the event">
           <span><strong data-unit="days">0</strong><small data-days-word>days</small></span>
           <span><strong data-unit="hrs">00</strong><small>hours</small></span>
