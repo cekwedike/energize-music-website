@@ -15,17 +15,7 @@ const isBack = variant === 'back';
   class:list={['editorial-link', isBack && 'editorial-link--back', className]}
 >
   {
-    isBack ? (
-      <>
-        <span class="editorial-link__arrow editorial-link__arrow--back" aria-hidden="true">←</span>
-        <span class="editorial-link__label">{label}</span>
-      </>
-    ) : (
-      <>
-        <span class="editorial-link__label">{label}</span>
-        <span class="editorial-link__arrow" aria-hidden="true">→</span>
-      </>
-    )
+    <span class="editorial-link__label">{label}</span>
   }
 </a>
 

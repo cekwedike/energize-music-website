@@ -8,6 +8,10 @@ export interface SanityImage {
     url: string;
     metadata?: SanityImageMetadata;
   };
+  /** Editor's crop from the Studio, as fractions trimmed from each edge. */
+  crop?: { top: number; bottom: number; left: number; right: number };
+  /** Editor's focal point from the Studio. */
+  hotspot?: { x: number; y: number; height: number; width: number };
   alt?: string;
 }
 

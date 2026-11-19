@@ -15,9 +15,11 @@ interface Props {
   width?: number;
   /** Load first and rise into place. For the main poster on a page only. */
   lead?: boolean;
+  /** Spill the poster's own colours onto the page behind it, like stage light. */
+  glow?: boolean;
 }
 
-const { cover, title, href, width = 1200, lead = false } = Astro.props;
+const { cover, title, href, width = 1200, lead = false, glow = false } = Astro.props;
 const src = getEventPosterUrl(cover, width * 2);
 const ratio = getEventPosterRatio(cover);
 const Tag = href ? 'a' : 'div';
@@ -30,6 +32,7 @@ const Tag = href ? 'a' : 'div';
   style={`--ratio: ${ratio.toFixed(4)}`}
   data-event-poster
 >
+  {glow && src && <img class="ev-poster__glow" src={src} alt="" aria-hidden="true" loading="lazy" decoding="async" />}
   <span class="ev-poster__face">
     {
       src ? (
@@ -69,6 +72,8 @@ const Tag = href ? 'a' : 'div';
           poster.style.setProperty('--foil-x', `${(x * 100).toFixed(1)}%`);
           poster.style.setProperty('--foil-y', `${(y * 100).toFixed(1)}%`);
           poster.style.setProperty('--foil-sweep', `${((x - 0.5) * 60).toFixed(1)}deg`);
+          poster.style.setProperty('--glow-x', `${((0.5 - x) * 40).toFixed(1)}`);
+          poster.style.setProperty('--glow-y', `${((0.5 - y) * 30).toFixed(1)}`);
         });
       });
 
@@ -76,6 +81,8 @@ const Tag = href ? 'a' : 'div';
         cancelAnimationFrame(frame);
         poster.style.setProperty('--tilt-x', '0deg');
         poster.style.setProperty('--tilt-y', '0deg');
+        poster.style.setProperty('--glow-x', '0');
+        poster.style.setProperty('--glow-y', '0');
       });
     });
   }
@@ -86,8 +93,27 @@ const Tag = href ? 'a' : 'div';
     display: block;
     width: min(var(--poster-w, 100%), calc(var(--poster-h, 70svh) * var(--ratio)));
     max-width: 100%;
+    position: relative;
     color: inherit;
     perspective: 1500px;
+  }
+
+  .ev-poster__glow {
+    position: absolute;
+    inset: 6% -4% -2%;
+    width: 108%;
+    max-width: none;
+    height: 96%;
+    object-fit: fill;
+    filter: blur(clamp(40px, 6vw, 90px)) saturate(1.6);
+    opacity: 0.6;
+    transform: translate(calc(var(--glow-x, 0) * 1px), calc(var(--glow-y, 0) * 1px)) scale(1.04);
+    pointer-events: none;
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ev-poster:hover .ev-poster__glow {
+    opacity: 0.85;
   }
 
   .ev-poster--lead {

@@ -31,6 +31,8 @@ export interface EventDetail {
   /** Set when another organiser is putting on the event. Empty means Energize Music. */
   host?: string;
   cover?: SanityImage;
+  /** Wide live photo for the top of the event page. */
+  heroImage?: SanityImage;
   shareImage?: SanityImage;
   summary?: string;
   body?: PortableTextBlock[];

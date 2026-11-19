@@ -201,12 +201,10 @@ const typeLabel: Record<Release['type'], string> = { single: 'Single', ep: 'EP',
             </p>
             <p class="post-meta__details">
               <time datetime={post.publishedAt}>{published}</time>
-              <span aria-hidden="true">·</span>
               <span>{reading}</span>
               {updated && (
                 <>
-                  <span aria-hidden="true">·</span>
-                  <span>
+                      <span>
                     Updated <time datetime={post.updatedAt}>{updated}</time>
                   </span>
                 </>

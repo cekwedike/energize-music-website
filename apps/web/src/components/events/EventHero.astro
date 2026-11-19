@@ -1,0 +1,102 @@
+---
+/**
+ * The full-screen opening of an event page: a live photo in the site's blue duotone,
+ * the title set big and heavy over it, the whole poster pinned beside it, and the countdown along the bottom.
+ */
+import type { EventDetail } from '@energize/shared';
+import EventPoster from './EventPoster.astro';
+import { getEventCoverUrl } from '../../lib/events/media';
+import { eventDateParts, formatEventLocation, formatEventType, isPastEvent } from '../../lib/events/format';
+import { titleCase } from '../../lib/text/titleCase';
+import { directionsUrl, googleCalendarUrl } from '../../lib/events/calendar';
+import { absoluteUrl } from '../../lib/seo/site';
+
+interface Props {
+  event: EventDetail;
+}
+
+/** Used until an editor adds a hero photo to the event in the Studio. */
+const FALLBACK_PHOTO = '/initiatives/energize-fest.webp';
+
+const { event } = Astro.props;
+const isPast = isPastEvent(event.startDate, event.endDate);
+const date = eventDateParts(event.startDate);
+const venue = formatEventLocation(event.location);
+const host = event.host?.trim();
+const mode = event.eventType && event.eventType !== 'physical' ? formatEventType(event.eventType) : null;
+const photo = getEventCoverUrl(event.heroImage, 2400, 1500) ?? FALLBACK_PHOTO;
+const ticketLabel = event.ctaLabel || 'Get tickets';
+const offerAlerts = !event.ticketUrl && !host && !isPast;
+const pageUrl = absoluteUrl(`/events/${event.slug}`);
+const directions = event.eventType !== 'virtual' ? directionsUrl(event.location) : undefined;
+const secondary = !isPast && event.secondaryCtaUrl ? {
+  href: event.secondaryCtaUrl,
+  label: event.secondaryCtaLabel || 'Learn more',
+  external: /^https?:\/\//.test(event.secondaryCtaUrl),
+} : null;
+---
+
+<section class="evh theme-dark" data-evh>
+  <div class="evh__photo" aria-hidden="true">
+    <img src={photo} alt="" fetchpriority="high" decoding="async" />
+  </div>
+  <div class="evh__veil" aria-hidden="true"></div>
+
+  <div class="event-shell evh__inner">
+    <div class="evh__copy">
+      <h1 class="evh__title" style={`--len: ${event.title.length}`}>{event.title}</h1>
+      {event.subtitle && <p class="evh__subtitle">{titleCase(event.subtitle)}</p>}
+
+      <dl class="evh__facts">
+        <div><dt>Date</dt><dd>{date.weekday.slice(0, 3)} {date.day} {date.monthShort} {date.year}</dd></div>
+        <div><dt>Starts</dt><dd>{date.time}</dd></div>
+        <div><dt>Venue</dt><dd>{venue}{mode && `, ${mode}`}</dd></div>
+        {host && <div><dt>Host</dt><dd>{host}</dd></div>}
+      </dl>
+
+      <div class="evh__actions ev-actions">
+        {isPast ? (
+          <a href="/events" class="event-btn event-btn--accent">See upcoming events</a>
+        ) : event.ticketUrl ? (
+          <a href={event.ticketUrl} class="event-btn event-btn--accent" target="_blank" rel="noopener noreferrer">{ticketLabel}</a>
+        ) : offerAlerts ? (
+          <button
+            type="button"
+            class="event-btn event-btn--accent"
+            data-subscribe-open
+            data-subscribe-title="Get ticket alerts"
+            data-subscribe-lead={`Hear first when ${event.title} tickets go on sale.`}
+          >Get ticket alerts</button>
+        ) : null}
+        {secondary && (
+          <a href={secondary.href} class="event-btn event-btn--ghost" {...(secondary.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+            {secondary.label}
+          </a>
+        )}
+      </div>
+
+      {!isPast && (
+        <p class="evh__tools">
+          <a href={`/events/${event.slug}.ics`} download={`${event.slug}.ics`}>Add to calendar</a>
+          <a href={googleCalendarUrl(event, pageUrl)} target="_blank" rel="noopener noreferrer">Google Calendar</a>
+          {directions && <a href={directions} target="_blank" rel="noopener noreferrer">Get directions</a>}
+        </p>
+      )}
+    </div>
+
+    <div class="evh__poster">
+      <EventPoster cover={event.cover} title={event.title} width={640} lead />
+    </div>
+  </div>
+
+  {!isPast && (
+    <div class="evh__count" aria-label="Time until the event">
+      <p class="event-shell evh__clock" data-countdown={event.startDate} role="timer">
+        <span><strong data-unit="days">0</strong><small data-days-word>days</small></span>
+        <span><strong data-unit="hrs">00</strong><small>hours</small></span>
+        <span><strong data-unit="min">00</strong><small>minutes</small></span>
+        <span><strong data-unit="sec">00</strong><small>seconds</small></span>
+      </p>
+    </div>
+  )}
+</section>

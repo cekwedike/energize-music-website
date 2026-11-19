@@ -16,7 +16,7 @@ const teamIntro =
   'The people behind Energize Music: strategists, creatives, and builders shaping Afro-gospel culture.';
 ---
 
-<section id="team" class="scroll-mt-24 border-b border-[var(--color-line)]" aria-labelledby="about-team-heading">
+<section id="team" class="scroll-mt-24" aria-labelledby="about-team-heading">
   <div class="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
     <div class="scroll-reveal max-w-2xl">
       <h2 id="about-team-heading" class="text-h2">{teamHeading}</h2>
@@ -55,7 +55,8 @@ const teamIntro =
   }
 
   .about-team-list {
-    border-top: 1px solid var(--color-line);
+    display: grid;
+    gap: 1.5rem;
   }
 
   @media (min-width: 640px) {

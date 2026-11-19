@@ -164,6 +164,16 @@ export default defineType({
         'The event poster. It is always shown whole and never cropped. Any shape works. Use at least 1600px on the long side.',
     }),
     defineField({
+      name: 'heroImage',
+      group: 'basics',
+      title: 'Hero photo',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [defineField({ name: 'alt', title: 'Alt text', type: 'string' })],
+      description:
+        'Optional. A wide live photo (stage, crowd, performer) that fills the top of the event page. Landscape, at least 2400px wide. Set the hotspot on the subject. Without one, the site uses a photo from a past Energize show.',
+    }),
+    defineField({
       name: 'shareImage',
       group: 'page',
       title: 'Social share image',

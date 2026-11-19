@@ -7,22 +7,26 @@ import { sanityClient } from '../../lib/sanity/client';
 import { eventBySlugQuery, eventsQuery, type EventDetail } from '@energize/shared';
 import { getEventCoverUrl, getEventShareImageUrl } from '../../lib/events/media';
 import { formatEventLocation } from '../../lib/events/format';
+import { splitEvents } from '../../lib/events/fest';
 import { crumbs, organizationId } from '../../lib/seo/schema';
 import { absoluteUrl } from '../../lib/seo/site';
 
 export const getStaticPaths = (async () => {
   const events = await sanityClient.fetch<EventDetail[]>(eventsQuery);
+  const { upcoming } = splitEvents(events);
   return events.map((event) => ({
     params: { slug: event.slug },
-    props: { event },
+    // Up to three other upcoming events for "More events" at the foot of the page.
+    props: { event, others: upcoming.filter((other) => other._id !== event._id).slice(0, 3) },
   }));
 }) satisfies GetStaticPaths;
 
 interface Props {
   event: EventDetail;
+  others: EventDetail[];
 }
 
-const { event } = Astro.props;
+const { event, others = [] } = Astro.props;
 const slug = Astro.params.slug ?? event.slug;
 const detail = event ?? (await sanityClient.fetch<EventDetail | null>(eventBySlugQuery, { slug }));
 
@@ -89,6 +93,7 @@ const jsonLd = {
 
 <BaseLayout
   title={`${detail.title} | Energize Music Events`}
+  headerVariant="overlay"
   description={detail.summary ?? detail.subtitle ?? `Event details, dates, and tickets for ${detail.title}.`}
   ogImage={ogImage}
   keywords={[detail.title, 'Energize Music events', 'live music event']}
@@ -98,5 +103,5 @@ const jsonLd = {
   )}
 >
   <JsonLd data={jsonLd} />
-  <EventDetailView event={detail} shareUrl={shareUrl} />
+  <EventDetailView event={detail} shareUrl={shareUrl} others={others} />
 </BaseLayout>

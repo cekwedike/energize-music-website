@@ -37,9 +37,6 @@ export function pageList(current: number, total: number): Array<number | null> {
   return out;
 }
 
-const ARROW_LEFT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>';
-const ARROW_RIGHT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>';
-
 export function readPageParam(param: string): number {
   const value = Number(new URLSearchParams(window.location.search).get(param));
   return Number.isInteger(value) && value > 0 ? value : 1;
@@ -73,7 +70,7 @@ export function createPager(options: PagerOptions): Pager {
     const el = document.createElement('button');
     el.type = 'button';
     el.className = attrs.className;
-    el.innerHTML = content;
+    el.textContent = content;
     el.setAttribute('aria-label', attrs.label);
     if (attrs.current) el.setAttribute('aria-current', 'page');
     if (attrs.disabled) el.disabled = true;
@@ -103,7 +100,7 @@ export function createPager(options: PagerOptions): Pager {
       if (total <= 1) return current;
 
       nav.append(
-        button(`${ARROW_LEFT}<span>Previous</span>`, current - 1, {
+        button('Previous', current - 1, {
           label: 'Previous page',
           disabled: current === 1,
           className: 'pager__step',
@@ -115,7 +112,7 @@ export function createPager(options: PagerOptions): Pager {
         if (n === null) {
           const gap = document.createElement('span');
           gap.className = 'pager__gap';
-          gap.textContent = '…';
+          gap.textContent = '...';
           gap.setAttribute('aria-hidden', 'true');
           list.append(gap);
         } else {
@@ -124,7 +121,7 @@ export function createPager(options: PagerOptions): Pager {
       });
       nav.append(list);
       nav.append(
-        button(`<span>Next</span>${ARROW_RIGHT}`, current + 1, {
+        button('Next', current + 1, {
           label: 'Next page',
           disabled: current === total,
           className: 'pager__step',

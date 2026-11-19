@@ -1,9 +1,9 @@
 ---
 import type { EventDetail } from '@energize/shared';
 import EventPoster from './EventPoster.astro';
+import DuotoneFilter from './DuotoneFilter.astro';
 import SubscribeDialog from '../forms/SubscribeDialog.astro';
 import { eventDateParts, formatEventLocation } from '../../lib/events/format';
-import { getEventPosterUrl } from '../../lib/events/media';
 import '../../styles/events.css';
 
 interface Props {
@@ -12,7 +12,6 @@ interface Props {
 }
 
 const { upcoming, past } = Astro.props;
-const [lead, ...moreUpcoming] = upcoming;
 
 const getEvent = (event: EventDetail) => ({
   event,
@@ -22,9 +21,9 @@ const getEvent = (event: EventDetail) => ({
   ticketLabel: event.ctaLabel || 'Get tickets',
 });
 
-const leadEvent = lead ? getEvent(lead) : null;
-const leadPoster = lead ? getEventPosterUrl(lead.cover, 1600) : null;
-const moreEvents = moreUpcoming.map(getEvent);
+const nights = upcoming.map(getEvent);
+const next = nights[0];
+const archive = past.map(getEvent);
 const updates = {
   'data-subscribe-open': '',
   'data-subscribe-title': 'Get event updates',
@@ -32,131 +31,144 @@ const updates = {
 };
 ---
 
-<main class="event-world events-index">
-  <header class="event-shell events-intro">
-    <div class="events-intro__title">
-      <p class="events-intro__kicker">Energize Music live</p>
-      <h1>Events</h1>
+<main class="event-world evs" data-evs>
+  <section class="evs-hero theme-dark" data-evh>
+    <div class="evh__photo evs-hero__photo" aria-hidden="true">
+      <img src="/next/takit.webp" alt="" fetchpriority="high" decoding="async" />
     </div>
-    <p>Good music is better in a room full of people. Find the next one.</p>
-  </header>
+    <div class="evh__veil" aria-hidden="true"></div>
+
+    <div class="event-shell evs-hero__inner">
+      <div class="evs-hero__lockup">
+        <h1 class="evs-hero__title">Events</h1>
+        <p class="evs-hero__script" aria-hidden="true">Energize Live</p>
+      </div>
+      <p class="evs-hero__lead">Live events from Energize Music and friends.</p>
+
+      {next ? (
+        <a class="evs-next" href={next.href}>
+          <span class="evs-next__poster">
+            <EventPoster cover={next.event.cover} title={next.event.title} width={200} />
+          </span>
+          <span class="evs-next__copy">
+            <strong>{next.event.title}</strong>
+            <span>{next.date.weekday.slice(0, 3)} {next.date.day} {next.date.monthShort}, {next.date.time}</span>
+            <span>{next.venue}</span>
+            <span class="evs-next__cta">See the event</span>
+          </span>
+        </a>
+      ) : (
+        <button type="button" class="event-btn event-btn--accent evs-hero__alerts" {...updates}>Get event updates</button>
+      )}
+    </div>
+  </section>
 
   {
-    leadEvent ? (
-      <article class="event-shell event-feature">
-        <div class="event-feature__art">
-          <a class="event-mosaic" href={leadEvent.href} aria-label={`View ${leadEvent.event.title}`} data-event-mosaic>
-            {leadPoster ? (
-              <>
-                <span class="event-mosaic__tile event-mosaic__tile--one"><img src={leadPoster} alt="" /></span>
-                <span class="event-mosaic__tile event-mosaic__tile--two"><img src={leadPoster} alt="" /></span>
-                <span class="event-mosaic__tile event-mosaic__tile--three"><img src={leadPoster} alt="" /></span>
-                <span class="event-mosaic__tile event-mosaic__tile--four"><img src={leadPoster} alt="" /></span>
-                <span class="event-mosaic__tile event-mosaic__tile--five"><img src={leadPoster} alt="" /></span>
-              </>
-            ) : (
-              <span class="event-mosaic__blank">{leadEvent.event.title}</span>
-            )}
-            <span class="event-mosaic__date" aria-hidden="true">{leadEvent.date.day}</span>
-            <span class="event-mosaic__month" aria-hidden="true">{leadEvent.date.monthShort}</span>
-          </a>
-        </div>
-
-        <div class="event-feature__copy">
-          <p class="event-feature__when">
-            <span class="event-feature__day">{leadEvent.date.day}</span>
-            <span>{leadEvent.date.month} {leadEvent.date.year}</span>
-            <span>{leadEvent.date.weekday} at {leadEvent.date.time}</span>
-          </p>
-          <h2><a href={leadEvent.href}>{leadEvent.event.title}</a></h2>
-          {leadEvent.event.subtitle && <p class="event-feature__summary">{leadEvent.event.subtitle}</p>}
-          <p class="event-feature__place"><span>Venue</span>{leadEvent.venue}</p>
-          {leadEvent.event.host && <p class="event-feature__host">Hosted by {leadEvent.event.host}</p>}
-          <div class="event-feature__actions">
-            {leadEvent.event.ticketUrl && (
-              <a class="event-btn event-btn--solid" href={leadEvent.event.ticketUrl} target="_blank" rel="noopener noreferrer">
-                {leadEvent.ticketLabel}
-              </a>
-            )}
-            <a class="event-textlink" href={leadEvent.href}>See event details</a>
-          </div>
-        </div>
-      </article>
-    ) : (
-      <section class="event-shell events-empty">
-        <h2>The next show is taking shape.</h2>
-        <p>Join the list and we will tell you when the date is ready.</p>
-        <button type="button" class="event-btn event-btn--solid" {...updates}>Get event updates</button>
-      </section>
-    )
-  }
-
-  {
-    moreEvents.length > 0 && (
-      <section class="event-shell events-more" aria-labelledby="events-more-title">
-        <h2 id="events-more-title">More dates</h2>
-        <ol>
-          {moreEvents.map((item) => (
-            <li>
-              <a href={item.href} class="events-more__link">
-                <span class="events-more__date">{item.date.day}<small>{item.date.monthShort}</small></span>
-                <span class="events-more__name">{item.event.title}</span>
-                <span class="events-more__place">{item.venue}</span>
-                <span class="events-more__open">View event</span>
-              </a>
+    nights.length > 0 ? (
+      <section class="event-shell evs-list" aria-labelledby="evs-list-title" id="evs-dates">
+        <h2 id="evs-list-title" class="evs-heading scroll-reveal">Upcoming</h2>
+        <ol class="evs-rows" data-evs-pages="page" data-page-size="5">
+          {nights.map((item) => (
+            <li class="evs-row scroll-reveal">
+              <p class="evs-row__date" aria-hidden="true">
+                <span class="evs-row__month">{item.date.monthShort}</span>
+                <span class="evs-row__day">{item.date.day}</span>
+              </p>
+              <div class="evs-row__poster">
+                <EventPoster cover={item.event.cover} title={item.event.title} href={item.href} width={360} />
+              </div>
+              <div class="evs-row__copy">
+                <h3><a href={item.href}>{item.event.title}</a></h3>
+                <p class="evs-row__facts">
+                  <span>{item.date.weekday} {item.date.day} {item.date.month} {item.date.year}, {item.date.time}</span>
+                  <span>{item.venue}</span>
+                  {item.event.host && <span>Hosted by {item.event.host}</span>}
+                </p>
+              </div>
+              <div class="evs-row__actions">
+                {item.event.ticketUrl && (
+                  <a class="event-btn event-btn--accent" href={item.event.ticketUrl} target="_blank" rel="noopener noreferrer">
+                    {item.ticketLabel}
+                  </a>
+                )}
+                <a class="event-btn event-btn--ghost" href={item.href}>See the event</a>
+              </div>
             </li>
           ))}
         </ol>
+        <nav class="evs-pager" data-evs-pager="page" hidden></nav>
+      </section>
+    ) : (
+      <section class="event-shell evs-empty">
+        <h2 class="evs-heading">The next show is taking shape.</h2>
+        <p>Join the list and we will tell you when the date is set.</p>
+        <button type="button" class="event-btn event-btn--accent" {...updates}>Get event updates</button>
       </section>
     )
   }
 
   {
-    past.length > 0 && (
-      <section class="events-past" aria-labelledby="events-past-title">
-        <div class="event-shell events-past__head">
-          <h2 id="events-past-title">Past events</h2>
-          <p>Good nights deserve another look.</p>
+    archive.length > 0 && (
+      <section class="evs-past" aria-labelledby="evs-past-title">
+        <div class="event-shell">
+          <h2 id="evs-past-title" class="evs-heading scroll-reveal">Past events</h2>
         </div>
-        <ul class="events-past__rail">
-          {past.map((event) => {
-            const item = getEvent(event);
-            return (
-              <li>
-                <EventPoster cover={event.cover} title={event.title} href={item.href} width={520} />
-                <h3><a href={item.href}>{event.title}</a></h3>
-                <p>{item.date.month} {item.date.year}</p>
-              </li>
-            );
-          })}
+        <ul class="event-shell evs-past__grid scroll-reveal-stagger" data-evs-pages="past" data-page-size="8">
+          {archive.map((item) => (
+            <li>
+              <a class="evs-past__card" href={item.href}>
+                <span class="evs-past__poster">
+                  <EventPoster cover={item.event.cover} title={item.event.title} width={420} />
+                </span>
+                <span class="evs-past__title">{item.event.title}</span>
+                <span class="evs-past__when">{item.date.month} {item.date.year}</span>
+              </a>
+            </li>
+          ))}
         </ul>
+        <div class="event-shell">
+          <nav class="evs-pager" data-evs-pager="past" hidden></nav>
+        </div>
       </section>
     )
   }
 
-  <section class="event-shell events-signup" aria-labelledby="events-signup-title">
-    <h2 id="events-signup-title">Be there for the next one.</h2>
-    <p>New dates and ticket news, sent straight to you.</p>
-    <button type="button" class="event-btn event-btn--solid" {...updates}>Join the event list</button>
+  <section class="evs-signup theme-dark" aria-labelledby="evs-signup-title" data-evh>
+    <div class="evh__photo" aria-hidden="true">
+      <img src="/initiatives/energize-fest.webp" alt="" loading="lazy" decoding="async" />
+    </div>
+    <div class="evh__veil" aria-hidden="true"></div>
+    <div class="event-shell evs-signup__inner">
+      <h2 id="evs-signup-title" class="evs-signup__title">Be there for the next one.</h2>
+      <p>New dates and ticket news, sent straight to you.</p>
+      <button type="button" class="event-btn event-btn--accent event-btn--big" {...updates}>Join the event list</button>
+    </div>
   </section>
 
+  <DuotoneFilter />
   <SubscribeDialog />
 </main>
 
 <script>
-  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (finePointer && !reducedMotion) {
-    document.querySelectorAll<HTMLElement>('[data-event-mosaic]').forEach((mosaic) => {
-      mosaic.addEventListener('pointermove', (event) => {
-        const bounds = mosaic.getBoundingClientRect();
-        mosaic.style.setProperty('--mosaic-x', `${((event.clientX - bounds.left) / bounds.width - 0.5).toFixed(3)}`);
-        mosaic.style.setProperty('--mosaic-y', `${((event.clientY - bounds.top) / bounds.height - 0.5).toFixed(3)}`);
-      });
-      mosaic.addEventListener('pointerleave', () => {
-        mosaic.style.setProperty('--mosaic-x', '0');
-        mosaic.style.setProperty('--mosaic-y', '0');
-      });
+  import { initHeroes } from '../../lib/events/hero';
+  import { createPager } from '../../lib/ui/pagination';
+
+  const root = document.querySelector<HTMLElement>('[data-evs]');
+  initHeroes(root ?? document);
+
+  // Upcoming and past events page in place (?page=2, ?past=2). Every event stays in the HTML.
+  root?.querySelectorAll<HTMLElement>('[data-evs-pages]').forEach((list) => {
+    const key = list.dataset.evsPages ?? 'page';
+    const nav = root.querySelector<HTMLElement>(`[data-evs-pager="${key}"]`);
+    if (!nav) return;
+    const items = Array.from(list.children) as HTMLElement[];
+    const pager = createPager({
+      nav,
+      pageSize: Number(list.dataset.pageSize ?? 6),
+      param: key,
+      scrollTarget: list.closest('section'),
+      label: key === 'past' ? 'Past events pages' : 'Upcoming events pages',
     });
-  }
+    pager.render(items, items);
+  });
 </script>

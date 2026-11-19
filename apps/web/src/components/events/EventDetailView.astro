@@ -1,10 +1,13 @@
 ---
 import type { EventDetail } from '@energize/shared';
 import PortableText from '../portable/PortableText.astro';
+import EventHero from './EventHero.astro';
+import EventPoster from './EventPoster.astro';
 import EventShare from './EventShare.astro';
+import DuotoneFilter from './DuotoneFilter.astro';
 import SubscribeDialog from '../forms/SubscribeDialog.astro';
 import { getEventCoverUrl } from '../../lib/events/media';
-import { eventDateParts, formatEventLocation, formatEventType, isPastEvent, lineupDisplayName } from '../../lib/events/format';
+import { eventDateParts, formatEventLocation, isPastEvent, lineupDisplayName } from '../../lib/events/format';
 import { imageAlt } from '../../lib/seo/site';
 import { titleCase } from '../../lib/text/titleCase';
 import '../../styles/events.css';
@@ -13,15 +16,15 @@ import '../../styles/event-page.css';
 interface Props {
   event: EventDetail;
   shareUrl: string;
+  /** Other upcoming events, shown at the foot of the page. */
+  others?: EventDetail[];
 }
 
-const { event, shareUrl } = Astro.props;
+const { event, shareUrl, others = [] } = Astro.props;
 const { title, ticketUrl } = event;
 const isPast = isPastEvent(event.startDate, event.endDate);
 const date = eventDateParts(event.startDate);
 const host = event.host?.trim();
-const venue = formatEventLocation(event.location);
-const mode = event.eventType && event.eventType !== 'physical' ? formatEventType(event.eventType) : null;
 const ticketLabel = event.ctaLabel || 'Get tickets';
 const offerAlerts = !ticketUrl && !host && !isPast;
 const hasAction = !isPast && Boolean(ticketUrl || offerAlerts);
@@ -30,13 +33,9 @@ const alerts = {
   'data-subscribe-title': 'Get ticket alerts',
   'data-subscribe-lead': `Hear first when ${title} tickets go on sale.`,
 };
-const secondary = !isPast && event.secondaryCtaUrl ? {
-  href: event.secondaryCtaUrl,
-  label: event.secondaryCtaLabel || 'Learn more',
-  external: /^https?:\/\//.test(event.secondaryCtaUrl),
-} : null;
 const highlights = (event.highlights ?? []).filter((item) => item?.title && item?.body);
 const body = event.body?.length ? event.body : null;
+// Every act gets the same card, in the order set in the Studio.
 const acts = (event.lineup ?? []).filter(Boolean).map((slot) => {
   const revealed = !slot.revealState || slot.revealState === 'confirmed';
   const photo = revealed ? (slot.photo?.asset ? slot.photo : slot.artistPhoto) : undefined;
@@ -45,155 +44,116 @@ const acts = (event.lineup ?? []).filter(Boolean).map((slot) => {
     name,
     role: slot.role ? titleCase(slot.role) : undefined,
     href: revealed && slot.artistSlug ? `/artists/${slot.artistSlug}` : undefined,
-    photoUrl: getEventCoverUrl(photo, 560, 700),
-    photoAlt: imageAlt(photo?.alt, `${name} at ${title}`),
+    photoUrl: getEventCoverUrl(photo, 640, 800),
+    photoAlt: imageAlt(photo?.alt, name),
+    initials: name.split(/\s+/).map((part) => part[0]).join('').slice(0, 3).toUpperCase(),
   };
 });
-const lineupRowCount = acts.length > 14 ? 3 : 2;
-const lineupRows = Array.from({ length: lineupRowCount }, (_, rowIndex) =>
-  acts.filter((_, actIndex) => actIndex % lineupRowCount === rowIndex),
-);
-const posterSrc = getEventCoverUrl(event.cover, 1600, 2000);
+/** Up to this many acts sit in one row; longer lineups become a sideways rail. */
+const ROW_MAX = 6;
+const asRail = acts.length > ROW_MAX;
+const moreEvents = others.map((other) => ({
+  event: other,
+  href: `/events/${other.slug}`,
+  date: eventDateParts(other.startDate),
+  venue: formatEventLocation(other.location),
+}));
 const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, ${date.time}`;
 ---
 
-<article class="event-world event-detail" data-ev>
-  <header class="event-hero">
-    <div class="event-shell event-hero__grid">
-      <div class="event-hero__copy">
-        <a href="/events" class="event-hero__back"><span aria-hidden="true">←</span> All events</a>
-        <h1>{title}</h1>
-        {event.subtitle && <p class="event-hero__subtitle">{titleCase(event.subtitle)}</p>}
-
-        <div class="event-hero__facts">
-          <p><strong>{date.weekday}, {date.month} {date.day}</strong><span>{date.year} at {date.time}</span></p>
-          <p><strong>{venue}</strong>{mode && <span>{mode} event</span>}</p>
-          {host && <p><strong>Hosted by {host}</strong></p>}
-        </div>
-
-        <div class="event-actions ev-actions">
-          {isPast ? (
-            <a href="/events" class="event-btn event-btn--solid">See upcoming events</a>
-          ) : ticketUrl ? (
-            <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">{ticketLabel}</a>
-          ) : offerAlerts ? (
-            <button type="button" class="event-btn event-btn--solid" {...alerts}>Get ticket alerts</button>
-          ) : null}
-          {secondary && (
-            <a href={secondary.href} class="event-btn event-btn--ghost" {...(secondary.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
-              {secondary.label}
-            </a>
-          )}
-        </div>
-      </div>
-
-      <div class="event-hero__art">
-        <div class="event-hero-mosaic" data-event-hero-mosaic>
-          <span class="event-hero-mosaic__label">{title}</span>
-          {posterSrc ? (
-            <>
-              <span class="event-hero-mosaic__slice event-hero-mosaic__slice--one"><img src={posterSrc} alt="" /></span>
-              <span class="event-hero-mosaic__slice event-hero-mosaic__slice--two"><img src={posterSrc} alt="" /></span>
-              <span class="event-hero-mosaic__slice event-hero-mosaic__slice--three"><img src={posterSrc} alt="" /></span>
-              <span class="event-hero-mosaic__slice event-hero-mosaic__slice--four"><img src={posterSrc} alt="" /></span>
-              <img class="event-hero-mosaic__whole" src={posterSrc} alt={imageAlt(event.cover?.alt, `${title} event poster`)} />
-            </>
-          ) : (
-            <span class="event-hero-mosaic__blank">{title}</span>
-          )}
-          <span class="event-hero-mosaic__day" aria-hidden="true">{date.day}</span>
-          <span class="event-hero-mosaic__month" aria-hidden="true">{date.monthShort}</span>
-        </div>
-      </div>
-    </div>
-
-    {!isPast && (
-      <div class="event-shell event-countdown">
-        <p>Until the room opens</p>
-        <p class="ev-clock" data-countdown={event.startDate} role="timer" aria-label="Time until the event">
-          <span><strong data-unit="days">0</strong><small data-days-word>days</small></span>
-          <span><strong data-unit="hrs">00</strong><small>hours</small></span>
-          <span><strong data-unit="min">00</strong><small>minutes</small></span>
-          <span><strong data-unit="sec">00</strong><small>seconds</small></span>
-        </p>
-      </div>
-    )}
-  </header>
+<article class="event-world ev" data-ev>
+  <EventHero event={event} />
 
   {(event.summary || body) && (
-    <section class="event-shell event-story" aria-labelledby="event-story-title">
-      <h2 id="event-story-title">The night</h2>
-      <div>
-        {event.summary && <p class="event-story__lead">{event.summary}</p>}
-        {body && <div class="event-story__body"><PortableText value={body} /></div>}
-      </div>
+    <section class="event-shell ev-story" aria-labelledby="ev-story-title">
+      <h2 id="ev-story-title" class="ev-heading scroll-reveal">About the event</h2>
+      {event.summary && (
+        <p class="ev-story__lead scroll-reveal" style="--reveal-delay: 100ms">{event.summary}</p>
+      )}
+      {body && <div class="ev-story__body scroll-reveal" style="--reveal-delay: 180ms"><PortableText value={body} /></div>}
     </section>
   )}
 
   {acts.length > 0 && (
-    <section class="event-lineup" aria-labelledby="event-lineup-title">
-      <div class="event-shell">
-        <div class="event-lineup__head">
-          <h2 id="event-lineup-title">Lineup</h2>
-          <p>{acts.length} artists. One night.</p>
-        </div>
+    <section
+      class:list={['ev-lineup', asRail && 'ev-lineup--rail']}
+      aria-labelledby="ev-lineup-title"
+      data-ev-lineup={asRail ? 'rail' : 'row'}
+    >
+      <div class="event-shell ev-lineup__head">
+        <h2 id="ev-lineup-title" class="ev-heading scroll-reveal">Lineup</h2>
+        {asRail && <p class="ev-lineup__hint">{acts.length} artists. Scroll to see everyone.</p>}
       </div>
-
-      <div class:list={['event-lineup__stage', acts.length <= 10 && 'event-lineup__stage--single']}>
-        {lineupRows.map((row, rowIndex) => (
-          <div class:list={['event-lineup__track', rowIndex % 2 === 1 && 'event-lineup__track--reverse']} style={`--lineup-speed: ${Math.max(24, row.length * 7)}s`}>
-            {[0, 1].map((copyIndex) => (
-              <div class="event-lineup__run" aria-hidden={copyIndex === 1 ? 'true' : undefined}>
-                {row.map((act) => (
-                  <article class:list={['event-lineup__card', !act.photoUrl && 'event-lineup__card--missing']}>
+      <div class="ev-lineup__viewport" data-ev-rail-viewport>
+        <ul class="ev-acts" style={`--count: ${acts.length}`} data-ev-rail-track>
+          {acts.map((act, i) => {
+            const Tag = act.href ? 'a' : 'div';
+            return (
+              <li class="ev-acts__item">
+                <Tag class="ev-act" href={act.href}>
+                  <span class="ev-act__photo reveal-image" style={`--reveal-delay: ${Math.min(i, 6) * 70}ms`}>
                     {act.photoUrl ? (
-                      <img src={act.photoUrl} alt={copyIndex === 0 ? act.photoAlt : ''} width="560" height="700" loading="lazy" decoding="async" />
+                      <img src={act.photoUrl} alt={act.photoAlt} width="640" height="800" loading="lazy" decoding="async" />
                     ) : (
-                      <span class="event-lineup__missing" aria-hidden="true">Photo coming soon</span>
+                      <span class="ev-act__blank" aria-hidden="true">{act.initials}</span>
                     )}
-                    <div class="event-lineup__card-copy">
-                      <h3>{act.name}</h3>
-                      {act.role && <p>{act.role}</p>}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-
-      <details class="event-shell event-lineup__full">
-        <summary>See every artist</summary>
-        <ul>
-          {acts.map((act) => (
-            <li>
-              {act.href ? <a href={act.href}>{act.name}</a> : <span>{act.name}</span>}
-              {act.role && <small>{act.role}</small>}
-            </li>
-          ))}
+                  </span>
+                  <span class="ev-act__copy">
+                    <span class="ev-act__name">{act.name}</span>
+                    {act.role && <span class="ev-act__role">{act.role}</span>}
+                  </span>
+                </Tag>
+              </li>
+            );
+          })}
         </ul>
-      </details>
+      </div>
     </section>
   )}
 
   {highlights.length > 0 && (
-    <section class="event-shell event-notes" aria-labelledby="event-notes-title">
-      <h2 id="event-notes-title">Good to know</h2>
-      <ul>{highlights.map((item) => <li><h3>{titleCase(item.title)}</h3><p>{item.body}</p></li>)}</ul>
+    <section class="event-shell ev-notes" aria-labelledby="ev-notes-title">
+      <h2 id="ev-notes-title" class="ev-heading scroll-reveal">Good to know</h2>
+      <ul class="scroll-reveal-stagger">{highlights.map((item) => <li><h3>{titleCase(item.title)}</h3><p>{item.body}</p></li>)}</ul>
     </section>
   )}
 
-  <footer class="event-shell event-finale" data-ev-close>
-    <div>
-      <p>{date.weekday}, {date.month} {date.day} at {date.time}</p>
-      <h2>{isPast ? 'Find your next night out.' : 'Meet us there.'}</h2>
+  {moreEvents.length > 0 && (
+    <section class="event-shell ev-more" aria-labelledby="ev-more-title">
+      <h2 id="ev-more-title" class="ev-heading scroll-reveal">More events</h2>
+      <ul class="ev-more__list scroll-reveal-stagger">
+        {moreEvents.map((item) => (
+          <li>
+            <a class="ev-more__card" href={item.href}>
+              <span class="ev-more__poster">
+                <EventPoster cover={item.event.cover} title={item.event.title} width={420} />
+              </span>
+              <span class="ev-more__date">{item.date.weekday.slice(0, 3)} {item.date.day} {item.date.monthShort}, {item.date.time}</span>
+              <span class="ev-more__title">{item.event.title}</span>
+              <span class="ev-more__venue">{item.venue}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <footer class="ev-close theme-dark" data-ev-close data-evh>
+    <div class="evh__photo" aria-hidden="true">
+      <img src="/next/gaise.webp" alt="" loading="lazy" decoding="async" />
     </div>
-    <div class="event-finale__actions">
-      {!isPast && ticketUrl && <a href={ticketUrl} class="event-btn event-btn--solid" target="_blank" rel="noopener noreferrer">{ticketLabel}</a>}
-      {!isPast && offerAlerts && <button type="button" class="event-btn event-btn--solid" {...alerts}>Get ticket alerts</button>}
-      {isPast && <a href="/events" class="event-btn event-btn--solid">See upcoming events</a>}
-      <EventShare title={title} summary={event.summary} shareUrl={shareUrl} />
+    <div class="evh__veil" aria-hidden="true"></div>
+    <div class="event-shell ev-close__inner">
+      <h2 class="ev-close__title">{isPast ? 'Catch the next one.' : 'Meet us there.'}</h2>
+      <p class="ev-close__when">{date.weekday} {date.day} {date.month}, {date.time}</p>
+      <div class="ev-close__actions">
+        {!isPast && ticketUrl && (
+          <a href={ticketUrl} class="event-btn event-btn--accent event-btn--big" target="_blank" rel="noopener noreferrer" data-ev-magnet>{ticketLabel}</a>
+        )}
+        {!isPast && offerAlerts && <button type="button" class="event-btn event-btn--accent event-btn--big" data-ev-magnet {...alerts}>Get ticket alerts</button>}
+        {isPast && <a href="/events" class="event-btn event-btn--accent event-btn--big" data-ev-magnet>See upcoming events</a>}
+        <EventShare title={title} summary={event.summary} shareUrl={shareUrl} />
+      </div>
     </div>
   </footer>
 
@@ -208,23 +168,14 @@ const shortDate = `${date.weekday.slice(0, 3)} ${date.day} ${date.monthShort}, $
     </div>
   )}
 
+  <DuotoneFilter />
   <SubscribeDialog />
 </article>
 
 <script>
   import { initEventPage } from '../../lib/events/eventPage';
-  initEventPage(document.querySelector<HTMLElement>('[data-ev]'));
-
-  const mosaic = document.querySelector<HTMLElement>('[data-event-hero-mosaic]');
-  if (mosaic && window.matchMedia('(hover: hover) and (pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    mosaic.addEventListener('pointermove', (event) => {
-      const bounds = mosaic.getBoundingClientRect();
-      mosaic.style.setProperty('--hero-x', `${((event.clientX - bounds.left) / bounds.width - 0.5).toFixed(3)}`);
-      mosaic.style.setProperty('--hero-y', `${((event.clientY - bounds.top) / bounds.height - 0.5).toFixed(3)}`);
-    });
-    mosaic.addEventListener('pointerleave', () => {
-      mosaic.style.setProperty('--hero-x', '0');
-      mosaic.style.setProperty('--hero-y', '0');
-    });
-  }
+  import { initHeroes } from '../../lib/events/hero';
+  const root = document.querySelector<HTMLElement>('[data-ev]');
+  initEventPage(root);
+  initHeroes(root ?? document);
 </script>

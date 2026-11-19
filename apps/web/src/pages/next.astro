@@ -35,12 +35,12 @@ const heroImages = [
 ];
 
 const journey = [
-  { number: '01', title: 'Submissions', period: 'May', body: 'Singers and rappers across Africa enter with a performance video and an artiste profile.' },
-  { number: '02', title: 'Showcase', period: 'June', body: 'Top 50 are revealed. Public voting narrows the field to 20.' },
-  { number: '03', title: 'Finalists', period: 'July', body: 'Community votes crown the final 10 for the album.' },
-  { number: '04', title: 'Album', period: 'Jul-Aug', body: 'Finalists record the ENERGIZE Afrogospel Album.' },
-  { number: '05', title: 'Block Parties', period: 'Sep', body: 'Community nights across the participating countries.' },
-  { number: '06', title: 'Launch Concert', period: 'Oct', body: 'A pan-African concert launches the album and the finalists.' },
+  { title: 'Submissions', period: 'May', body: 'Singers and rappers across Africa enter with a performance video and an artiste profile.' },
+  { title: 'Showcase', period: 'June', body: 'Top 50 are revealed. Public voting narrows the field to 20.' },
+  { title: 'Finalists', period: 'July', body: 'Community votes crown the final 10 for the album.' },
+  { title: 'Album', period: 'Jul-Aug', body: 'Finalists record the ENERGIZE Afrogospel Album.' },
+  { title: 'Block Parties', period: 'Sep', body: 'Community nights across the participating countries.' },
+  { title: 'Launch Concert', period: 'Oct', body: 'A pan-African concert launches the album and the finalists.' },
 ];
 
 const steps = [
@@ -162,11 +162,8 @@ const faqSchema = buildFaqPageSchema(faqs, absoluteUrl('/next'));
         {
           journey.map((phase, i) => (
             <li class="next-scroll-reveal next-glass-card rounded-2xl p-6" style={`--reveal-delay: ${i * 50}ms`}>
-              <div class="flex items-baseline justify-between gap-3">
-                <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-accent)]">{phase.number}</p>
-                <p class="text-xs font-semibold uppercase tracking-wider text-fg">{phase.period}</p>
-              </div>
-              <h3 class="mt-2 font-display text-xl font-medium">{phase.title}</h3>
+              <h3 class="font-display text-xl font-medium">{phase.title}</h3>
+              <p class="mt-1 text-sm font-semibold text-[var(--color-accent)]">{phase.period}</p>
               <p class="mt-2 text-sm leading-relaxed text-fg">{phase.body}</p>
             </li>
           ))

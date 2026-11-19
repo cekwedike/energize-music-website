@@ -12,7 +12,7 @@ const { title } = Astro.props;
       <h1 class="text-display max-w-3xl font-display leading-[0.95] tracking-tight">{title}</h1>
     </div>
 
-    <div class="scroll-reveal hidden lg:block" style="--reveal-delay: 120ms">
+    <div class="reveal-image media-frame hidden lg:block" style="--reveal-delay: 120ms">
       <img
         src="/initiatives/energize-fest.webp"
         alt="Energize Music event with a global audience"
@@ -28,6 +28,6 @@ const { title } = Astro.props;
 
 <style>
   .about-hero {
-    border-bottom: 1px solid var(--color-line);
+    position: relative;
   }
 </style>
